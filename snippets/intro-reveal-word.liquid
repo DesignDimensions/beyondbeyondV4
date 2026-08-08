@@ -1,0 +1,44 @@
+{% comment %}
+  Renders one masked word of the intro tagline.
+
+  Accepts:
+  - word: {String} the word to render
+  - italic: {String} lowercased word that gets the accent treatment
+
+  Usage:
+  {% render 'intro-reveal-word', word: word, italic: italic_word %}
+{% endcomment %}
+
+{%- liquid
+  assign stripped = word | downcase | strip
+  assign is_accent = false
+  if italic != blank and stripped == italic
+    assign is_accent = true
+  endif
+
+  # Artwork is sized and nudged with its own margins, which would be cropped by
+  # the reveal mask, so that wrapper opts out of clipping entirely.
+  assign wrap_class = 'intro__w'
+  if is_accent and settings.intro_accent_image != blank
+    assign wrap_class = 'intro__w intro__w--keep'
+  endif
+-%}
+
+<span class="{{ wrap_class }}">
+  <span data-intro-word>
+    {%- if is_accent and settings.intro_accent_image != blank -%}
+      <img
+        class="intro__accent-img"
+        src="{{ settings.intro_accent_image | image_url: width: 600 }}"
+        width="{{ settings.intro_accent_image.width }}"
+        height="{{ settings.intro_accent_image.height }}"
+        alt="{{ word | escape }}"
+        loading="eager"
+      >
+    {%- elsif is_accent -%}
+      <em class="intro__em">{{ word }}</em>
+    {%- else -%}
+      {{ word }}
+    {%- endif -%}
+  </span>
+</span>

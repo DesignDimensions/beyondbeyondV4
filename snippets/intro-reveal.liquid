@@ -1,0 +1,60 @@
+{% comment %}
+  Renders the full-screen brand intro that hands the logo to the header and the
+  highlighted word to the last slot of the navigation.
+
+  Usage:
+  {% render 'intro-reveal' %}
+{% endcomment %}
+
+{%- liquid
+  assign intro_line = settings.intro_line | default: "India's first NAD+ skincare."
+  assign intro_word = settings.intro_highlight | default: 'NAD+'
+  assign line_parts = intro_line | split: intro_word
+  assign words_before = line_parts[0] | split: ' '
+  assign words_after = line_parts[1] | split: ' '
+  assign italic_word = settings.intro_italic_word | default: 'first' | downcase
+-%}
+
+<script>
+  (function () {
+    try {
+      if (window.Shopify && window.Shopify.designMode) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var forced = window.location.search.indexOf('intro') !== -1;
+      var once = {% if settings.intro_once_per_session %}true{% else %}false{% endif %};
+      if (!forced && once && sessionStorage.getItem('bb:intro-seen') === '1') return;
+      document.documentElement.classList.add('intro-running');
+    } catch (e) {}
+  })();
+</script>
+
+<div class="intro" id="IntroReveal" aria-hidden="true">
+  <div class="intro__bg" data-intro-bg></div>
+
+  <div class="intro__stage">
+    <div class="intro__logo" data-intro-logo>
+      {%- if settings.logo != blank -%}
+        {%- assign logo_height = 600 | divided_by: settings.logo.aspect_ratio -%}
+        {{
+          settings.logo
+          | image_url: width: 600
+          | image_tag: width: 600, height: logo_height, alt: '', loading: 'eager', fetchpriority: 'high'
+        }}
+      {%- else -%}
+        <span class="intro__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </div>
+
+    <p class="intro__line" data-intro-line>
+      {%- for word in words_before -%}
+        {%- render 'intro-reveal-word', word: word, italic: italic_word -%}
+      {%- endfor -%}
+      <span class="intro__w intro__w--keep">
+        <span class="intro__badge" data-intro-word data-intro-badge>{{ intro_word }}</span>
+      </span>
+      {%- for word in words_after -%}
+        {%- render 'intro-reveal-word', word: word, italic: italic_word -%}
+      {%- endfor -%}
+    </p>
+  </div>
+</div>

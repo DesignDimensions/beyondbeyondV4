@@ -59,6 +59,11 @@
     <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'standard-actions-override.js' | asset_url }}" defer="defer"></script>
 
+    {%- if settings.intro_enabled -%}
+      <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'intro-reveal.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
@@ -279,6 +284,28 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'intro-reveal.css' | asset_url | stylesheet_tag }}
+
+    {%- if settings.intro_enabled -%}
+      {%- assign intro_font_bold = settings.intro_font | font_modify: 'weight', 'bold' -%}
+      {%- assign intro_font_italic = settings.intro_font | font_modify: 'style', 'italic' -%}
+      {% style %}
+        {{ settings.intro_font | font_face: font_display: 'swap' }}
+        {{ intro_font_bold | font_face: font_display: 'swap' }}
+        {{ intro_font_italic | font_face: font_display: 'swap' }}
+
+        .intro__line,
+        .intro__logo-text {
+          font-family: {{ settings.intro_font.family }}, {{ settings.intro_font.fallback_families }};
+        }
+      {% endstyle %}
+      {% comment %}theme-check-disable AssetPreload{% endcomment %}
+      <link rel="preload" as="font" href="{{ intro_font_bold | font_url }}" type="font/woff2" crossorigin>
+      {% comment %}theme-check-enable AssetPreload{% endcomment %}
+      {%- if settings.intro_accent_image != blank -%}
+        <link rel="preload" as="image" href="{{ settings.intro_accent_image | image_url: width: 600 }}">
+      {%- endif -%}
+    {%- endif -%}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -322,6 +349,10 @@
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+    {%- if settings.intro_enabled -%}
+      {%- render 'intro-reveal' -%}
+    {%- endif -%}
+
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>

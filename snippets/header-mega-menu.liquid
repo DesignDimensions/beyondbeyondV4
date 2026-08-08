@@ -5,9 +5,17 @@
   {% render 'header-mega-menu' %}
 {% endcomment %}
 
+{%- assign nad_title = settings.intro_highlight | default: 'NAD+' | downcase -%}
+
 <nav class="header__inline-menu">
   <ul class="list-menu list-menu--inline" role="list">
     {%- for link in section.settings.menu.links -%}
+      {%- comment -%}The NAD+ pill is appended below, so drop any duplicate of it here.{%- endcomment -%}
+      {%- assign link_title = link.title | downcase | strip -%}
+      {%- if settings.intro_enabled and link_title == nad_title -%}
+        {%- assign nad_url = link.url -%}
+        {%- continue -%}
+      {%- endif -%}
       <li>
         {%- if link.links != blank -%}
           <header-menu>
@@ -90,5 +98,6 @@
         {%- endif -%}
       </li>
     {%- endfor -%}
+    {%- render 'header-nad-pill', fallback_url: nad_url -%}
   </ul>
 </nav>

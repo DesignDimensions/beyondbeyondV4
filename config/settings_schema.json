@@ -8,6 +8,62 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+    "name": "Intro animation",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "intro_enabled",
+        "default": true,
+        "label": "Enable intro animation",
+        "info": "Full-screen brand reveal that hands the logo to the header and the highlighted word to the navigation. Add ?intro to any URL to replay it."
+      },
+      {
+        "type": "checkbox",
+        "id": "intro_once_per_session",
+        "default": false,
+        "label": "Play once per session",
+        "info": "Off means it replays on every page load."
+      },
+      {
+        "type": "text",
+        "id": "intro_line",
+        "default": "India's first NAD+ skincare.",
+        "label": "Tagline"
+      },
+      {
+        "type": "font_picker",
+        "id": "intro_font",
+        "default": "raleway_n4",
+        "label": "Tagline font"
+      },
+      {
+        "type": "text",
+        "id": "intro_highlight",
+        "default": "NAD+",
+        "label": "Highlighted word",
+        "info": "Must appear in the tagline. Stays on screen and becomes the navigation pill."
+      },
+      {
+        "type": "text",
+        "id": "intro_italic_word",
+        "default": "first",
+        "label": "Italic accent word",
+        "info": "Set in italic serif for contrast. Leave blank for none."
+      },
+      {
+        "type": "image_picker",
+        "id": "intro_accent_image",
+        "label": "Accent word image",
+        "info": "Optional. Replaces the accent word with an image (a transparent GIF animates on its own). Scales to the tagline height."
+      },
+      {
+        "type": "url",
+        "id": "intro_pill_url",
+        "label": "Navigation pill link"
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.logo.name",
     "settings": [
       {

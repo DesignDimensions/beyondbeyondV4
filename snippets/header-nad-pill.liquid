@@ -1,0 +1,22 @@
+{% comment %}
+  Renders the NAD+ pill that sits last in the header navigation and doubles as
+  the landing target for the intro animation.
+
+  Accepts:
+  - fallback_url: {String} url of the menu link this pill replaced
+
+  Usage:
+  {% render 'header-nad-pill', fallback_url: nad_url %}
+{% endcomment %}
+
+{%- if settings.intro_enabled -%}
+  <li class="header__nad-item">
+    <a
+      href="{{ settings.intro_pill_url | default: fallback_url | default: routes.root_url }}"
+      class="header__nad link"
+      data-intro-target
+    >
+      <span data-intro-target-text>{{ settings.intro_highlight | default: 'NAD+' }}</span>
+    </a>
+  </li>
+{%- endif -%}

@@ -1,0 +1,181 @@
+:root {
+  --intro-blue: #0107ef;
+}
+
+/* ---------------------------------------------------------------------------
+   Header NAD+ pill — the permanent nav item the intro badge flies into.
+   --------------------------------------------------------------------------- */
+
+.header__nad-item {
+  display: flex;
+  align-items: center;
+}
+
+.header__nad {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 1.2rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 10rem;
+  background-color: var(--intro-blue);
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.05rem;
+  line-height: calc(1 + 0.3 / var(--font-body-scale));
+  white-space: nowrap;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.header__nad:hover {
+  color: #fff;
+  transform: translateY(-0.1rem);
+  box-shadow: 0 0.6rem 1.8rem rgba(1, 7, 239, 0.35);
+}
+
+.header__nad:focus-visible {
+  outline: 0.2rem solid rgb(var(--color-foreground));
+  outline-offset: 0.3rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Intro overlay
+   --------------------------------------------------------------------------- */
+
+.intro {
+  display: none;
+}
+
+html.intro-running,
+html.intro-running body {
+  overflow: hidden;
+}
+
+html.intro-running .intro {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  pointer-events: none;
+}
+
+/* Everything the intro hands back to the page starts out of sight. Inline
+   styles written by GSAP override these, so the reveal wins. */
+html.intro-running .header__heading-logo-wrapper,
+html.intro-running .header__heading-link>.h2,
+html.intro-running .header__nad-item,
+html.intro-running .header__inline-menu,
+html.intro-running .header__icons,
+html.intro-running header-drawer,
+html.intro-running .announcement-bar-section,
+html.intro-running .content-for-layout,
+html.intro-running .shopify-section-group-footer-group {
+  opacity: 0;
+}
+
+/* An empty element, so it has to out-specify and undo Dawn's
+   `div:empty { display: none }` reset in base.css. */
+.intro .intro__bg {
+  display: block;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  background-color: var(--intro-blue);
+  border-radius: 0;
+}
+
+.intro__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(3rem, 6.5vh, 7rem);
+  padding: 8vw;
+  text-align: center;
+}
+
+.intro__logo {
+  opacity: 0;
+  filter: invert(1) blur(0px) brightness(1);
+  will-change: transform, opacity, filter;
+}
+
+.intro__logo img,
+.intro__logo svg {
+  display: block;
+  width: clamp(10rem, 12.5vw, 17rem);
+  height: auto;
+}
+
+.intro__logo-text {
+  font-family: var(--font-heading-family);
+  font-size: clamp(3.2rem, 6vw, 6rem);
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.intro__line {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  column-gap: 0.4em;
+  row-gap: 0.12em;
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 2.9vw, 3.4rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+/* Inherits the tagline family; the contrast is italic and a lighter weight. */
+.intro__em {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  /* The slant eats into the gap that follows, so pay it back optically. */
+  padding-right: 0.08em;
+}
+
+/* Stands in for the accent word. The artwork carries roughly half its canvas
+   height as padding, so it is set taller than the text and pulled back into
+   the line box to keep the glyphs optically the same size as their neighbours. */
+.intro__accent-img {
+  display: block;
+  height: 6.5rem;
+  width: auto;
+  margin-block: -0.1em;
+  margin-top: -12px;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.intro__w {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
+}
+
+.intro__w--keep,
+.intro__line--lit .intro__w {
+  overflow: visible;
+}
+
+.intro__w>span {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.intro__badge {
+  display: block;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
