@@ -77,27 +77,146 @@
 </style>
 
 {%- style -%}
-  .header {
-    padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
-  }
-
-  .section-header {
-    position: sticky; /* This is for fixing a Safari z-index issue. PR #2147 */
-    margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .section-header {
-      margin-bottom: {{ section.settings.margin_bottom }}px;
-    }
-  }
-
-  @media screen and (min-width: 990px) {
     .header {
-      padding-top: {{ section.settings.padding_top }}px;
-      padding-bottom: {{ section.settings.padding_bottom }}px;
+      padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
     }
-  }
+
+    .section-header {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1000;
+      margin-bottom: 0;
+      background: transparent;
+    }
+
+    @media screen and (min-width: 750px) {
+      .section-header {
+        margin-bottom: 0;
+      }
+    }
+
+    @media screen and (min-width: 990px) {
+      .header {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+      }
+    }
+
+    .section-header .header-wrapper,
+    .section-header .header-wrapper.gradient {
+      background-color: rgba(255, 255, 255, 0) !important;
+      background-image: none !important;
+      transition: background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.52s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: background-color, backdrop-filter, box-shadow, border-color;
+    }
+
+    .section-header.scrolled-past-header .header-wrapper {
+      background-color: rgba(255, 255, 255, 0.76) !important;
+      background-image: none !important;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .section-header:not(.scrolled-past-header) .header-wrapper {
+      box-shadow: none;
+      border-bottom: none;
+    }
+
+    .shopify-section-header-sticky {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .header__icons {
+      gap: 2.5rem;
+    }
+
+    .section-header .header__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      height: auto;
+      min-width: auto;
+      min-height: auto;
+      padding: 0.35rem;
+      color: rgb(var(--color-foreground));
+    }
+
+    .section-header .header__icon span {
+      height: auto;
+    }
+
+    .section-header .header__icon .svg-wrapper {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .section-header .header__icon .icon {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    .section-header .header__icon--cart,
+    .section-header .header__icon--account {
+      margin-right: 0;
+    }
+
+    .header__search {
+      display: inline-flex !important;
+      align-items: center;
+    }
+
+    .header__icon.header__icon--search,
+    .header__search-trigger {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none !important;
+    }
+  .header__search-trigger{
+    min-width: 200px;
+    justify-content: space-between !important;
+    margin-bottom: -6px;
+    }
+    .header__search-trigger {
+      gap: 0.75rem;
+      padding-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-bottom: 1px solid currentColor;
+      text-decoration: none !important;
+      text-decoration-skip-ink: none;
+    }
+
+    .header__search-trigger .header__search-label {
+      display: inline-flex;
+      align-items: center;
+      padding-bottom: 0.08rem;
+      text-decoration: none !important;
+    }
+
+    .header__search-trigger .svg-wrapper {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .header__search-trigger .icon {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+    .header__search-trigger span:first-of-type {
+      font-size: 17px;
+      font-weight: 500;
+    }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -260,11 +379,11 @@
               {%- if customer and customer.has_avatar? -%}
                 {{ customer | avatar }}
               {%- else -%}
-                <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                <span class="svg-wrapper">{{ 'icon-account-v2.svg' | inline_asset_content }}</span>
               {%- endif -%}
             </account-icon>
           {%- else -%}
-            <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+            <span class="svg-wrapper">{{ 'icon-account-v2.svg' | inline_asset_content }}</span>
           {%- endif -%}
           <span class="visually-hidden">
             {%- liquid
@@ -287,9 +406,9 @@
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
         {% if cart == empty %}
-          <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
+          <span class="svg-wrapper">{{ 'icon-cart-v2.svg' | inline_asset_content }}</span>
         {% else %}
-          <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+          <span class="svg-wrapper">{{ 'icon-cart-v2.svg' | inline_asset_content }}</span>
         {% endif %}
         <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
         {%- if cart != empty -%}

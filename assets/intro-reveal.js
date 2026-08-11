@@ -203,7 +203,7 @@
         bg,
         {
           ...sizeOf(navPill),
-          borderRadius: () => navPill.getBoundingClientRect().height / 2,
+          borderRadius: 6,
           duration: 0.44,
           ease: 'power2.inOut',
           onUpdate: trackBadge,

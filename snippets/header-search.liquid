@@ -15,9 +15,10 @@
       aria-haspopup="dialog"
       aria-label="{{ 'general.search.search' | t }}"
     >
-      <span>
+      <span class="header__search-trigger">
+        <span>{{ 'general.search.search' | t }}</span>
         <span class="svg-wrapper">
-          {{- 'icon-search.svg' | inline_asset_content -}}
+          {{- 'icon-search-v2.svg' | inline_asset_content -}}
         </span>
         <span class="svg-wrapper header__icon-close">
           {{- 'icon-close.svg' | inline_asset_content -}}
