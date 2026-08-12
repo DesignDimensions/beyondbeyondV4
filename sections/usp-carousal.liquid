@@ -1,21 +1,55 @@
 {{ 'usp-carousal.css' | asset_url | stylesheet_tag }}
-<div class="usp-carousal-container">
-  <div class="usp-carousal-track">
-    <div class="page-width">
-      {% for block in section.blocks %}
-        <div class="usp-carousal-item">
-          <img src="{{ block.settings.icon | img_url }}" alt="{{ block.settings.title }}" class="usp-carousal-icon" />
-          <p class="usp-carousal-title">{{ block.settings.title }}</p>
+
+<div
+  class="usp-carousal-container"
+  data-usp
+  data-speed="{{ section.settings.speed }}"
+  data-direction="{{ section.settings.direction }}"
+  data-pause-on-hover="{{ section.settings.pause_on_hover }}"
+  data-scroll-effect="{{ section.settings.scroll_effect }}"
+  style="
+    --usp-bg: {{ section.settings.background_color }};
+    --usp-text: {{ section.settings.text_color }};
+    --usp-gap: {{ section.settings.item_gap }}px;
+    --usp-icon: {{ section.settings.icon_size }}px;
+  "
+>
+  <div class="usp-carousal__viewport" data-usp-viewport>
+    <div class="usp-carousal__track" data-usp-track>
+      {%- for block in section.blocks -%}
+        <div class="usp-carousal__item" {{ block.shopify_attributes }}>
+          <span class="usp-carousal__inner">
+            {%- if block.settings.icon != blank -%}
+              <img
+                class="usp-carousal__icon"
+                src="{{ block.settings.icon | image_url: width: 150 }}"
+                srcset="
+                  {{ block.settings.icon | image_url: width: 100 }} 100w,
+                  {{ block.settings.icon | image_url: width: 150 }} 150w
+                "
+                sizes="{{ section.settings.icon_size }}px"
+                width="{{ block.settings.icon.width }}"
+                height="{{ block.settings.icon.height }}"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              >
+            {%- endif -%}
+            <span class="usp-carousal__title">{{ block.settings.title }}</span>
+          </span>
         </div>
-      {% endfor %}
+      {%- endfor -%}
     </div>
   </div>
 </div>
-{{ 'usp-carousal.js' | asset_url | script_tag }}
+
+<script src="{{ 'usp-carousal.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {
   "name": "USP Carousal",
+  "tag": "section",
+  "class": "section-usp-carousal",
   "blocks": [
     {
       "type": "usp_carousal_item",
@@ -34,7 +68,81 @@
       ]
     }
   ],
-  "settings": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Scroll speed per second",
+      "default": 70
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        { "value": "left", "label": "Right to left" },
+        { "value": "right", "label": "Left to right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Slow down on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_effect",
+      "label": "React to page scrolling",
+      "info": "The strip surges and eases back as the shopper scrolls.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#0107EF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 20,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between items",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 20,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 45
+    }
+  ],
   "presets": [
     {
       "name": "USP Carousal"

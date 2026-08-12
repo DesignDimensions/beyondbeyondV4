@@ -1,59 +1,143 @@
-.usp-carousal-container {
-    background-color: #0107EF;
-}
-
-.usp-carousal-container .page-width {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: 80px;
-    padding: 25px 0;
-}
-
-.usp-carousal-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #fff;
-}
-
-.usp-carousal-icon {
-    width: 50px;
-    height: auto;
-}
-
-.usp-carousal-title {
-    margin: 0;
-    font-size: 15px;
-}
+/* ==========================================================================
+   USP Carousal — velocity-driven marquee
+   ========================================================================== */
 
 .usp-carousal-container {
-    overflow: hidden;
-    cursor: grab;
+  --usp-fade: 4rem;
+
+  position: relative;
+  background-color: var(--usp-bg, #0107ef);
+  overflow: hidden;
 }
 
-.usp-carousal-container.usp-carousal-grabbing {
-    cursor: grabbing;
+@media screen and (min-width: 750px) {
+  .usp-carousal-container {
+    --usp-fade: 9rem;
+  }
 }
 
-.usp-carousal-track {
-    display: flex;
-    width: max-content;
+/* The mask lives here rather than on the track so the edges stay put while
+   the track slides underneath, and the coloured bar itself never fades. */
+.usp-carousal__viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--usp-fade),
+    #000 calc(100% - var(--usp-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--usp-fade),
+    #000 calc(100% - var(--usp-fade)),
+    transparent 100%
+  );
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
 }
 
-.usp-carousal-track .page-width {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: 80px;
-    padding: 25px 0;
-    margin: 0;
+.usp-carousal-container.is-draggable .usp-carousal__viewport {
+  cursor: grab;
 }
 
-.usp-carousal-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #fff;
-    flex-shrink: 0;
+.usp-carousal-container.is-dragging .usp-carousal__viewport {
+  cursor: grabbing;
+}
+
+.usp-carousal__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: var(--usp-gap, 8rem);
+  padding: 2.2rem 0;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Items
+   -------------------------------------------------------------------------- */
+
+/* The item handles the reveal, the inner span handles hover — keeping them on
+   separate elements means neither transition stomps the other. */
+.usp-carousal__item {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateY(1.4rem);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--usp-i, 0) * 70ms);
+}
+
+.usp-carousal-container.is-revealed .usp-carousal__item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.usp-carousal__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--usp-text, #ffffff);
+  transform-origin: center;
+  /* Transform and opacity only: anything that reflows would change the strip's
+     width and break the loop's measured repeat distance. */
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  /* Hovering the strip recedes every item, then the one under the cursor
+     comes back forward. */
+  .usp-carousal__viewport:hover .usp-carousal__inner {
+    opacity: 0.45;
+  }
+
+  .usp-carousal__item:hover .usp-carousal__inner {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  .usp-carousal__item:hover .usp-carousal__icon {
+    transform: scale(1.14) rotate(-7deg);
+    filter: drop-shadow(0 0 1.2rem rgba(255, 255, 255, 0.45));
+  }
+}
+
+.usp-carousal__icon {
+  width: var(--usp-icon, 4.5rem);
+  height: auto;
+  flex: 0 0 auto;
+  transform-origin: center;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.usp-carousal__title {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .usp-carousal__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .usp-carousal__inner,
+  .usp-carousal__icon {
+    transition: none;
+  }
 }

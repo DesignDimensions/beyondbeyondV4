@@ -9,20 +9,40 @@
  */
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "upselling_image_slider": {
+      "type": "upselling-image-slider",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "background_color": "#C5C4C7",
+            "image_desktop": "shopify://shop_images/prime_banner_bb_1.png",
+            "link": "shopify://products/ultra-hydrating-oligo-ha-mist",
+            "link_label": "",
+            "open_in_new_tab": false,
+            "product": "ultra-hydrating-oligo-ha-mist",
+            "hotspot_x_desktop": 62,
+            "hotspot_y_desktop": 83,
+            "hotspot_x_mobile": 55,
+            "hotspot_y_mobile": 62
+          }
+        }
+      },
+      "block_order": [
+        "slide_1"
+      ],
+      "name": "Upselling Image Slider",
       "settings": {
-        "image": "shopify://shop_images/Frame_40796.jpg",
-        "image_overlay_opacity": 40,
-        "image_height": "adapt",
-        "image_behavior": "none",
-        "desktop_content_position": "bottom-center",
-        "desktop_content_alignment": "center",
-        "show_text_box": false,
-        "color_scheme": "scheme-3",
-        "stack_images_on_mobile": false,
-        "mobile_content_alignment": "center",
-        "show_text_below": false
+        "background_color": "#ffffff",
+        "hotspot_color": "#0107ef",
+        "add_button_label": "Add",
+        "added_button_label": "Added",
+        "show_arrows": true,
+        "show_dots": true,
+        "autoplay": true,
+        "autoplay_speed": 6,
+        "padding_top": 0,
+        "padding_bottom": 0
       }
     },
     "usp_carousal_m8RAJH": {
@@ -77,7 +97,7 @@
             "middle_logo": "shopify://shop_images/Group_829.png",
             "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
             "product_caption": "DERMATOLOGICALLY APPROVED",
-            "product_title": "The Ultimate Night  Repair Super Cream",
+            "product_title": "The Ultimate Night  Repair Super Cream",
             "pre_price": "Starts at",
             "ingredient_bottom": "shopify://shop_images/Group_1112.png",
             "cta": "Click to shop"
@@ -91,7 +111,7 @@
             "middle_logo": "shopify://shop_images/Group_829.png",
             "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
             "product_caption": "DERMATOLOGICALLY APPROVED",
-            "product_title": "The Ultimate Night  Repair Super Cream",
+            "product_title": "The Ultimate Night  Repair Super Cream",
             "pre_price": "Starts at",
             "ingredient_bottom": "shopify://shop_images/Group_1112.png",
             "cta": "Click to shop"
@@ -109,7 +129,7 @@
     }
   },
   "order": [
-    "image_banner",
+    "upselling_image_slider",
     "usp_carousal_m8RAJH",
     "home_bestsellers_gtGjFX"
   ]

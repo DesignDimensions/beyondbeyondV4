@@ -1,0 +1,646 @@
+/* ==========================================================================
+   Upselling Image Slider
+   Full-bleed background, page-width slider, product hotspots.
+   ========================================================================== */
+
+/* --uis-bg is re-set per slide, so the full-bleed band cross-fades along with
+   the slide transition rather than snapping. */
+.uis {
+  background-color: var(--uis-bg, #ffffff);
+  padding-top: var(--uis-padding-top, 0px);
+  padding-bottom: var(--uis-padding-bottom, 0px);
+  transition: background-color 0.6s ease;
+}
+
+.uis__inner {
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Viewport + track
+   -------------------------------------------------------------------------- */
+
+.uis__viewport {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--uis-ratio-mobile, 2.65);
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.uis__track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Follow the finger 1:1 while dragging, and jump silently between a clone
+   and its real slide. */
+.uis.is-dragging .uis__track,
+.uis__track--instant {
+  transition: none !important;
+}
+
+/* No-JS / single slide: the track is a plain block so the first slide fills it. */
+/* No overflow clipping here: the viewport already clips, and the card's
+   drop shadow needs to breathe at the slide edges. */
+.uis__slide {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.uis__link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.uis__picture,
+.uis__link > .uis__picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.uis__image,
+.uis__image--placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.uis__image--placeholder {
+  background-color: #f2f2f2;
+}
+
+.uis.is-dragging .uis__viewport {
+  cursor: grabbing;
+}
+
+.uis.is-draggable .uis__viewport {
+  cursor: grab;
+}
+
+/* Suppress the slide link while a drag is in flight. */
+.uis.is-dragging .uis__link {
+  pointer-events: none;
+}
+
+@media screen and (min-width: 750px) {
+  .uis__viewport {
+    aspect-ratio: var(--uis-ratio-desktop, 2.65);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Hotspot (+ button)
+   -------------------------------------------------------------------------- */
+
+.uis__hotspot {
+  position: absolute;
+  left: var(--uis-x-mobile, 50%);
+  top: var(--uis-y-mobile, 70%);
+  width: 0;
+  height: 0;
+  z-index: 3;
+}
+
+@media screen and (min-width: 750px) {
+  .uis__hotspot {
+    left: var(--uis-x-desktop, 59%);
+    top: var(--uis-y-desktop, 82%);
+  }
+}
+
+.uis__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--uis-hotspot, #0107ef);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media screen and (min-width: 750px) {
+  .uis__dot {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+}
+
+.uis__dot:focus-visible {
+  outline: 2px solid var(--uis-hotspot, #0107ef);
+  outline-offset: 3px;
+}
+
+.uis__dot-icon {
+  position: relative;
+  z-index: 1;
+  width: 1.2rem;
+  height: 1.2rem;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media screen and (min-width: 750px) {
+  .uis__dot-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+}
+
+/* + rotates into a × while its card is open. */
+.uis__hotspot.is-open .uis__dot-icon {
+  transform: rotate(45deg);
+}
+
+.uis__dot-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: var(--uis-hotspot, #0107ef);
+  opacity: 0.55;
+  animation: uis-pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.uis__hotspot.is-open .uis__dot-pulse {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes uis-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Product card
+   -------------------------------------------------------------------------- */
+
+/* Anchor owns positioning (set in JS); the card inside owns the animation.
+   `visibility: hidden` keeps the card measurable while removing it from the
+   accessibility tree — JS needs its box to place it before it is revealed. */
+.uis__card-anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(var(--uis-card-tx, 0px), var(--uis-card-ty, 0px));
+  width: 30rem;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.uis__card-anchor.is-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Frosted-glass panel: translucent fill over a blurred sample of the artwork
+   behind it, lifted by a bright top edge. */
+.uis__card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 1.4rem;
+  padding: 1rem;
+  border-radius: 1.8rem;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 0.1rem solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2rem) saturate(150%);
+  -webkit-backdrop-filter: blur(2rem) saturate(150%);
+  box-shadow: 0 1.2rem 3.2rem rgba(16, 24, 40, 0.14), 0 0.2rem 0.6rem rgba(16, 24, 40, 0.05);
+  transform-origin: var(--uis-card-origin, left center);
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.26s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Without backdrop-filter the translucent fill would read as muddy, so make
+   the panel mostly opaque instead. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .uis__card {
+    background-color: rgba(255, 255, 255, 0.88);
+  }
+}
+
+/* Desktop keeps the + itself as the toggle, so no close button is needed. */
+.uis__card-close {
+  display: none;
+}
+
+.uis__card-anchor.is-open .uis__card {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* GSAP drives these properties directly; CSS transitions would fight it. */
+.uis--gsap .uis__card,
+.uis--gsap .uis__track {
+  transition: none;
+}
+
+/* Portrait well for the bottle shot — it sets the card's height. */
+.uis__card-media {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7rem;
+  border-radius: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+}
+
+.uis__card-media img,
+.uis__card-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Grid, not stacked flex: the Add button has to sit on the price row while the
+   discount runs underneath it. */
+.uis__card-body {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  column-gap: 1.2rem;
+  min-width: 0;
+}
+
+.uis__card-title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 1.1rem;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #16181d;
+  text-decoration: none;
+  letter-spacing: 0;
+}
+
+/* Guarded so a tap on touch devices does not leave a stuck underline. */
+@media (hover: hover) {
+  .uis__card-title:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+  }
+}
+
+.uis__card-price {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #16181d;
+}
+
+.uis__card-discount {
+  grid-column: 1;
+  grid-row: 3;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--uis-accent, #16a34a);
+}
+
+/* Row 2 keeps the button centred on the price rather than the whole block. */
+.uis__form {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  margin: 0;
+}
+
+.uis__add {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-width: 7.4rem;
+  padding: 0.8rem 1.4rem;
+  border: 0;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  color: var(--uis-accent, #16a34a);
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  cursor: pointer;
+  box-shadow: 0 0.2rem 0.8rem rgba(16, 24, 40, 0.1);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.uis__add:hover:not([disabled]) {
+  background-color: #ffffff;
+  box-shadow: 0 0.4rem 1.2rem rgba(16, 24, 40, 0.16);
+}
+
+.uis__add:active:not([disabled]) {
+  transform: scale(0.96);
+}
+
+.uis__add:focus-visible {
+  outline: 2px solid #16181d;
+  outline-offset: 2px;
+}
+
+.uis__add[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.uis__add-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+
+.uis__add-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin: -0.7rem 0 0 -0.7rem;
+  border: 2px solid rgba(22, 163, 74, 0.25);
+  border-top-color: var(--uis-accent, #16a34a);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.uis__add.is-loading .uis__add-icon,
+.uis__add.is-loading .uis__add-label {
+  opacity: 0;
+}
+
+.uis__add.is-loading .uis__add-spinner {
+  opacity: 1;
+  animation: uis-spin 0.65s linear infinite;
+}
+
+/* Momentary confirmation state after a successful add. */
+.uis__add.is-added {
+  background-color: var(--uis-accent, #16a34a);
+  color: #ffffff;
+}
+
+.uis__add.is-added .uis__add-icon {
+  display: none;
+}
+
+.uis__add.is-error {
+  background-color: #fde8e8;
+  color: #b42318;
+  animation: uis-shake 0.4s ease;
+}
+
+@keyframes uis-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes uis-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  45% {
+    transform: translateX(4px);
+  }
+  70% {
+    transform: translateX(-2px);
+  }
+}
+
+/* Mobile: the card docks to the bottom of the image, so let it stretch. */
+@media screen and (max-width: 749px) {
+  .uis__card-anchor {
+    width: auto;
+    /* Sits above the + button, which the docked card may overlap. */
+    z-index: 2;
+  }
+
+  .uis__card {
+    border-radius: 1.6rem;
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
+
+  .uis__card-media {
+    width: 6rem;
+    height: 9rem;
+    border-radius: 1rem;
+  }
+
+  .uis__card-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    padding-right: 1.8rem;
+  }
+
+  .uis__card-price {
+    font-size: 1.7rem;
+  }
+
+  /* The docked card can cover the + button, so it dismisses itself. */
+  .uis__card-close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #6b6f76;
+    cursor: pointer;
+  }
+
+  .uis__card-close svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .uis__card-close:focus-visible {
+    outline: 2px solid #16181d;
+    outline-offset: -2px;
+  }
+
+  /* Hide the + while its card is docked over it. */
+  .uis__hotspot.is-open .uis__dot {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Arrows (desktop) — hidden on mobile per design
+   -------------------------------------------------------------------------- */
+
+.uis__arrow {
+  display: none;
+}
+
+@media screen and (min-width: 750px) {
+  .uis__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.2rem;
+    height: 4.2rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.82);
+    color: #16181d;
+    cursor: pointer;
+    opacity: 0;
+    box-shadow: 0 0.4rem 1.6rem rgba(16, 24, 40, 0.14);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity 0.28s ease, transform 0.28s ease, background-color 0.2s ease;
+  }
+
+  .uis__arrow svg {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .uis__arrow--prev {
+    left: 1.6rem;
+    transform: translate(-0.8rem, -50%);
+  }
+
+  .uis__arrow--next {
+    right: 1.6rem;
+    transform: translate(0.8rem, -50%);
+  }
+
+  .uis__arrow:hover {
+    background-color: #ffffff;
+  }
+
+  .uis:hover .uis__arrow,
+  .uis__arrow:focus-visible {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+
+  .uis__arrow:focus-visible {
+    outline: 2px solid #16181d;
+    outline-offset: 2px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Dots (mobile) — hidden on desktop per design
+   -------------------------------------------------------------------------- */
+
+.uis__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1.4rem 0 0.2rem;
+}
+
+.uis__pip {
+  width: 0.7rem;
+  height: 0.7rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background-color: rgba(22, 24, 29, 0.22);
+  cursor: pointer;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
+}
+
+.uis__pip.is-active {
+  width: 2rem;
+  background-color: var(--uis-hotspot, #0107ef);
+}
+
+.uis__pip:focus-visible {
+  outline: 2px solid #16181d;
+  outline-offset: 2px;
+}
+
+@media screen and (min-width: 750px) {
+  .uis__dots {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .uis__dot-pulse {
+    animation: none;
+    opacity: 0;
+  }
+
+  .uis,
+  .uis__track,
+  .uis__arrow,
+  .uis__pip,
+  .uis__dot-icon {
+    transition-duration: 0.01ms !important;
+  }
+}

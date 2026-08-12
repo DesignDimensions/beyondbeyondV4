@@ -1,0 +1,511 @@
+{{ 'upselling-image-slider.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    The section is as tall as its artwork: the first slide's aspect ratio sets
+    the viewport box, so every slide shares one height and nothing reflows
+    mid-transition.
+  endcomment
+  assign first_block = section.blocks.first
+
+  assign ratio_desktop = 2.65
+  if first_block.settings.image_desktop != blank
+    assign ratio_desktop = first_block.settings.image_desktop.aspect_ratio
+  elsif first_block.settings.image_mobile != blank
+    assign ratio_desktop = first_block.settings.image_mobile.aspect_ratio
+  endif
+
+  assign ratio_mobile = ratio_desktop
+  if first_block.settings.image_mobile != blank
+    assign ratio_mobile = first_block.settings.image_mobile.aspect_ratio
+  endif
+
+  comment
+    Each slide carries its own full-bleed background. Paint the first slide's
+    colour server-side so the section never flashes a fallback before the
+    slider script takes over.
+  endcomment
+  assign background_first = section.settings.background_color
+  if first_block.settings.background_color != blank
+    assign background_first = first_block.settings.background_color
+  endif
+-%}
+
+<div
+  class="uis"
+  id="uis-{{ section.id }}"
+  data-uis
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed }}"
+  data-added-label="{{ section.settings.added_button_label | default: 'Added' | escape }}"
+  style="
+    --uis-bg: {{ background_first }};
+    --uis-hotspot: {{ section.settings.hotspot_color }};
+    --uis-ratio-desktop: {{ ratio_desktop }};
+    --uis-ratio-mobile: {{ ratio_mobile }};
+    --uis-padding-top: {{ section.settings.padding_top }}px;
+    --uis-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="page-width uis__inner">
+    <div class="uis__viewport" data-uis-viewport>
+      <div class="uis__track" data-uis-track>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign image_desktop = block.settings.image_desktop
+            assign image_mobile = block.settings.image_mobile
+            if image_mobile == blank
+              assign image_mobile = image_desktop
+            endif
+
+            comment
+              The <img> carries the desktop art; <source> only overrides it on
+              small screens, so a mobile-only slide still renders an <img>.
+            endcomment
+            assign image_main = image_desktop
+            if image_main == blank
+              assign image_main = image_mobile
+            endif
+
+            assign product = block.settings.product
+            comment
+              selected_or_first_available_variant is nil when every variant is
+              sold out, so fall back to the first variant for price/id output.
+            endcomment
+            assign variant = product.selected_or_first_available_variant | default: product.variants.first
+
+            assign discount = 0
+            if variant.compare_at_price > variant.price
+              assign saved = variant.compare_at_price | minus: variant.price | times: 100.0
+              assign discount = saved | divided_by: variant.compare_at_price | round
+            endif
+
+            assign loading = 'lazy'
+            assign fetch_priority = 'auto'
+            if forloop.first
+              assign loading = 'eager'
+              assign fetch_priority = 'high'
+            endif
+
+            assign slide_background = block.settings.background_color
+            if slide_background == blank
+              assign slide_background = section.settings.background_color
+            endif
+          -%}
+
+          <div
+            class="uis__slide"
+            data-uis-slide
+            data-index="{{ forloop.index0 }}"
+            data-uis-bg="{{ slide_background }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.link != blank -%}
+              <a
+                class="uis__link"
+                href="{{ block.settings.link }}"
+                {% if block.settings.open_in_new_tab %}
+                  target="_blank" rel="noopener"
+                {% endif %}
+              >
+                <span class="visually-hidden">
+                  {{- block.settings.link_label | default: image_main.alt | default: shop.name -}}
+                </span>
+            {%- endif -%}
+
+            <picture class="uis__picture">
+              {%- if image_main != blank -%}
+                {%- if image_desktop != blank and block.settings.image_mobile != blank -%}
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {{ image_mobile | image_url: width: 450 }} 450w,
+                      {{ image_mobile | image_url: width: 750 }} 750w,
+                      {{ image_mobile | image_url: width: 1100 }} 1100w,
+                      {{ image_mobile | image_url: width: 1500 }} 1500w
+                    "
+                    sizes="calc(100vw - 3rem)"
+                    width="{{ image_mobile.width }}"
+                    height="{{ image_mobile.height }}"
+                  >
+                {%- endif -%}
+
+                <img
+                  class="uis__image"
+                  src="{{ image_main | image_url: width: 1600 }}"
+                  srcset="
+                    {{ image_main | image_url: width: 750 }} 750w,
+                    {{ image_main | image_url: width: 1100 }} 1100w,
+                    {{ image_main | image_url: width: 1500 }} 1500w,
+                    {{ image_main | image_url: width: 1900 }} 1900w,
+                    {{ image_main | image_url: width: 2400 }} 2400w
+                  "
+                  sizes="(min-width: 1200px) 1100px, (min-width: 750px) calc(100vw - 10rem), calc(100vw - 3rem)"
+                  width="{{ image_main.width }}"
+                  height="{{ image_main.height }}"
+                  alt="{{ image_main.alt | escape }}"
+                  loading="{{ loading }}"
+                  fetchpriority="{{ fetch_priority }}"
+                  decoding="async"
+                >
+              {%- else -%}
+                {{ 'hero-apparel-1' | placeholder_svg_tag: 'uis__image uis__image--placeholder' }}
+              {%- endif -%}
+            </picture>
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- endif -%}
+
+            {%- if product != blank -%}
+              <div
+                class="uis__hotspot"
+                data-uis-hotspot
+                style="
+                  --uis-x-desktop: {{ block.settings.hotspot_x_desktop }}%;
+                  --uis-y-desktop: {{ block.settings.hotspot_y_desktop }}%;
+                  --uis-x-mobile: {{ block.settings.hotspot_x_mobile }}%;
+                  --uis-y-mobile: {{ block.settings.hotspot_y_mobile }}%;
+                "
+              >
+                <button
+                  type="button"
+                  class="uis__dot"
+                  data-uis-dot
+                  aria-expanded="false"
+                  aria-label="{{ 'products.product.view_full_details' | t }} — {{ product.title | escape }}"
+                >
+                  <span class="uis__dot-pulse" aria-hidden="true"></span>
+                  <svg class="uis__dot-icon" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+                    <path d="M7 1.75v10.5M1.75 7h10.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+                  </svg>
+                </button>
+
+                <div class="uis__card-anchor" data-uis-card>
+                  <div class="uis__card">
+                    {%- comment -%}
+                      On mobile the card docks over the image and can cover the
+                      + button, so it carries its own dismiss control there.
+                    {%- endcomment -%}
+                    <button
+                      type="button"
+                      class="uis__card-close"
+                      data-uis-close
+                      aria-label="{{ 'accessibility.close' | t }}"
+                    >
+                      <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                        <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+
+                    <a class="uis__card-media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+                      {%- if product.featured_image != blank -%}
+                        <img
+                          src="{{ product.featured_image | image_url: width: 220 }}"
+                          srcset="
+                            {{ product.featured_image | image_url: width: 160 }} 160w,
+                            {{ product.featured_image | image_url: width: 320 }} 320w
+                          "
+                          sizes="70px"
+                          width="{{ product.featured_image.width }}"
+                          height="{{ product.featured_image.height }}"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        >
+                      {%- else -%}
+                        {{ 'product-1' | placeholder_svg_tag: 'uis__card-placeholder' }}
+                      {%- endif -%}
+                    </a>
+
+                    {%- comment -%}
+                      Flat children on purpose: the body is a grid so the Add
+                      button lines up with the price row, with the discount
+                      sitting underneath it.
+                    {%- endcomment -%}
+                    <div class="uis__card-body">
+                      <a class="uis__card-title" href="{{ product.url }}">{{ product.title }}</a>
+
+                      <span class="uis__card-price">{{ variant.price | money }}</span>
+
+                      {%- if discount > 0 -%}
+                        <span class="uis__card-discount">({{ discount }}% OFF)</span>
+                      {%- endif -%}
+
+                      <form
+                        method="post"
+                        action="{{ routes.cart_add_url }}"
+                        accept-charset="UTF-8"
+                        class="uis__form"
+                        data-uis-form
+                        enctype="multipart/form-data"
+                      >
+                        <input type="hidden" name="form_type" value="product">
+                        <input type="hidden" name="utf8" value="✓">
+                        <input type="hidden" name="id" value="{{ variant.id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button
+                          type="submit"
+                          class="uis__add"
+                          data-uis-add
+                          {% unless variant.available %}
+                            disabled
+                          {% endunless %}
+                        >
+                          <svg class="uis__add-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                            <path d="M6 1.5v9M1.5 6h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          </svg>
+                          <span class="uis__add-label">
+                            {%- if variant.available -%}
+                              {{ section.settings.add_button_label | default: 'Add' }}
+                            {%- else -%}
+                              {{ 'products.product.sold_out' | t }}
+                            {%- endif -%}
+                          </span>
+                          <span class="uis__add-spinner" aria-hidden="true"></span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.show_arrows and section.blocks.size > 1 -%}
+        <button type="button" class="uis__arrow uis__arrow--prev" data-uis-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+          <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+            <path d="M11.5 3.5 5.5 9l6 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button type="button" class="uis__arrow uis__arrow--next" data-uis-next aria-label="{{ 'general.slider.next_slide' | t }}">
+          <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+            <path d="M6.5 3.5 12.5 9l-6 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_dots and section.blocks.size > 1 -%}
+      <div class="uis__dots" data-uis-dots role="tablist" aria-label="{{ 'general.slider.name' | t }}">
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="uis__pip{% if forloop.first %} is-active{% endif %}"
+            data-uis-pip
+            data-index="{{ forloop.index0 }}"
+            role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-label="{{ forloop.index }} {{ 'general.slider.of' | t }} {{ section.blocks.size }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- unless settings.intro_enabled -%}
+  <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+{%- endunless -%}
+<script src="{{ 'upselling-image-slider.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Upselling Image Slider",
+  "tag": "section",
+  "class": "section-upselling-image-slider",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Fallback background color",
+      "info": "Used for slides that have no background color of their own.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hotspot_color",
+      "label": "Hotspot (+) color",
+      "default": "#0107EF"
+    },
+    {
+      "type": "text",
+      "id": "add_button_label",
+      "label": "Add to cart button label",
+      "default": "Add"
+    },
+    {
+      "type": "text",
+      "id": "added_button_label",
+      "label": "Added confirmation label",
+      "default": "Added"
+    },
+    {
+      "type": "header",
+      "content": "Slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows on desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show dots on mobile",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-rotate slides",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "label": "Change slide every",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color",
+          "info": "Fills the full screen width behind this slide.",
+          "default": "#ffffff"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_desktop",
+          "label": "Desktop image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Falls back to the desktop image when empty."
+        },
+        {
+          "type": "header",
+          "content": "Click redirection"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Slide link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link description",
+          "info": "Screen-reader text for the slide link."
+        },
+        {
+          "type": "checkbox",
+          "id": "open_in_new_tab",
+          "label": "Open link in a new tab",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Product hotspot"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Leave empty to hide the + button on this slide."
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x_desktop",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Desktop — horizontal position",
+          "default": 59
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y_desktop",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Desktop — vertical position",
+          "default": 82
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Mobile — horizontal position",
+          "default": 55
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y_mobile",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Mobile — vertical position",
+          "default": 62
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Upselling Image Slider",
+      "blocks": [
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
