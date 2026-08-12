@@ -1,0 +1,61 @@
+{% comment %}
+  Renders the decorative artwork layer of a bestseller card.
+
+  Rendered once per block inside the pinned card (stacked and cross-faded as
+  the shopper scrolls) and once inside each row's inline mobile card, so the
+  markup lives in one place.
+
+  Accepts:
+  - block: {Object} a home_bestsellers_product block
+
+  Usage:
+  {% render 'home-bestsellers-art', block: block %}
+{% endcomment %}
+
+{%- if block.settings.ingredient_left != blank -%}
+  <img
+    class="hb-card__ingredient hb-card__ingredient--left"
+    src="{{ block.settings.ingredient_left | image_url: width: 600 }}"
+    width="{{ block.settings.ingredient_left.width }}"
+    height="{{ block.settings.ingredient_left.height }}"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  >
+{%- endif -%}
+
+{%- if block.settings.ingredient_right != blank -%}
+  <img
+    class="hb-card__ingredient hb-card__ingredient--right"
+    src="{{ block.settings.ingredient_right | image_url: width: 600 }}"
+    width="{{ block.settings.ingredient_right.width }}"
+    height="{{ block.settings.ingredient_right.height }}"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  >
+{%- endif -%}
+
+{%- if block.settings.ingredient_bottom != blank -%}
+  <img
+    class="hb-card__ingredient hb-card__ingredient--bottom"
+    src="{{ block.settings.ingredient_bottom | image_url: width: 900 }}"
+    width="{{ block.settings.ingredient_bottom.width }}"
+    height="{{ block.settings.ingredient_bottom.height }}"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  >
+{%- endif -%}
+
+{%- if block.settings.middle_logo != blank -%}
+  <img
+    class="hb-card__logo"
+    src="{{ block.settings.middle_logo | image_url: width: 180 }}"
+    width="{{ block.settings.middle_logo.width }}"
+    height="{{ block.settings.middle_logo.height }}"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  >
+{%- endif -%}

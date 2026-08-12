@@ -1,106 +1,387 @@
-.home-bestsellers-products {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+/* ==========================================================================
+   Home Bestsellers — rows scroll normally, one pinned card rides along
+   ========================================================================== */
 
-.home-bestsellers-product {
-    display: flex;
-    justify-content: space-between;
-}
+/* The decorative ingredient artwork is positioned with fixed pixel offsets
+   drawn against a card of a particular size, so the card owns its height and
+   the rows follow it — never the other way round. */
+.home-bestsellers-container {
+  --hb-gap: 2rem;
+  --hb-card-h: 54rem;
+  /* 60px logo offset + 45px logo + 70px gap, matching the original flow. */
+  --hb-copy-top: 17.5rem;
 
-.home-bestsellers-product-image {
-    width: 30%;
-    height: fit-content;
-}
-
-.home-bestsellers-product-details {
-    width: 30%;
-    height: auto;
-    overflow: hidden;
-    border: 1px dashed #000;
-    position: relative;
-    justify-content: start;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    padding: 0 20px;
-    text-align: center;
-}
-
-
-.home-bestsellers-product-ingredient-left {
-    position: absolute;
-    top: -35px;
-    left: -91px;
-    width: 70%;
-}
-
-.home-bestsellers-product-ingredient-right {
-    position: absolute;
-    top: -41px;
-    right: -143px;
-    width: 83%;
-}
-
-.home-bestsellers-product-middle-logo {
-    display: flex;
-    width: 45px;
-    margin-top: 60px;
-}
-
-.home-bestsellers-product-details p:first-of-type {
-    font-weight: 600;
-    font-size: 13px;
-    color: #000;
-    margin-top: 70px;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-
-.home-bestsellers-product-details p:nth-of-type(2) {
-    font-size: 28px;
-    color: #000;
-    font-weight: 600;
-    margin: 0;
-    line-height: 1.4;
-    margin-bottom: 10px;
-}
-
-.home-bestsellers-product-details p:nth-of-type(3) {
-    margin: 0;
-    font-weight: 600;
-    font-size: 15px;
-    color: #000;
-    letter-spacing: .5px;
-}
-
-.home-bestsellers-product-ingredient-bottom {
-    position: absolute;
-    width: 150%;
-    bottom: -70px;
-}
-
-.home-bestsellers-product-link {
-    text-decoration: none;
-    color: #000;
-    margin: 0;
-    font-weight: 500;
-    font-size: 15px;
-    letter-spacing: .5px;
-    position: absolute;
-    bottom: 10px;
+  margin-top: 50px;
 }
 
 .home-bestsellers-container .section-heading {
-    text-align: center;
-    font-size: 19px;
-    font-weight: 700;
-    color: #000;
-    letter-spacing: 7px;
-    margin: 0 0 35px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 7px;
+  margin: 0 0 35px;
 }
 
-.home-bestsellers-container {
-    margin-top: 50px;
+/* --------------------------------------------------------------------------
+   Card
+   -------------------------------------------------------------------------- */
+
+.hb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: var(--hb-card-h);
+  overflow: hidden;
+  padding: 0 20px 50px;
+  border: 1px dashed #000;
+  text-align: center;
+  text-decoration: none;
+  color: #000;
+  background-color: #fff;
+}
+
+/* Artwork sits behind the copy and is the only part that differs per product,
+   so it travels while the text rolls over. */
+.hb-card__art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hb-card__face {
+  position: absolute;
+  inset: 0;
+}
+
+/* `height: auto` is load-bearing. These images carry width/height attributes
+   for CLS, and those are presentational hints that would otherwise pin the
+   height to the raw pixel value and stretch the artwork. */
+.hb-card__ingredient {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+
+/* --hb-home is where a piece rests; --hb-away is far enough past its own edge
+   that the card's overflow clips it completely. --hb-d orders the stagger. */
+.hb-card__ingredient--left {
+  --hb-d: 0;
+  --hb-home: translate3d(0, 0, 0);
+  --hb-away: translate3d(-85%, -22%, 0) rotate(-18deg) scale(0.9);
+
+  top: -35px;
+  left: -91px;
+  width: 70%;
+}
+
+.hb-card__ingredient--right {
+  --hb-d: 1;
+  --hb-home: translate3d(0, 0, 0);
+  --hb-away: translate3d(85%, -22%, 0) rotate(18deg) scale(0.9);
+
+  top: -41px;
+  right: -143px;
+  width: 83%;
+}
+
+.hb-card__ingredient--bottom {
+  --hb-d: 3;
+  --hb-home: translate3d(-50%, 0, 0);
+  --hb-away: translate3d(-50%, 110%, 0) scale(1.05);
+
+  bottom: -70px;
+  left: 50%;
+  width: 150%;
+}
+
+.hb-card__logo {
+  --hb-d: 2;
+  --hb-home: translate3d(-50%, 0, 0);
+  --hb-away: translate3d(-50%, -420%, 0) scale(0.55);
+
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  width: 45px;
+  height: auto;
+}
+
+/* Resting state — also what the mobile cards use, since they never swap. */
+.hb-card__art img {
+  transform: var(--hb-home, none);
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+/* Settling home: overshoot slightly, staggered. Used both when a new product
+   arrives and when the cursor leaves, so returning feels immediate. */
+.hb-card__face img {
+  transition-property: transform, opacity, filter;
+  transition-duration: 0.75s, 0.45s, 0.5s;
+  transition-timing-function: cubic-bezier(0.19, 1.12, 0.3, 1), ease, ease;
+  transition-delay: calc(var(--hb-d, 0) * 55ms);
+}
+
+.hb-card__face .hb-card__ingredient {
+  filter: blur(0);
+}
+
+/* Leaving: accelerate out, no delay to speak of, blurring as it goes. */
+.hb-card__face:not(.is-active) img {
+  transform: var(--hb-away, none);
+  opacity: 0;
+  transition-property: transform, opacity, filter;
+  transition-duration: 0.6s, 0.45s, 0.5s;
+  transition-timing-function: cubic-bezier(0.5, 0, 0.75, 0), ease, ease;
+  transition-delay: calc(var(--hb-d, 0) * 45ms);
+}
+
+.hb-card__face:not(.is-active) .hb-card__ingredient {
+  filter: blur(6px);
+}
+
+/* Only during a product change does the incoming set wait for the outgoing one
+   to clear. CSS cannot tell that apart from a hover return, so JS flags it. */
+.hb-card--pinned.is-swapping .hb-card__face.is-active img {
+  transition-duration: 0.9s, 0.5s, 0.6s;
+  transition-delay: calc(220ms + var(--hb-d, 0) * 80ms);
+}
+
+/* --------------------------------------------------------------------------
+   Card copy
+   -------------------------------------------------------------------------- */
+
+.hb-card__caption,
+.hb-card__title,
+.hb-card__price-row,
+.hb-card__cta {
+  position: relative;
+  z-index: 1;
+  /* Each line is animated individually by JS, so give the compositor warning. */
+  will-change: transform, opacity;
+  transition: color 0.4s ease;
+}
+
+.hb-card__caption {
+  font-weight: 600;
+  font-size: 13px;
+  color: #000;
+  margin: var(--hb-copy-top) 0 10px;
+  letter-spacing: 1px;
+}
+
+.hb-card__title {
+  font-size: 28px;
+  color: #000;
+  font-weight: 600;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.hb-card__price-row {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
+.hb-card__preprice,
+.hb-card__price {
+  display: inline-block;
+}
+
+.hb-card__cta {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+/* Underline sweeps out from the centre. Done with a pseudo-element rather than
+   a transform, because JS animates the CTA's own transform during a swap. */
+.hb-card__cta::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -0.5rem;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transform: translateX(-50%);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Hover — the card inverts and the artwork clears out
+   -------------------------------------------------------------------------- */
+
+.hb-card--pinned {
+  transition: background-color 0.45s ease, border-color 0.45s ease;
+}
+
+@media (hover: hover) {
+  .hb-card--pinned:hover {
+    background-color: var(--hb-hover-bg, #0107ef);
+    border-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .hb-card--pinned:hover .hb-card__caption,
+  .hb-card--pinned:hover .hb-card__title,
+  .hb-card--pinned:hover .hb-card__price-row,
+  .hb-card--pinned:hover .hb-card__cta {
+    color: var(--hb-hover-text, #ffffff);
+  }
+
+  .hb-card--pinned:hover .hb-card__cta::after {
+    width: 9rem;
+  }
+
+  /* Hover empties the card: every piece of artwork leaves by the same edge it
+     uses during a product change, just faster. Declared last so it outranks
+     the .is-swapping rule when both apply. */
+  .hb-card--pinned:hover .hb-card__face.is-active img {
+    transform: var(--hb-away, none);
+    opacity: 0;
+    transition-duration: 0.55s, 0.4s, 0.45s;
+    transition-timing-function: cubic-bezier(0.45, 0, 0.55, 1), ease, ease;
+    transition-delay: calc(var(--hb-d, 0) * 50ms);
+  }
+
+  .hb-card--pinned:hover .hb-card__face.is-active .hb-card__ingredient {
+    filter: blur(5px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Rows — these scroll with the page, exactly like any other content
+   -------------------------------------------------------------------------- */
+
+.hb-stack {
+  position: relative;
+}
+
+.hb-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hb-gap);
+}
+
+.hb-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--hb-gap);
+}
+
+.hb-row__media {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background-color: #f4f4f4;
+}
+
+.hb-row__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Oversized so the parallax offset can never expose an edge. */
+.hb-row__media--parallax .hb-row__img {
+  position: absolute;
+  top: -6rem;
+  left: 0;
+  height: calc(100% + 12rem);
+  will-change: transform;
+}
+
+.hb-pin-layer {
+  display: none;
+}
+
+.hb-card--inline {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Desktop — the card pins to the centre column while the rows pass it
+   -------------------------------------------------------------------------- */
+
+@media screen and (min-width: 990px) {
+  .hb-row {
+    grid-template-columns: repeat(3, 1fr);
+    height: var(--hb-card-h);
+  }
+
+  /* The centre column is deliberately empty: the travelling card sits over it. */
+  .hb-row__slot {
+    visibility: hidden;
+  }
+
+  .hb-card--inline {
+    display: none;
+  }
+
+  .hb-pin-layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--hb-gap);
+    pointer-events: none;
+  }
+
+  /* Deliberately not sticky. A sticky card holds the viewport centre and drifts
+     free of the rows, which reads as floating between them. Instead it sits at
+     the first row's position and JS parks it on whichever row is current, so it
+     scrolls with that row like the rest of the content. */
+  .hb-pin {
+    grid-column: 2;
+    align-self: start;
+    height: var(--hb-card-h);
+    pointer-events: auto;
+  }
+
+  /* Carries the spring — separate from .hb-pin so the grid geometry is never
+     disturbed by a transform. */
+  .hb-slot {
+    height: 100%;
+    will-change: transform;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-card__face,
+  .hb-card__face img,
+  .hb-card__cta::after {
+    transition: none;
+  }
+
+  /* Fade only — no travel, no blur. */
+  .hb-card__face:not(.is-active) img {
+    transform: var(--hb-home, none);
+    filter: none;
+  }
+
+  .hb-row__media--parallax .hb-row__img {
+    position: relative;
+    top: 0;
+    height: 100%;
+    transform: none !important;
+  }
 }

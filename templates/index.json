@@ -15,7 +15,7 @@
         "slide_1": {
           "type": "slide",
           "settings": {
-            "background_color": "#C5C4C7",
+            "background_color": "#c5c4c7",
             "image_desktop": "shopify://shop_images/prime_banner_bb_1.png",
             "link": "shopify://products/ultra-hydrating-oligo-ha-mist",
             "link_label": "",
@@ -84,7 +84,16 @@
         "usp_carousal_item_j3rEJh"
       ],
       "name": "USP Carousal",
-      "settings": {}
+      "settings": {
+        "speed": 70,
+        "direction": "left",
+        "pause_on_hover": true,
+        "scroll_effect": true,
+        "background_color": "#0107ef",
+        "text_color": "#ffffff",
+        "item_gap": 80,
+        "icon_size": 45
+      }
     },
     "home_bestsellers_gtGjFX": {
       "type": "home-bestsellers",
@@ -106,12 +115,12 @@
         "home_bestsellers_product_NfUgkN": {
           "type": "home_bestsellers_product",
           "settings": {
-            "product": "the-ultimate-night-repair-super-cream-1",
+            "product": "broad-spectrum-active-sunspray",
             "ingredient_left": "shopify://shop_images/photo-olive-isolated-background-Photoroom_2_1.png",
             "middle_logo": "shopify://shop_images/Group_829.png",
             "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
             "product_caption": "DERMATOLOGICALLY APPROVED",
-            "product_title": "The Ultimate Night  Repair Super Cream",
+            "product_title": "Broad Spectrum Active Sunspray",
             "pre_price": "Starts at",
             "ingredient_bottom": "shopify://shop_images/Group_1112.png",
             "cta": "Click to shop"
@@ -124,7 +133,12 @@
       ],
       "name": "Home Bestsellers",
       "settings": {
-        "heading": "SHOP BESTSELLERS"
+        "heading": "SHOP BESTSELLERS",
+        "card_height": 540,
+        "pin_length": 100,
+        "card_travel": 220,
+        "hover_background": "#0107ef",
+        "hover_text": "#ffffff"
       }
     }
   },

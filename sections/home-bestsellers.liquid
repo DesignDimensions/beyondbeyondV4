@@ -1,58 +1,206 @@
 {{ 'home-bestsellers.css' | asset_url | stylesheet_tag }}
-<div class="home-bestsellers-container">
+
+<div
+  class="home-bestsellers-container"
+  data-hb
+  data-threshold="{{ section.settings.handover_threshold }}"
+  style="
+    --hb-card-h: {{ section.settings.card_height }}px;
+    --hb-hover-bg: {{ section.settings.hover_background }};
+    --hb-hover-text: {{ section.settings.hover_text }};
+  "
+>
   <div class="page-width">
     <p class="section-heading">{{ section.settings.heading }}</p>
-    <div class="home-bestsellers-products">
-      {% for block in section.blocks %}
-        {% assign product = block.settings.product %}
-        <div class="home-bestsellers-product">
-          <img
-            src="{{ product.featured_image | image_url }}"
-            class="home-bestsellers-product-image"
-          />
-          <div class="home-bestsellers-product-details">
-            <img
-              src="{{ block.settings.ingredient_left | image_url }}"
-              class="home-bestsellers-product-ingredient-left"
-            />
-            <img
-              src="{{ block.settings.middle_logo | image_url }}"
-              class="home-bestsellers-product-middle-logo"
-            />
-            <img
-              src="{{ block.settings.ingredient_right | image_url }}"
-              class="home-bestsellers-product-ingredient-right"
-            />
-            <p>{{ block.settings.product_caption }}</p>
-            <p>{{ block.settings.product_title }}</p>
-            <p>
-              {{ block.settings.pre_price }}
-              <span>{{ product.price | money }}</span>
-            </p>
-            <img
-              src="{{ block.settings.ingredient_bottom | image_url }}"
-              class="home-bestsellers-product-ingredient-bottom"
-            />
-            <a href="{{ product.url }}" class="home-bestsellers-product-link">{{ block.settings.cta }}</a>
+
+    <div class="hb-stack" data-hb-stack>
+      <div class="hb-rows">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign product = block.settings.product
+            assign secondary = product.metafields.custom.bestseller_image
+            assign price = product.price | money
+            assign label = block.settings.product_title | default: product.title
+          -%}
+
+          <div
+            class="hb-row"
+            data-hb-row
+            data-index="{{ forloop.index0 }}"
+            data-hb-caption="{{ block.settings.product_caption | escape }}"
+            data-hb-title="{{ block.settings.product_title | escape }}"
+            data-hb-preprice="{{ block.settings.pre_price | escape }}"
+            data-hb-price="{{ price | escape }}"
+            data-hb-cta="{{ block.settings.cta | escape }}"
+            data-hb-url="{{ product.url }}"
+            {{ block.shopify_attributes }}
+          >
+            <a
+              class="hb-row__media"
+              href="{{ product.url }}"
+              aria-label="{{ label | escape }}{% if product != blank %} — {{ price | strip_html | escape }}{% endif %}"
+            >
+              {%- if product.featured_image != blank -%}
+                <img
+                  class="hb-row__img"
+                  src="{{ product.featured_image | image_url: width: 900 }}"
+                  srcset="
+                    {{ product.featured_image | image_url: width: 450 }} 450w,
+                    {{ product.featured_image | image_url: width: 900 }} 900w
+                  "
+                  sizes="(min-width: 990px) 33vw, 100vw"
+                  width="{{ product.featured_image.width }}"
+                  height="{{ product.featured_image.height }}"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'hb-row__img' }}
+              {%- endif -%}
+            </a>
+
+            {%- comment -%}
+              Empty on desktop — the travelling card sits over this column. On
+              mobile it holds that product's own card, since nothing travels.
+            {%- endcomment -%}
+            <div class="hb-row__slot">
+              <a class="hb-card hb-card--inline" href="{{ product.url }}">
+                <div class="hb-card__art">
+                  {%- render 'home-bestsellers-art', block: block -%}
+                </div>
+                <p class="hb-card__caption">{{ block.settings.product_caption }}</p>
+                <p class="hb-card__title">{{ block.settings.product_title }}</p>
+                <p class="hb-card__price-row">
+                  <span class="hb-card__preprice">{{ block.settings.pre_price }}</span>
+                  <span class="hb-card__price">{{ price }}</span>
+                </p>
+                <span class="hb-card__cta">{{ block.settings.cta }}</span>
+              </a>
+            </div>
+
+            <a
+              class="hb-row__media hb-row__media--parallax"
+              href="{{ product.url }}"
+              tabindex="-1"
+              aria-hidden="true"
+            >
+              {%- if secondary == blank -%}
+                {%- assign secondary = product.featured_image -%}
+              {%- endif -%}
+              {%- if secondary != blank -%}
+                <img
+                  class="hb-row__img"
+                  data-hb-parallax
+                  src="{{ secondary | image_url: width: 900 }}"
+                  srcset="
+                    {{ secondary | image_url: width: 450 }} 450w,
+                    {{ secondary | image_url: width: 900 }} 900w
+                  "
+                  sizes="(min-width: 990px) 33vw, 100vw"
+                  width="{{ secondary.width }}"
+                  height="{{ secondary.height }}"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- endif -%}
+            </a>
           </div>
-          <img
-            src="{{ product.metafields.custom.bestseller_image | image_url }}"
-            class="home-bestsellers-product-image"
-          />
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%}
+        The single travelling card. It parks on whichever row is most visible
+        and scrolls with it. A visual presentation of the rows' own content, so
+        it stays out of the accessibility tree — each row's image link already
+        exposes the product name and price.
+      {%- endcomment -%}
+      <div class="hb-pin-layer" aria-hidden="true">
+        <div class="hb-pin">
+          {%- comment -%}
+            Two nested elements on purpose: .hb-pin holds the grid position,
+            .hb-slot carries the spring's transform.
+          {%- endcomment -%}
+          <div class="hb-slot" data-hb-slot>
+            <a class="hb-card hb-card--pinned" data-hb-card href="{{ section.blocks.first.settings.product.url }}" tabindex="-1">
+              <div class="hb-card__art">
+                {%- for block in section.blocks -%}
+                  <div
+                    class="hb-card__face{% if forloop.first %} is-active{% endif %}"
+                    data-hb-face
+                    data-index="{{ forloop.index0 }}"
+                  >
+                    {%- render 'home-bestsellers-art', block: block -%}
+                  </div>
+                {%- endfor -%}
+              </div>
+
+              <p class="hb-card__caption" data-hb-field="caption"></p>
+              <p class="hb-card__title" data-hb-field="title"></p>
+              <p class="hb-card__price-row">
+                <span class="hb-card__preprice" data-hb-field="preprice"></span>
+                <span class="hb-card__price" data-hb-field="price"></span>
+              </p>
+              <span class="hb-card__cta" data-hb-field="cta"></span>
+            </a>
+          </div>
         </div>
-      {% endfor %}
+      </div>
     </div>
   </div>
 </div>
 
+<script src="{{ 'home-bestsellers.js' | asset_url }}" defer="defer"></script>
+
 {% schema %}
 {
   "name": "Home Bestsellers",
+  "tag": "section",
+  "class": "section-home-bestsellers",
   "settings": [
     {
       "type": "text",
       "id": "heading",
       "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "min": 320,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Card height",
+      "info": "Sets the card and the product rows together. The ingredient artwork bleeds from the card edges, so changing this moves it — 540 keeps the bottom artwork clear of the price.",
+      "default": 540
+    },
+    {
+      "type": "range",
+      "id": "handover_threshold",
+      "min": 40,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Move card at",
+      "info": "The card hops to the next product once its current row is less visible than this.",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Card hover"
+    },
+    {
+      "type": "color",
+      "id": "hover_background",
+      "label": "Hover background",
+      "default": "#0107EF"
+    },
+    {
+      "type": "color",
+      "id": "hover_text",
+      "label": "Hover text",
+      "default": "#FFFFFF"
     }
   ],
   "blocks": [
