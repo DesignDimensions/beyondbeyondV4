@@ -1,0 +1,106 @@
+.home-bestsellers-products {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.home-bestsellers-product {
+    display: flex;
+    justify-content: space-between;
+}
+
+.home-bestsellers-product-image {
+    width: 30%;
+    height: fit-content;
+}
+
+.home-bestsellers-product-details {
+    width: 30%;
+    height: auto;
+    overflow: hidden;
+    border: 1px dashed #000;
+    position: relative;
+    justify-content: start;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+    text-align: center;
+}
+
+
+.home-bestsellers-product-ingredient-left {
+    position: absolute;
+    top: -35px;
+    left: -91px;
+    width: 70%;
+}
+
+.home-bestsellers-product-ingredient-right {
+    position: absolute;
+    top: -41px;
+    right: -143px;
+    width: 83%;
+}
+
+.home-bestsellers-product-middle-logo {
+    display: flex;
+    width: 45px;
+    margin-top: 60px;
+}
+
+.home-bestsellers-product-details p:first-of-type {
+    font-weight: 600;
+    font-size: 13px;
+    color: #000;
+    margin-top: 70px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.home-bestsellers-product-details p:nth-of-type(2) {
+    font-size: 28px;
+    color: #000;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.home-bestsellers-product-details p:nth-of-type(3) {
+    margin: 0;
+    font-weight: 600;
+    font-size: 15px;
+    color: #000;
+    letter-spacing: .5px;
+}
+
+.home-bestsellers-product-ingredient-bottom {
+    position: absolute;
+    width: 150%;
+    bottom: -70px;
+}
+
+.home-bestsellers-product-link {
+    text-decoration: none;
+    color: #000;
+    margin: 0;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: .5px;
+    position: absolute;
+    bottom: 10px;
+}
+
+.home-bestsellers-container .section-heading {
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 7px;
+    margin: 0 0 35px;
+}
+
+.home-bestsellers-container {
+    margin-top: 50px;
+}

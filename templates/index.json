@@ -25,37 +25,92 @@
         "show_text_below": false
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
+    "usp_carousal_m8RAJH": {
+      "type": "usp-carousal",
+      "blocks": {
+        "usp_carousal_item_zAVqqm": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Clinically Tested"
+          }
+        },
+        "usp_carousal_item_Wk78Mc": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Clean Formulations"
+          }
+        },
+        "usp_carousal_item_pXNyfK": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Dermatologist Tested"
+          }
+        },
+        "usp_carousal_item_j3rEJh": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "India’s First NAD+ Skincare"
+          }
+        }
+      },
+      "block_order": [
+        "usp_carousal_item_zAVqqm",
+        "usp_carousal_item_Wk78Mc",
+        "usp_carousal_item_pXNyfK",
+        "usp_carousal_item_j3rEJh"
+      ],
+      "name": "USP Carousal",
+      "settings": {}
+    },
+    "home_bestsellers_gtGjFX": {
+      "type": "home-bestsellers",
+      "blocks": {
+        "home_bestsellers_product_tiqrg8": {
+          "type": "home_bestsellers_product",
+          "settings": {
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "ingredient_left": "shopify://shop_images/photo-olive-isolated-background-Photoroom_2_1.png",
+            "middle_logo": "shopify://shop_images/Group_829.png",
+            "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
+            "product_caption": "DERMATOLOGICALLY APPROVED",
+            "product_title": "The Ultimate Night  Repair Super Cream",
+            "pre_price": "Starts at",
+            "ingredient_bottom": "shopify://shop_images/Group_1112.png",
+            "cta": "Click to shop"
+          }
+        },
+        "home_bestsellers_product_NfUgkN": {
+          "type": "home_bestsellers_product",
+          "settings": {
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "ingredient_left": "shopify://shop_images/photo-olive-isolated-background-Photoroom_2_1.png",
+            "middle_logo": "shopify://shop_images/Group_829.png",
+            "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
+            "product_caption": "DERMATOLOGICALLY APPROVED",
+            "product_title": "The Ultimate Night  Repair Super Cream",
+            "pre_price": "Starts at",
+            "ingredient_bottom": "shopify://shop_images/Group_1112.png",
+            "cta": "Click to shop"
+          }
+        }
+      },
+      "block_order": [
+        "home_bestsellers_product_tiqrg8",
+        "home_bestsellers_product_NfUgkN"
+      ],
+      "name": "Home Bestsellers",
       "settings": {
-        "collection": "all",
-        "products_to_show": 8,
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "columns_desktop": 4,
-        "enable_desktop_slider": false,
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "swipe_on_mobile": false,
-        "padding_top": 44,
-        "padding_bottom": 36
+        "heading": "SHOP BESTSELLERS"
       }
     }
   },
   "order": [
     "image_banner",
-    "featured_collection"
+    "usp_carousal_m8RAJH",
+    "home_bestsellers_gtGjFX"
   ]
 }

@@ -1,0 +1,44 @@
+{{ 'usp-carousal.css' | asset_url | stylesheet_tag }}
+<div class="usp-carousal-container">
+  <div class="usp-carousal-track">
+    <div class="page-width">
+      {% for block in section.blocks %}
+        <div class="usp-carousal-item">
+          <img src="{{ block.settings.icon | img_url }}" alt="{{ block.settings.title }}" class="usp-carousal-icon" />
+          <p class="usp-carousal-title">{{ block.settings.title }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{{ 'usp-carousal.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "USP Carousal",
+  "blocks": [
+    {
+      "type": "usp_carousal_item",
+      "name": "USP Carousal Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        }
+      ]
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "USP Carousal"
+    }
+  ]
+}
+{% endschema %}

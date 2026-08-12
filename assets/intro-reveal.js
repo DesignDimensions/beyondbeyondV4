@@ -45,7 +45,7 @@
     if (intro) intro.remove();
     try {
       sessionStorage.setItem('bb:intro-seen', '1');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const failsafe = setTimeout(finish, 9000);
@@ -235,9 +235,9 @@
   const ready =
     logoImg && !logoImg.complete
       ? new Promise((res) => {
-          logoImg.addEventListener('load', res, { once: true });
-          logoImg.addEventListener('error', res, { once: true });
-        })
+        logoImg.addEventListener('load', res, { once: true });
+        logoImg.addEventListener('error', res, { once: true });
+      })
       : Promise.resolve();
 
   Promise.race([ready, new Promise((res) => setTimeout(res, 250))]).then(start);
