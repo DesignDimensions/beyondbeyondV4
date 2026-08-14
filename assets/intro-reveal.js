@@ -29,7 +29,11 @@
   ].filter(Boolean);
 
   const handBack = pageBits.concat([navPillItem]).filter(Boolean);
-  const skipEvents = ['pointerdown', 'keydown', 'wheel', 'touchmove'];
+  // Deliberate gestures only. `wheel` and `touchmove` used to be here too, but
+  // the page is locked at `overflow: hidden` while the intro plays, so those
+  // fire without moving anything — a nudged trackpad or the tail of an inertial
+  // scroll carried in from the previous page killed the intro for no gain.
+  const skipEvents = ['pointerdown', 'keydown'];
   const startWidth = window.innerWidth;
 
   let done = false;
@@ -46,6 +50,10 @@
     try {
       sessionStorage.setItem('bb:intro-seen', '1');
     } catch (e) { }
+    // Releases every section reveal that has been holding for the curtain.
+    // Fired on every exit path — completed, skipped, failsafe — so a reveal can
+    // never be stranded by the intro ending in an unexpected way.
+    document.dispatchEvent(new CustomEvent('bb:intro-done'));
   }
 
   const failsafe = setTimeout(finish, 9000);

@@ -63,8 +63,55 @@
     <script src="{{ 'search-form.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'standard-actions-override.js' | asset_url }}" defer="defer"></script>
 
+    {%- comment -%}
+      Loaded here rather than per section so there is exactly one copy on the
+      page. Two sections each requesting it ran two GSAP instances with two
+      tickers, and whichever loaded second took over `window.gsap` while the
+      first section kept tweening against the one it had already captured.
+    {%- endcomment -%}
+    <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+
+    {%- comment -%}
+      The intro covers the page while it plays, but the page underneath is laid
+      out and on screen as far as IntersectionObserver is concerned — so every
+      entry animation above the fold used to run and finish behind the curtain,
+      and the visitor met a page whose reveals had already happened. Anything
+      that animates on entry waits on this gate instead.
+
+      Inline and unconditional on purpose: it has to exist before the first
+      deferred script asks for it, and callers should not have to know whether
+      the intro is switched on, already seen this session, or suppressed by
+      reduced motion. In all of those cases there is no `intro-running` class
+      and the callback runs immediately.
+    {%- endcomment -%}
+    <script>
+      (function () {
+        var waiting = [];
+        var released = false;
+
+        function release() {
+          if (released) return;
+          released = true;
+          // Also the last-resort escape from a half-loaded intro: if
+          // intro-reveal.js never ran, this is what gives the page back.
+          document.documentElement.classList.remove('intro-running');
+          while (waiting.length) waiting.shift()();
+        }
+
+        window.bbIntroReady = function (callback) {
+          if (released || !document.documentElement.classList.contains('intro-running')) {
+            callback();
+            return;
+          }
+          waiting.push(callback);
+        };
+
+        document.addEventListener('bb:intro-done', release);
+        setTimeout(release, 12000);
+      })();
+    </script>
+
     {%- if settings.intro_enabled -%}
-      <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
       <script src="{{ 'intro-reveal.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 

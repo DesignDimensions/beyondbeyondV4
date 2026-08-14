@@ -102,9 +102,7 @@
           "type": "home_bestsellers_product",
           "settings": {
             "product": "the-ultimate-night-repair-super-cream-1",
-            "ingredient_left": "shopify://shop_images/photo-olive-isolated-background-Photoroom_2_1.png",
             "middle_logo": "shopify://shop_images/Group_829.png",
-            "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
             "product_caption": "DERMATOLOGICALLY APPROVED",
             "product_title": "The Ultimate Night  Repair Super Cream",
             "pre_price": "Starts at",
@@ -116,9 +114,7 @@
           "type": "home_bestsellers_product",
           "settings": {
             "product": "broad-spectrum-active-sunspray",
-            "ingredient_left": "shopify://shop_images/photo-olive-isolated-background-Photoroom_2_1.png",
             "middle_logo": "shopify://shop_images/Group_829.png",
-            "ingredient_right": "shopify://shop_images/photo-olive-isolated-background-Photoroom_1.png",
             "product_caption": "DERMATOLOGICALLY APPROVED",
             "product_title": "Broad Spectrum Active Sunspray",
             "pre_price": "Starts at",
@@ -135,16 +131,95 @@
       "settings": {
         "heading": "SHOP BESTSELLERS",
         "card_height": 540,
-        "pin_length": 100,
-        "card_travel": 220,
         "hover_background": "#0107ef",
         "hover_text": "#ffffff"
+      }
+    },
+    "home_philosophy_4kTxNb": {
+      "type": "home-philosophy",
+      "blocks": {
+        "callout_left": {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem ipsum",
+            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas.</p>",
+            "text_x": 4,
+            "text_y": 40,
+            "dot_x": 24,
+            "dot_y": 44,
+            "bend_x": 36,
+            "bend_y": 44,
+            "anchor_x": 42,
+            "anchor_y": 54
+          }
+        },
+        "callout_top_right": {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem",
+            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas.</p>",
+            "text_x": 64,
+            "text_y": 6,
+            "dot_x": 63,
+            "dot_y": 9,
+            "bend_x": 57,
+            "bend_y": 9,
+            "anchor_x": 54,
+            "anchor_y": 31
+          }
+        },
+        "callout_bottom_right": {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem ipsum doret",
+            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas. mentum in odio turpis egestas.</p>",
+            "text_x": 64,
+            "text_y": 70,
+            "dot_x": 63,
+            "dot_y": 74,
+            "bend_x": 59,
+            "bend_y": 74,
+            "anchor_x": 56,
+            "anchor_y": 69
+          }
+        }
+      },
+      "block_order": [
+        "callout_left",
+        "callout_top_right",
+        "callout_bottom_right"
+      ],
+      "name": "Philosophy Bubble",
+      "settings": {
+        "heading": "Lorem ipsum diam id",
+        "bubble_style": "gel",
+        "bubble_size": 340,
+        "label_image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/WHAT_IS_NAD.png?v=1786704571",
+        "label_image_w": 371,
+        "label_image_h": 217,
+        "label_scale": 52,
+        "label_alt": "What is NAD+",
+        "label_small": "WHAT IS",
+        "label_large": "NAD+",
+        "pull": 50,
+        "squeeze": 40,
+        "wobble": 45,
+        "quality": "88",
+        "float_speed": 100,
+        "stage_height": 500,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "color_background": "#ffffff",
+        "color_text": "#000000",
+        "color_line": "#0107ef",
+        "color_bubble": "#064cd7"
       }
     }
   },
   "order": [
     "upselling_image_slider",
     "usp_carousal_m8RAJH",
-    "home_bestsellers_gtGjFX"
+    "home_bestsellers_gtGjFX",
+    "home_philosophy_4kTxNb"
   ]
 }

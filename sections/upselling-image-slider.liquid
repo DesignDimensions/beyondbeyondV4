@@ -37,6 +37,7 @@
   data-uis
   data-autoplay="{{ section.settings.autoplay }}"
   data-autoplay-speed="{{ section.settings.autoplay_speed }}"
+  data-auto-open="{{ section.settings.hotspot_auto_open }}"
   data-added-label="{{ section.settings.added_button_label | default: 'Added' | escape }}"
   style="
     --uis-bg: {{ background_first }};
@@ -306,9 +307,7 @@
   </div>
 </div>
 
-{%- unless settings.intro_enabled -%}
-  <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
-{%- endunless -%}
+{%- comment -%} GSAP is loaded once, in the layout head. {%- endcomment -%}
 <script src="{{ 'upselling-image-slider.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
@@ -342,6 +341,17 @@
       "id": "added_button_label",
       "label": "Added confirmation label",
       "default": "Added"
+    },
+    {
+      "type": "range",
+      "id": "hotspot_auto_open",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Show product card after",
+      "info": "The slide's product card opens on its own once the slide has been on screen this long. Set to 0 to only open on tap. Closing a card stops it re-opening on that slide.",
+      "default": 2
     },
     {
       "type": "header",

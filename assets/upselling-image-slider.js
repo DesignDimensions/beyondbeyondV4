@@ -17,6 +17,13 @@
   var EDGE_PAD_DESKTOP = 14;
   var EDGE_PAD_MOBILE = 10;
 
+  // Holds the first auto-open until the full-screen intro has handed the page
+  // over. Runs the callback straight away when there is no intro to wait for.
+  function introReady(callback) {
+    if (typeof window.bbIntroReady === 'function') window.bbIntroReady(callback);
+    else callback();
+  }
+
   function isMobile() {
     return window.matchMedia(MOBILE_QUERY).matches;
   }
@@ -67,8 +74,17 @@
     this.swallowClick = false;
     this.autoplayTimer = null;
 
+    // Cards the shopper has dismissed, by slide index. An auto-open is a
+    // suggestion, so a slide that has been waved away is not offered again.
+    this.dismissed = {};
+    this.autoOpenTimer = null;
+    this.autoOpened = false;
+
     this.autoplayEnabled = root.dataset.autoplay === 'true';
     this.autoplaySpeed = (parseInt(root.dataset.autoplaySpeed, 10) || 6) * 1000;
+
+    var autoOpen = parseFloat(root.dataset.autoOpen);
+    this.autoOpenDelay = isNaN(autoOpen) ? 0 : autoOpen * 1000;
 
     this.buildLoop();
     this.bindEvents();
@@ -76,7 +92,15 @@
     this.applyX(-this.pos * this.width, true);
     this.updateActiveIndex();
     this.observe();
-    this.startAutoplay();
+
+    // Both held back for the intro. Rotating behind the curtain means the
+    // visitor can meet the slider already on slide two, having never seen the
+    // first one — the same class of problem as a reveal playing unwatched.
+    var self = this;
+    introReady(function () {
+      self.startAutoplay();
+      self.scheduleAutoOpen();
+    });
 
     if (this.loop) root.classList.add('is-draggable');
     this.ready = true;
@@ -246,11 +270,15 @@
       this.killTween();
       this.applyX(target, true);
       this.normalize();
+      this.scheduleAutoOpen();
       return;
     }
 
     this.animateTo(target, function () {
       self.normalize();
+      // Armed once the slide has landed, so the countdown is time spent looking
+      // at the slide rather than time spent travelling to it.
+      self.scheduleAutoOpen();
     });
   };
 
@@ -365,7 +393,13 @@
     anchor.style.setProperty('--uis-card-origin', origin);
   };
 
-  UpsellingImageSlider.prototype.openCard = function (hotspot) {
+  /**
+   * @param {Element} hotspot
+   * @param {boolean} auto Opened by the timer rather than by the shopper. An
+   *                       auto-opened card is a passive suggestion, so it does
+   *                       not hold the slider the way a deliberate one does.
+   */
+  UpsellingImageSlider.prototype.openCard = function (hotspot, auto) {
     if (!hotspot || this.openHotspot === hotspot) return;
     if (this.openHotspot) this.closeCard(true);
 
@@ -373,6 +407,8 @@
     var dot = hotspot.querySelector('[data-uis-dot]');
     if (!anchor) return;
 
+    clearTimeout(this.autoOpenTimer);
+    this.autoOpened = !!auto;
     this.openHotspot = hotspot;
     hotspot.classList.add('is-open');
     if (dot) dot.setAttribute('aria-expanded', 'true');
@@ -390,7 +426,7 @@
       );
     }
 
-    this.pauseAutoplay();
+    if (!auto) this.pauseAutoplay();
   };
 
   UpsellingImageSlider.prototype.closeCard = function (immediate) {
@@ -401,6 +437,7 @@
     var dot = hotspot.querySelector('[data-uis-dot]');
 
     this.openHotspot = null;
+    this.autoOpened = false;
     hotspot.classList.remove('is-open');
     if (dot) dot.setAttribute('aria-expanded', 'false');
 
@@ -428,6 +465,51 @@
     }
 
     this.resumeAutoplay();
+  };
+
+  // Closing the card by hand also cancels the standing offer for that slide,
+  // so the shopper is not talked over by a card they just dismissed.
+  UpsellingImageSlider.prototype.dismissCard = function () {
+    clearTimeout(this.autoOpenTimer);
+    this.dismissed[this.index] = true;
+    this.closeCard();
+  };
+
+  /* ----------------------------------------------------------------------
+     Auto-open
+     ---------------------------------------------------------------------- */
+
+  // The slide sitting at the current track position, or null when that is one
+  // of the loop clones — a clone is aria-hidden and out of the tab order, so
+  // its card must never be the one presented.
+  UpsellingImageSlider.prototype.currentHotspot = function () {
+    var slides = this.track.querySelectorAll('[data-uis-slide]');
+    var slide = slides[this.pos];
+    if (!slide || slide.hasAttribute('data-uis-clone')) return null;
+    return slide.querySelector('[data-uis-hotspot]');
+  };
+
+  // Show the current slide's product card unprompted, once the slide has been
+  // on screen long enough to have been looked at.
+  UpsellingImageSlider.prototype.scheduleAutoOpen = function () {
+    var self = this;
+
+    clearTimeout(this.autoOpenTimer);
+    if (!this.autoOpenDelay) return;
+
+    var index = this.index;
+    if (this.dismissed[index]) return;
+
+    this.autoOpenTimer = setTimeout(function () {
+      // Every one of these can change during the wait.
+      if (self.index !== index) return;
+      if (self.openHotspot || self.dragState) return;
+      if (!self.inView || document.hidden) return;
+      if (self.dismissed[index]) return;
+
+      var hotspot = self.currentHotspot();
+      if (hotspot) self.openCard(hotspot, true);
+    }, this.autoOpenDelay);
   };
 
   /* ----------------------------------------------------------------------
@@ -543,7 +625,10 @@
     if (!this.autoplayEnabled || !this.loop || reducedMotion()) return;
 
     this.autoplayTimer = setInterval(function () {
-      if (self.hovering || !self.inView || document.hidden || self.openHotspot || self.dragState) return;
+      if (self.hovering || !self.inView || document.hidden || self.dragState) return;
+      // A card the shopper opened holds the slider; one that opened itself must
+      // not, or the slider would stop on the first slide and never move again.
+      if (self.openHotspot && !self.autoOpened) return;
       // Hold for keyboard users only. A plain mouse click leaves :focus on the
       // arrow but not :focus-visible, so clicking an arrow must not stop
       // autoplay for the rest of the session.
@@ -711,7 +796,7 @@
           event.preventDefault();
           event.stopPropagation();
           var openDot = self.openHotspot && self.openHotspot.querySelector('[data-uis-dot]');
-          self.closeCard();
+          self.dismissCard();
           if (openDot) openDot.focus();
           return;
         }
@@ -721,7 +806,7 @@
           event.preventDefault();
           event.stopPropagation();
           var hotspot = dot.closest('[data-uis-hotspot]');
-          if (self.openHotspot === hotspot) self.closeCard();
+          if (self.openHotspot === hotspot) self.dismissCard();
           else self.openCard(hotspot);
           return;
         }
@@ -755,7 +840,7 @@
       keydown: function (event) {
         if (event.key === 'Escape' && self.openHotspot) {
           var dot = self.openHotspot.querySelector('[data-uis-dot]');
-          self.closeCard();
+          self.dismissCard();
           if (dot) dot.focus();
           return;
         }
@@ -778,7 +863,7 @@
 
         // Dismissing the card should not also follow the slide's link.
         if (self.root.contains(event.target)) self.swallowNextClick();
-        self.closeCard();
+        self.dismissCard();
       },
 
       enter: function () {
@@ -813,7 +898,11 @@
     if ('IntersectionObserver' in window) {
       this.intersectionObserver = new IntersectionObserver(
         function (entries) {
+          var was = self.inView;
           self.inView = entries[0].isIntersecting;
+          // A countdown that ran out while the section was scrolled past is
+          // dropped rather than fired late, so re-arm it on the way back in.
+          if (self.inView && !was) self.scheduleAutoOpen();
         },
         { threshold: 0.15 }
       );
@@ -850,6 +939,7 @@
     this.killTween();
     this.endDrag();
 
+    clearTimeout(this.autoOpenTimer);
     cancelAnimationFrame(this.resizeFrame);
     if (this.intersectionObserver) this.intersectionObserver.disconnect();
     if (this.resizeObserver) this.resizeObserver.disconnect();

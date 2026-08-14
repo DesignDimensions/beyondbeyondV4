@@ -7,11 +7,18 @@
  * lean (skewX) is derived from how far `speed` currently sits from its
  * resting rate, so the strip visibly reacts to its own motion.
  *
- * Deliberately GSAP-free: the theme only loads GSAP when the intro animation
- * is switched on, and this strip must not freeze when a merchant turns it off.
+ * Deliberately GSAP-free: nothing here should depend on another library having
+ * loaded, so the strip cannot freeze because a dependency went missing.
  */
 (function () {
   'use strict';
+
+  // Holds the entry reveal until the full-screen intro has handed the page over.
+  // Runs the callback straight away when there is no intro to wait for.
+  function introReady(callback) {
+    if (typeof window.bbIntroReady === 'function') window.bbIntroReady(callback);
+    else callback();
+  }
 
   var SPEED_TAU = 0.55; // seconds for speed to close most of the gap to target
   var SKEW_TAU = 0.14;
@@ -344,8 +351,12 @@
           self.inView = entries[0].isIntersecting;
 
           if (self.inView) {
-            self.root.classList.add('is-revealed');
-            if (!document.hidden) self.start();
+            introReady(function () {
+              // The strip may well have scrolled back out during the intro.
+              if (!self.inView) return;
+              self.root.classList.add('is-revealed');
+              if (!document.hidden) self.start();
+            });
           } else {
             self.stop();
           }

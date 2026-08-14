@@ -1,0 +1,372 @@
+/* ==========================================================================
+   Philosophy Bubble — a floating gel bubble with three annotated callouts
+   ==========================================================================
+   The stage is a fixed-height box on desktop; everything inside it is placed
+   with percentages so the art stays composed as the viewport changes. Below
+   750px the whole thing collapses into a plain stack and the connector lines
+   drop away, since there is nothing left to connect.
+   ========================================================================== */
+
+.home-philosophy {
+  --hp-bg: #fff;
+  --hp-text: #000;
+  --hp-line: #0107ef;
+  --hp-bubble-size: 220px;
+  --hp-stage-h: 500px;
+  --hp-pad-top: 60px;
+  --hp-pad-bottom: 60px;
+
+  position: relative;
+  background: var(--hp-bg);
+  color: var(--hp-text);
+  padding: var(--hp-pad-top) 0 var(--hp-pad-bottom);
+  overflow: hidden;
+}
+
+.hp-heading {
+  margin: 0 auto 4rem;
+  max-width: 90%;
+  text-align: center;
+  /* Deliberately the body face: the heading face is only loaded at 700, and
+     the design wants the lighter weight. */
+  font-family: var(--font-body-family);
+  font-size: clamp(2.8rem, 4.4vw, 5rem);
+  font-weight: var(--font-body-weight);
+  line-height: 1.15;
+  letter-spacing: 0;
+  color: var(--hp-text);
+}
+
+/* --------------------------------------------------------------------------
+   Stage
+   -------------------------------------------------------------------------- */
+
+.hp-stage {
+  position: relative;
+  height: var(--hp-stage-h);
+  max-width: 145rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Bubble
+   -------------------------------------------------------------------------- */
+
+.hp-bubble-wrap {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  width: var(--hp-bubble-size);
+  height: var(--hp-bubble-size);
+  margin: calc(var(--hp-bubble-size) / -2) 0 0 calc(var(--hp-bubble-size) / -2);
+  /* Written by the script every frame: the drift + cursor pull offset. */
+  transform: translate3d(var(--hp-x, 0px), var(--hp-y, 0px), 0);
+  will-change: transform;
+}
+
+.hp-bubble {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Squash and stretch, rotated onto the axis the bubble is travelling along. */
+  transform: rotate(var(--hp-squeeze-angle, 0deg)) scale(var(--hp-sx, 1), var(--hp-sy, 1))
+    rotate(calc(var(--hp-squeeze-angle, 0deg) * -1));
+  will-change: transform;
+}
+
+/* Wider than it is tall, because the droplet travels mostly sideways — the
+   callouts sit left and right of the bubble, so that is where the cursor
+   spends its time. Height stays at 2x the bubble box; going taller would push
+   the canvas past the section and get it clipped. */
+.hp-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300%;
+  height: 200%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Once the blob is live it stands in for the flat bubble entirely. */
+.hp--gl .hp-bubble__fallback,
+.hp--gl .hp-bubble__img {
+  display: none;
+}
+
+/* The blob does its own moving inside the scene, so the wrapper holds still
+   and the label is told where the core drifted to. */
+.hp--gl .hp-bubble {
+  transform: none;
+}
+
+.hp--gl .hp-bubble__label {
+  transform: translate(var(--hp-label-x, 0px), var(--hp-label-y, 0px));
+}
+
+.hp-bubble__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Stand-in for the artwork so the section never renders empty in the editor. */
+.hp-bubble__fallback {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 70% 78%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 68%);
+  /* After the shorthand, or it would be reset by it. Heavily lightened: the
+     setting holds a saturated brand colour for the shader to derive from, which
+     as a flat fill would be an opaque blue ball. */
+  background-color: #eaf0fc;
+  background-color: color-mix(in srgb, var(--hp-bubble-tint, #064cd7) 10%, white);
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.9),
+    inset -8px -12px 26px rgba(150, 165, 195, 0.35),
+    0 18px 40px rgba(120, 140, 180, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.hp-bubble__label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  color: #2b2b2b;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Width tracks the Bubble size setting, so resizing the bubble does not leave
+   the label behind. Height comes from the intrinsic ratio. */
+.hp-bubble__label-img {
+  display: block;
+  width: calc(var(--hp-bubble-size) * var(--hp-label-w, 52) / 100);
+  height: auto;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hp-bubble__label-small {
+  font-size: calc(var(--hp-bubble-size) * 0.098);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.hp-bubble__label-large {
+  font-size: calc(var(--hp-bubble-size) * 0.17);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-top: calc(var(--hp-bubble-size) * 0.03);
+}
+
+/* --------------------------------------------------------------------------
+   Connector lines and dots
+   -------------------------------------------------------------------------- */
+
+.hp-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hp-line {
+  fill: none;
+  stroke: var(--hp-line);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.hp-dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--hp-line);
+  pointer-events: none;
+}
+
+.hp-dot--anchor {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Callouts
+   -------------------------------------------------------------------------- */
+
+.hp-callout {
+  position: absolute;
+  width: min(34rem, 30vw);
+}
+
+.hp-callout__title {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-body-family);
+  font-size: clamp(1.9rem, 2.1vw, 2.6rem);
+  font-weight: var(--font-body-weight);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--hp-text);
+}
+
+.hp-callout__text {
+  font-size: clamp(1.4rem, 1.2vw, 1.6rem);
+  line-height: 1.55;
+  color: var(--hp-text);
+}
+
+.hp-callout__text > * {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Reveal on scroll — the line draws itself, the copy fades up behind it
+   -------------------------------------------------------------------------- */
+
+.home-philosophy[data-hp-animate] [data-hp-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--hp-delay, 0ms),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--hp-delay, 0ms);
+}
+
+.home-philosophy[data-hp-animate] .hp-dot {
+  transform: scale(0);
+  transition:
+    opacity 0.4s ease var(--hp-delay, 0ms),
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) var(--hp-delay, 0ms);
+}
+
+/* The no-JS fallback fades the lines rather than drawing them. Drawing needs a
+   dash length measured in screen space, which CSS alone cannot express on a
+   non-uniformly scaled SVG — declaring it in user units draws only part of the
+   line and leaves it hanging short of its dot. */
+.home-philosophy[data-hp-animate] .hp-line {
+  opacity: 0;
+  transition: opacity 0.7s ease var(--hp-line-delay, 0ms);
+}
+
+.home-philosophy[data-hp-animate] .hp-bubble-wrap {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.home-philosophy[data-hp-animate].is-in-view [data-hp-reveal] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.home-philosophy[data-hp-animate].is-in-view .hp-dot {
+  transform: scale(1);
+}
+
+.home-philosophy[data-hp-animate].is-in-view .hp-line {
+  opacity: 1;
+}
+
+.home-philosophy[data-hp-animate].is-in-view .hp-bubble-wrap {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — stack the callouts, drop the connectors
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 989px) {
+  .hp-callout {
+    width: min(30rem, 33vw);
+  }
+
+  .hp-callout__text {
+    font-size: 1.3rem;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .home-philosophy {
+    --hp-bubble-size: min(58vw, 260px);
+  }
+
+  .hp-heading {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .hp-stage {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.5rem;
+    padding: 0 2.4rem;
+  }
+
+  .hp-lines,
+  .hp-dot {
+    display: none;
+  }
+
+  .hp-bubble-wrap {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 1rem 0 1.5rem;
+    order: -1;
+  }
+
+  .hp-callout {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100%;
+    max-width: 44rem;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — hold everything still and visible
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .home-philosophy[data-hp-animate] [data-hp-reveal],
+  .home-philosophy[data-hp-animate] .hp-bubble-wrap {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .home-philosophy[data-hp-animate] .hp-dot {
+    transform: scale(1);
+  }
+
+  .home-philosophy[data-hp-animate] .hp-line {
+    opacity: 1;
+    transition: none;
+  }
+}

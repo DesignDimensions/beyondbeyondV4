@@ -12,30 +12,6 @@
   {% render 'home-bestsellers-art', block: block %}
 {% endcomment %}
 
-{%- if block.settings.ingredient_left != blank -%}
-  <img
-    class="hb-card__ingredient hb-card__ingredient--left"
-    src="{{ block.settings.ingredient_left | image_url: width: 600 }}"
-    width="{{ block.settings.ingredient_left.width }}"
-    height="{{ block.settings.ingredient_left.height }}"
-    alt=""
-    loading="lazy"
-    decoding="async"
-  >
-{%- endif -%}
-
-{%- if block.settings.ingredient_right != blank -%}
-  <img
-    class="hb-card__ingredient hb-card__ingredient--right"
-    src="{{ block.settings.ingredient_right | image_url: width: 600 }}"
-    width="{{ block.settings.ingredient_right.width }}"
-    height="{{ block.settings.ingredient_right.height }}"
-    alt=""
-    loading="lazy"
-    decoding="async"
-  >
-{%- endif -%}
-
 {%- if block.settings.ingredient_bottom != blank -%}
   <img
     class="hb-card__ingredient hb-card__ingredient--bottom"

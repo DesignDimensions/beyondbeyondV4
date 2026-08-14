@@ -1,0 +1,587 @@
+{%- liquid
+  assign s = section.settings
+  assign bubble_img = s.image
+
+  comment
+    A picked asset wins over the pasted URL, so the artwork can be moved into
+    theme assets later without editing the URL field. The intrinsic size travels
+    with it either way — an img without width/height shifts the layout as it
+    loads.
+  endcomment
+  assign label_img = s.label_image
+  if label_img != blank
+    assign label_src = label_img | image_url: width: 900
+    assign label_w = label_img.width
+    assign label_h = label_img.height
+  else
+    assign label_src = s.label_image_url
+    assign label_w = s.label_image_w
+    assign label_h = s.label_image_h
+  endif
+-%}
+
+{{ 'home-philosophy.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  three.js and its MarchingCubes helper only load on pages carrying this
+  section, and only for the gel style — the image style needs neither.
+{%- endcomment -%}
+{%- if s.bubble_style == 'gel' -%}
+  <script src="{{ 'three.min.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'marching-cubes.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'home-philosophy-blob.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+{%- comment -%}
+  theme.liquid only loads GSAP for the intro, so pull it in when that is off.
+  Guarded to avoid executing the library twice on pages that already have it.
+{%- endcomment -%}
+{%- comment -%} GSAP is loaded once, in the layout head. {%- endcomment -%}
+<script src="{{ 'home-philosophy.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="home-philosophy"
+  data-hp
+  data-pull="{{ s.pull }}"
+  data-squeeze="{{ s.squeeze }}"
+  data-float="{{ s.float_speed }}"
+  data-style="{{ s.bubble_style }}"
+  data-tint="{{ s.color_bubble }}"
+  data-wobble="{{ s.wobble }}"
+  data-quality="{{ s.quality }}"
+  data-env="{{ 'home-philosophy-env.jpg' | asset_url }}"
+  style="
+    --hp-bg: {{ s.color_background }};
+    --hp-bubble-tint: {{ s.color_bubble }};
+    --hp-text: {{ s.color_text }};
+    --hp-line: {{ s.color_line }};
+    --hp-bubble-size: {{ s.bubble_size }}px;
+    --hp-stage-h: {{ s.stage_height }}px;
+    --hp-pad-top: {{ s.padding_top }}px;
+    --hp-pad-bottom: {{ s.padding_bottom }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- if s.heading != blank -%}
+    <h2 class="hp-heading" data-hp-reveal>{{ s.heading }}</h2>
+  {%- endif -%}
+
+  <div class="hp-stage" data-hp-stage>
+    {%- comment -%}
+      One overlay SVG for every connector line. The viewBox is a plain 0–1000
+      grid stretched over the stage (preserveAspectRatio="none"), so every point
+      is just the block's percentage setting × 10 and the ends stay glued to the
+      text and the bubble at any viewport width. Non-scaling strokes keep the
+      hairline even once the grid is stretched, and the round end caps read as
+      the little dots in the design.
+    {%- endcomment -%}
+    <svg
+      class="hp-lines"
+      viewBox="0 0 1000 1000"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign x1 = b.dot_x | times: 10
+          assign y1 = b.dot_y | times: 10
+          assign x2 = b.bend_x | times: 10
+          assign y2 = b.bend_y | times: 10
+          assign x3 = b.anchor_x | times: 10
+          assign y3 = b.anchor_y | times: 10
+        -%}
+        <polyline
+          class="hp-line"
+          data-hp-line
+          style="--hp-line-delay: {{ forloop.index0 | times: 120 }}ms"
+          points="{{ x1 }},{{ y1 }} {{ x2 }},{{ y2 }} {{ x3 }},{{ y3 }}"
+        />
+      {%- endfor -%}
+    </svg>
+
+    {%- comment -%}
+      The dots live in HTML rather than in the SVG: the overlay grid is stretched
+      non-uniformly, which would turn an SVG circle into an ellipse.
+    {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      {%- assign b = block.settings -%}
+      <span
+        class="hp-dot hp-dot--text"
+        data-hp-reveal
+        style="left: {{ b.dot_x }}%; top: {{ b.dot_y }}%; --hp-delay: {{ forloop.index0 | times: 120 | plus: 120 }}ms"
+        aria-hidden="true"
+      ></span>
+      <span
+        class="hp-dot hp-dot--anchor"
+        data-hp-reveal
+        style="left: {{ b.anchor_x }}%; top: {{ b.anchor_y }}%; --hp-delay: {{ forloop.index0 | times: 120 | plus: 320 }}ms"
+        aria-hidden="true"
+      ></span>
+    {%- endfor -%}
+
+    <div class="hp-bubble-wrap" data-hp-bubble-wrap>
+      <div class="hp-bubble" data-hp-bubble>
+        {%- comment -%}
+          The gel blob is drawn into a canvas the script appends here. The
+          markup below stays as the fallback for a merchant-supplied image, and
+          for browsers without WebGL — the script hides it once the blob is up.
+        {%- endcomment -%}
+        {%- if bubble_img != blank and s.bubble_style == 'image' -%}
+          <img
+            class="hp-bubble__img"
+            src="{{ bubble_img | image_url: width: 900 }}"
+            srcset="
+              {{ bubble_img | image_url: width: 450 }} 450w,
+              {{ bubble_img | image_url: width: 900 }} 900w
+            "
+            sizes="{{ s.bubble_size }}px"
+            width="{{ bubble_img.width }}"
+            height="{{ bubble_img.height }}"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          >
+        {%- else -%}
+          <span class="hp-bubble__fallback" aria-hidden="true"></span>
+        {%- endif -%}
+
+        {%- if label_src != blank -%}
+          <span class="hp-bubble__label" style="--hp-label-w: {{ s.label_scale }}">
+            <img
+              class="hp-bubble__label-img"
+              src="{{ label_src }}"
+              width="{{ label_w }}"
+              height="{{ label_h }}"
+              alt="{{ s.label_alt | escape }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </span>
+        {%- elsif s.label_small != blank or s.label_large != blank -%}
+          <span class="hp-bubble__label">
+            {%- if s.label_small != blank -%}
+              <span class="hp-bubble__label-small">{{ s.label_small }}</span>
+            {%- endif -%}
+            {%- if s.label_large != blank -%}
+              <strong class="hp-bubble__label-large">{{ s.label_large }}</strong>
+            {%- endif -%}
+          </span>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- for block in section.blocks -%}
+      {%- assign b = block.settings -%}
+      <div
+        class="hp-callout"
+        data-hp-reveal
+        style="
+          left: {{ b.text_x }}%;
+          top: {{ b.text_y }}%;
+          --hp-delay: {{ forloop.index0 | times: 120 }}ms;
+        "
+        {{ block.shopify_attributes }}
+      >
+        {%- if b.title != blank -%}
+          <p class="hp-callout__title">{{ b.title }}</p>
+        {%- endif -%}
+        {%- if b.text != blank -%}
+          <div class="hp-callout__text">{{ b.text }}</div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Philosophy Bubble",
+  "tag": "section",
+  "class": "section-home-philosophy",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Lorem ipsum diam id"
+    },
+    {
+      "type": "header",
+      "content": "Bubble"
+    },
+    {
+      "type": "select",
+      "id": "bubble_style",
+      "label": "Bubble style",
+      "options": [
+        {
+          "value": "gel",
+          "label": "3D gel (WebGL)"
+        },
+        {
+          "value": "image",
+          "label": "Image"
+        }
+      ],
+      "default": "gel",
+      "info": "The 3D gel blob is drawn live and deforms towards the cursor. Falls back to the image, or a glass placeholder, where WebGL is unavailable."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Bubble image",
+      "info": "Used when the style above is set to Image."
+    },
+    {
+      "type": "range",
+      "id": "bubble_size",
+      "label": "Bubble size",
+      "min": 120,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "image_picker",
+      "id": "label_image",
+      "label": "Label image"
+    },
+    {
+      "type": "text",
+      "id": "label_image_url",
+      "label": "Label image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/WHAT_IS_NAD.png?v=1786704571",
+      "info": "Used when no image is picked above. Clear both to fall back to the text lines."
+    },
+    {
+      "type": "number",
+      "id": "label_image_w",
+      "label": "Label image width (px)",
+      "default": 371,
+      "info": "Intrinsic size of the URL image, so the browser reserves space before it loads. Ignored when an image is picked."
+    },
+    {
+      "type": "number",
+      "id": "label_image_h",
+      "label": "Label image height (px)",
+      "default": 217
+    },
+    {
+      "type": "range",
+      "id": "label_scale",
+      "label": "Label width",
+      "min": 25,
+      "max": 90,
+      "step": 1,
+      "unit": "%",
+      "default": 52,
+      "info": "Percentage of the bubble's width."
+    },
+    {
+      "type": "text",
+      "id": "label_alt",
+      "label": "Label alt text",
+      "default": "What is NAD+"
+    },
+    {
+      "type": "text",
+      "id": "label_small",
+      "label": "Label — small line",
+      "default": "WHAT IS"
+    },
+    {
+      "type": "text",
+      "id": "label_large",
+      "label": "Label — large line",
+      "default": "NAD+"
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "range",
+      "id": "pull",
+      "label": "Cursor attraction",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "squeeze",
+      "label": "Squeeze strength",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "wobble",
+      "label": "Surface wobble",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 45,
+      "info": "How much the gel blob's own surface churns. 3D gel style only."
+    },
+    {
+      "type": "select",
+      "id": "quality",
+      "label": "Blob quality",
+      "options": [
+        {
+          "value": "64",
+          "label": "Low — fastest"
+        },
+        {
+          "value": "88",
+          "label": "Medium"
+        },
+        {
+          "value": "116",
+          "label": "High — smoothest"
+        }
+      ],
+      "default": "88",
+      "info": "The surface is rebuilt on the CPU every frame, and the cost grows with the cube of this value. Drop it if the section feels heavy."
+    },
+    {
+      "type": "range",
+      "id": "float_speed",
+      "label": "Float speed",
+      "min": 20,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "stage_height",
+      "label": "Stage height",
+      "min": 360,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#ffffff",
+      "info": "Note that the bubble's white highlights composite to nothing against pure white. A slightly off-white background makes it read brighter."
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_line",
+      "label": "Connector lines",
+      "default": "#0107ef"
+    },
+    {
+      "type": "color",
+      "id": "color_bubble",
+      "label": "Bubble colour",
+      "default": "#064cd7",
+      "info": "Drives the whole glass palette. Pick a saturated colour, not a pale one — the body takes a trace of it while the contour and shadow take much more. Highlights stay white on top."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "callout",
+      "name": "Callout",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Lorem ipsum"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas.</p>"
+        },
+        {
+          "type": "header",
+          "content": "Position",
+          "info": "All values are a percentage of the stage — left/top for the text, then the two dots and the bend in the line between them."
+        },
+        {
+          "type": "range",
+          "id": "text_x",
+          "label": "Text — from left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "text_y",
+          "label": "Text — from top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 41
+        },
+        {
+          "type": "range",
+          "id": "dot_x",
+          "label": "Text dot — from left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 30
+        },
+        {
+          "type": "range",
+          "id": "dot_y",
+          "label": "Text dot — from top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 46
+        },
+        {
+          "type": "range",
+          "id": "bend_x",
+          "label": "Bend — from left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 42
+        },
+        {
+          "type": "range",
+          "id": "bend_y",
+          "label": "Bend — from top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 51
+        },
+        {
+          "type": "range",
+          "id": "anchor_x",
+          "label": "Bubble dot — from left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 44
+        },
+        {
+          "type": "range",
+          "id": "anchor_y",
+          "label": "Bubble dot — from top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 53
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Philosophy Bubble",
+      "blocks": [
+        {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem ipsum",
+            "text_x": 4,
+            "text_y": 40,
+            "dot_x": 24,
+            "dot_y": 44,
+            "bend_x": 36,
+            "bend_y": 44,
+            "anchor_x": 42,
+            "anchor_y": 54
+          }
+        },
+        {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem",
+            "text_x": 64,
+            "text_y": 6,
+            "dot_x": 63,
+            "dot_y": 9,
+            "bend_x": 57,
+            "bend_y": 9,
+            "anchor_x": 54,
+            "anchor_y": 31
+          }
+        },
+        {
+          "type": "callout",
+          "settings": {
+            "title": "Lorem ipsum doret",
+            "text_x": 64,
+            "text_y": 70,
+            "dot_x": 63,
+            "dot_y": 74,
+            "bend_x": 59,
+            "bend_y": 74,
+            "anchor_x": 56,
+            "anchor_y": 69
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

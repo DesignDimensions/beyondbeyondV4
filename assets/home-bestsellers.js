@@ -12,33 +12,36 @@
  *   - the artwork leaves by the edge it lives on and the next set arrives
  *   - the card springs a whole row up or down to its new home
  *
- * That move is a spring integrated per frame rather than a CSS easing curve.
- * An easing curve can only overshoot once; a spring keeps trading position for
- * velocity, so it wobbles down to rest. Its velocity also drives a slight tilt,
- * so the card leans into its own movement.
+ * That move is a spring integrated per frame rather than a CSS easing curve, so
+ * it stays smooth when a fast scroll interrupts it mid-flight and retargets. It
+ * is tuned close to critically damped: the card glides to the new row and stops
+ * there, with only a few pixels of give at the end.
  */
 (function () {
   'use strict';
 
   var DESKTOP_QUERY = '(min-width: 990px)';
   var FIELDS = ['caption', 'title', 'preprice', 'price', 'cta'];
-  var STAGGER = { caption: 0, title: 45, preprice: 90, price: 90, cta: 135 };
-  var OUT_MS = 260;
-  var IN_MS = 420;
+  // The stagger is what sets how long the card reads as empty: the last line to
+  // leave is also the last to come back, so it is kept tight on the way out.
+  var STAGGER = { caption: 0, title: 35, preprice: 70, price: 70, cta: 105 };
+  var OUT_MS = 220;
+  var IN_MS = 380;
 
-  // Spring constants, tuned by feel: the low damping is what keeps the wobble
-  // alive for a beat instead of settling on the first pass.
-  var STIFFNESS = 0.14;
-  var DAMPING = 0.76;
+  // Spring constants. Damping ratio lands near 0.75, which is about 1% overshoot
+  // on a full row — enough to read as settling rather than stopping dead, but
+  // not a visible bounce. Lower DAMPING is *more* friction; it scales velocity.
+  var STIFFNESS = 0.095;
+  var DAMPING = 0.66;
   // Terminal velocity. Without it the overshoot would scale with the distance
   // travelled, and a full row jump would fling the card far past its target.
-  var MAX_VELOCITY = 22; // px per step
+  // Set just under the spring's natural peak so it trims the fling without
+  // flattening the whole journey into a constant-speed slide.
+  var MAX_VELOCITY = 30; // px per step
   var STEP = 1 / 60; // fixed integration step, so the spring is frame-rate independent
   var MAX_FRAME = 0.05;
   var REST_POSITION = 0.05;
   var REST_VELOCITY = 0.05;
-  var TILT_PER_VELOCITY = 0.12;
-  var MAX_TILT = 2.6; // degrees
   var DEFAULT_THRESHOLD = 0.6; // hand over once the current row is less visible than this
   var PARALLAX = 60; // px of counter-drift at the extremes of the viewport
 
@@ -263,9 +266,7 @@
 
   HomeBestsellers.prototype.render = function () {
     if (!this.slot) return;
-    var tilt = clamp(this.velocity * TILT_PER_VELOCITY, -MAX_TILT, MAX_TILT);
-    this.slot.style.transform =
-      'translate3d(0, ' + this.y.toFixed(2) + 'px, 0) rotate(' + tilt.toFixed(3) + 'deg)';
+    this.slot.style.transform = 'translate3d(0, ' + this.y.toFixed(2) + 'px, 0)';
   };
 
   HomeBestsellers.prototype.settled = function () {

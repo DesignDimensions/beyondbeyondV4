@@ -92,8 +92,17 @@ function percentageSeen(element) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  initializeScrollAnimationTrigger();
-  initializeScrollZoomAnimationTrigger();
+  const start = () => {
+    initializeScrollAnimationTrigger();
+    initializeScrollZoomAnimationTrigger();
+  };
+
+  // Anything already in the viewport intersects the moment it is observed. With
+  // the intro playing that means the above-the-fold reveals run to completion
+  // while the page is still hidden behind it, and the visitor sees a page whose
+  // animations have already finished. Wait for the curtain.
+  if (typeof window.bbIntroReady === 'function') window.bbIntroReady(start);
+  else start();
 });
 
 if (Shopify.designMode) {
