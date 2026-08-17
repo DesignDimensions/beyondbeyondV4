@@ -295,7 +295,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Desktop — the card pins to the centre column while the rows pass it
+   Desktop — the card holds the centre of the viewport while the rows pass it
    -------------------------------------------------------------------------- */
 
 @media screen and (min-width: 990px) {
@@ -318,26 +318,25 @@
     inset: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    /* A single full-height row, so the card's grid area is the whole span of
+       the rows. That area is what clamps the sticky card — with an auto row it
+       would be only as tall as the card and could never travel. */
+    grid-template-rows: 1fr;
     gap: var(--hb-gap);
     pointer-events: none;
   }
 
-  /* Deliberately not sticky. A sticky card holds the viewport centre and drifts
-     free of the rows, which reads as floating between them. Instead it sits at
-     the first row's position and JS parks it on whichever row is current, so it
-     scrolls with that row like the rest of the content. */
+  /* The card holds the vertical centre of the viewport and rides the scroll for
+     the length of the section, clamped by the layer so it never leaves the
+     first or last row. The offset is in viewport units on purpose: a percentage
+     `top` would resolve against the layer's height, not the screen. */
   .hb-pin {
+    position: sticky;
+    top: calc(50vh - var(--hb-card-h) / 2);
     grid-column: 2;
     align-self: start;
     height: var(--hb-card-h);
     pointer-events: auto;
-  }
-
-  /* Carries the spring — separate from .hb-pin so the grid geometry is never
-     disturbed by a transform. */
-  .hb-slot {
-    height: 100%;
-    will-change: transform;
   }
 }
 

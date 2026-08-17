@@ -111,40 +111,35 @@
       </div>
 
       {%- comment -%}
-        The single travelling card. It parks on whichever row is most visible
-        and scrolls with it. A visual presentation of the rows' own content, so
-        it stays out of the accessibility tree — each row's image link already
+        The single travelling card. It holds the centre of the viewport and
+        rides the scroll for the whole section, showing whichever row it is
+        passing over. A visual presentation of the rows' own content, so it
+        stays out of the accessibility tree — each row's image link already
         exposes the product name and price.
       {%- endcomment -%}
       <div class="hb-pin-layer" aria-hidden="true">
         <div class="hb-pin">
-          {%- comment -%}
-            Two nested elements on purpose: .hb-pin holds the grid position,
-            .hb-slot carries the spring's transform.
-          {%- endcomment -%}
-          <div class="hb-slot" data-hb-slot>
-            <a class="hb-card hb-card--pinned" data-hb-card href="{{ section.blocks.first.settings.product.url }}" tabindex="-1">
-              <div class="hb-card__art">
-                {%- for block in section.blocks -%}
-                  <div
-                    class="hb-card__face{% if forloop.first %} is-active{% endif %}"
-                    data-hb-face
-                    data-index="{{ forloop.index0 }}"
-                  >
-                    {%- render 'home-bestsellers-art', block: block -%}
-                  </div>
-                {%- endfor -%}
-              </div>
+          <a class="hb-card hb-card--pinned" data-hb-card href="{{ section.blocks.first.settings.product.url }}" tabindex="-1">
+            <div class="hb-card__art">
+              {%- for block in section.blocks -%}
+                <div
+                  class="hb-card__face{% if forloop.first %} is-active{% endif %}"
+                  data-hb-face
+                  data-index="{{ forloop.index0 }}"
+                >
+                  {%- render 'home-bestsellers-art', block: block -%}
+                </div>
+              {%- endfor -%}
+            </div>
 
-              <p class="hb-card__caption" data-hb-field="caption"></p>
-              <p class="hb-card__title" data-hb-field="title"></p>
-              <p class="hb-card__price-row">
-                <span class="hb-card__preprice" data-hb-field="preprice"></span>
-                <span class="hb-card__price" data-hb-field="price"></span>
-              </p>
-              <span class="hb-card__cta" data-hb-field="cta"></span>
-            </a>
-          </div>
+            <p class="hb-card__caption" data-hb-field="caption"></p>
+            <p class="hb-card__title" data-hb-field="title"></p>
+            <p class="hb-card__price-row">
+              <span class="hb-card__preprice" data-hb-field="preprice"></span>
+              <span class="hb-card__price" data-hb-field="price"></span>
+            </p>
+            <span class="hb-card__cta" data-hb-field="cta"></span>
+          </a>
         </div>
       </div>
     </div>
@@ -178,13 +173,13 @@
     {
       "type": "range",
       "id": "handover_threshold",
-      "min": 40,
+      "min": 50,
       "max": 90,
       "step": 5,
       "unit": "%",
-      "label": "Move card at",
-      "info": "The card hops to the next product once its current row is less visible than this.",
-      "default": 60
+      "label": "Change product at",
+      "info": "The card's copy and artwork change once the row it is moving onto covers this much of the card. Higher holds the current product for longer.",
+      "default": 50
     },
     {
       "type": "header",

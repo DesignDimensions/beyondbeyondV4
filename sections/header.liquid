@@ -134,6 +134,36 @@
         right: 0;
       }
 
+      /* Slide out of the way going down, slide back in coming up. The section is
+         `position: fixed`, so the theme's own hidden state — which drops `top` to
+         -(header height) — is outranked by the `top: 0` above and never shows. A
+         transform is the better mechanism regardless: it runs on the compositor,
+         so the slide holds up over a busy page. `top` is pinned here so the two
+         mechanisms can never both fire and hide the header twice over. */
+      .section-header,
+      .section-header.animate {
+        transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
+      }
+
+      .section-header.shopify-section-header-hidden {
+        top: 0;
+        transform: translate3d(0, -100%, 0);
+      }
+
+      /* An open drawer or menu owns the header — it stays put even if the page
+         scrolls underneath it. */
+      .section-header.shopify-section-header-hidden.menu-open {
+        transform: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .section-header,
+        .section-header.animate {
+          transition: none;
+        }
+      }
+
       .header__icons {
         gap: 2.5rem;
       }

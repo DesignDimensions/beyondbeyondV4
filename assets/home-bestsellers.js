@@ -1,21 +1,20 @@
 /**
- * Home Bestsellers — rows scroll normally, one card hops between them.
+ * Home Bestsellers — rows scroll normally, one card holds the viewport centre.
  *
  * The product rows are ordinary content and scroll with the page. The card is
- * parked on one row at a time and scrolls with it, so it never drifts free
- * between two rows. Once its row falls below the visibility threshold, the card
- * springs to whichever neighbour is more visible — up or down, following the
- * scroll.
+ * sticky: it rides the scroll with the section and stays vertically centred in
+ * the viewport for the whole run, clamped to the rows so it never escapes the
+ * first or last one. That positioning is CSS (`position: sticky` on .hb-pin) —
+ * this file only decides *what* the card shows.
  *
- * When the card moves to a new row:
+ * As the card moves off one row and onto the next:
  *   - the copy rolls out upward, changes, and rolls back in from below
  *   - the artwork leaves by the edge it lives on and the next set arrives
- *   - the card springs a whole row up or down to its new home
  *
- * That move is a spring integrated per frame rather than a CSS easing curve, so
- * it stays smooth when a fast scroll interrupts it mid-flight and retargets. It
- * is tuned close to critically damped: the card glides to the new row and stops
- * there, with only a few pixels of give at the end.
+ * The hand-over point is geometric rather than a scroll offset: card and rows
+ * are the same height, so whichever row the card covers most is the row it is
+ * on. Measured from live rects each frame, so it is right at any scroll speed
+ * and survives a resize with nothing to re-measure.
  */
 (function () {
   'use strict';
@@ -28,21 +27,10 @@
   var OUT_MS = 220;
   var IN_MS = 380;
 
-  // Spring constants. Damping ratio lands near 0.75, which is about 1% overshoot
-  // on a full row — enough to read as settling rather than stopping dead, but
-  // not a visible bounce. Lower DAMPING is *more* friction; it scales velocity.
-  var STIFFNESS = 0.095;
-  var DAMPING = 0.66;
-  // Terminal velocity. Without it the overshoot would scale with the distance
-  // travelled, and a full row jump would fling the card far past its target.
-  // Set just under the spring's natural peak so it trims the fling without
-  // flattening the whole journey into a constant-speed slide.
-  var MAX_VELOCITY = 30; // px per step
-  var STEP = 1 / 60; // fixed integration step, so the spring is frame-rate independent
-  var MAX_FRAME = 0.05;
-  var REST_POSITION = 0.05;
-  var REST_VELOCITY = 0.05;
-  var DEFAULT_THRESHOLD = 0.6; // hand over once the current row is less visible than this
+  // Share of the card the incoming row has to cover before the content changes.
+  // At 0.5 that is the moment the card is more on the new row than the old one;
+  // higher holds the current product past halfway.
+  var DEFAULT_THRESHOLD = 0.5;
   var PARALLAX = 60; // px of counter-drift at the extremes of the viewport
 
   function reducedMotion() {
@@ -64,7 +52,6 @@
     if (!this.rows.length) return;
 
     this.card = root.querySelector('[data-hb-card]');
-    this.slot = root.querySelector('[data-hb-slot]');
     this.faces = Array.prototype.slice.call(root.querySelectorAll('[data-hb-face]'));
     this.parallax = Array.prototype.slice.call(root.querySelectorAll('[data-hb-parallax]'));
 
@@ -78,22 +65,12 @@
 
     this.index = -1;
     this.animations = {};
-    this.offsets = [];
-    this.y = 0;
-    this.target = 0;
-    this.velocity = 0;
-    this.accumulator = 0;
-    this.last = 0;
     this.raf = null;
     this.inView = false;
 
     this.tick = this.tick.bind(this);
 
-    // measure() first: apply() derives the spring target from these offsets.
-    this.measure();
-    this.apply(this.mostVisible(), false);
-    this.y = this.target;
-    this.render();
+    this.apply(this.rowUnderCard(), false);
     this.bindEvents();
     this.observe();
 
@@ -104,65 +81,76 @@
      Geometry
      ---------------------------------------------------------------------- */
 
-  // Where each row sits relative to the first. The card is translated by these,
-  // so it lands exactly on a row rather than anywhere between two.
-  HomeBestsellers.prototype.measure = function () {
-    var base = this.rows[0].offsetTop;
-    this.offsets = this.rows.map(function (row) {
-      return row.offsetTop - base;
-    });
+  HomeBestsellers.prototype.cardRect = function () {
+    // Zero height means the card is not laid out — mobile hides the pin layer.
+    if (!this.card) return { top: 0, bottom: 0, height: 0 };
+    return this.card.getBoundingClientRect();
   };
 
   /**
-   * How much of a row is on screen, 0 to 1. Measured against the smaller of the
-   * row and the viewport so a row taller than the screen can still read as 1.
+   * How much of the card a row is under, 0 to 1. Measured as a share of the
+   * card, not the row, so the threshold means the same thing whatever height
+   * the merchant picks.
    */
-  HomeBestsellers.prototype.visibility = function (index) {
-    var rect = this.rows[index].getBoundingClientRect();
-    var height = window.innerHeight;
-    var shown = Math.min(rect.bottom, height) - Math.max(rect.top, 0);
-    var reference = Math.min(rect.height, height);
-    if (reference <= 0) return 0;
-    return clamp(shown / reference, 0, 1);
+  HomeBestsellers.prototype.coverage = function (index, rect) {
+    if (rect.height <= 0) return 0;
+    var row = this.rows[index].getBoundingClientRect();
+    var shared = Math.min(rect.bottom, row.bottom) - Math.max(rect.top, row.top);
+    return clamp(shared / rect.height, 0, 1);
   };
 
-  HomeBestsellers.prototype.mostVisible = function () {
+  /**
+   * The row the card is sitting on: the one it covers most. If it covers none
+   * of them — parked in a gap, or measured before layout — fall back to the
+   * nearest centre so there is always an answer.
+   */
+  HomeBestsellers.prototype.rowUnderCard = function (rect) {
+    rect = rect || this.cardRect();
+
     var best = 0;
-    var bestValue = -1;
+    var bestValue = 0;
+
     for (var i = 0; i < this.rows.length; i++) {
-      var value = this.visibility(i);
+      var value = this.coverage(i, rect);
       if (value > bestValue) {
         bestValue = value;
         best = i;
       }
     }
-    return best;
+
+    if (bestValue > 0) return best;
+
+    var centre = rect.top + rect.height / 2;
+    var nearest = 0;
+    var shortest = Infinity;
+
+    for (var j = 0; j < this.rows.length; j++) {
+      var box = this.rows[j].getBoundingClientRect();
+      var distance = Math.abs(box.top + box.height / 2 - centre);
+      if (distance < shortest) {
+        shortest = distance;
+        nearest = j;
+      }
+    }
+
+    return nearest;
   };
 
   /**
-   * Hand the card over only when its row has dropped below the threshold AND a
-   * neighbour is genuinely more visible. Requiring both is what stops the card
-   * flapping between two rows around the boundary.
+   * Hand the card over once it is more on another row than on its own, and that
+   * row covers at least the threshold. Requiring the coverage as well as the
+   * lead is what keeps the copy from changing the instant the card's edge
+   * crosses the gap between two rows.
    */
   HomeBestsellers.prototype.handover = function () {
-    if (this.index < 0) return;
+    var rect = this.cardRect();
+    if (rect.height <= 0) return;
 
-    var current = this.visibility(this.index);
-    if (current >= this.threshold) return;
+    var next = this.rowUnderCard(rect);
+    if (next === this.index) return;
+    if (this.coverage(next, rect) < this.threshold) return;
 
-    var best = this.index;
-    var bestValue = current;
-
-    [this.index - 1, this.index + 1].forEach(function (candidate) {
-      if (candidate < 0 || candidate >= this.rows.length) return;
-      var value = this.visibility(candidate);
-      if (value > bestValue) {
-        bestValue = value;
-        best = candidate;
-      }
-    }, this);
-
-    if (best !== this.index) this.apply(best, true);
+    this.apply(next, true);
   };
 
   /* ----------------------------------------------------------------------
@@ -178,7 +166,6 @@
     if (index < 0 || index >= this.rows.length) return;
 
     this.index = index;
-    this.target = this.offsets[index] || 0;
 
     var row = this.rows[index];
 
@@ -198,8 +185,6 @@
         }, 1500);
       }
     }
-
-    if (animate) this.wake();
 
     this.faces.forEach(function (face, i) {
       face.classList.toggle('is-active', i === index);
@@ -261,53 +246,13 @@
   };
 
   /* ----------------------------------------------------------------------
-     Spring
+     Frame loop — runs only while the section is on screen
      ---------------------------------------------------------------------- */
 
-  HomeBestsellers.prototype.render = function () {
-    if (!this.slot) return;
-    this.slot.style.transform = 'translate3d(0, ' + this.y.toFixed(2) + 'px, 0)';
-  };
-
-  HomeBestsellers.prototype.settled = function () {
-    return Math.abs(this.target - this.y) < REST_POSITION && Math.abs(this.velocity) < REST_VELOCITY;
-  };
-
-  /* ----------------------------------------------------------------------
-     Frame loop
-     ---------------------------------------------------------------------- */
-
-  HomeBestsellers.prototype.tick = function (now) {
+  HomeBestsellers.prototype.tick = function () {
     if (!this.raf) return;
 
-    var dt = this.last ? Math.min((now - this.last) / 1000, MAX_FRAME) : STEP;
-    this.last = now;
-
     if (isDesktop()) this.handover();
-
-    if (reducedMotion() || !isDesktop()) {
-      this.y = this.target;
-      this.velocity = 0;
-    } else {
-      // Fixed-step integration: the spring behaves identically at 60Hz and 144Hz.
-      this.accumulator += dt;
-      var guard = 0;
-      while (this.accumulator >= STEP && guard < 8) {
-        this.velocity += (this.target - this.y) * STIFFNESS;
-        this.velocity *= DAMPING;
-        this.velocity = clamp(this.velocity, -MAX_VELOCITY, MAX_VELOCITY);
-        this.y += this.velocity;
-        this.accumulator -= STEP;
-        guard++;
-      }
-
-      if (this.settled()) {
-        this.y = this.target;
-        this.velocity = 0;
-      }
-    }
-
-    this.render();
     this.drift();
 
     this.raf = requestAnimationFrame(this.tick);
@@ -339,8 +284,6 @@
 
   HomeBestsellers.prototype.wake = function () {
     if (this.raf || !this.inView) return;
-    this.last = 0;
-    this.accumulator = 0;
     this.raf = requestAnimationFrame(this.tick);
   };
 
@@ -357,36 +300,16 @@
   HomeBestsellers.prototype.bindEvents = function () {
     var self = this;
 
+    // No resize handling: every measurement is taken from a live rect inside
+    // the frame loop, and the card's position is the browser's own sticky.
     this.handlers = {
       visibility: function () {
         if (document.hidden) self.sleep();
         else if (self.inView) self.wake();
       },
-
-      resize: function () {
-        cancelAnimationFrame(self.resizeFrame);
-        self.resizeFrame = requestAnimationFrame(function () {
-          self.measure();
-          self.target = self.offsets[self.index] || 0;
-          if (!isDesktop()) {
-            self.y = self.target;
-            self.velocity = 0;
-            self.slot.style.transform = '';
-            return;
-          }
-          self.wake();
-        });
-      },
     };
 
     document.addEventListener('visibilitychange', this.handlers.visibility);
-
-    if ('ResizeObserver' in window) {
-      this.resizeObserver = new ResizeObserver(this.handlers.resize);
-      this.resizeObserver.observe(this.root);
-    } else {
-      window.addEventListener('resize', this.handlers.resize);
-    }
   };
 
   HomeBestsellers.prototype.observe = function () {
@@ -412,11 +335,8 @@
   HomeBestsellers.prototype.destroy = function () {
     this.sleep();
     clearTimeout(this.swapTimer);
-    cancelAnimationFrame(this.resizeFrame);
 
     if (this.viewObserver) this.viewObserver.disconnect();
-    if (this.resizeObserver) this.resizeObserver.disconnect();
-    else window.removeEventListener('resize', this.handlers.resize);
     document.removeEventListener('visibilitychange', this.handlers.visibility);
 
     var self = this;

@@ -1,0 +1,87 @@
+/* ==========================================================================
+   Video Parallax — an ordinary band that plays a sequence when you reach it
+   ==========================================================================
+   No pin and no scroll track: the section is its own height, the height the
+   ratio gives it, and the sequence runs on its own clock once the band is on
+   screen. Whoever is watching has already stopped.
+
+   There is almost nothing to style. The whole thing — the quote, the dust, the
+   film, the grade — is one fragment shader on one canvas, because the effect is
+   thousands of specks appearing independently and the DOM cannot be asked for
+   that. See video-parallax.js.
+
+   The <video> underneath is the shader's source, not a picture: it is held at
+   zero opacity rather than hidden, because a display:none video is not
+   guaranteed to keep decoding and a texture needs frames. It is also the
+   fallback — if WebGL is missing, the shader fails to build, or the file turns
+   out not to allow cross-origin reads, the canvas goes and this is what is
+   left.
+   ========================================================================== */
+
+.vpx {
+  --vpx-ratio: 1900 / 670;
+  --vpx-ratio-mobile: 4 / 5;
+  --vpx-bg: #ffffff;
+  /* 0 while the shader is drawing, 1 once it has handed the picture back to
+     the video element underneath. */
+  --vpx-plain: 0;
+
+  position: relative;
+  background: var(--vpx-bg);
+}
+
+.vpx__band {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--vpx-ratio-mobile);
+  overflow: hidden;
+}
+
+@media screen and (min-width: 750px) {
+  .vpx__band {
+    aspect-ratio: var(--vpx-ratio);
+  }
+}
+
+.vpx__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* The canvas is opaque — its context is created without alpha — so while it is
+   at full strength the video underneath is simply not visible, and no rule is
+   needed to hide it. Fading the canvas out is therefore a cross-fade between
+   two drawings of the same frame, and there is nothing to see in it.
+
+   What it buys is the finish: the last state is the real video element, at its
+   own resolution, composited by the browser. A video read into a texture and
+   magnified with bilinear filtering is softer than the same file handed to the
+   video path, and no amount of tuning inside the shader recovers that. */
+.vpx__canvas {
+  position: absolute;
+  inset: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
+  opacity: calc(1 - var(--vpx-plain));
+}
+
+.vpx--armed .vpx__canvas {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------------------------
+   Never armed, so there is no dust and no sequence — the band is a still frame
+   the visitor can start themselves; the script hands the video controls and
+   keeps it paused. */
+
+@media (prefers-reduced-motion: reduce) {
+  .vpx--armed .vpx__canvas {
+    display: none;
+  }
+}

@@ -1,0 +1,383 @@
+{%- liquid
+  assign s = section.settings
+
+  comment
+    A video picked in the editor wins over the pasted URL, so the file can be
+    moved into Shopify's own hosting later without touching the section.
+  endcomment
+  assign poster = s.poster
+  if s.video != blank and poster == blank
+    assign poster = s.video.preview_image
+  endif
+
+  if s.video != blank
+    assign video_alt = s.video.alt | default: s.video_alt
+  else
+    assign video_alt = s.video_alt
+  endif
+
+  assign ratio_mobile = s.ratio_mobile
+  if ratio_mobile == 'same'
+    assign ratio_mobile = s.ratio
+  endif
+
+  comment
+    The quote goes to the script as data rather than as markup — it is painted
+    into a canvas and handed to the GPU as a texture, so there is no element for
+    it to live in. Newlines survive the attribute; the script splits on them.
+  endcomment
+  assign quote = s.type_text | strip | newline_to_br | strip_newlines | replace: '<br />', '&#10;'
+
+  assign type_tracking = s.type_tracking | divided_by: 100.0
+  assign type_leading = s.type_leading | divided_by: 100.0
+
+  comment
+    Phase boundaries, as fractions of the run: the quote is set by the first,
+    has become film by the second, and starts coming apart at the third.
+  endcomment
+  assign phases = s.phase_set | divided_by: 100.0 | append: ','
+  assign phases = s.phase_fill | divided_by: 100.0 | prepend: phases | append: ','
+  assign phases = s.phase_dust | divided_by: 100.0 | prepend: phases
+-%}
+
+{{ 'video-parallax.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'video-parallax.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="vpx"
+  data-vpx
+  data-vpx-duration="{{ s.duration }}"
+  data-vpx-push="{{ s.push }}"
+  data-vpx-grain="{{ s.grain }}"
+  data-vpx-grain-size="{{ s.grain_size }}"
+  data-vpx-soft="{{ s.grain_soft }}"
+  data-vpx-depth="{{ s.grain_depth }}"
+  data-vpx-phases="{{ phases }}"
+  data-vpx-autoplay="{{ s.autoplay }}"
+  data-vpx-quote="{{ quote }}"
+  data-vpx-type-size="{{ s.type_size }}"
+  data-vpx-type-leading="{{ type_leading }}"
+  data-vpx-type-weight="{{ s.type_weight }}"
+  data-vpx-type-tracking="{{ type_tracking }}"
+  data-vpx-type-family="{{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }}"
+  data-vpx-bg="{{ s.color_background }}"
+  data-vpx-ink="{{ s.type_color }}"
+  style="
+    --vpx-ratio: {{ s.ratio }};
+    --vpx-ratio-mobile: {{ ratio_mobile }};
+    --vpx-bg: {{ s.color_background }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="vpx__band" data-vpx-band>
+    {%- comment -%}
+      Hand-rolled rather than the `video_tag` filter: this is a texture source
+      before it is a picture, so it needs `crossorigin` — without it the browser
+      will not let a cross-origin frame be read into WebGL at all — and the
+      script needs to own play and pause. Muted and inline are what make
+      autoplay allowed at all on mobile.
+    {%- endcomment -%}
+    {%- if s.video != blank or s.video_url != blank -%}
+      <video
+        class="vpx__video"
+        data-vpx-video
+        crossorigin="anonymous"
+        {% if poster != blank %}
+          poster="{{ poster | image_url: width: 1600 }}"
+        {% endif %}
+        {% if s.autoplay %}
+          autoplay
+        {% endif %}
+        {% if video_alt != blank %}
+          aria-label="{{ video_alt | escape }}"
+        {% endif %}
+        muted
+        loop
+        playsinline
+        preload="auto"
+      >
+        {%- if s.video != blank -%}
+          {%- for source in s.video.sources -%}
+            {%- if source.format == 'mp4' -%}
+              <source src="{{ source.url }}" type="{{ source.mime_type }}">
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          <source src="{{ s.video_url }}" type="video/mp4">
+        {%- endif -%}
+      </video>
+    {%- else -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'vpx__video placeholder-svg' }}
+    {%- endif -%}
+
+    {%- comment -%}
+      Where the whole sequence happens. Carries the quote for assistive tech,
+      since the painted copy is pixels in a texture and reads as nothing.
+    {%- endcomment -%}
+    <canvas
+      class="vpx__canvas"
+      data-vpx-canvas
+      role="img"
+      aria-label="{{ s.type_text | strip | escape }}"
+    ></canvas>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video Parallax",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Overrides the URL below. Leave empty to use an externally hosted MP4."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "MP4 URL",
+      "default": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4"
+    },
+    {
+      "type": "text",
+      "id": "video_alt",
+      "label": "Video description",
+      "info": "Read by screen readers. Used only with the MP4 URL."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Poster image",
+      "info": "Shown until the first frame is decoded."
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay while on screen",
+      "default": true,
+      "info": "Always muted and looping. Ignored when the visitor has reduced motion on — they get controls instead."
+    },
+    {
+      "type": "header",
+      "content": "Shape"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Aspect ratio",
+      "options": [
+        { "value": "1900 / 670", "label": "1900:670 (source)" },
+        { "value": "21 / 9", "label": "21:9 (cinematic)" },
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "3 / 2", "label": "3:2" },
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "1 / 1", "label": "1:1" }
+      ],
+      "default": "1900 / 670",
+      "info": "Match it to the file's own ratio and nothing is cropped."
+    },
+    {
+      "type": "select",
+      "id": "ratio_mobile",
+      "label": "Aspect ratio on mobile",
+      "options": [
+        { "value": "same", "label": "Same as desktop" },
+        { "value": "1900 / 670", "label": "1900:670 (source)" },
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "4 / 5", "label": "4:5" },
+        { "value": "3 / 4", "label": "3:4" }
+      ],
+      "default": "4 / 5",
+      "info": "The source ratio is a thin strip on a phone, and the pinned stage is a whole screen tall. A taller crop fills it."
+    },
+    {
+      "type": "header",
+      "content": "Playback"
+    },
+    {
+      "type": "range",
+      "id": "duration",
+      "label": "Length",
+      "min": 2000,
+      "max": 9800,
+      "step": 200,
+      "unit": "ms",
+      "default": 5200,
+      "info": "How long the whole sequence runs. It starts once the band is properly on screen, and plays once."
+    },
+    {
+      "type": "range",
+      "id": "push",
+      "label": "Push in",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "default": 6,
+      "info": "How far the film is zoomed at the start, easing back to its true size as the sequence runs."
+    },
+    {
+      "type": "header",
+      "content": "Quote"
+    },
+    {
+      "type": "textarea",
+      "id": "type_text",
+      "label": "Quote",
+      "default": "Not anti-ageing.\nPro-longevity.",
+      "info": "One line per line. Set in the theme's heading face, italic. Every counter and gap in it is a window onto the video, so a heavy face reads best."
+    },
+    {
+      "type": "range",
+      "id": "type_size",
+      "label": "Size",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "default": 5,
+      "info": "Share of the band's width."
+    },
+    {
+      "type": "range",
+      "id": "type_leading",
+      "label": "Line height",
+      "min": 80,
+      "max": 180,
+      "step": 5,
+      "unit": "%",
+      "default": 115
+    },
+    {
+      "type": "range",
+      "id": "type_weight",
+      "label": "Weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 500,
+      "info": "Only weights the heading face actually ships will look right; the rest are synthesised."
+    },
+    {
+      "type": "range",
+      "id": "type_tracking",
+      "label": "Letter spacing",
+      "min": -10,
+      "max": 40,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "grain_size",
+      "label": "Dust fineness",
+      "min": 200,
+      "max": 2000,
+      "step": 50,
+      "default": 700,
+      "info": "How many specks across the band. High is dust; low enough and they stop being specks and start being blocks."
+    },
+    {
+      "type": "range",
+      "id": "grain_soft",
+      "label": "Dust softness",
+      "min": 0,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 80,
+      "info": "How far in from its rim each speck starts to fade. Low is hard little discs and reads as noise; high is soft and closer to a haze."
+    },
+    {
+      "type": "range",
+      "id": "grain_depth",
+      "label": "Dust depth",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70,
+      "info": "How much the dust reads as a cloud with near and far sides rather than a flat field. Drives how fast the nearest specks stream past the slowest ones, how they are lit, and how much haze sits on the far ones. It clears as the dust settles."
+    },
+    {
+      "type": "range",
+      "id": "grain",
+      "label": "Film grain",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 15,
+      "info": "Film grain over the band while the sequence runs, reseeded every frame. It clears as the dust settles, so the finished picture is left clean."
+    },
+    {
+      "type": "header",
+      "content": "Phases"
+    },
+    {
+      "type": "range",
+      "id": "phase_set",
+      "label": "Quote is set by",
+      "min": 3,
+      "max": 40,
+      "step": 1,
+      "unit": "%",
+      "default": 12,
+      "info": "Point in the run where the last line has finished arriving."
+    },
+    {
+      "type": "range",
+      "id": "phase_fill",
+      "label": "Video has filled it by",
+      "min": 10,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "phase_dust",
+      "label": "Dust starts at",
+      "min": 20,
+      "max": 90,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "info": "The gap between this and the one above is the hold — the quote sitting there, full of film, before it lets go."
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#ffffff",
+      "info": "The page the quote is set on, and the colour the grains eat away."
+    },
+    {
+      "type": "color",
+      "id": "type_color",
+      "label": "Quote",
+      "default": "#000000",
+      "info": "The colour it holds at before the video comes through."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Parallax"
+    }
+  ]
+}
+{% endschema %}

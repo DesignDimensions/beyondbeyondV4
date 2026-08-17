@@ -214,12 +214,39 @@
         "color_line": "#0107ef",
         "color_bubble": "#064cd7"
       }
+    },
+    "video_parallax_hLmT4c": {
+      "type": "video-parallax",
+      "name": "Video Parallax",
+      "settings": {
+        "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+        "video_alt": "",
+        "autoplay": true,
+        "ratio": "1900 / 670",
+        "ratio_mobile": "4 / 5",
+        "duration": 5200,
+        "push": 6,
+        "type_text": "Not anti-ageing.\nPro-longevity.",
+        "type_size": 5,
+        "type_leading": 115,
+        "type_weight": 500,
+        "type_tracking": 0,
+        "grain_size": 700,
+        "grain_soft": 80,
+        "grain": 15,
+        "phase_set": 12,
+        "phase_fill": 42,
+        "phase_dust": 50,
+        "color_background": "#ffffff",
+        "type_color": "#000000"
+      }
     }
   },
   "order": [
     "upselling_image_slider",
     "usp_carousal_m8RAJH",
     "home_bestsellers_gtGjFX",
-    "home_philosophy_4kTxNb"
+    "home_philosophy_4kTxNb",
+    "video_parallax_hLmT4c"
   ]
 }
