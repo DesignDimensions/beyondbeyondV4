@@ -1,0 +1,282 @@
+/* ==========================================================================
+   Browse By Concern — a rail of concerns over the grid it filters
+   ========================================================================== */
+
+.bbc {
+  padding-top: var(--bbc-pad-top, 60px);
+  padding-bottom: var(--bbc-pad-bottom, 60px);
+}
+
+/* The rail sizes itself against this column rather than the window, so the
+   thumbnails keep the share of the row they hold in the design however wide
+   the theme's page-width happens to settle. */
+.bbc__inner {
+  container-type: inline-size;
+}
+
+/* --------------------------------------------------------------------------
+   Rail
+   -------------------------------------------------------------------------- */
+
+/* The rail owns the full content column and the arrows hang off it into the
+   page-width gutters, so the row of thumbnails itself is never shortened to
+   make room for them. */
+.bbc__rail {
+  position: relative;
+  margin-bottom: var(--bbc-rail-gap, 36px);
+  /* Six thumbnails and the five gaps between them divide the row exactly:
+     both are shares of it, so 6 x width + 5 x gap is always 100% and the
+     rail ends flush with the column whatever width the theme settles on.
+     The height follows from the thumbnail ratio, and is the one figure the
+     arrows need to find the middle of the row. */
+  --bbc-thumb-w: calc((100% - (var(--bbc-visible, 6) - 1) * var(--bbc-thumb-gap, 2.5%)) / var(--bbc-visible, 6));
+  --bbc-thumb-h: calc(var(--bbc-thumb-w) * var(--bbc-ratio-h, 229) / var(--bbc-ratio-w, 173));
+}
+
+/* Hides the thumbnails waiting off the end of the rail. The headroom on top
+   is exactly the distance a raised thumbnail travels, so it clears the row
+   without being sheared off against the clip. */
+.bbc__viewport {
+  position: relative;
+  overflow: hidden;
+  padding-top: var(--bbc-thumb-lift, 28px);
+}
+
+/* Centred is the resting state — a rail with room to spare sits in the middle
+   of the row, and the script switches it to flex-start only once there is
+   more track than viewport to scroll through. */
+.bbc__track {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--bbc-thumb-gap, 2.5%);
+  will-change: transform;
+}
+
+.bbc--dragging .bbc__track {
+  cursor: grabbing;
+}
+
+.bbc__concern {
+  flex: 0 0 var(--bbc-thumb-w);
+  width: var(--bbc-thumb-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbc__concern:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* The selected thumbnail rises by transform alone. Animating its position in
+   the flow would relayout the rail on every frame and shift the thumbnails
+   beside it; a composited translate costs nothing. Hovering any thumbnail
+   plays the same rise, so pointing at one shows what picking it will do. */
+.bbc__concern-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--bbc-ratio-w, 173) / var(--bbc-ratio-h, 229);
+  overflow: hidden;
+  border-radius: var(--bbc-thumb-radius, 0px);
+  background-color: #f2f2f2;
+  transform-origin: center center;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bbc__concern.is-active .bbc__concern-media,
+.bbc__concern:hover .bbc__concern-media,
+.bbc__concern:focus-visible .bbc__concern-media {
+  transform: translate3d(0, calc(var(--bbc-thumb-lift, 28px) * -1), 0);
+}
+
+.bbc__concern-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bbc__concern-label {
+  display: block;
+  margin-top: 12px;
+  font-size: var(--bbc-label-size, 11px);
+  letter-spacing: var(--bbc-label-spacing, 0px);
+  line-height: 1.3;
+  color: var(--bbc-label-color, #4a4a4a);
+  text-align: center;
+  transition: color 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bbc__concern.is-active .bbc__concern-label,
+.bbc__concern:hover .bbc__concern-label,
+.bbc__concern:focus-visible .bbc__concern-label {
+  color: var(--bbc-label-active-color, #000);
+  transform: translate3d(0, calc(var(--bbc-thumb-lift, 28px) * -1), 0);
+}
+
+.bbc__concern-dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background-color: var(--bbc-dot-color, #000);
+  opacity: 0;
+  transform: scale(0.2);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bbc__concern.is-active .bbc__concern-dot,
+.bbc__concern:hover .bbc__concern-dot,
+.bbc__concern:focus-visible .bbc__concern-dot {
+  opacity: 1;
+  transform: scale(1) translate3d(0, calc(var(--bbc-thumb-lift, 28px) * -1), 0);
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   -------------------------------------------------------------------------- */
+
+/* Out of the flow and out of the column: each arrow sits in the page-width
+   gutter beside the rail. */
+.bbc__arrow {
+  position: absolute;
+  top: 0;
+  /* The middle of the row of thumbnails, not of the rail — the labels below
+     them would otherwise pull the arrows down. It has to be margin rather
+     than `top`: the height it is offset by is a share of the rail's width,
+     and only margins resolve a percentage against that. */
+  margin-top: calc(var(--bbc-thumb-lift, 28px) + var(--bbc-thumb-h) / 2);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--bbc-arrow-size, 16px) + 16px);
+  height: calc(var(--bbc-arrow-size, 16px) + 16px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bbc__arrow--prev {
+  right: calc(100% + var(--bbc-arrow-offset, 16px));
+}
+
+.bbc__arrow--next {
+  left: calc(100% + var(--bbc-arrow-offset, 16px));
+}
+
+.bbc__arrow img {
+  width: var(--bbc-arrow-size, 16px);
+  height: auto;
+  display: block;
+}
+
+.bbc__arrow-glyph {
+  font-size: calc(var(--bbc-arrow-size, 16px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.bbc__arrow--prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.bbc__arrow--next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+.bbc__arrow[disabled],
+.bbc__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.bbc__arrow[hidden] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Panels
+   -------------------------------------------------------------------------- */
+
+.bbc__panels {
+  position: relative;
+}
+
+.bbc__panel[hidden] {
+  display: none;
+}
+
+/* Only while a swap is in flight — a permanent clip would cut off the cards'
+   focus rings and the add-to-cart button's shadow. */
+.bbc__panels.is-swapping {
+  overflow: hidden;
+}
+
+.bbc__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--bbc-columns, 3), minmax(0, 1fr));
+  gap: var(--bbc-grid-gap, 20px);
+}
+
+.bbc__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--pcard-muted, #6b6b6b);
+}
+
+.bbc__view-all {
+  display: inline-block;
+  margin-top: 32px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--pcard-text, #000);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .bbc__grid {
+    grid-template-columns: repeat(var(--bbc-columns-mobile, 2), minmax(0, 1fr));
+  }
+
+  .bbc__rail {
+    --bbc-visible: var(--bbc-visible-mobile, 3);
+  }
+
+  /* The gutter here is 1.5rem, which is not room enough to hang an arrow in.
+     The rail is dragged on a phone anyway. */
+  .bbc__arrow {
+    display: none;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .bbc__concern-media,
+  .bbc__concern-img,
+  .bbc__concern-label,
+  .bbc__concern-dot,
+  .bbc__arrow {
+    transition-duration: 0.01ms;
+  }
+}

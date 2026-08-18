@@ -1,0 +1,346 @@
+{{ 'founders.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    The panel is drawn to a 925px content column: an image a little under half
+    of it, the copy filling what is left, and one inset repeated on all four
+    sides. Those are written as shares of the column rather than px, so the
+    two halves keep their proportions to each other at any width the theme's
+    page-width settles on.
+  endcomment
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1200
+  endif
+
+  comment
+    With no link chosen, the button still has to go somewhere sensible. The
+    store's own about page is looked up by its handle first — which keeps the
+    localised URL when there is one — and only failing that does it fall back
+    to the path the page would have if it existed.
+  endcomment
+  assign link = section.settings.link
+  if link == blank
+    assign about = pages['about'] | default: pages['about-us'] | default: pages['our-story']
+    if about != blank and about.url != blank
+      assign link = about.url
+    else
+      assign link = '/pages/about'
+    endif
+  endif
+-%}
+
+<div class="fnd" data-fnd style="
+    --fnd-pad-top: {{ section.settings.padding_top }}px;
+    --fnd-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --fnd-bg: {{ section.settings.background }};
+    --fnd-inset: {{ section.settings.inset }}px;
+    --fnd-gap: {{ section.settings.column_gap }}px;
+    --fnd-media-w: {{ section.settings.media_width }}%;
+    --fnd-media-ratio: {{ section.settings.media_ratio }};
+    --fnd-heading-size: {{ section.settings.heading_size }}px;
+    --fnd-heading-color: {{ section.settings.heading_color }};
+    --fnd-heading-gap: {{ section.settings.heading_gap }}px;
+    --fnd-body-color: {{ section.settings.body_color }};
+    --fnd-body-gap: {{ section.settings.body_gap }}px;
+    --fnd-cta-gap: {{ section.settings.cta_gap }}px;
+    --fnd-cta-h: {{ section.settings.cta_height }}px;
+    --fnd-cta-size: {{ section.settings.cta_size }}px;
+    --fnd-cta-bg: {{ section.settings.cta_background }};
+    --fnd-cta-fg: {{ section.settings.cta_color }};
+    --fnd-cta-radius: {{ section.settings.cta_radius }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    <div class="fnd__panel">
+      <div class="fnd__media">
+        {%- if image_src != blank -%}
+          <img
+            class="fnd__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 1200 }} 1200w"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) 43vw, 90vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        {%- else -%}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'fnd__img fnd__img--placeholder' }}
+        {%- endif -%}
+      </div>
+
+      <div class="fnd__copy">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="fnd__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="fnd__body section-text">{{ section.settings.body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.cta_label != blank -%}
+          <a class="fnd__cta" href="{{ link }}">
+            <span class="fnd__cta-label">{{ section.settings.cta_label }}</span>
+            {%- comment -%}
+              Drawn rather than typed: the long arrow of the design has no
+              dependable glyph across the faces a theme might be set to, and
+              this one can be given its own length and slide on hover.
+            {%- endcomment -%}
+            <svg class="fnd__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
+              <path
+                d="M0 5h31.5M27.5 1 32 5l-4.5 4"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Founders",
+  "tag": "section",
+  "class": "section-founders",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Panel background",
+      "default": "#F2F3FF"
+    },
+    {
+      "type": "range",
+      "id": "inset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Panel inset",
+      "info": "The space between the panel's edge and everything inside it.",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between image and copy",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image.",
+      "default": "The founders"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 25,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the panel. The copy takes what is left.",
+      "default": 43
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "0.75", "label": "Tall portrait" },
+        { "value": "1", "label": "Square" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": "0.815"
+    },
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "From Our Founders"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below heading",
+      "default": 32
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>Lorem ipsum dolor sit amet consectetur. Posuere quis amet mi vitae diam arcu. Nulla in viverra in semper egestas orci. Tristique feugiat blandit auctor rhoncus imperdiet suspendisse egestas. Non massa egestas aliquet felis nulla ullamcorp.</p><p>Enim ut pulvinar sit aliquet eu. In egestas scelerisque at mattis eget dolor. Integer faucibus venenatis parturient pellentesque sit sed pulvinar nunc phasellus. Tristique feugiat blandit auctor rhoncus imperdiet suspendisse egestas. Non massa egestas aliquet felis nulla ullamcorp.</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text color",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Our Story"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Button link",
+      "info": "Defaults to /pages/about."
+    },
+    {
+      "type": "range",
+      "id": "cta_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above button",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "cta_height",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Button height",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "cta_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Button corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Button background",
+      "default": "#0107EF"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 56
+    }
+  ],
+  "presets": [
+    {
+      "name": "Founders"
+    }
+  ]
+}
+{% endschema %}

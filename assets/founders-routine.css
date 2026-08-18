@@ -1,0 +1,200 @@
+/* ==========================================================================
+   Founder's Routine — two routines, one rail each
+   ========================================================================== */
+
+.fr {
+  padding-top: var(--fr-pad-top, 60px);
+  padding-bottom: var(--fr-pad-bottom, 60px);
+}
+
+/* --------------------------------------------------------------------------
+   Switcher
+   -------------------------------------------------------------------------- */
+
+/* The routines split the bar evenly, so the two names sit either side of the
+   middle however long they are. */
+.fr__tabs {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: var(--fr-tabs-h, 48px);
+  margin-bottom: var(--fr-tabs-gap, 36px);
+  border: 1px solid var(--fr-tabs-border, #e4e4e7);
+  border-radius: var(--fr-tabs-radius, 4px);
+  background-color: var(--fr-tabs-bg, #f8f8f9);
+  overflow: hidden;
+}
+
+.fr__tab {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: var(--fr-tab-color, #1a1a1a);
+  font-family: inherit;
+  font-size: var(--fr-tab-size, 18px);
+  line-height: 1.2;
+  cursor: pointer;
+  transition: color 0.35s ease;
+}
+
+.fr__tab.is-active {
+  color: var(--fr-tab-active, #0107ef);
+}
+
+.fr__tab:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -4px;
+}
+
+/* One mark for both routines, slid and resized between them by the script:
+   two labels of different lengths cannot share a border and still each be
+   underlined to their own width. */
+.fr__underline {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: var(--fr-underline, 3px);
+  width: 0;
+  background-color: var(--fr-tab-active, #0107ef);
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Rails
+   -------------------------------------------------------------------------- */
+
+.fr__panels {
+  position: relative;
+  margin-top: var(--fr-rail-gap, 36px);
+}
+
+.fr__panel[hidden] {
+  display: none;
+}
+
+/* The arrows hang in the page-width gutters, so the cards keep the whole
+   content column to themselves. */
+.fr__frame {
+  position: relative;
+}
+
+.fr__rail {
+  display: flex;
+  gap: var(--fr-card-gap, 24px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for the cards' focus rings, which the scroll box would otherwise
+     clip. */
+  padding-bottom: 4px;
+}
+
+.fr__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.fr__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+.fr__card {
+  flex: 0 0 calc((100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3));
+  scroll-snap-align: start;
+}
+
+.fr__card .pcard {
+  width: 100%;
+}
+
+.fr__empty {
+  color: var(--pcard-muted, #6b6b6b);
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   -------------------------------------------------------------------------- */
+
+.fr__arrow {
+  position: absolute;
+  /* Centred on the images rather than on the whole card, so the copy under
+     them does not pull the arrows down. */
+  top: 0;
+  margin-top: calc(
+    (100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3) / 2
+  );
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--fr-arrow-size, 16px) + 16px);
+  height: calc(var(--fr-arrow-size, 16px) + 16px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fr__arrow--prev {
+  right: calc(100% + var(--fr-arrow-offset, 20px));
+}
+
+.fr__arrow--next {
+  left: calc(100% + var(--fr-arrow-offset, 20px));
+}
+
+.fr__arrow-glyph {
+  font-size: calc(var(--fr-arrow-size, 16px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.fr__arrow--prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.fr__arrow--next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+.fr__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .fr__card {
+    flex-basis: calc(
+      (100% - (var(--fr-columns-mobile, 1.2) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns-mobile, 1.2)
+    );
+  }
+
+  .fr__arrow {
+    display: none;
+  }
+
+  .fr__tab {
+    font-size: calc(var(--fr-tab-size, 18px) * 0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fr__tab,
+  .fr__underline,
+  .fr__arrow {
+    transition-duration: 0.01ms;
+  }
+}

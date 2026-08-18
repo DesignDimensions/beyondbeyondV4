@@ -1,0 +1,348 @@
+{{ 'gallery.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    The backdrop's transparency is baked into its colour rather than left to
+    the element's opacity. Opacity would fade the blur along with the tint,
+    and a half-faded frost over a sharp page is neither one thing nor the
+    other; this way the element fades in whole, at full strength.
+  endcomment
+  assign backdrop = section.settings.backdrop_color | color_modify: 'alpha', section.settings.backdrop_opacity
+  if backdrop == blank
+    assign backdrop = section.settings.backdrop_color
+  endif
+
+  comment
+    The row prints its images twice. One copy is what you see, the second is
+    what slides into its place, and the loop is the track travelling exactly
+    one copy's width before starting over — no seam to hide. The script clones
+    further copies when one is narrower than the window.
+  endcomment
+-%}
+
+<div
+  class="gal"
+  id="gal-{{ section.id }}"
+  data-gal
+  data-speed="{{ section.settings.speed }}"
+  data-direction="{{ section.settings.direction }}"
+  data-hover-slow="{{ section.settings.slow_on_hover }}"
+  style="
+    --gal-pad-top: {{ section.settings.padding_top }}px;
+    --gal-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --gal-h: {{ section.settings.tile_height }}px;
+    --gal-h-mobile: {{ section.settings.tile_height | times: 0.62 | round }}px;
+    --gal-gap: {{ section.settings.tile_gap }}px;
+    --gal-radius: {{ section.settings.tile_radius }}px;
+    --gal-tile-bg: {{ section.settings.tile_background }};
+    --gal-backdrop: {{ backdrop }};
+    --gal-backdrop-blur: {{ section.settings.backdrop_blur }}px;
+    --gal-viewer-fg: {{ section.settings.viewer_text_color }};
+    --gal-viewer-pad: {{ section.settings.viewer_padding }}px;
+    --gal-viewer-radius: {{ section.settings.viewer_radius }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="gal__row" data-gal-row>
+    <div class="gal__track" data-gal-track>
+      {%- for copy in (1..2) -%}
+        <div
+          class="gal__seq"
+          data-gal-seq
+          {% unless forloop.first %}
+            aria-hidden="true"
+          {% endunless %}
+        >
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign image = block.settings.image
+              assign thumb = block.settings.image_url
+              assign full = block.settings.image_url
+              if image != blank
+                assign thumb = image | image_url: width: 900
+                assign full = image | image_url: width: 2400
+              endif
+            -%}
+            <button
+              class="gal__item"
+              type="button"
+              data-gal-item
+              data-index="{{ forloop.index0 }}"
+              data-full="{{ full }}"
+              data-caption="{{ block.settings.caption | escape }}"
+              aria-label="{{ block.settings.caption | default: 'Open image' | escape }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if thumb != blank -%}
+                <img
+                  class="gal__img"
+                  src="{{ thumb }}"
+                  alt="{{ block.settings.caption | escape }}"
+                  draggable="false"
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'gal__img gal__img--placeholder' }}
+              {%- endif -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%}
+    The viewer. The script moves it to the end of <body> on setup: the track
+    beside it is permanently transformed, and any transformed ancestor becomes
+    the containing block for a fixed element, which would trap the viewer
+    inside the sliding row instead of over the window. Its own colours travel
+    with it, since custom properties would stop inheriting once it moves.
+  {%- endcomment -%}
+  <div
+    class="gal__viewer"
+    data-gal-viewer
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'general.slider.name' | t | default: 'Gallery' }}"
+    hidden
+    style="
+      --gal-backdrop: {{ backdrop }};
+      --gal-backdrop-blur: {{ section.settings.backdrop_blur }}px;
+      --gal-viewer-fg: {{ section.settings.viewer_text_color }};
+      --gal-viewer-pad: {{ section.settings.viewer_padding }}px;
+      --gal-viewer-radius: {{ section.settings.viewer_radius }}px;
+    "
+  >
+    <div class="gal__backdrop" data-gal-backdrop></div>
+
+    <img class="gal__full" data-gal-full alt="" draggable="false">
+
+    <button class="gal__close" type="button" data-gal-close aria-label="{{ 'accessibility.close' | t }}">
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+    <button
+      class="gal__nav gal__nav--prev"
+      type="button"
+      data-gal-nav="-1"
+      aria-label="{{ 'general.slider.previous_slide' | t }}"
+    >
+      <span aria-hidden="true">&lsaquo;</span>
+    </button>
+
+    <button
+      class="gal__nav gal__nav--next"
+      type="button"
+      data-gal-nav="1"
+      aria-label="{{ 'general.slider.next_slide' | t }}"
+    >
+      <span aria-hidden="true">&rsaquo;</span>
+    </button>
+
+    <p class="gal__caption" data-gal-caption></p>
+  </div>
+</div>
+
+<script src="{{ 'gallery.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Gallery",
+  "tag": "section",
+  "class": "section-gallery",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Row"
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 120,
+      "max": 620,
+      "step": 10,
+      "unit": "px",
+      "label": "Image height",
+      "info": "Widths follow each image's own shape, so a mixed set stays uncropped.",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "tile_gap",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between images",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "tile_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "tile_background",
+      "label": "Image background",
+      "default": "#F2F2F2"
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Speed",
+      "info": "Pixels travelled per second. The row can also be dragged and thrown.",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        { "value": "-1", "label": "Left" },
+        { "value": "1", "label": "Right" }
+      ],
+      "default": "-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "slow_on_hover",
+      "label": "Slow down while hovering",
+      "info": "Holds an image still enough to be aimed at and opened.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Viewer"
+    },
+    {
+      "type": "color",
+      "id": "backdrop_color",
+      "label": "Backdrop",
+      "default": "#0B0B0F"
+    },
+    {
+      "type": "range",
+      "id": "backdrop_opacity",
+      "min": 0.1,
+      "max": 1,
+      "step": 0.1,
+      "label": "Backdrop strength",
+      "info": "Below 1 lets the blurred page show through the tint.",
+      "default": 0.6
+    },
+    {
+      "type": "range",
+      "id": "backdrop_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Backdrop blur",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "viewer_text_color",
+      "label": "Viewer text and controls",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "viewer_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Opened image corner radius",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "viewer_padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space around the opened image",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Image URL",
+          "info": "Used when no image is picked above."
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "info": "Read out in place of the image, and shown under it when opened."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

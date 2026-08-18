@@ -1,0 +1,331 @@
+/* ==========================================================================
+   Testimonials — vertical videos, each carrying the product it speaks about
+   ========================================================================== */
+
+.tst {
+  padding-top: var(--tst-pad-top, 56px);
+  padding-bottom: var(--tst-pad-bottom, 56px);
+}
+
+.tst__heading {
+  margin-bottom: var(--tst-heading-gap, 40px);
+}
+
+/* The arrows hang in the page-width gutters, so the row of cards keeps the
+   whole content column to itself. */
+.tst__frame {
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Rail
+   -------------------------------------------------------------------------- */
+
+.tst__rail {
+  display: flex;
+  gap: var(--tst-gap, 34px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* The cards' own shadows and focus rings need room the scroll box would
+     otherwise clip. */
+  padding-bottom: 4px;
+}
+
+.tst__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.tst__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+.tst__card {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--tst-columns, 3) - 1) * var(--tst-gap, 34px)) / var(--tst-columns, 3));
+  scroll-snap-align: start;
+  border-radius: var(--tst-radius, 0px);
+  overflow: hidden;
+  background-color: var(--tst-media-bg, #efefef);
+}
+
+/* --------------------------------------------------------------------------
+   Video
+   -------------------------------------------------------------------------- */
+
+.tst__media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--tst-ratio, 0.5625);
+  /* The click that turns the sound on lands here and nowhere else — the
+     product card and the sound button are siblings, not children, so the
+     pointer is never over both at once. */
+  cursor: pointer;
+}
+
+.tst__video,
+.tst__placeholder-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tst__placeholder {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-color: var(--tst-media-bg, #efefef);
+}
+
+/* --------------------------------------------------------------------------
+   Sound button
+   -------------------------------------------------------------------------- */
+
+.tst__mute {
+  position: absolute;
+  z-index: 3;
+  top: var(--tst-inset, 18px);
+  right: var(--tst-inset, 18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tst-mute-size, 38px);
+  height: var(--tst-mute-size, 38px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--tst-mute-bg, #fff);
+  color: var(--tst-mute-fg, #000);
+  cursor: pointer;
+  transform-origin: center;
+  transition: opacity 0.3s ease;
+}
+
+.tst__mute-icon {
+  display: flex;
+  width: 55%;
+  height: 55%;
+  transform-origin: center;
+}
+
+.tst__mute-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.tst__mute-icon--unmuted {
+  display: none;
+}
+
+.tst__mute.is-unmuted .tst__mute-icon--muted {
+  display: none;
+}
+
+.tst__mute.is-unmuted .tst__mute-icon--unmuted {
+  display: flex;
+}
+
+/* --------------------------------------------------------------------------
+   Product card
+   -------------------------------------------------------------------------- */
+
+/* The whole card is the link — title, image, price and the space between
+   them — so there is no small target to find at the foot of a video. */
+.tst__product {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px var(--tst-inset, 18px) var(--tst-inset, 18px);
+  color: var(--tst-card-text, #fff);
+  text-decoration: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, calc(var(--tst-scrim, 0.8) * 0.55)) 45%,
+    rgba(0, 0, 0, var(--tst-scrim, 0.8)) 100%
+  );
+}
+
+.tst__product-media {
+  flex: 0 0 auto;
+  width: var(--tst-thumb, 42px);
+  height: var(--tst-thumb, 42px);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tst__product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  mix-blend-mode: multiply;
+}
+
+.tst__product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.tst__product-title {
+  font-size: var(--tst-title-size, 13px);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.tst__product:hover .tst__product-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tst__product-price {
+  font-size: var(--tst-price-size, 13px);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   -------------------------------------------------------------------------- */
+
+.tst__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--tst-arrow-size, 16px) + 16px);
+  height: calc(var(--tst-arrow-size, 16px) + 16px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tst__arrow--prev {
+  right: calc(100% + var(--tst-arrow-offset, 20px));
+}
+
+.tst__arrow--next {
+  left: calc(100% + var(--tst-arrow-offset, 20px));
+}
+
+.tst__arrow img {
+  width: var(--tst-arrow-size, 16px);
+  height: auto;
+  display: block;
+}
+
+.tst__arrow-glyph {
+  font-size: calc(var(--tst-arrow-size, 16px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.tst__arrow--prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.tst__arrow--next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+.tst__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Pointer tag
+   --------------------------------------------------------------------------
+   A pill that rides alongside the cursor over a video and says what a click
+   will do. The real cursor stays visible next to it, and the sound button
+   above works whether or not any of this is running.
+   -------------------------------------------------------------------------- */
+
+.tst__cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: none;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.tst__cursor.is-enabled {
+  display: flex;
+}
+
+.tst__cursor-flip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  background: var(--tst-tag-bg, #000);
+  color: var(--tst-tag-fg, #fff);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.tst__cursor-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.tst__cursor-text {
+  display: inline-block;
+  vertical-align: top;
+  will-change: transform;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .tst__cursor {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .tst__card {
+    flex-basis: calc(
+      (100% - (var(--tst-columns-mobile, 1.2) - 1) * var(--tst-gap, 34px)) / var(--tst-columns-mobile, 1.2)
+    );
+  }
+
+  .tst__arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tst__arrow,
+  .tst__mute {
+    transition-duration: 0.01ms;
+  }
+}

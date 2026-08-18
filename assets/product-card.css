@@ -1,0 +1,574 @@
+/* ==========================================================================
+   Product card — one design, everywhere
+   ==========================================================================
+   The numbers below are the card as drawn: a portrait tile in the brand
+   lavender, the product fitted inside it, a black add-to-cart bar held off
+   the tile's corners, then title, stars, type line and price.
+
+   They live here as tokens so the two card implementations in the theme —
+   the stock `card-product` snippet used by every collection, search and
+   related-products grid, and the Browse By Concern section's own card —
+   read from the same source and cannot drift apart. A section that offers
+   the merchant a setting still overrides its token; the token is the
+   starting point, not a ceiling.
+
+   The overrides below are all written under `.card-wrapper` on purpose.
+   Sections load `component-card.css` from inside the body, which lands after
+   anything in the head, so matching Dawn's specificity would lose on source
+   order. The extra ancestor puts this sheet ahead of it wherever it loads.
+   ========================================================================== */
+
+:root {
+  --pcard-media-bg: #e6e9fc;
+  /* The same square, in the two notations the two cards need: a
+     padding-bottom for the theme card's ratio box, a number for the brand
+     card's aspect-ratio. */
+  --pcard-media-ratio: 100%;
+  --pcard-media-aspect: 1;
+  --pcard-media-fit: cover;
+  --pcard-media-blend: multiply;
+  --pcard-media-pad: 0px;
+  --pcard-inset: 16px;
+  --pcard-title: 16px;
+  --pcard-title-weight: 500;
+  --pcard-text: #000;
+  --pcard-muted: #6b6b6b;
+  --pcard-star: #0107ef;
+  --pcard-star-empty: #d5d5d5;
+  --pcard-star-size: 15px;
+  --pcard-star-gap: 1px;
+  /* The star is one tile of a mask, so the row underneath it can be painted
+     however the rating needs and the shape simply cuts it into stars. Carried
+     as a data URI rather than a file: it is a mask either way, and this one
+     cannot 404. */
+  --pcard-star-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2015%2014%22%3E%3Cpath%20d=%22M14.4381%205.24979C14.3606%205.0106%2014.2138%204.79979%2014.0165%204.64403C13.8191%204.48828%2013.58%204.39457%2013.3293%204.37479L9.79245%204.08916L8.42745%200.788536C8.33152%200.55526%208.16843%200.355756%207.95889%200.215357C7.74934%200.0749588%207.5028%200%207.25057%200C6.99834%200%206.7518%200.0749588%206.54226%200.215357C6.33272%200.355756%206.16963%200.55526%206.0737%200.788536L4.70995%204.08979L1.17307%204.37479C0.921962%204.39549%200.682574%204.48996%200.484991%204.64632C0.287409%204.80267%200.140447%205.01394%200.0625747%205.25357C-0.0152978%205.49319%20-0.0206067%205.75049%200.047315%205.99313C0.115237%206.23577%200.253359%206.45291%200.444324%206.61729L3.14307%208.94479L2.31807%2012.426C2.2579%2012.6715%202.27214%2012.9293%202.35896%2013.1666C2.44579%2013.4039%202.60129%2013.61%202.80565%2013.7587C3.01001%2013.9074%203.25398%2013.9919%203.50652%2014.0014C3.75905%2014.0109%204.0087%2013.9451%204.2237%2013.8123L7.25057%2011.9492L10.2774%2013.8123C10.4924%2013.9442%2010.7416%2014.0094%2010.9936%2013.9996C11.2456%2013.9898%2011.4891%2013.9054%2011.6931%2013.7572C11.8971%2013.609%2012.0526%2013.4036%2012.1398%2013.1669C12.2271%2012.9303%2012.2421%2012.6731%2012.1831%2012.4279L11.3581%208.94666L14.0568%206.61916C14.2489%206.45439%2014.3877%206.23625%2014.4556%205.99243C14.5235%205.74861%2014.5174%205.49012%2014.4381%205.24979ZM10.0337%208.10604C9.92963%208.19575%209.85221%208.31233%209.80989%208.44305C9.76757%208.57377%209.76197%208.7136%209.7937%208.84729L10.5993%2012.2498L7.6437%2010.4323C7.52548%2010.3595%207.38939%2010.321%207.25057%2010.321C7.11176%2010.321%206.97567%2010.3595%206.85745%2010.4323L3.90182%2012.2498L4.70745%208.84979C4.73918%208.7161%204.73358%208.57627%204.69126%208.44555C4.64893%208.31483%204.57151%208.19825%204.46745%208.10854L1.82557%205.82729L5.28807%205.54791C5.42586%205.53684%205.55791%205.48791%205.66964%205.40651C5.78136%205.32511%205.86842%205.21442%205.9212%205.08666L7.25057%201.86791L8.57995%205.08666C8.63272%205.21442%208.71978%205.32511%208.83151%205.40651C8.94324%205.48791%209.07528%205.53684%209.21307%205.54791L12.6756%205.82729L10.0337%208.10604Z%22/%3E%3Cpath%20d=%22M10.0337%208.10604C9.92963%208.19575%209.85221%208.31233%209.80989%208.44305C9.76757%208.57377%209.76197%208.7136%209.7937%208.84729L10.5993%2012.2498L7.6437%2010.4323C7.52548%2010.3595%207.38939%2010.321%207.25057%2010.321C7.11176%2010.321%206.97567%2010.3595%206.85745%2010.4323L3.90182%2012.2498L4.70745%208.84979C4.73918%208.7161%204.73358%208.57627%204.69126%208.44555C4.64893%208.31483%204.57151%208.19825%204.46745%208.10854L1.82557%205.82729L5.28807%205.54791C5.42586%205.53684%205.55791%205.48791%205.66964%205.40651C5.78136%205.32511%205.86842%205.21442%205.9212%205.08666L7.25057%201.86791L8.57995%205.08666C8.63272%205.21442%208.71978%205.32511%208.83151%205.40651C8.94324%205.48791%209.07528%205.53684%209.21307%205.54791L12.6756%205.82729L10.0337%208.10604Z%22/%3E%3C/svg%3E");
+  --pcard-meta: 11px;
+  --pcard-price: 17px;
+  --pcard-atc-h: 50px;
+  --pcard-atc-text: 19px;
+  --pcard-atc-bg: #000;
+  --pcard-atc-fg: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   One face
+   -------------------------------------------------------------------------- */
+
+/* The theme's body and heading settings both point at Raleway today, so this
+   changes nothing to look at — it is here so the card cannot pick up a second
+   face if one of them is ever changed, and so the pieces that name a family of
+   their own stop doing so: Dawn's heading scale on the title, and Times on the
+   rating, which the star mask covers but the declaration outlives. */
+.card-wrapper,
+.card-wrapper .card__heading,
+.card-wrapper .card__heading a,
+.card-wrapper .card-information,
+.card-wrapper .price,
+.card-wrapper .rating-star,
+.card-wrapper .quick-add__submit.button,
+.card__meta,
+.pcard,
+.pcard .pcard__atc {
+  font-family: var(--font-body-family);
+}
+
+/* --------------------------------------------------------------------------
+   Media
+   -------------------------------------------------------------------------- */
+
+/* The ratio box takes its height from an inline `--ratio-percent` the section
+   settings write, which an inline style would win. The shape is part of the
+   card design rather than a per-section choice, so it is set on the
+   pseudo-element instead, where no inline style can reach. */
+.card-wrapper .card__inner.ratio::before {
+  padding-bottom: var(--pcard-media-ratio);
+}
+
+.card-wrapper .card__media,
+.card-wrapper .card__inner .media {
+  background-color: var(--pcard-media-bg);
+}
+
+/* Filled, not fitted: the image covers the whole tile. Multiply still lets a
+   product shot on a white backdrop take the tile's colour — white multiplied
+   by the tint is the tint, while the product itself is dark enough to come
+   through nearly unchanged. */
+.card-wrapper .card__media .media img {
+  object-fit: cover;
+  mix-blend-mode: multiply;
+}
+
+/* Keeps that blend composited against this tile's own colour rather than
+   whatever the page paints behind the card. */
+.card-wrapper .card__inner {
+  isolation: isolate;
+}
+
+/* Dawn parks the badge in the last row of the layer over the picture, and
+   takes its corner from a theme setting. The card wants it in the same corner
+   every time: the top left, out of the add-to-cart's way. */
+.card-wrapper .card__inner .card__badge {
+  grid-row-start: 1;
+  align-self: flex-start;
+  justify-self: flex-start;
+}
+
+/* --------------------------------------------------------------------------
+   Copy
+   -------------------------------------------------------------------------- */
+
+/* Dawn splits padding across the content grid and the information block. The
+   card wants one inset, matching the one the button is held off by, so it is
+   collected here and zeroed there.
+
+   Only the outer content — the one that follows the image. The card carries a
+   second `card__content` inside `card__inner`, which is the layer the badge
+   sits on over the picture, and it is left as it is.
+
+   Block rather than grid, too: Dawn's three-row grid parks the information in
+   the middle row with a flexible row either side, so in a row of cards
+   stretched to a common height the copy floats away from the image it belongs
+   to instead of sitting under it. */
+.card-wrapper .card > .card__content {
+  display: block;
+  position: relative;
+  padding: 0;
+}
+
+.card-wrapper .card__information {
+  padding: 20px var(--pcard-inset) 0;
+}
+
+.card-wrapper .card__heading {
+  font-size: var(--pcard-title);
+  font-weight: var(--pcard-title-weight);
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: var(--pcard-text);
+}
+
+/* Dawn stacks the information block; the design puts the stars and their
+   count on one line and everything else on a line of its own, which is a
+   wrapping row with the two of them left to size themselves. */
+.card-wrapper .card-information {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.card-wrapper .card-information>* {
+  flex: 1 0 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.card-wrapper .rating,
+.card-wrapper .rating-count {
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Rating
+   -------------------------------------------------------------------------- */
+
+.card-wrapper .rating {
+  margin: 10px 0 0;
+  order: 1;
+}
+
+/* A row of five stars is one box: a hard-stopped gradient painted across it —
+   filled colour up to the rating, empty colour after — with the star repeated
+   over it as a mask. `space` spreads what is left of the width evenly between
+   the five, which is where the gap between them comes from. One element, no
+   second copy to keep in step, and a half star falls out of the gradient stop
+   rather than needing its own glyph. */
+.card__stars,
+.card-wrapper .rating-star {
+  --pcard-star-w: calc(var(--pcard-star-size) * 15 / 14);
+  display: inline-block;
+  width: calc(var(--pcard-star-w) * 5 + var(--pcard-star-gap) * 4);
+  height: var(--pcard-star-size);
+  background-image: linear-gradient(to right,
+      var(--pcard-star) var(--percent, 100%),
+      var(--pcard-star-empty) var(--percent, 100%));
+  -webkit-mask-image: var(--pcard-star-icon);
+  mask-image: var(--pcard-star-icon);
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+  -webkit-mask-repeat: space no-repeat;
+  mask-repeat: space no-repeat;
+  font-size: 0;
+  letter-spacing: 0;
+}
+
+/* Dawn draws its stars as text through this pseudo-element, and works the
+   half star into `--percent` with the font metrics. The mask replaces both. */
+.card-wrapper .rating-star {
+  --percent: calc(var(--rating) / var(--rating-max) * 100%);
+}
+
+.card-wrapper .rating-star::before {
+  display: none;
+}
+
+/* The design shows the count alone — "20 Reviews" — so the score beside it is
+   redundant. It stays in the markup for the screen reader label. */
+.card-wrapper .rating-text {
+  display: none;
+}
+
+.card-wrapper .rating-count {
+  margin: 10px 0 0 8px;
+  order: 2;
+  font-size: 11px;
+  letter-spacing: 0;
+  color: var(--pcard-muted);
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Type line and price
+   -------------------------------------------------------------------------- */
+
+/* No ancestor: `card__meta` is this theme's own class, so there is nothing in
+   Dawn for it to lose a specificity tie against, and both cards can share it
+   exactly as written. */
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.card__meta-sep {
+  font-size: 10px;
+}
+
+/* The sizes are controls, so they carry the affordance the type label does
+   not — but as an underline and a heavier weight rather than a box, which
+   would sit oddly in a line whose other half is a plain label. They also have
+   to out-rank the card's full-surface link overlay, which would otherwise
+   swallow the click. */
+.card__variant {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.card__variant:hover {
+  text-decoration: underline;
+}
+
+.card__variant.is-selected {
+  color: var(--pcard-text);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.card__variant.is-unavailable {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Written back into the card by the variant script, and rendered as-is by the
+   section's own card, so one rule covers both. */
+.card__price-was {
+  margin-left: 6px;
+  font-weight: 400;
+  color: var(--pcard-muted);
+}
+
+.card-wrapper .card__meta {
+  order: 3;
+  flex: 1 0 100%;
+}
+
+.card-wrapper .price {
+  order: 4;
+  flex: 1 0 100%;
+  margin: 12px 0 0;
+  font-size: var(--pcard-price);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--pcard-text);
+}
+
+.card-wrapper .price--on-sale .price-item--regular {
+  font-weight: 400;
+  color: var(--pcard-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Add to cart
+   -------------------------------------------------------------------------- */
+
+/* The button belongs to the tile, not to the flow under it, so the copy never
+   moves when it appears. Taking it out of the flow collapses the wrapper it
+   sits in, which is what keeps the gap it used to occupy from staying behind.
+   `bottom: 100% + inset` puts its base that far above the copy's top edge —
+   which is the tile's bottom edge — so it rides inside the image.
+
+   That measurement is against the copy, so the wrapper must not be positioned
+   itself: Dawn makes it `relative`, which turns it into the containing block
+   and leaves the button measuring against a collapsed box — which is how it
+   ends up sitting over the price instead of over the picture. */
+.card-wrapper .quick-add {
+  position: static;
+  margin: 0;
+  padding: 0;
+}
+
+.card-wrapper .quick-add__submit.button {
+  position: absolute;
+  left: var(--pcard-inset);
+  right: var(--pcard-inset);
+  bottom: calc(100% + var(--pcard-inset));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  height: var(--pcard-atc-h);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--pcard-atc-bg);
+  box-shadow: none;
+  color: var(--pcard-atc-fg);
+  font-size: var(--pcard-atc-text);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  opacity: 0;
+  transform: translate3d(0, calc(100% + var(--pcard-inset)), 0);
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.card-wrapper .quick-add__submit.button::after,
+.card-wrapper .quick-add__submit.button::before {
+  display: none;
+}
+
+.card-wrapper:hover .quick-add__submit.button,
+.card-wrapper:focus-within .quick-add__submit.button {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+/* Picking a size that is out of stock leaves the button in place, saying so,
+   rather than removing the only thing on the card that explains why. */
+.card-wrapper .quick-add__submit.button.is-unavailable,
+.pcard__atc.is-unavailable {
+  background: #8a8a8a;
+  cursor: default;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 749px) {
+
+  /* Hover cannot reveal the button on touch, so it simply stays put. */
+  .card-wrapper .quick-add__submit.button {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    height: calc(var(--pcard-atc-h) * 0.8);
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-wrapper .quick-add__submit.button {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ==========================================================================
+   The card itself
+   ==========================================================================
+   Rendered by `product-card-brand.liquid`, which is what the home page's own
+   sections use. The rules above dress the theme's stock card to match this
+   one; these are the thing being matched.
+   ========================================================================== */
+
+.pcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pcard__frame {
+  position: relative;
+  overflow: hidden;
+  /* Keeps the image's multiply blend composited against this tile's own
+     colour rather than whatever the page paints behind the card. */
+  isolation: isolate;
+  aspect-ratio: var(--pcard-media-aspect, 1);
+  background-color: var(--pcard-media-bg, #e6e9fc);
+}
+
+.pcard__media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: var(--pcard-media-pad, 0px);
+}
+
+/* Multiply lets a product shot on a white backdrop take the tile's colour:
+   white multiplied by the tint is the tint, while the product itself is dark
+   enough to come through nearly unchanged. */
+.pcard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: var(--pcard-media-fit, contain);
+  mix-blend-mode: var(--pcard-media-blend, normal);
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pcard:hover .pcard__img {
+  transform: scale(1.04);
+}
+
+/* The button belongs to the frame, not the flow, so the copy underneath never
+   moves when it appears. */
+.pcard__form {
+  margin: 0;
+}
+
+.pcard__atc {
+  position: absolute;
+  left: var(--pcard-inset, 16px);
+  right: var(--pcard-inset, 16px);
+  bottom: var(--pcard-inset, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--pcard-atc-h, 50px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: var(--pcard-atc-bg, #000);
+  color: var(--pcard-atc-fg, #fff);
+  font-family: inherit;
+  font-size: var(--pcard-atc-text, 19px);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0;
+  transform: translate3d(0, calc(100% + var(--pcard-inset, 16px)), 0);
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.pcard:hover .pcard__atc,
+.pcard:focus-within .pcard__atc {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.pcard__atc--soldout {
+  background-color: #8a8a8a;
+  cursor: default;
+  pointer-events: none;
+}
+
+.pcard__atc.is-loading .pcard__atc-label {
+  opacity: 0.55;
+}
+
+.pcard__atc.is-error {
+  animation: bbc-shake 0.45s ease;
+}
+
+@keyframes bbc-shake {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate3d(-5px, 0, 0);
+  }
+
+  75% {
+    transform: translate3d(5px, 0, 0);
+  }
+}
+
+.pcard__info {
+  padding: 20px var(--pcard-inset, 16px) 0;
+}
+
+.pcard__title {
+  display: block;
+  font-size: var(--pcard-title, 16px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--pcard-text, #000);
+  text-decoration: none;
+}
+
+.pcard__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pcard__rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pcard__reviews {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcard-muted, #6b6b6b);
+}
+
+.pcard__price {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--pcard-text, #000);
+}
+
+@media screen and (max-width: 749px) {
+  /* Hover cannot reveal the button on touch, so it simply stays put. */
+  .pcard__atc {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    height: calc(var(--pcard-atc-h, 50px) * 0.8);
+    font-size: 16px;
+  }
+
+  .pcard__atc--soldout {
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard__img,
+  .pcard__atc {
+    transition-duration: 0.01ms;
+  }
+}

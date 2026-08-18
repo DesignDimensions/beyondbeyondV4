@@ -62,7 +62,7 @@
   {{ section.shopify_attributes }}
 >
   {%- if s.heading != blank -%}
-    <h2 class="hp-heading" data-hp-reveal>{{ s.heading }}</h2>
+    <h2 class="section-title" data-hp-reveal>{{ s.heading }}</h2>
   {%- endif -%}
 
   <div class="hp-stage" data-hp-stage>
@@ -187,7 +187,7 @@
           <p class="hp-callout__title">{{ b.title }}</p>
         {%- endif -%}
         {%- if b.text != blank -%}
-          <div class="hp-callout__text">{{ b.text }}</div>
+          <div class="hp-callout__text section-text">{{ b.text }}</div>
         {%- endif -%}
       </div>
     {%- endfor -%}

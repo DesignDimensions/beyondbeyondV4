@@ -1,0 +1,252 @@
+/* ==========================================================================
+   Gallery — a drifting row of images that open out of the row itself
+   ========================================================================== */
+
+.gal {
+  padding-top: var(--gal-pad-top, 60px);
+  padding-bottom: var(--gal-pad-bottom, 60px);
+  overflow: hidden;
+}
+
+/* The row is the window; the track is longer than it and slides. `pan-y` is
+   what makes it grabbable on a phone without stealing the page — the browser
+   keeps vertical scrolling and hands us anything sideways. */
+.gal__row {
+  position: relative;
+  display: flex;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gal.is-grabbing .gal__row {
+  cursor: grabbing;
+}
+
+.gal__track {
+  display: flex;
+  flex: 0 0 auto;
+  will-change: transform;
+}
+
+.gal__seq {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: var(--gal-gap, 34px);
+  padding-right: var(--gal-gap, 34px);
+}
+
+.gal__item {
+  position: relative;
+  z-index: 0;
+  display: block;
+  flex: 0 0 auto;
+  height: var(--gal-h, 320px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--gal-radius, 0px);
+  overflow: hidden;
+  background: var(--gal-tile-bg, #f2f2f2);
+  cursor: pointer;
+  /* The swell is on the tile, not the image inside it, so the corner radius
+     grows with it and nothing has to be re-clipped mid-transition. */
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Raised over its neighbours only while it is the one growing, so the tiles
+   either side are overlapped rather than pushing back. */
+.gal__item:hover {
+  z-index: 1;
+  transform: scale(1.06);
+}
+
+.gal__item:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* Hidden rather than removed while its image is open in the viewer: the tile
+   keeps its place in the row, so the picture has somewhere exact to fall back
+   into when it closes. */
+.gal__item.is-open {
+  opacity: 0;
+}
+
+.gal__img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   Viewer
+   --------------------------------------------------------------------------
+   The opened image is one element that travels from the tile's place on
+   screen to the middle of the window and back. It is never a second copy
+   fading in over the first — there is nothing to line up, and nothing to
+   catch out at either end.
+   -------------------------------------------------------------------------- */
+
+.gal__viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gal__viewer[hidden] {
+  display: none;
+}
+
+/* The theme hides every empty div (base.css), and this one is empty by
+   design — it is a sheet of colour, not a container. Dawn's own cart-drawer
+   overlay opts out of that rule the same way. */
+.gal__backdrop:empty {
+  display: block;
+}
+
+.gal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--gal-backdrop, rgba(11, 11, 15, 0.6));
+  -webkit-backdrop-filter: blur(var(--gal-backdrop-blur, 18px));
+  backdrop-filter: blur(var(--gal-backdrop-blur, 18px));
+  opacity: 0;
+  cursor: zoom-out;
+}
+
+/* Fixed, and placed frame by frame by the script — it starts life exactly over
+   the tile that was clicked. */
+.gal__full {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Above the backdrop rather than merely later than it in the markup, so
+     nothing about paint order decides whether it can be clicked. */
+  z-index: 1;
+  object-fit: cover;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+  will-change: transform, width, height;
+  cursor: zoom-in;
+  /* A press on an image with a pixel of travel in it starts the browser's own
+     drag-the-picture gesture, and the click that should have followed never
+     arrives. */
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gal__viewer.is-zoomed .gal__full {
+  cursor: grab;
+}
+
+.gal__viewer.is-panning .gal__full {
+  cursor: grabbing;
+}
+
+.gal__close,
+.gal__nav {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--gal-viewer-fg, #fff);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* `display: flex` above would otherwise beat the attribute's own display:none,
+   and a single-image gallery has nowhere to step to. */
+.gal__close[hidden],
+.gal__nav[hidden] {
+  display: none;
+}
+
+.gal__close:hover,
+.gal__nav:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.gal__close {
+  width: 42px;
+  height: 42px;
+  font-size: 26px;
+}
+
+.gal__nav {
+  width: 52px;
+  height: 52px;
+  font-size: 30px;
+}
+
+.gal__nav--prev:hover {
+  transform: translateX(-3px);
+}
+
+.gal__nav--next:hover {
+  transform: translateX(3px);
+}
+
+.gal__caption {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  color: var(--gal-viewer-fg, #fff);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gal__caption:empty {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .gal__item {
+    height: var(--gal-h-mobile, 200px);
+  }
+
+  .gal__seq {
+    gap: calc(var(--gal-gap, 34px) * 0.6);
+    padding-right: calc(var(--gal-gap, 34px) * 0.6);
+  }
+
+  .gal__nav {
+    width: 44px;
+    height: 44px;
+    font-size: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gal__item {
+    transition-duration: 0.01ms;
+  }
+}

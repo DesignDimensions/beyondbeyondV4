@@ -1,0 +1,125 @@
+{%- comment -%}
+  The brand's product card: a tinted tile with the add-to-cart riding inside
+  it, then title, stars, type line and price.
+
+  This is the card itself — markup and all — rather than a second card that
+  merely looks like the first. Anything that renders it gets the same card by
+  construction, so the two can never drift the way two stylesheets aiming at
+  the same design eventually do. The theme's own `card-product` snippet is
+  styled to match it in product-card.css, for the stock grids that render it.
+
+  Accepts:
+  - product: {Object} the product to show
+  - sizes: {String} the img sizes attribute (optional)
+  - show_rating: {Boolean} show the stars and review count. Default: true
+  - show_meta: {Boolean} show the type and size line. Default: true
+  - reviews_label: {String} the word after the count. Default: 'Reviews'
+  - fallback_rating: {Number} rating to show when the product has no reviews
+  - fallback_review_count: {Number} count to show alongside it
+  - cart_behavior: {String} 'add' adds the variant, anything else links to the
+    product page. Default: 'add'
+  - atc_label / soldout_label: {String} button wording
+
+  Usage:
+  {% render 'product-card-brand', product: product, atc_label: 'Add to Cart' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant | default: product.variants.first
+
+  comment
+    A real reviews metafield always wins; the values passed in only stand in
+    while the review app has nothing to show yet.
+  endcomment
+  assign rating = fallback_rating
+  assign rating_count = fallback_review_count
+  if product.metafields.reviews.rating.value != blank
+    assign rating = product.metafields.reviews.rating.value.rating
+    assign rating_count = product.metafields.reviews.rating_count
+  endif
+  assign rating_percent = rating | times: 20.0
+
+  assign card_sizes = sizes | default: '(min-width: 990px) 33vw, 50vw'
+  assign add_label = atc_label | default: 'Add to Cart'
+  assign out_label = soldout_label | default: 'Sold out'
+  assign reviews_word = reviews_label | default: 'Reviews'
+-%}
+
+<div class="pcard" data-card>
+  {%- comment -%}
+    The frame owns the image shape so the add-to-cart button can sit against
+    its bottom edge. The button cannot live inside the media link — a form is
+    not allowed inside an anchor.
+  {%- endcomment -%}
+  <div class="pcard__frame">
+    <a class="pcard__media" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+      {%- if product.featured_image != blank -%}
+        <img
+          class="pcard__img"
+          src="{{ product.featured_image | image_url: width: 800 }}"
+          srcset="
+            {{ product.featured_image | image_url: width: 400 }} 400w,
+            {{ product.featured_image | image_url: width: 800 }} 800w
+          "
+          sizes="{{ card_sizes }}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          alt="{{ product.featured_image.alt | escape }}"
+          loading="lazy"
+          decoding="async"
+        >
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'pcard__img' }}
+      {%- endif -%}
+    </a>
+
+    {%- if cart_behavior != 'link' and variant != blank and variant.available -%}
+      <form class="pcard__form" method="post" action="{{ routes.cart_add_url }}" data-card-form>
+        <input type="hidden" name="form_type" value="product">
+        <input type="hidden" name="utf8" value="✓">
+        <input type="hidden" name="id" value="{{ variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button class="pcard__atc" type="submit" data-card-add>
+          <span class="pcard__atc-label">{{ add_label }}</span>
+        </button>
+      </form>
+    {%- elsif cart_behavior != 'link' and variant != blank -%}
+      <span class="pcard__atc pcard__atc--soldout">{{ out_label }}</span>
+    {%- else -%}
+      <a class="pcard__atc" href="{{ product.url }}">
+        <span class="pcard__atc-label">{{ add_label }}</span>
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="pcard__info">
+    <a class="pcard__title" href="{{ product.url }}">{{ product.title }}</a>
+
+    {%- unless show_rating == false -%}
+      <div class="pcard__rating">
+        <span
+          class="card__stars"
+          style="--percent: {{ rating_percent }}%;"
+          role="img"
+          aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating, rating_max: 5 }}"
+        ></span>
+        {%- if rating_count != blank and rating_count > 0 -%}
+          <span class="pcard__reviews">{{ rating_count }} {{ reviews_word }}</span>
+        {%- endif -%}
+      </div>
+    {%- endunless -%}
+
+    {%- unless show_meta == false -%}
+      {% render 'product-card-meta', product: product %}
+    {%- endunless -%}
+
+    <p class="pcard__price" data-card-price>
+      {%- if variant.compare_at_price > variant.price -%}
+        <span class="card__price-sale">{{ variant.price | money }}</span>
+        <s class="card__price-was">{{ variant.compare_at_price | money }}</s>
+      {%- else -%}
+        <span class="card__price-now">{{ variant.price | default: product.price | money }}</span>
+      {%- endif -%}
+    </p>
+  </div>
+</div>

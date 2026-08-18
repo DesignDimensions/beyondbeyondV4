@@ -1,0 +1,152 @@
+/* ==========================================================================
+   As Seen In — two rows of press logos drifting, and draggable
+   ========================================================================== */
+
+.asi {
+  position: relative;
+  padding-top: var(--asi-pad-top, 56px);
+  padding-bottom: var(--asi-pad-bottom, 56px);
+  overflow: hidden;
+}
+
+/* A soft bloom sitting behind the logos rather than a background on the
+   section, so it can spill past the rows on all four sides without painting
+   an edge anywhere. */
+
+.asi__heading {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--asi-heading-gap, 40px);
+}
+
+.asi__rows {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--asi-row-gap, 22px);
+}
+
+/* The row is the window; the track is longer than it and slides. Nothing is
+   clipped here — the section's own overflow does that — so a logo hovered at
+   the very edge still shows its full self. */
+.asi__row {
+  position: relative;
+  display: flex;
+  cursor: grab;
+  /* What makes the row grabbable on a phone without stealing the page: the
+     browser keeps vertical scrolling, and hands us anything sideways before
+     it starts scrolling on its own. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.asi.is-grabbing .asi__row {
+  cursor: grabbing;
+}
+
+.asi__track {
+  display: flex;
+  flex: 0 0 auto;
+  will-change: transform;
+}
+
+.asi__seq {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.asi__cell {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: var(--asi-gap, 56px);
+  padding-right: var(--asi-gap, 56px);
+}
+
+.asi__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  text-decoration: none;
+  /* Opacity alone, so nothing about the logo's size or position changes when
+     the row dims around it and the drift stays perfectly even. */
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asi__logo-img {
+  display: block;
+  height: var(--asi-logo-h, 46px);
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  user-select: none;
+  cursor: grab;
+  -webkit-user-drag: none;
+}
+
+.asi__sep {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asi__sep-img {
+  display: block;
+  height: var(--asi-sep-h, 30px);
+  width: auto;
+  max-width: none;
+}
+
+/* Hovering one logo is a spotlight: everything else in the section — both
+   rows, and the separators between them — falls back. Driven by a class on
+   the section rather than `:hover` on the siblings, because the logo under the
+   pointer belongs to whichever copy of the sequence happens to be passing. */
+.asi.is-focusing .asi__logo,
+.asi.is-focusing .asi__sep {
+  opacity: var(--asi-dim, 0.2);
+}
+
+.asi.is-focusing .asi__logo.is-hovered {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------------
+   The rows are moved frame by frame from the script rather than by an
+   animation here: their position has to be a value a hand on the row can take
+   back mid-flight, and a keyframe animation would never give it up. Reduced
+   motion stops the drift there — the rows stay draggable, since that movement
+   is the reader's own doing.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .asi__logo,
+  .asi__sep {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .asi__logo-img {
+    height: var(--asi-logo-h-mobile, 32px);
+  }
+
+  .asi__cell {
+    gap: calc(var(--asi-gap, 56px) * 0.6);
+    padding-right: calc(var(--asi-gap, 56px) * 0.6);
+  }
+
+  .asi__sep-img {
+    height: calc(var(--asi-sep-h, 30px) * 0.7);
+  }
+}

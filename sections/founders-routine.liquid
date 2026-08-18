@@ -1,0 +1,463 @@
+{{ 'founders-routine.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Both routines are printed into the page, each into its own rail, so choosing
+  one is a local swap with nothing to wait for. The cards are the theme's own
+  product card — the same one every collection grid renders — so a routine
+  shows exactly what the rest of the store shows.
+{%- endcomment -%}
+
+<div
+  class="fr"
+  id="fr-{{ section.id }}"
+  data-fr
+  data-card-added-label="{{ section.settings.added_label | escape }}"
+  style="
+    --fr-pad-top: {{ section.settings.padding_top }}px;
+    --fr-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --fr-tabs-gap: {{ section.settings.tabs_gap }}px;
+    --fr-tabs-h: {{ section.settings.tabs_height }}px;
+    --fr-tabs-bg: {{ section.settings.tabs_background }};
+    --fr-tabs-border: {{ section.settings.tabs_border }};
+    --fr-tabs-radius: {{ section.settings.tabs_radius }}px;
+    --fr-tab-size: {{ section.settings.tab_size }}px;
+    --fr-tab-color: {{ section.settings.tab_color }};
+    --fr-tab-active: {{ section.settings.tab_active_color }};
+    --fr-underline: {{ section.settings.underline_height }}px;
+    --fr-rail-gap: {{ section.settings.rail_gap }}px;
+    --fr-columns: {{ section.settings.columns_desktop }};
+    --fr-columns-mobile: {{ section.settings.columns_mobile }};
+    --fr-card-gap: {{ section.settings.card_gap }}px;
+    --fr-arrow-size: {{ section.settings.arrow_size }}px;
+    --fr-arrow-offset: {{ section.settings.arrow_offset }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    {%- if section.settings.overline != blank -%}
+      <p class="section-heading">{{ section.settings.overline }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- comment -%}
+      A tab list, so the browser's own semantics carry the relationship
+      between a routine's name and its rail rather than us describing it
+      twice. The mark under the chosen one is a single element the script
+      slides between them — two labels of different lengths cannot share a
+      border and still line up.
+    {%- endcomment -%}
+    <div class="fr__tabs" data-fr-tabs role="tablist" aria-label="{{ section.settings.heading | escape }}">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign label = block.settings.label | default: block.settings.collection.title
+          assign tab_id = 'fr-tab-' | append: section.id | append: '-' | append: block.id
+          assign panel_id = 'fr-panel-' | append: section.id | append: '-' | append: block.id
+        -%}
+        <button
+          class="fr__tab{% if forloop.first %} is-active{% endif %}"
+          type="button"
+          role="tab"
+          id="{{ tab_id }}"
+          aria-controls="{{ panel_id }}"
+          aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+          tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+          data-fr-tab
+          data-index="{{ forloop.index0 }}"
+          {{ block.shopify_attributes }}
+        >
+          <span class="fr__tab-label">{{ label }}</span>
+        </button>
+      {%- endfor -%}
+
+      <span class="fr__underline" data-fr-underline aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="fr__panels" data-fr-panels>
+    {%- for block in section.blocks -%}
+      {%- liquid
+        comment
+          A routine with no collection picked yet falls back to every product
+          in the shop, so an unconfigured block shows a real rail rather than
+          an empty panel.
+        endcomment
+        assign collection = block.settings.collection
+        assign products = collection.products
+        if collection == blank
+          assign products = collections.all.products
+        endif
+        assign limit = section.settings.products_limit
+        assign tab_id = 'fr-tab-' | append: section.id | append: '-' | append: block.id
+        assign panel_id = 'fr-panel-' | append: section.id | append: '-' | append: block.id
+      -%}
+      <div
+        class="fr__panel{% if forloop.first %} is-active{% endif %}"
+        id="{{ panel_id }}"
+        role="tabpanel"
+        aria-labelledby="{{ tab_id }}"
+        data-fr-panel
+        data-index="{{ forloop.index0 }}"
+        {% unless forloop.first %}
+          hidden
+        {% endunless %}
+      >
+        <div class="page-width fr__frame">
+          {%- if section.settings.show_arrows -%}
+            <button
+              class="fr__arrow fr__arrow--prev"
+              type="button"
+              data-fr-arrow="prev"
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              <span class="fr__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+            </button>
+          {%- endif -%}
+
+          <div class="fr__rail" data-fr-rail tabindex="0" role="group" aria-label="{{ block.settings.label | escape }}">
+            {%- assign skip_card_styles = false -%}
+            {%- for product in products limit: limit -%}
+              <div class="fr__card">
+                {% render 'card-product',
+                  card_product: product,
+                  media_aspect_ratio: 'square',
+                  show_secondary_image: false,
+                  show_vendor: false,
+                  show_rating: true,
+                  quick_add: 'standard',
+                  skip_styles: skip_card_styles,
+                  section_id: section.id,
+                  product_view_context: 'founders-routine'
+                %}
+              </div>
+              {%- assign skip_card_styles = true -%}
+            {%- else -%}
+              <p class="fr__empty">{{ 'sections.collection_template.empty' | t }}</p>
+            {%- endfor -%}
+          </div>
+
+          {%- if section.settings.show_arrows -%}
+            <button
+              class="fr__arrow fr__arrow--next"
+              type="button"
+              data-fr-arrow="next"
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              <span class="fr__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+            </button>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script src="{{ 'founders-routine.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Founder's Routine",
+  "tag": "section",
+  "class": "section-founders-routine",
+  "settings": [
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "default": "FOUNDER'S ROUTINE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "A Routine For Every Part Of Your Day"
+    },
+    {
+      "type": "header",
+      "content": "Routine switcher"
+    },
+    {
+      "type": "range",
+      "id": "tabs_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below the switcher",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "tabs_height",
+      "min": 36,
+      "max": 90,
+      "step": 2,
+      "unit": "px",
+      "label": "Switcher height",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "tabs_background",
+      "label": "Switcher background",
+      "default": "#F8F8F9"
+    },
+    {
+      "type": "color",
+      "id": "tabs_border",
+      "label": "Switcher border",
+      "default": "#E4E4E7"
+    },
+    {
+      "type": "range",
+      "id": "tabs_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Switcher corner radius",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "tab_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Routine name size",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "tab_color",
+      "label": "Routine name color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_color",
+      "label": "Selected routine color",
+      "default": "#0107EF"
+    },
+    {
+      "type": "range",
+      "id": "underline_height",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "Selected routine underline",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "label": "Products per routine",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Cards visible on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1 and a peek" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "rail_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space above the cards",
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star rating",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Reviews word",
+      "default": "Reviews"
+    },
+    {
+      "type": "range",
+      "id": "fallback_rating",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "label": "Placeholder rating",
+      "info": "Shown only for products with no reviews metafield yet.",
+      "default": 5
+    },
+    {
+      "type": "number",
+      "id": "fallback_review_count",
+      "label": "Placeholder review count",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meta",
+      "label": "Show type and size line",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "cart_behavior",
+      "label": "Button action",
+      "options": [
+        { "value": "add", "label": "Add the selected variant" },
+        { "value": "link", "label": "Go to the product page" }
+      ],
+      "default": "add"
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Button label",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "added_label",
+      "label": "Added label",
+      "default": "Added"
+    },
+    {
+      "type": "text",
+      "id": "soldout_label",
+      "label": "Sold out label",
+      "default": "Sold out"
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between arrow and cards",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "routine",
+      "name": "Routine",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Name",
+          "info": "Falls back to the collection title."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Founder's Routine",
+      "blocks": [
+        { "type": "routine", "settings": { "label": "Morning Routine" } },
+        { "type": "routine", "settings": { "label": "Night Routine" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

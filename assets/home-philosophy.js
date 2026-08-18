@@ -159,7 +159,7 @@
        page without JS shows complete content rather than an empty section. */
     armReveal() {
       const parts = {
-        heading: this.root.querySelector('.hp-heading'),
+        heading: this.root.querySelector('.section-title'),
         callouts: this.root.querySelectorAll('.hp-callout'),
         textDots: this.root.querySelectorAll('.hp-dot--text'),
         anchorDots: this.root.querySelectorAll('.hp-dot--anchor'),

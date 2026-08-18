@@ -37,6 +37,7 @@
         "hotspot_color": "#0107ef",
         "add_button_label": "Add",
         "added_button_label": "Added",
+        "hotspot_auto_open": 2,
         "show_arrows": true,
         "show_dots": true,
         "autoplay": true,
@@ -131,6 +132,7 @@
       "settings": {
         "heading": "SHOP BESTSELLERS",
         "card_height": 540,
+        "handover_threshold": 50,
         "hover_background": "#0107ef",
         "hover_text": "#ffffff"
       }
@@ -233,12 +235,346 @@
         "type_tracking": 0,
         "grain_size": 700,
         "grain_soft": 80,
+        "grain_depth": 70,
         "grain": 15,
         "phase_set": 12,
         "phase_fill": 42,
         "phase_dust": 50,
         "color_background": "#ffffff",
         "type_color": "#000000"
+      }
+    },
+    "browse_by_concern": {
+      "type": "browse-by-concern",
+      "blocks": {
+        "concern_1": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": "5-discount-eligible"
+          }
+        },
+        "concern_2": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": ""
+          }
+        },
+        "concern_3": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": ""
+          }
+        },
+        "concern_4": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": ""
+          }
+        },
+        "concern_5": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": ""
+          }
+        },
+        "concern_6": {
+          "type": "concern",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+            "label": "Acne & Blemishes",
+            "collection": ""
+          }
+        }
+      },
+      "block_order": [
+        "concern_1",
+        "concern_2",
+        "concern_3",
+        "concern_4",
+        "concern_5",
+        "concern_6"
+      ],
+      "name": "Browse By Concern",
+      "settings": {
+        "heading": "BROWSE BY CONCERN",
+        "thumbs_visible": 6,
+        "thumbs_visible_mobile": 3,
+        "thumb_ratio_w": 173,
+        "thumb_ratio_h": 229,
+        "thumb_gap": 2.5,
+        "thumb_radius": 0,
+        "active_lift": 28,
+        "label_size": 11,
+        "label_letter_spacing": 0,
+        "label_color": "#4a4a4a",
+        "label_active_color": "#000000",
+        "dot_color": "#000000",
+        "rail_gap": 28,
+        "show_arrows": true,
+        "arrows_loop": false,
+        "arrow_prev_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967",
+        "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
+        "arrow_size": 16,
+        "arrow_offset": 16,
+        "fallback_collection": "",
+        "products_limit": 6,
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "grid_gap": 16,
+        "card_media_background": "#e6e9fc",
+        "card_media_ratio": "1",
+        "card_media_fit": "cover",
+        "card_media_blend": true,
+        "card_media_padding": 0,
+        "card_inset": 16,
+        "card_title_size": 16,
+        "card_text_color": "#000000",
+        "card_muted_color": "#6b6b6b",
+        "show_rating": true,
+        "star_color": "#0107ef",
+        "reviews_label": "Reviews",
+        "fallback_rating": 5,
+        "fallback_review_count": 20,
+        "show_meta": true,
+        "cart_behavior": "add",
+        "atc_label": "Add to Cart",
+        "added_label": "Added",
+        "soldout_label": "Sold out",
+        "atc_background": "#000000",
+        "atc_text_color": "#ffffff",
+        "atc_height": 50,
+        "show_view_all": false,
+        "view_all_label": "View all",
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    },
+    "as_seen_in": {
+      "type": "as-seen-in",
+      "blocks": {
+        "logo_vogue": {
+          "type": "logo",
+          "settings": {
+            "name": "Vogue India",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321319004_1.png?v=1787043113"
+          }
+        },
+        "logo_cosmopolitan": {
+          "type": "logo",
+          "settings": {
+            "name": "Cosmopolitan India",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_2_1_b4215a6b-8d52-496e-b612-29d92a5ba077.png?v=1787043112"
+          }
+        },
+        "logo_grazia": {
+          "type": "logo",
+          "settings": {
+            "name": "Grazia",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_1_4_1.png?v=1787043110"
+          }
+        },
+        "logo_elle": {
+          "type": "logo",
+          "settings": {
+            "name": "Elle",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Page-1_48656e87-4f44-4ab1-a73b-99ecb359dac3.png?v=1787043109"
+          }
+        }
+      },
+      "block_order": [
+          "logo_vogue",
+          "logo_cosmopolitan",
+          "logo_grazia",
+          "logo_elle"
+      ],
+      "name": "As Seen In",
+      "settings": {
+        "heading": "AS SEEN IN",
+        "separator_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Vector_605.png?v=1787043185"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_1": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_2": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        },
+        "testimonial_3": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "ultra-hydrating-oligo-ha-mist"
+          }
+        },
+        "testimonial_4": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_5": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        },
+        "testimonial_6": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "ultra-hydrating-oligo-ha-mist"
+          }
+        },
+        "testimonial_7": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_8": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        }
+      },
+      "block_order": [
+          "testimonial_1",
+          "testimonial_2",
+          "testimonial_3",
+          "testimonial_4",
+          "testimonial_5",
+          "testimonial_6",
+          "testimonial_7",
+          "testimonial_8"
+      ],
+      "name": "Testimonials",
+      "settings": {
+        "heading": "TESTIMONIALS"
+      }
+    },
+    "gallery": {
+      "type": "gallery",
+      "blocks": {
+        "gallery_image_1": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_2": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_3": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_4": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_5": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_6": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_7": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        },
+        "gallery_image_8": {
+          "type": "image",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+          }
+        }
+      },
+      "block_order": [
+          "gallery_image_1",
+          "gallery_image_2",
+          "gallery_image_3",
+          "gallery_image_4",
+          "gallery_image_5",
+          "gallery_image_6",
+          "gallery_image_7",
+          "gallery_image_8"
+      ],
+      "name": "Gallery",
+      "settings": {}
+    },
+    "founders": {
+      "type": "founders",
+      "settings": {
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318963.png?v=1787051600",
+        "heading": "From Our Founders",
+        "cta_label": "Our Story"
+      }
+    },
+    "founders_routine": {
+      "type": "founders-routine",
+      "blocks": {
+        "routine_morning": {
+          "type": "routine",
+          "settings": {
+            "label": "Morning Routine"
+          }
+        },
+        "routine_night": {
+          "type": "routine",
+          "settings": {
+            "label": "Night Routine"
+          }
+        }
+      },
+      "block_order": [
+        "routine_morning",
+        "routine_night"
+      ],
+      "name": "Founder's Routine",
+      "settings": {
+        "overline": "FOUNDER'S ROUTINE",
+        "heading": "A Routine For Every Part Of Your Day"
       }
     }
   },
@@ -247,6 +583,12 @@
     "usp_carousal_m8RAJH",
     "home_bestsellers_gtGjFX",
     "home_philosophy_4kTxNb",
-    "video_parallax_hLmT4c"
+    "video_parallax_hLmT4c",
+    "browse_by_concern",
+    "as_seen_in",
+    "testimonials",
+    "gallery",
+    "founders",
+    "founders_routine"
   ]
 }

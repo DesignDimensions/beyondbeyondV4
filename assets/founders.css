@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Founders — a tinted panel: the founders on the left, their word on the right
+   ========================================================================== */
+
+.fnd {
+  padding-top: var(--fnd-pad-top, 56px);
+  padding-bottom: var(--fnd-pad-bottom, 56px);
+}
+
+/* One inset, repeated on all four sides, is what makes the panel read as a
+   plate rather than as two columns that happen to share a background. */
+.fnd__panel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fnd-gap, 20px);
+  padding: 60px;
+  background-color: var(--fnd-bg, #f2f3ff);
+}
+
+.fnd__media {
+  flex: 0 0 45%;
+  max-width: 45%;
+  aspect-ratio: var(--fnd-media-ratio, 0.815);
+  overflow: hidden;
+}
+
+.fnd__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The copy takes whatever the image leaves, so the two together always come
+   to the panel's width exactly. */
+.fnd__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fnd__heading {
+  margin: 0 0 var(--fnd-heading-gap, 32px);
+  font-size: var(--fnd-heading-size, 32px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--fnd-heading-color, #1a1a1a);
+}
+
+/* Size and leading come from `.section-text`, which the philosophy callouts
+   read too — only the tint and the space between paragraphs belong to this
+   panel. The margin reset comes with it. */
+.fnd__body {
+  color: var(--fnd-body-color, #3d3d3d);
+}
+
+.fnd__body>*+* {
+  margin-top: var(--fnd-body-gap, 24px);
+}
+
+/* --------------------------------------------------------------------------
+   Button
+   -------------------------------------------------------------------------- */
+
+/* The full width of the copy column, as drawn — the button is the foot of
+   that column rather than a shape sitting loose inside it. */
+.fnd__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  height: var(--fnd-cta-h, 48px);
+  margin-top: var(--fnd-cta-gap, 40px);
+  border-radius: var(--fnd-cta-radius, 0px);
+  background-color: var(--fnd-cta-bg, #0107ef);
+  color: var(--fnd-cta-fg, #fff);
+  font-size: var(--fnd-cta-size, 16px);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  transition: filter 0.3s ease;
+}
+
+.fnd__cta:hover {
+  filter: brightness(1.12);
+}
+
+.fnd__cta-arrow {
+  width: 34px;
+  height: 10px;
+  flex: 0 0 auto;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fnd__cta:hover .fnd__cta-arrow {
+  transform: translateX(6px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .fnd__panel {
+    flex-direction: column;
+    gap: 28px;
+    padding: calc(var(--fnd-inset, 40px) * 0.6);
+  }
+
+  .fnd__media {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .fnd__heading {
+    margin-bottom: calc(var(--fnd-heading-gap, 32px) * 0.75);
+  }
+
+  .fnd__cta {
+    margin-top: calc(var(--fnd-cta-gap, 40px) * 0.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .fnd__cta,
+  .fnd__cta-arrow {
+    transition-duration: 0.01ms;
+  }
+}

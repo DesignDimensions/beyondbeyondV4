@@ -1,0 +1,534 @@
+{{ 'testimonials.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    Every card carries its own video and its own product. The video is the
+    testimonial; the card sitting on it is the thing being spoken about, and
+    the whole of that card is one link to the product page — so the only
+    click the video itself has to answer for is the one that turns the sound
+    on.
+  endcomment
+  assign arrow_prev = section.settings.arrow_prev_url
+  if section.settings.arrow_prev != blank
+    assign arrow_prev = section.settings.arrow_prev | image_url: width: 120
+  endif
+
+  assign arrow_next = section.settings.arrow_next_url
+  if section.settings.arrow_next != blank
+    assign arrow_next = section.settings.arrow_next | image_url: width: 120
+  endif
+-%}
+
+<div
+  class="tst"
+  id="tst-{{ section.id }}"
+  data-tst
+  data-mute-label="{{ section.settings.mute_label | escape }}"
+  data-unmute-label="{{ section.settings.unmute_label | escape }}"
+  style="
+    --tst-pad-top: {{ section.settings.padding_top }}px;
+    --tst-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --tst-heading-gap: {{ section.settings.heading_gap }}px;
+    --tst-columns: {{ section.settings.columns_desktop }};
+    --tst-columns-mobile: {{ section.settings.columns_mobile }};
+    --tst-gap: {{ section.settings.card_gap }}px;
+    --tst-radius: {{ section.settings.card_radius }}px;
+    --tst-ratio: {{ section.settings.video_ratio }};
+    --tst-media-bg: {{ section.settings.media_background }};
+    --tst-scrim: {{ section.settings.scrim_opacity }};
+    --tst-inset: {{ section.settings.card_inset }}px;
+    --tst-thumb: {{ section.settings.thumb_size }}px;
+    --tst-title-size: {{ section.settings.title_size }}px;
+    --tst-price-size: {{ section.settings.price_size }}px;
+    --tst-card-text: {{ section.settings.card_text_color }};
+    --tst-mute-size: {{ section.settings.mute_size }}px;
+    --tst-mute-bg: {{ section.settings.mute_background }};
+    --tst-mute-fg: {{ section.settings.mute_color }};
+    --tst-arrow-size: {{ section.settings.arrow_size }}px;
+    --tst-arrow-offset: {{ section.settings.arrow_offset }}px;
+    --tst-tag-bg: {{ section.settings.tag_background }};
+    --tst-tag-fg: {{ section.settings.tag_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- if section.settings.heading != blank -%}
+    <div class="page-width">
+      <p class="section-heading tst__heading">{{ section.settings.heading }}</p>
+    </div>
+  {%- endif -%}
+
+  <div class="page-width tst__frame">
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="tst__arrow tst__arrow--prev"
+        type="button"
+        data-tst-arrow="prev"
+        aria-label="{{ 'general.slider.previous_slide' | t }}"
+      >
+        {%- if arrow_prev != blank -%}
+          <img src="{{ arrow_prev }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+        {%- else -%}
+          <span class="tst__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+        {%- endif -%}
+      </button>
+    {%- endif -%}
+
+    {%- comment -%}
+      A scroll container rather than a transformed track: swipe, trackpad,
+      keyboard and the arrows all drive the same one thing, and the browser
+      keeps the snapping honest at every width.
+    {%- endcomment -%}
+    <div class="tst__rail" data-tst-rail tabindex="0" role="group" aria-label="{{ section.settings.heading | escape }}">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign product = block.settings.product
+          assign variant = product.selected_or_first_available_variant | default: product.variants.first
+          assign poster = ''
+          if block.settings.poster != blank
+            assign poster = block.settings.poster | image_url: width: 720
+          endif
+        -%}
+        <article class="tst__card" data-tst-card {{ block.shopify_attributes }}>
+          <div class="tst__media" data-tst-media>
+            {%- if block.settings.video != blank -%}
+              {{
+                block.settings.video
+                | video_tag:
+                  class: 'tst__video',
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  controls: false,
+                  playsinline: true,
+                  image_size: '720x'
+              }}
+            {%- elsif block.settings.video_url != blank -%}
+              <video
+                class="tst__video"
+                data-tst-video
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                {% if poster != blank %}
+                  poster="{{ poster }}"
+                {% endif %}
+              >
+                <source src="{{ block.settings.video_url }}" type="video/mp4">
+              </video>
+            {%- else -%}
+              <span class="tst__placeholder" aria-hidden="true">
+                {{ 'hero-apparel-1' | placeholder_svg_tag: 'tst__placeholder-svg' }}
+              </span>
+            {%- endif -%}
+          </div>
+
+          {%- comment -%}
+            Outside the media, not inside it: hovering this must not read as
+            hovering the video, or the cursor tag would offer to unmute while
+            the pointer is on the button that already does it.
+          {%- endcomment -%}
+          <button
+            class="tst__mute"
+            type="button"
+            data-tst-mute
+            aria-pressed="true"
+            aria-label="{{ section.settings.unmute_label | escape }}"
+          >
+            <span class="tst__mute-icon tst__mute-icon--muted">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor"/>
+                <path d="m16 9 5 6m0-6-5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="tst__mute-icon tst__mute-icon--unmuted">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor"/>
+                <path
+                  d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
+          </button>
+
+          {%- if product != blank -%}
+            <a class="tst__product" href="{{ product.url }}">
+              <span class="tst__product-media">
+                {%- if product.featured_image != blank -%}
+                  <img
+                    class="tst__product-img"
+                    src="{{ product.featured_image | image_url: width: 200 }}"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'tst__product-img' }}
+                {%- endif -%}
+              </span>
+              <span class="tst__product-info">
+                <span class="tst__product-title">{{ product.title }}</span>
+                <span class="tst__product-price">{{ variant.price | default: product.price | money }}</span>
+              </span>
+            </a>
+          {%- endif -%}
+        </article>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="tst__arrow tst__arrow--next"
+        type="button"
+        data-tst-arrow="next"
+        aria-label="{{ 'general.slider.next_slide' | t }}"
+      >
+        {%- if arrow_next != blank -%}
+          <img src="{{ arrow_next }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+        {%- else -%}
+          <span class="tst__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+        {%- endif -%}
+      </button>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+    The pointer tag. Split in two: the outer element only ever translates to
+    follow the cursor, the inner only ever rotates for the flip — combining a
+    percentage translation with a 3D rotation on one element shears it into a
+    parallelogram instead of flipping cleanly. The script moves it to the end
+    of <body> so its fixed position resolves against the window rather than
+    against any transformed ancestor.
+  {%- endcomment -%}
+  <span class="tst__cursor" data-tst-cursor aria-hidden="true">
+    <span class="tst__cursor-flip" data-tst-cursor-flip>
+      <span class="tst__cursor-mask">
+        <span class="tst__cursor-text" data-tst-cursor-text>{{ section.settings.unmute_label }}</span>
+      </span>
+    </span>
+  </span>
+</div>
+
+<script src="{{ 'testimonials.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section-testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "TESTIMONIALS"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below heading",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Cards visible on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1 and a peek" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 34
+    },
+    {
+      "type": "select",
+      "id": "video_ratio",
+      "label": "Video shape",
+      "options": [
+        { "value": "0.5625", "label": "Vertical (9:16)" },
+        { "value": "0.75", "label": "Portrait (3:4)" },
+        { "value": "1", "label": "Square" }
+      ],
+      "default": "0.5625"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Video background",
+      "default": "#EFEFEF"
+    },
+    {
+      "type": "header",
+      "content": "Product card"
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Shade behind the product",
+      "info": "Darkens the foot of the video so the product stays readable over it.",
+      "default": 0.8
+    },
+    {
+      "type": "range",
+      "id": "card_inset",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Inset",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "thumb_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Product image size",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Product title size",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Price size",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Card text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Sound"
+    },
+    {
+      "type": "text",
+      "id": "unmute_label",
+      "label": "Unmute label",
+      "default": "Unmute Video"
+    },
+    {
+      "type": "text",
+      "id": "mute_label",
+      "label": "Mute label",
+      "default": "Mute Video"
+    },
+    {
+      "type": "range",
+      "id": "mute_size",
+      "min": 28,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Sound button size",
+      "default": 38
+    },
+    {
+      "type": "color",
+      "id": "mute_background",
+      "label": "Sound button background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "mute_color",
+      "label": "Sound button icon",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tag_background",
+      "label": "Pointer tag background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tag_color",
+      "label": "Pointer tag text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "arrow_prev",
+      "label": "Left arrow image"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_url",
+      "label": "Left arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967"
+    },
+    {
+      "type": "image_picker",
+      "id": "arrow_next",
+      "label": "Right arrow image"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_url",
+      "label": "Right arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between arrow and cards",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video file URL",
+          "info": "An .mp4 from Content > Files. Used when no video is picked above."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster image",
+          "info": "Shown until the video has enough to play."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}

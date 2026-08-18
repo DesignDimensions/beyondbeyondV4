@@ -1,5 +1,13 @@
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The card carries its add-to-cart everywhere it appears, so this grid loads
+  what that button needs even though the section has no setting for it.
+{%- endcomment -%}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-search.css' | asset_url | stylesheet_tag }}
 
@@ -281,6 +289,7 @@
                           show_rating: section.settings.show_rating,
                           lazy_load: lazy_load,
                           skip_styles: skip_card_product_styles,
+                          quick_add: 'standard',
                           product_view_context: 'search'
                         %}
                         {%- assign skip_card_product_styles = true -%}

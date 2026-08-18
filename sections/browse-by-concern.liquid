@@ -1,0 +1,748 @@
+{{ 'browse-by-concern.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    Every concern's products are printed server-side into its own panel, so
+    switching concerns is a local swap with nothing to wait for — a fetch here
+    would put a network round trip in the middle of the transition.
+  endcomment
+  assign arrow_prev = section.settings.arrow_prev_url
+  if section.settings.arrow_prev != blank
+    assign arrow_prev = section.settings.arrow_prev | image_url: width: 120
+  endif
+
+  assign arrow_next = section.settings.arrow_next_url
+  if section.settings.arrow_next != blank
+    assign arrow_next = section.settings.arrow_next | image_url: width: 120
+  endif
+
+  comment
+    The rail is never given a thumbnail width in px. It is told how many
+    thumbnails share the page-width column and how wide the gap between them
+    is as a share of it, and the CSS divides the row by that — so six of them
+    always fit, flush with the column's edges, whatever width the theme
+    settles on. The shape of each comes from the ratio below, not a height.
+  endcomment
+  assign ratio_w = section.settings.thumb_ratio_w | default: 173
+  assign ratio_h = section.settings.thumb_ratio_h | default: 229
+
+  comment
+    The lift and the labels still carry px settings, and those are written as
+    a share of the 1200px content column the design was drawn to: 1px is 1/12
+    of a cqw, which lands back on the exact setting at 1200 and shrinks with
+    the column below it. Type shrinks far more gently than the thumbnails it
+    sits under — a label scaled the whole way down stops being readable long
+    before the rail runs out of room.
+  endcomment
+  assign thumb_lift_cq = section.settings.active_lift | divided_by: 12.0
+  assign thumb_lift_min = section.settings.active_lift | times: 0.62 | round: 1
+  assign label_cq = section.settings.label_size | divided_by: 12.0
+  assign label_min = section.settings.label_size | times: 0.85 | round: 1
+-%}
+
+<div
+  class="bbc"
+  id="bbc-{{ section.id }}"
+  data-bbc
+  data-loop="{{ section.settings.arrows_loop }}"
+  data-card-added-label="{{ section.settings.added_label | escape }}"
+  style="
+    --bbc-pad-top: {{ section.settings.padding_top }}px;
+    --bbc-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --bbc-visible: {{ section.settings.thumbs_visible }};
+    --bbc-visible-mobile: {{ section.settings.thumbs_visible_mobile }};
+    --bbc-ratio-w: {{ ratio_w }};
+    --bbc-ratio-h: {{ ratio_h }};
+    --bbc-thumb-gap: {{ section.settings.thumb_gap }}%;
+    --bbc-thumb-lift: clamp({{ thumb_lift_min }}px, {{ thumb_lift_cq }}cqw, {{ section.settings.active_lift }}px);
+    --bbc-thumb-radius: {{ section.settings.thumb_radius }}px;
+    --bbc-label-size: clamp({{ label_min }}px, {{ label_cq }}cqw, {{ section.settings.label_size }}px);
+    --bbc-label-spacing: {{ section.settings.label_letter_spacing }}px;
+    --bbc-label-color: {{ section.settings.label_color }};
+    --bbc-label-active-color: {{ section.settings.label_active_color }};
+    --bbc-dot-color: {{ section.settings.dot_color }};
+    --bbc-arrow-size: {{ section.settings.arrow_size }}px;
+    --bbc-arrow-offset: {{ section.settings.arrow_offset }}px;
+    --bbc-rail-gap: {{ section.settings.rail_gap }}px;
+    --bbc-columns: {{ section.settings.columns_desktop }};
+    --bbc-columns-mobile: {{ section.settings.columns_mobile }};
+    --bbc-grid-gap: {{ section.settings.grid_gap }}px;
+    --pcard-media-bg: {{ section.settings.card_media_background }};
+    --pcard-media-aspect: {{ section.settings.card_media_ratio }};
+    --pcard-media-fit: {{ section.settings.card_media_fit }};
+    --pcard-media-blend: {% if section.settings.card_media_blend %}multiply{% else %}normal{% endif %};
+    --pcard-media-pad: {{ section.settings.card_media_padding }}px;
+    --pcard-inset: {{ section.settings.card_inset }}px;
+    --pcard-title: {{ section.settings.card_title_size }}px;
+    --pcard-text: {{ section.settings.card_text_color }};
+    --pcard-muted: {{ section.settings.card_muted_color }};
+    --pcard-star: {{ section.settings.star_color }};
+    --pcard-atc-bg: {{ section.settings.atc_background }};
+    --pcard-atc-fg: {{ section.settings.atc_text_color }};
+    --pcard-atc-h: {{ section.settings.atc_height }}px;
+  "
+>
+  <div class="page-width bbc__inner">
+    {%- if section.settings.heading != blank -%}
+      <p class="section-heading">{{ section.settings.heading }}</p>
+    {%- endif -%}
+
+    {%- comment -%}
+      Concern rail. The buttons are a tab list — each one owns the grid below
+      it — so the browser's own tab semantics carry the relationship for
+      screen readers instead of us describing it twice.
+    {%- endcomment -%}
+    <div class="bbc__rail" data-bbc-rail>
+      {%- if section.settings.show_arrows -%}
+        <button
+          class="bbc__arrow bbc__arrow--prev"
+          type="button"
+          data-bbc-arrow="prev"
+          aria-label="{{ 'general.slider.previous_slide' | t }}"
+        >
+          {%- if arrow_prev != blank -%}
+            <img src="{{ arrow_prev }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+          {%- else -%}
+            <span class="bbc__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+          {%- endif -%}
+        </button>
+      {%- endif -%}
+
+      <div class="bbc__viewport" data-bbc-viewport>
+        <div class="bbc__track" data-bbc-track role="tablist" aria-label="{{ section.settings.heading | escape }}">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign concern_image = block.settings.image
+              assign concern_label = block.settings.label | default: block.settings.collection.title
+              assign panel_id = 'bbc-panel-' | append: section.id | append: '-' | append: block.id
+              assign tab_id = 'bbc-tab-' | append: section.id | append: '-' | append: block.id
+            -%}
+            <button
+              class="bbc__concern{% if forloop.first %} is-active{% endif %}"
+              type="button"
+              role="tab"
+              id="{{ tab_id }}"
+              aria-controls="{{ panel_id }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+              data-bbc-concern
+              data-index="{{ forloop.index0 }}"
+              {{ block.shopify_attributes }}
+            >
+              <span class="bbc__concern-media">
+                {%- if concern_image != blank -%}
+                  <img
+                    class="bbc__concern-img"
+                    src="{{ concern_image | image_url: width: 400 }}"
+                    srcset="
+                      {{ concern_image | image_url: width: 200 }} 200w,
+                      {{ concern_image | image_url: width: 400 }} 400w,
+                      {{ concern_image | image_url: width: 600 }} 600w
+                    "
+                    sizes="(min-width: 750px) calc(100vw / {{ section.settings.thumbs_visible }}), calc(100vw / {{ section.settings.thumbs_visible_mobile }})"
+                    width="{{ concern_image.width }}"
+                    height="{{ concern_image.height }}"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- elsif block.settings.image_url != blank -%}
+                  <img
+                    class="bbc__concern-img"
+                    src="{{ block.settings.image_url }}"
+                    width="400"
+                    height="500"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'bbc__concern-img bbc__concern-img--placeholder' }}
+                {%- endif -%}
+              </span>
+              <span class="bbc__concern-label">{{ concern_label }}</span>
+              <span class="bbc__concern-dot" aria-hidden="true"></span>
+            </button>
+          {%- endfor -%}
+        </div>
+      </div>
+
+      {%- if section.settings.show_arrows -%}
+        <button
+          class="bbc__arrow bbc__arrow--next"
+          type="button"
+          data-bbc-arrow="next"
+          aria-label="{{ 'general.slider.next_slide' | t }}"
+        >
+          {%- if arrow_next != blank -%}
+            <img src="{{ arrow_next }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+          {%- else -%}
+            <span class="bbc__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+          {%- endif -%}
+        </button>
+      {%- endif -%}
+    </div>
+
+    <div class="bbc__panels" data-bbc-panels>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          comment
+            A concern with no collection picked yet falls back to the section's
+            own collection, then to every product in the shop — an unconfigured
+            block should still show a real grid rather than an empty panel.
+          endcomment
+          assign collection = block.settings.collection
+          if collection == blank
+            assign collection = section.settings.fallback_collection
+          endif
+
+          assign concern_products = collection.products
+          assign concern_url = collection.url
+          if collection == blank
+            assign concern_products = collections.all.products
+            assign concern_url = routes.all_products_collection_url
+          endif
+
+          assign limit = section.settings.products_limit
+          assign card_sizes = '(min-width: 990px) calc(100vw / ' | append: section.settings.columns_desktop | append: '), 50vw'
+          assign panel_id = 'bbc-panel-' | append: section.id | append: '-' | append: block.id
+          assign tab_id = 'bbc-tab-' | append: section.id | append: '-' | append: block.id
+        -%}
+        <div
+          class="bbc__panel{% if forloop.first %} is-active{% endif %}"
+          id="{{ panel_id }}"
+          role="tabpanel"
+          aria-labelledby="{{ tab_id }}"
+          data-bbc-panel
+          data-index="{{ forloop.index0 }}"
+          {% unless forloop.first %}hidden{% endunless %}
+        >
+          <div class="bbc__grid">
+            {%- for product in concern_products limit: limit -%}
+              {% render 'product-card-brand',
+                product: product,
+                sizes: card_sizes,
+                show_rating: section.settings.show_rating,
+                show_meta: section.settings.show_meta,
+                reviews_label: section.settings.reviews_label,
+                fallback_rating: section.settings.fallback_rating,
+                fallback_review_count: section.settings.fallback_review_count,
+                cart_behavior: section.settings.cart_behavior,
+                atc_label: section.settings.atc_label,
+                soldout_label: section.settings.soldout_label
+              %}
+            {%- else -%}
+              <p class="bbc__empty">{{ 'sections.collection_template.empty' | t }}</p>
+            {%- endfor -%}
+          </div>
+
+          {%- if section.settings.show_view_all -%}
+            <a class="bbc__view-all" href="{{ concern_url }}">
+              {{- section.settings.view_all_label | default: collection.title -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'browse-by-concern.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Browse By Concern",
+  "tag": "section",
+  "class": "section-browse-by-concern",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "BROWSE BY CONCERN"
+    },
+    {
+      "type": "header",
+      "content": "Concern rail"
+    },
+    {
+      "type": "range",
+      "id": "thumbs_visible",
+      "min": 3,
+      "max": 9,
+      "step": 1,
+      "label": "Thumbnails visible",
+      "info": "They divide the page width between them, so the rail always ends flush with the content column.",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "thumbs_visible_mobile",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Thumbnails visible on mobile",
+      "default": 3
+    },
+    {
+      "type": "number",
+      "id": "thumb_ratio_w",
+      "label": "Thumbnail ratio width",
+      "default": 173
+    },
+    {
+      "type": "number",
+      "id": "thumb_ratio_h",
+      "label": "Thumbnail ratio height",
+      "default": 229
+    },
+    {
+      "type": "range",
+      "id": "thumb_gap",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "%",
+      "label": "Space between thumbnails",
+      "info": "A share of the rail's width, so the thumbnails keep fitting it exactly.",
+      "default": 2.5
+    },
+    {
+      "type": "range",
+      "id": "thumb_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Thumbnail corner radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "active_lift",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Selected thumbnail lifts by",
+      "info": "Hovering a thumbnail raises it the same way, so the rail shows what picking it will do.",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 8,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Label size",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "label_letter_spacing",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Label letter spacing",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#4A4A4A"
+    },
+    {
+      "type": "color",
+      "id": "label_active_color",
+      "label": "Selected label color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Selected dot color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "rail_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below rail",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "arrows_loop",
+      "label": "Wrap around at the ends",
+      "info": "Off dims the arrow once the rail reaches its end.",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "arrow_prev",
+      "label": "Left arrow image"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_url",
+      "label": "Left arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "image_picker",
+      "id": "arrow_next",
+      "label": "Right arrow image"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_url",
+      "label": "Right arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between arrow and rail",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Product grid"
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Fallback collection",
+      "info": "Used by any concern that has no collection of its own. Leave empty to fall back to all products."
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "label": "Products per concern",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between products",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "card_media_background",
+      "label": "Image background",
+      "default": "#E6E9FC"
+    },
+    {
+      "type": "select",
+      "id": "card_media_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "1.15", "label": "Landscape" },
+        { "value": "0.85", "label": "Portrait" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "card_media_fit",
+      "label": "Image fit",
+      "info": "Fill suits photos that already carry their own background. Fit shows the whole image and lets the background colour above show around it.",
+      "options": [
+        { "value": "contain", "label": "Fit inside the tile" },
+        { "value": "cover", "label": "Fill the tile" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "checkbox",
+      "id": "card_media_blend",
+      "label": "Blend image into the background",
+      "info": "Multiplies the photo over the colour above, so a product shot on a white backdrop takes on the tile colour instead of sitting in a white box. Turn off for photos that already have the right background, or transparent PNGs.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_media_padding",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Image padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_inset",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card inset",
+      "info": "How far the copy and the add-to-cart button sit in from the image's edges.",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Product title size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Product text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "card_muted_color",
+      "label": "Secondary text color",
+      "default": "#6B6B6B"
+    },
+    {
+      "type": "header",
+      "content": "Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star rating",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star color",
+      "default": "#0107EF"
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Reviews word",
+      "default": "Reviews"
+    },
+    {
+      "type": "range",
+      "id": "fallback_rating",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "label": "Placeholder rating",
+      "info": "Shown only for products with no reviews metafield yet.",
+      "default": 5
+    },
+    {
+      "type": "number",
+      "id": "fallback_review_count",
+      "label": "Placeholder review count",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meta",
+      "label": "Show type and size line",
+      "info": "Reads the product type, then its variant names.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Add to cart"
+    },
+    {
+      "type": "select",
+      "id": "cart_behavior",
+      "label": "Button action",
+      "options": [
+        { "value": "add", "label": "Add first available variant" },
+        { "value": "link", "label": "Go to the product page" }
+      ],
+      "default": "add"
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Button label",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "added_label",
+      "label": "Added label",
+      "default": "Added"
+    },
+    {
+      "type": "text",
+      "id": "soldout_label",
+      "label": "Sold out label",
+      "default": "Sold out"
+    },
+    {
+      "type": "color",
+      "id": "atc_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "atc_text_color",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "atc_height",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Button height",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "View all"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show view all link",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all label",
+      "default": "View all"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "concern",
+      "name": "Concern",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Image URL",
+          "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
+          "info": "Used when no image is picked above."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Falls back to the collection title."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Browse By Concern",
+      "blocks": [
+        { "type": "concern" },
+        { "type": "concern" },
+        { "type": "concern" },
+        { "type": "concern" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -416,6 +416,66 @@ blockquote {
   letter-spacing: 0.18rem;
 }
 
+/* Every section's header is the same pair of headings: a small tracked label
+   — the overline — over a large statement. Either half can stand alone. They
+   live here rather than in the sections so they cannot drift apart; a section
+   that wants a different look wants a different element, not an override. */
+.section-heading {
+  margin: 0 0 35px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 7px;
+  color: #000;
+  text-transform: uppercase;
+}
+
+/* The statement. Deliberately the body face: the heading face is only loaded
+   at 700, and this wants the lighter weight. `.title` is the class the
+   theme's own sections already put their heading in, so it is brought into
+   the same face here and the stock sections read as part of the theme rather
+   than beside it. Nothing but the face is claimed from them — their own
+   margins and alignment still stand. */
+.section-title,
+.title {
+  font-family: var(--font-body-family);
+  font-size: clamp(2.8rem, 4.4vw, 5rem);
+  font-weight: var(--font-body-weight);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.section-title {
+  margin: 0 auto 4rem;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* Paired, the label is that statement's overline rather than a heading in its
+   own right, so it sits in close under it instead of at arm's length. */
+.section-heading:has(+ .section-title) {
+  margin-bottom: 14px;
+}
+
+/* Body copy at the size the sections share — fluid between 14 and 16px, at the
+   line height the philosophy callouts were drawn to. Colour is left to the
+   section, since each panel tints its own text; everything else about the
+   setting is the same wherever it appears. */
+.section-text {
+  font-size: clamp(1.4rem, 1.2vw, 1.6rem);
+  line-height: 1.55;
+}
+
+.section-text > * {
+  margin: 0;
+}
+
+@media screen and (max-width: 749px) {
+  .section-title {
+    margin-bottom: 3rem;
+  }
+}
+
 .caption-large,
 .customer .field input,
 .customer select,

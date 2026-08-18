@@ -198,13 +198,17 @@
                   </span>
                 </p>
                 <p class="rating-count caption">
-                  <span aria-hidden="true">({{ card_product.metafields.reviews.rating_count }})</span>
+                  <span aria-hidden="true">
+                    {{- card_product.metafields.reviews.rating_count }} Reviews
+                  </span>
                   <span class="visually-hidden">
                     {{- card_product.metafields.reviews.rating_count }}
                     {{ 'accessibility.total_reviews' | t -}}
                   </span>
                 </p>
               {%- endif -%}
+
+              {% render 'product-card-meta', product: card_product %}
 
               {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
               {%- if card_product.quantity_price_breaks_configured? -%}
@@ -299,7 +303,14 @@
                   assign qty_rules = true
                 endif
               -%}
-              {%- if card_product.variants_count > 1 or qty_rules -%}
+              {%- comment -%}
+                Only a quantity rule needs the modal now. A product with
+                several variants is chosen on the card itself — its type line
+                carries the sizes — so it gets the same direct form a
+                single-variant product gets, pointed at whichever size is
+                selected.
+              {%- endcomment -%}
+              {%- if qty_rules -%}
                 <modal-opener data-modal="#QuickAdd-{{ card_product.id }}">
                   <button
                     id="{{ product_form_id }}-submit"

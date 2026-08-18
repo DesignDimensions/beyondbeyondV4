@@ -23,20 +23,6 @@
   overflow: hidden;
 }
 
-.hp-heading {
-  margin: 0 auto 4rem;
-  max-width: 90%;
-  text-align: center;
-  /* Deliberately the body face: the heading face is only loaded at 700, and
-     the design wants the lighter weight. */
-  font-family: var(--font-body-family);
-  font-size: clamp(2.8rem, 4.4vw, 5rem);
-  font-weight: var(--font-body-weight);
-  line-height: 1.15;
-  letter-spacing: 0;
-  color: var(--hp-text);
-}
-
 /* --------------------------------------------------------------------------
    Stage
    -------------------------------------------------------------------------- */
@@ -234,13 +220,7 @@
 }
 
 .hp-callout__text {
-  font-size: clamp(1.4rem, 1.2vw, 1.6rem);
-  line-height: 1.55;
   color: var(--hp-text);
-}
-
-.hp-callout__text > * {
-  margin: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -310,11 +290,6 @@
 @media screen and (max-width: 749px) {
   .home-philosophy {
     --hp-bubble-size: min(58vw, 260px);
-  }
-
-  .hp-heading {
-    font-size: 3rem;
-    margin-bottom: 3rem;
   }
 
   .hp-stage {

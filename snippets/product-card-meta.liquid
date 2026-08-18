@@ -1,0 +1,56 @@
+{%- comment -%}
+  The product card's type line — "TYPE • size • size". The type is a label;
+  the sizes after it are the product's variants, and each one is a control:
+  picking it points the card's add-to-cart at that variant and re-prices the
+  card. Without JS each is still a link to the product page with that variant
+  preselected, so the line does something useful either way.
+
+  A single-variant product has nothing to choose between, so it shows its type
+  alone rather than a lone chip that cannot be unpicked.
+
+  Both cards in the theme render this: the stock card-product snippet and the
+  Browse By Concern section's own card. It is one snippet so the line cannot
+  say one thing in a collection grid and another on the home page.
+
+  Accepts:
+  - product: {Object} the product to describe
+
+  Usage:
+  {% render 'product-card-meta', product: product %}
+{%- endcomment -%}
+
+{%- liquid
+  assign selected = product.selected_or_first_available_variant
+  assign show_variants = false
+  if product.variants.size > 1
+    assign show_variants = true
+  endif
+-%}
+
+{%- if product.type != blank or show_variants -%}
+  <p class="card__meta" data-soldout-label="{{ 'products.product.sold_out' | t | escape }}">
+    {%- if product.type != blank -%}
+      <span class="card__meta-item">{{ product.type }}</span>
+    {%- endif -%}
+
+    {%- if show_variants -%}
+      {%- for variant in product.variants -%}
+        {%- if forloop.first == false or product.type != blank -%}
+          <span class="card__meta-sep" aria-hidden="true">•</span>
+        {%- endif -%}
+        <a
+          class="card__variant{% if variant.id == selected.id %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}"
+          href="{{ product.url }}?variant={{ variant.id }}"
+          data-card-variant
+          data-variant-id="{{ variant.id }}"
+          data-variant-price="{{ variant.price | money }}"
+          data-variant-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+          data-variant-available="{{ variant.available }}"
+          aria-pressed="{% if variant.id == selected.id %}true{% else %}false{% endif %}"
+        >
+          {{- variant.title -}}
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </p>
+{%- endif -%}
