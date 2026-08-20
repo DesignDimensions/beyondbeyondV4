@@ -1,0 +1,18 @@
+/* ==========================================================================
+   Cursor field — an ambient wash of brand blue that follows the pointer,
+   drifts on its own when the page is idle, and pulses out from a click.
+   Sits behind every section rather than over them: a negative z-index with
+   no positioned/transformed ancestor puts it behind the page's own
+   background, so it only shows through wherever a section hasn't painted
+   over it -- the same way it shows only on white, never on top of content.
+   Created and removed entirely by cursor-field.js — nothing here without JS.
+   ========================================================================== */
+
+.cursor-field {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}

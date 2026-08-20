@@ -1,0 +1,324 @@
+{%- comment -%}
+  Skincare consultation.
+
+  A page-width header (overline + heading + a line of supporting copy), then
+  a two-up row: a portrait with a CTA fused flush to its bottom edge on the
+  left, a video or a still on the right -- whichever the merchant has ready.
+  Both occupy the exact same box, so switching between them later is a
+  setting, not a layout change. The CTA opens the beyond-chatbot widget
+  rather than linking anywhere -- clicking it is the same as clicking the
+  widget's own launcher, so the two never fall out of sync with each other's
+  open/closed state.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+
+  assign poster = s.poster
+  if s.video != blank and poster == blank
+    assign poster = s.video.preview_image
+  endif
+
+  if s.video != blank
+    assign video_alt = s.video.alt | default: s.video_alt
+  else
+    assign video_alt = s.video_alt
+  endif
+
+  assign media_image_url = s.video_image | image_url: width: 1200
+  if s.video_image == blank
+    assign media_image_url = s.video_image_url
+  endif
+-%}
+
+{{ 'skincare-consultation.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'skincare-consultation.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="sc"
+  style="
+    --sc-bg: {{ s.color_background }};
+    --sc-accent: {{ s.color_accent }};
+    --sc-ink: {{ s.color_text }};
+    --sc-pad-top: {{ s.padding_top }}px;
+    --sc-pad-bottom: {{ s.padding_bottom }}px;
+    --sc-gap: {{ s.column_gap }}px;
+    --sc-radius: {{ s.radius }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    {%- if s.overline != blank -%}
+      <p class="section-heading">{{ s.overline }}</p>
+    {%- endif -%}
+
+    {%- if s.heading != blank -%}
+      <h2 class="section-title">{{ s.heading }}</h2>
+    {%- endif -%}
+
+    {%- if s.subheading != blank -%}
+      <div class="section-text sc__lead">{{ s.subheading }}</div>
+    {%- endif -%}
+
+    <div class="sc__grid">
+      <div class="sc__media">
+        {%- if s.image != blank -%}
+          <img
+            class="sc__image"
+            srcset="
+              {{ s.image | image_url: width: 600 }} 600w,
+              {{ s.image | image_url: width: 900 }} 900w,
+              {{ s.image | image_url: width: 1200 }} 1200w
+            "
+            sizes="(max-width: 749px) 100vw, 50vw"
+            src="{{ s.image | image_url: width: 900 }}"
+            alt="{{ s.image.alt | default: s.heading | escape }}"
+            width="{{ s.image.width }}"
+            height="{{ s.image.height }}"
+            loading="lazy"
+          />
+        {%- else -%}
+          {{ 'model-1' | placeholder_svg_tag: 'sc__image placeholder-svg' }}
+        {%- endif -%}
+
+        <button type="button" class="sc__cta" data-sc-open-chat>
+          <span>{{ s.cta_label }}</span>
+          <svg
+            class="sc__cta-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sc__video-wrap">
+        {%- if s.media_type == 'video' -%}
+          {%- if s.video != blank or s.video_url != blank -%}
+            <video
+              class="sc__video"
+              {% if poster != blank %}
+                poster="{{ poster | image_url: width: 1200 }}"
+              {% endif %}
+              {% if video_alt != blank %}
+                aria-label="{{ video_alt | escape }}"
+              {% endif %}
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            >
+              {%- if s.video != blank -%}
+                {%- for source in s.video.sources -%}
+                  {%- if source.format == 'mp4' -%}
+                    <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- else -%}
+                <source src="{{ s.video_url }}" type="video/mp4">
+              {%- endif -%}
+            </video>
+          {%- else -%}
+            {{ 'hero-apparel-1' | placeholder_svg_tag: 'sc__video placeholder-svg' }}
+          {%- endif -%}
+        {%- else -%}
+          {%- if media_image_url != blank -%}
+            <img
+              class="sc__video sc__video--fit"
+              src="{{ media_image_url }}"
+              alt="{{ s.video_image.alt | default: video_alt | escape }}"
+              loading="lazy"
+            />
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'sc__video placeholder-svg' }}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if s.show_accent_line -%}
+      <div class="sc__rule" aria-hidden="true"><span class="sc__rule-dot"></span></div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Skincare consultation",
+  "tag": "section",
+  "class": "section-skincare-consultation",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "default": "Personalised skincare consultation"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Meet your skincare consultant"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "info": "Optional — the reference design ships without one."
+    },
+    {
+      "type": "header",
+      "content": "Left — image & CTA"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Start Consultation"
+    },
+    {
+      "type": "paragraph",
+      "content": "Opens the skincare assistant (the beyond-chatbot snippet). It needs to be rendered on this template for the button to do anything."
+    },
+    {
+      "type": "header",
+      "content": "Right — media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Show",
+      "options": [
+        { "value": "image", "label": "An image" },
+        { "value": "video", "label": "A video" }
+      ],
+      "default": "image",
+      "info": "Both fill the same box, so switching later doesn't change the layout."
+    },
+    {
+      "type": "image_picker",
+      "id": "video_image",
+      "label": "Image",
+      "info": "Used when \"Show\" is set to an image."
+    },
+    {
+      "type": "text",
+      "id": "video_image_url",
+      "label": "Image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318902.png?v=1787207344",
+      "info": "Used only when no image is picked above."
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Used when \"Show\" is set to a video. Overrides the URL below -- leave empty to use an externally hosted MP4 instead."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "MP4 URL",
+      "info": "Used only when no video is picked above."
+    },
+    {
+      "type": "text",
+      "id": "video_alt",
+      "label": "Video / image description",
+      "info": "Read by screen readers."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Video poster image",
+      "info": "Shown until the first frame of the video is decoded. Not used for the image."
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#E9EEF4"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent",
+      "info": "The button, the rule and its dot.",
+      "default": "#0107EF"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_accent_line",
+      "label": "Show the accent line under the row",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Space between the columns",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "Skincare consultation"
+    }
+  ]
+}
+{% endschema %}

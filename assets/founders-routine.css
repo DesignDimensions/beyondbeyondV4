@@ -11,6 +11,38 @@
    Switcher
    -------------------------------------------------------------------------- */
 
+/* The indicator is one element for the whole bar: at rest a thin bar under the
+   chosen routine, and on a change it swells into a filled pill, carries the
+   choice across, then settles back into a bar. Its two edges are animated as
+   registered custom properties so the pill and the white-text mask below are
+   driven by the same two numbers and cannot drift apart mid-flight. */
+@property --fr-l {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --fr-r {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* How far each end of the mark runs past its edge mid-journey. Held as fixed
+   lengths rather than falling out of the easing, so a routine sitting right
+   across the bar stretches the mark by the same amount a close one does. */
+@property --fr-lead {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --fr-trail {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 /* The routines split the bar evenly, so the two names sit either side of the
    middle however long they are. */
 .fr__tabs {
@@ -23,9 +55,79 @@
   border-radius: var(--fr-tabs-radius, 4px);
   background-color: var(--fr-tabs-bg, #f8f8f9);
   overflow: hidden;
+
+  /* Bar shape — where the indicator rests. */
+  --fr-ind-top: calc(100% - var(--fr-underline, 3px));
+  --fr-ind-bottom: 0px;
+  --fr-ind-pad: 2px;
+
+  /* Read back by the script, so the phases it sequences stay in step with the
+     durations declared here. */
+  --fr-morph: 0.24s;
+  --fr-slide: 0.46s;
+  --fr-land: 0.08s;
+
+  --fr-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fr-ease-travel: cubic-bezier(0.5, 0, 0.2, 1);
+
+  /* The stretch leans into the direction of travel: the end going first runs
+     further ahead than the end being dragged behind. */
+  --fr-grow-l: var(--fr-trail);
+  --fr-grow-r: var(--fr-lead);
+
+  transition: none;
+}
+
+.fr__tabs.is-reverse {
+  --fr-grow-l: var(--fr-lead);
+  --fr-grow-r: var(--fr-trail);
+}
+
+/* Pill shape — where the indicator goes while a change is in flight. */
+.fr__tabs.is-morphing {
+  --fr-ind-top: var(--fr-pill-inset, 5px);
+  --fr-ind-bottom: var(--fr-pill-inset, 5px);
+  --fr-ind-pad: var(--fr-pill-pad, 14px);
+}
+
+/* Only the travel leg animates the edges; the swell and the settle leave them
+   parked and are carried by the transitions on the indicator itself. Both
+   edges share one curve, so the journey itself is rigid and the stretch comes
+   entirely from the two amounts below. */
+.fr__tabs.is-sliding {
+  transition:
+    --fr-l var(--fr-slide) var(--fr-ease-travel),
+    --fr-r var(--fr-slide) var(--fr-ease-travel);
+  animation:
+    fr-lead var(--fr-slide) var(--fr-ease-travel),
+    fr-trail var(--fr-slide) var(--fr-ease-travel);
+}
+
+@keyframes fr-lead {
+  0%,
+  100% {
+    --fr-lead: 0px;
+  }
+
+  38% {
+    --fr-lead: var(--fr-stretch, 36px);
+  }
+}
+
+@keyframes fr-trail {
+  0%,
+  100% {
+    --fr-trail: 0px;
+  }
+
+  38% {
+    --fr-trail: calc(var(--fr-stretch, 36px) * 0.35);
+  }
 }
 
 .fr__tab {
+  position: relative;
+  z-index: 1;
   flex: 1 1 0;
   display: flex;
   align-items: center;
@@ -55,14 +157,61 @@
    underlined to their own width. */
 .fr__underline {
   position: absolute;
+  z-index: 0;
   left: 0;
-  bottom: 0;
-  height: var(--fr-underline, 3px);
-  width: 0;
+  top: var(--fr-ind-top);
+  bottom: var(--fr-ind-bottom);
+  width: calc(var(--fr-r) - var(--fr-l) + var(--fr-ind-pad) * 2 + var(--fr-grow-l) + var(--fr-grow-r));
+  translate: calc(var(--fr-l) - var(--fr-ind-pad) - var(--fr-grow-l)) 0;
+  border-radius: 999px;
   background-color: var(--fr-tab-active, #0107ef);
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
+  transition:
+    top var(--fr-morph) var(--fr-ease),
+    bottom var(--fr-morph) var(--fr-ease),
+    width var(--fr-morph) var(--fr-ease),
+    translate var(--fr-morph) var(--fr-ease);
+}
+
+/* A second set of the names, in the colour they take on top of the pill,
+   revealed only through the pill's own rectangle. The names change colour as
+   the pill uncovers them rather than all at once, so a name half-crossed is
+   half-lit. */
+.fr__tabs-mask {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  color: var(--fr-tab-on-pill, #ffffff);
+  pointer-events: none;
+  clip-path: inset(
+    var(--fr-ind-top)
+    calc(100% - var(--fr-r) - var(--fr-ind-pad) - var(--fr-grow-r))
+    var(--fr-ind-bottom)
+    calc(var(--fr-l) - var(--fr-ind-pad) - var(--fr-grow-l))
+    round 999px
+  );
+  transition: clip-path var(--fr-morph) var(--fr-ease);
+}
+
+.fr__tabs-mask .fr__tab {
+  color: inherit;
+  cursor: default;
+  transition: none;
+}
+
+/* In flight the edges are already being animated; letting the indicator run
+   its own transition on top of that would have it chase a moving target. */
+.fr__tabs.is-sliding .fr__underline,
+.fr__tabs.is-sliding .fr__tabs-mask {
+  transition: none;
+}
+
+/* Nothing to animate from until the first measurement has landed. */
+.fr__tabs:not(.is-ready) .fr__underline,
+.fr__tabs:not(.is-ready) .fr__tabs-mask {
+  transition: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -192,8 +341,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fr__tabs,
   .fr__tab,
   .fr__underline,
+  .fr__tabs-mask,
   .fr__arrow {
     transition-duration: 0.01ms;
   }

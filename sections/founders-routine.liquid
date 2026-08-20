@@ -78,6 +78,21 @@
       {%- endfor -%}
 
       <span class="fr__underline" data-fr-underline aria-hidden="true"></span>
+
+      {%- comment -%}
+        The same names again, in the colour they take on top of the pill. The
+        script clips this layer to the pill, so a name is lit exactly as far as
+        the pill has crossed it. Hidden from assistive tech — the buttons above
+        already carry the names.
+      {%- endcomment -%}
+      <span class="fr__tabs-mask" data-fr-mask aria-hidden="true">
+        {%- for block in section.blocks -%}
+          {%- assign label = block.settings.label | default: block.settings.collection.title -%}
+          <span class="fr__tab">
+            <span class="fr__tab-label">{{ label }}</span>
+          </span>
+        {%- endfor -%}
+      </span>
     </div>
   </div>
 

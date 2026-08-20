@@ -244,6 +244,25 @@
         "type_color": "#000000"
       }
     },
+    "skincare_consultation": {
+      "type": "skincare-consultation",
+      "settings": {
+        "overline": "Personalised skincare consultation",
+        "heading": "Meet your skincare consultant",
+        "image": "shopify://shop_images/Beyond_558_2_1.png",
+        "cta_label": "Start Consultation",
+        "video_url": "",
+        "video_alt": "",
+        "color_background": "#e9eef4",
+        "color_accent": "#0107ef",
+        "color_text": "#0a0a0b",
+        "show_accent_line": true,
+        "radius": 4,
+        "column_gap": 32,
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
     "browse_by_concern": {
       "type": "browse-by-concern",
       "blocks": {
@@ -365,42 +384,63 @@
         "logo_vogue": {
           "type": "logo",
           "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321319004_1.png?v=1787043113",
             "name": "Vogue India",
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321319004_1.png?v=1787043113"
+            "link": ""
           }
         },
         "logo_cosmopolitan": {
           "type": "logo",
           "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_2_1_b4215a6b-8d52-496e-b612-29d92a5ba077.png?v=1787043112",
             "name": "Cosmopolitan India",
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_2_1_b4215a6b-8d52-496e-b612-29d92a5ba077.png?v=1787043112"
+            "link": ""
           }
         },
         "logo_grazia": {
           "type": "logo",
           "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_1_4_1.png?v=1787043110",
             "name": "Grazia",
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_1_4_1.png?v=1787043110"
+            "link": ""
           }
         },
         "logo_elle": {
           "type": "logo",
           "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Page-1_48656e87-4f44-4ab1-a73b-99ecb359dac3.png?v=1787043109",
             "name": "Elle",
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Page-1_48656e87-4f44-4ab1-a73b-99ecb359dac3.png?v=1787043109"
+            "link": ""
           }
         }
       },
       "block_order": [
-          "logo_vogue",
-          "logo_cosmopolitan",
-          "logo_grazia",
-          "logo_elle"
+        "logo_vogue",
+        "logo_cosmopolitan",
+        "logo_grazia",
+        "logo_elle"
       ],
       "name": "As Seen In",
       "settings": {
         "heading": "AS SEEN IN",
-        "separator_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Vector_605.png?v=1787043185"
+        "heading_gap": 40,
+        "logo_height": 54,
+        "logo_gap": 56,
+        "row_gap": 40,
+        "separator_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Vector_605.png?v=1787043185",
+        "separator_height": 46,
+        "speed": 45,
+        "direction": "1",
+        "slow_on_hover": true,
+        "dim_opacity": 0.2,
+        "show_glow": true,
+        "glow_color": "#8b7cf0",
+        "glow_opacity": 0.5,
+        "glow_width": 620,
+        "glow_height": 340,
+        "glow_offset": 0,
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "testimonials": {
@@ -464,18 +504,45 @@
         }
       },
       "block_order": [
-          "testimonial_1",
-          "testimonial_2",
-          "testimonial_3",
-          "testimonial_4",
-          "testimonial_5",
-          "testimonial_6",
-          "testimonial_7",
-          "testimonial_8"
+        "testimonial_1",
+        "testimonial_2",
+        "testimonial_3",
+        "testimonial_4",
+        "testimonial_5",
+        "testimonial_6",
+        "testimonial_7",
+        "testimonial_8"
       ],
       "name": "Testimonials",
       "settings": {
-        "heading": "TESTIMONIALS"
+        "heading": "TESTIMONIALS",
+        "heading_gap": 40,
+        "columns_desktop": 3,
+        "columns_mobile": "1.2",
+        "card_gap": 34,
+        "video_ratio": "0.5625",
+        "card_radius": 0,
+        "media_background": "#efefef",
+        "scrim_opacity": 0.8,
+        "card_inset": 18,
+        "thumb_size": 42,
+        "title_size": 13,
+        "price_size": 13,
+        "card_text_color": "#ffffff",
+        "unmute_label": "Unmute Video",
+        "mute_label": "Mute Video",
+        "mute_size": 38,
+        "mute_background": "#ffffff",
+        "mute_color": "#000000",
+        "tag_background": "#000000",
+        "tag_color": "#ffffff",
+        "show_arrows": true,
+        "arrow_prev_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967",
+        "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
+        "arrow_size": 16,
+        "arrow_offset": 20,
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "gallery": {
@@ -484,71 +551,116 @@
         "gallery_image_1": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_2": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_3": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_4": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_5": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_6": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_7": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         },
         "gallery_image_8": {
           "type": "image",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724"
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318956.png?v=1787045724",
+            "caption": ""
           }
         }
       },
       "block_order": [
-          "gallery_image_1",
-          "gallery_image_2",
-          "gallery_image_3",
-          "gallery_image_4",
-          "gallery_image_5",
-          "gallery_image_6",
-          "gallery_image_7",
-          "gallery_image_8"
+        "gallery_image_1",
+        "gallery_image_2",
+        "gallery_image_3",
+        "gallery_image_4",
+        "gallery_image_5",
+        "gallery_image_6",
+        "gallery_image_7",
+        "gallery_image_8"
       ],
       "name": "Gallery",
-      "settings": {}
+      "settings": {
+        "tile_height": 320,
+        "tile_gap": 34,
+        "tile_radius": 0,
+        "tile_background": "#f2f2f2",
+        "speed": 40,
+        "direction": "-1",
+        "slow_on_hover": true,
+        "backdrop_color": "#0b0b0f",
+        "backdrop_opacity": 0.6,
+        "backdrop_blur": 18,
+        "viewer_text_color": "#ffffff",
+        "viewer_radius": 6,
+        "viewer_padding": 64,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
     },
     "founders": {
       "type": "founders",
       "settings": {
+        "background": "#f2f3ff",
+        "inset": 40,
+        "column_gap": 20,
         "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318963.png?v=1787051600",
+        "image_alt": "The founders",
+        "media_width": 43,
+        "media_ratio": "0.815",
         "heading": "From Our Founders",
-        "cta_label": "Our Story"
+        "heading_size": 32,
+        "heading_color": "#1a1a1a",
+        "heading_gap": 32,
+        "body": "<p>Lorem ipsum dolor sit amet consectetur. Posuere quis amet mi vitae diam arcu. Nulla in viverra in semper egestas orci. Tristique feugiat blandit auctor rhoncus imperdiet suspendisse egestas. Non massa egestas aliquet felis nulla ullamcorp.</p><p>Enim ut pulvinar sit aliquet eu. In egestas scelerisque at mattis eget dolor. Integer faucibus venenatis parturient pellentesque sit sed pulvinar nunc phasellus. Tristique feugiat blandit auctor rhoncus imperdiet suspendisse egestas. Non massa egestas aliquet felis nulla ullamcorp.</p>",
+        "body_color": "#3d3d3d",
+        "body_gap": 24,
+        "cta_label": "Our Story",
+        "link": "",
+        "cta_gap": 40,
+        "cta_height": 48,
+        "cta_size": 16,
+        "cta_radius": 0,
+        "cta_background": "#0107ef",
+        "cta_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "founders_routine": {
@@ -557,13 +669,15 @@
         "routine_morning": {
           "type": "routine",
           "settings": {
-            "label": "Morning Routine"
+            "label": "Morning Routine",
+            "collection": ""
           }
         },
         "routine_night": {
           "type": "routine",
           "settings": {
-            "label": "Night Routine"
+            "label": "Night Routine",
+            "collection": ""
           }
         }
       },
@@ -574,7 +688,35 @@
       "name": "Founder's Routine",
       "settings": {
         "overline": "FOUNDER'S ROUTINE",
-        "heading": "A Routine For Every Part Of Your Day"
+        "heading": "A Routine For Every Part Of Your Day",
+        "tabs_gap": 36,
+        "tabs_height": 48,
+        "tabs_background": "#f8f8f9",
+        "tabs_border": "#e4e4e7",
+        "tabs_radius": 4,
+        "tab_size": 18,
+        "tab_color": "#1a1a1a",
+        "tab_active_color": "#0107ef",
+        "underline_height": 3,
+        "products_limit": 8,
+        "columns_desktop": 3,
+        "columns_mobile": "1.2",
+        "card_gap": 24,
+        "rail_gap": 36,
+        "show_rating": true,
+        "reviews_label": "Reviews",
+        "fallback_rating": 5,
+        "fallback_review_count": 20,
+        "show_meta": true,
+        "cart_behavior": "add",
+        "atc_label": "Add to Cart",
+        "added_label": "Added",
+        "soldout_label": "Sold out",
+        "show_arrows": true,
+        "arrow_size": 16,
+        "arrow_offset": 20,
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     }
   },
@@ -584,6 +726,7 @@
     "home_bestsellers_gtGjFX",
     "home_philosophy_4kTxNb",
     "video_parallax_hLmT4c",
+    "skincare_consultation",
     "browse_by_concern",
     "as_seen_in",
     "testimonials",

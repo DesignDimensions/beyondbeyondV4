@@ -231,7 +231,7 @@
 .bbc__grid {
   display: grid;
   grid-template-columns: repeat(var(--bbc-columns, 3), minmax(0, 1fr));
-  gap: var(--bbc-grid-gap, 20px);
+  gap: 30px;
 }
 
 .bbc__empty {

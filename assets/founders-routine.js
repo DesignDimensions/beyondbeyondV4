@@ -5,7 +5,9 @@
  * Both rails are already in the page, so the swap is local — a crossfade, not
  * a fetch — and the mark under the chosen routine is a single element that
  * slides and resizes between the two names rather than a border each name
- * carries for itself.
+ * carries for itself. Choosing runs that mark through three phases: it swells
+ * from a bar into a filled pill where it stands, carries the choice across,
+ * then settles back into a bar under the new name.
  */
 (function () {
   'use strict';
@@ -23,6 +25,7 @@
     this.root = root;
     this.tabs = Array.prototype.slice.call(root.querySelectorAll('[data-fr-tab]'));
     this.panels = Array.prototype.slice.call(root.querySelectorAll('[data-fr-panel]'));
+    this.tabsEl = root.querySelector('[data-fr-tabs]');
     this.underline = root.querySelector('[data-fr-underline]');
     if (!this.tabs.length || !this.panels.length) return;
 
@@ -30,18 +33,29 @@
     this.fx = !!this.gsap && !reducedMotion();
     this.index = 0;
     this.swap = null;
+    this.morphTimers = [];
+    this.timing = this.readTiming();
 
-    this.onResize = this.markUnderline.bind(this);
+    this.onResize = this.markIndicator.bind(this);
 
     this.bind();
-    this.markUnderline();
+    this.markIndicator();
+
+    // The mark has nowhere to animate from until it has been measured once, so
+    // its transitions only come on for the frame after the first placement.
+    if (this.tabsEl) {
+      var el = this.tabsEl;
+      requestAnimationFrame(function () {
+        el.classList.add('is-ready');
+      });
+    }
 
     // The mark is measured from laid-out text, and web fonts landing late
     // change how wide a routine's name is.
     if (document.fonts && document.fonts.ready) {
       var self = this;
       document.fonts.ready.then(function () {
-        self.markUnderline();
+        self.markIndicator();
       });
     }
 
@@ -103,21 +117,93 @@
      The mark
      ------------------------------------------------------------------ */
 
-  // Measured from the label rather than the tab, so it is the width of the
-  // routine's name and not of the half of the bar it sits in.
-  FoundersRoutine.prototype.markUnderline = function () {
-    if (!this.underline) return;
+  // The phases are sequenced here but timed in the stylesheet, so the two
+  // cannot drift apart.
+  FoundersRoutine.prototype.readTiming = function () {
+    var styles = this.tabsEl ? getComputedStyle(this.tabsEl) : null;
+
+    function ms(name, fallback) {
+      var raw = styles && styles.getPropertyValue(name).trim();
+      if (!raw) return fallback;
+      var value = parseFloat(raw);
+      if (isNaN(value)) return fallback;
+      return raw.slice(-2) === 'ms' ? value : value * 1000;
+    }
+
+    return {
+      morph: ms('--fr-morph', 240),
+      slide: ms('--fr-slide', 460),
+      land: ms('--fr-land', 80),
+    };
+  };
+
+  // Measured from the label rather than the tab, so the mark is the width of
+  // the routine's name and not of the half of the bar it sits in. Only the two
+  // edges are published: the stylesheet turns them into the mark's own box and
+  // into the window the lit copy of the names is seen through, which is what
+  // keeps the two in step while both are moving.
+  FoundersRoutine.prototype.markIndicator = function () {
+    if (!this.tabsEl) return;
 
     var tab = this.tabs[this.index];
     var label = tab && tab.querySelector('.fr__tab-label');
     if (!label) return;
 
-    var bar = this.underline.parentNode.getBoundingClientRect();
+    var bar = this.tabsEl.getBoundingClientRect();
     var rect = label.getBoundingClientRect();
-    var pad = 10;
 
-    this.underline.style.width = rect.width + pad * 2 + 'px';
-    this.underline.style.transform = 'translate3d(' + (rect.left - bar.left - pad) + 'px, 0, 0)';
+    this.tabsEl.style.setProperty('--fr-l', rect.left - bar.left + 'px');
+    this.tabsEl.style.setProperty('--fr-r', rect.right - bar.left + 'px');
+  };
+
+  FoundersRoutine.prototype.clearMorph = function () {
+    this.morphTimers.forEach(clearTimeout);
+    this.morphTimers = [];
+  };
+
+  // Swell where it stands, carry the choice across, settle back into a bar. A
+  // second choice mid-flight restarts from wherever the mark has got to: the
+  // edges are transitioned, so they retarget rather than jump, and a mark
+  // already swollen skips straight to the travel.
+  FoundersRoutine.prototype.moveIndicator = function (direction) {
+    var self = this;
+    var el = this.tabsEl;
+    if (!el) return;
+
+    this.clearMorph();
+
+    if (reducedMotion()) {
+      el.classList.remove('is-morphing', 'is-sliding', 'is-reverse');
+      this.markIndicator();
+      return;
+    }
+
+    // Travel is lopsided towards the direction of the change, so the mark
+    // stretches ahead of itself rather than sliding rigidly.
+    el.classList.toggle('is-reverse', direction < 0);
+
+    var swell = el.classList.contains('is-morphing') ? 0 : this.timing.morph;
+
+    this.morphTimers.push(
+      setTimeout(function () {
+        el.classList.add('is-sliding');
+        self.markIndicator();
+      }, swell)
+    );
+
+    this.morphTimers.push(
+      setTimeout(function () {
+        el.classList.remove('is-sliding');
+      }, swell + this.timing.slide)
+    );
+
+    this.morphTimers.push(
+      setTimeout(function () {
+        el.classList.remove('is-morphing', 'is-reverse');
+      }, swell + this.timing.slide + this.timing.land)
+    );
+
+    el.classList.add('is-morphing');
   };
 
   /* ------------------------------------------------------------------
@@ -137,7 +223,7 @@
       tab.tabIndex = active ? 0 : -1;
     });
 
-    this.markUnderline();
+    this.moveIndicator(index > previous ? 1 : -1);
     this.swapPanels(previous, index);
   };
 
@@ -225,6 +311,7 @@
 
   FoundersRoutine.prototype.destroy = function () {
     window.removeEventListener('resize', this.onResize);
+    this.clearMorph();
     if (this.swap) this.swap.kill();
     this.ready = false;
   };

@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Skincare consultation — portrait + CTA on one side, a looping video on
+   the other. The CTA is fused to the image with no gap between them, so the
+   two read as one control rather than a picture with a button underneath it.
+   ========================================================================== */
+
+.sc {
+  padding-top: var(--sc-pad-top, 96px);
+  padding-bottom: var(--sc-pad-bottom, 96px);
+  background: var(--sc-bg, #ffffff);
+}
+
+.sc .section-heading,
+.sc .section-title {
+  color: var(--sc-ink, #0a0a0b);
+}
+
+.sc__lead {
+  max-width: 640px;
+  margin: 0 auto 4rem;
+  text-align: center;
+  color: var(--sc-ink, #0a0a0b);
+  opacity: 0.72;
+}
+
+/* --------------------------------------------------------------------------
+   Row
+   -------------------------------------------------------------------------- */
+
+.sc__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 9%;
+  padding-right: 5%;
+  padding-top: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   Left — image + CTA, glued together
+   -------------------------------------------------------------------------- */
+
+.sc__media {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sc__image,
+.sc__media .placeholder-svg {
+  display: block;
+  width: 80%;
+  height: auto;
+  object-fit: cover;
+}
+
+.sc__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 26px;
+  border: 0;
+  background: var(--sc-accent, #0107ef);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.sc__cta:hover {
+  background: color-mix(in srgb, var(--sc-accent, #0107ef) 85%, #000);
+}
+
+.sc__cta-arrow {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.sc__cta:hover .sc__cta-arrow {
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   Right — video
+   -------------------------------------------------------------------------- */
+
+.sc__video-wrap {
+  height: 100%;
+  overflow: hidden;
+  align-items: end;
+  justify-content: end;
+  display: flex;
+}
+
+.sc__video,
+.sc__video-wrap .placeholder-svg {
+  display: block;
+  width: 88%;
+  height: fit-content;
+  object-fit: cover;
+}
+
+/* The image option is a finished graphic (a device mock, a screenshot) with
+   its own composition baked in -- cropping it to fill the box the way a
+   video is cropped would cut pieces off it. Contain instead, and let the box
+   letterbox around it. */
+.sc__video--fit {
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Accent line
+   -------------------------------------------------------------------------- */
+
+.sc__rule {
+  position: relative;
+  height: 2px;
+  background: var(--sc-accent, #0107ef);
+}
+
+.sc__rule-dot {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sc-accent, #0107ef);
+  transform: translateY(-50%);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .sc__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sc__video-wrap {
+    aspect-ratio: 4 / 5;
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .sc__cta,
+  .sc__cta-arrow {
+    transition-duration: 0.01ms;
+  }
+}

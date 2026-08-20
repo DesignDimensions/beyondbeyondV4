@@ -126,6 +126,7 @@
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+
   .asi__logo,
   .asi__sep {
     transition-duration: 0.01ms;
