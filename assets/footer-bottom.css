@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Footer Bottom — copyright and payment badges on one row, with a large
+   brand mark graphic sitting in normal flow beneath, left-aligned.
+   ========================================================================== */
+
+.ftb {
+  padding-top: var(--ftb-pad-top, 40px);
+  padding-bottom: var(--ftb-pad-bottom, 40px);
+  background-color: #0107EF;
+}
+
+.ftb__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.ftb__copyright {
+  margin: 0;
+  font-size: 1.3rem;
+  opacity: 0.85;
+}
+
+.ftb__payment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.ftb__payment-item {
+  display: flex;
+}
+
+.ftb__payment-img {
+  display: block;
+  height: 40px;
+  width: auto;
+}
+
+.ftb__quote {
+  display: block;
+  width: fit-content;
+  margin-top: var(--ftb-quote-gap, 36px);
+  opacity: 0.95;
+}
+
+.ftb__quote svg,
+.ftb__quote img {
+  display: block;
+  width: var(--ftb-quote-width, 260px);
+  max-width: 100%;
+  height: auto;
+}
+
+.ftb__quote svg {
+  fill: var(--ftb-quote-color, #ffffff);
+}
+
+@media screen and (max-width: 749px) {
+  .ftb__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ftb__quote svg,
+  .ftb__quote img {
+    width: calc(var(--ftb-quote-width, 260px) * 0.65);
+  }
+}

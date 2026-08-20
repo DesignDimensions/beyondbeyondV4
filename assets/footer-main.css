@@ -1,0 +1,210 @@
+/* ==========================================================================
+   Footer Main — brand/newsletter/follow-us column beside a set of menu
+   columns. Each menu block picks which of the three visual columns it sits
+   in, so two short menus can stack under one heading-width the way a long
+   one fills a column on its own.
+   ========================================================================== */
+
+.ftm {
+  padding-top: var(--ftm-pad-top, 64px);
+  padding-bottom: var(--ftm-pad-bottom, 64px);
+}
+
+.ftm__grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) 1fr;
+  gap: 0;
+}
+
+.ftm__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+}
+
+.ftm__logo-link {
+  display: inline-block;
+  width: fit-content;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ftm__logo-img {
+  display: block;
+  width: var(--ftm-logo-width, 140px);
+  height: auto;
+}
+
+.ftm__logo-text {
+  font-family: var(--font-heading-family);
+  font-style: italic;
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.ftm__newsletter-heading {
+  margin: 0 0 16px;
+  font-size: 2.3rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ftm__newsletter-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 4px 4px 20px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  opacity: 0.9;
+}
+
+.ftm__newsletter-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 1.4rem;
+  outline: none;
+}
+
+.ftm__newsletter-input::placeholder {
+  color: currentColor;
+  opacity: 0.6;
+}
+
+.ftm__newsletter-submit {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ftm-btn-bg, #121212);
+  background: transparent;
+  cursor: pointer;
+}
+
+.ftm__newsletter-arrow {
+  display: flex;
+  width: 14px;
+  height: 14px;
+}
+
+.ftm__newsletter-arrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ftm__newsletter-message {
+  margin: 10px 0 0;
+  font-size: 1.2rem;
+}
+
+.ftm__follow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.ftm__follow-label {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.ftm__social {
+  display: flex;
+  gap: 35px;
+  margin: 0;
+  padding: 0;
+}
+
+.ftm__social .list-social__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+
+.ftm__social .list-social__link .icon,
+.ftm__social .list-social__link .svg-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+/* Flexbox, not grid: a grid row is one shared band across every column, so a
+   tall column (Shop) would drag every other column's second group down with
+   it. Each column here is its own box that only grows to fit its own
+   content, the way the design needs. */
+.ftm__menus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 45px;
+  justify-content: end;
+}
+
+.ftm__menu-column {
+  display: flex;
+  width: fit-content;
+  flex-direction: column;
+  gap: 36px;
+  min-width: 23.5%;
+}
+
+.ftm__menu-heading {
+  margin: 0 0 35px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.ftm__menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.ftm__menu-link {
+  font-size: 1.4rem;
+  color: #202020;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.ftm__menu-link:hover {
+  text-decoration: underline;
+  opacity: 1;
+}
+
+@media screen and (max-width: 989px) {
+  .ftm__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ftm__menu-column {
+    flex-basis: 45%;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .ftm__menus {
+    flex-direction: column;
+  }
+
+  .ftm__menu-column {
+    flex-basis: auto;
+  }
+}

@@ -1,0 +1,241 @@
+{{ 'footer-bottom.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign quote_image = section.settings.quote_graphic
+  assign quote_url = section.settings.quote_graphic_url
+-%}
+
+<div
+  class="ftb color-{{ section.settings.color_scheme }} gradient"
+  id="ftb-{{ section.id }}"
+  style="
+    --ftb-pad-top: {{ section.settings.padding_top }}px;
+    --ftb-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --ftb-quote-width: {{ section.settings.quote_width }}px;
+    --ftb-quote-color: {{ section.settings.quote_color }};
+    --ftb-quote-gap: {{ section.settings.quote_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width ftb__row">
+    <p class="ftb__copyright">
+      {%- if section.settings.copyright_text != blank -%}
+        {{ section.settings.copyright_text }}
+      {%- else -%}
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+      {%- endif -%}
+    </p>
+
+    {%- if section.settings.show_payment_icons and section.blocks.size > 0 -%}
+      <ul class="ftb__payment list-unstyled" role="list">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'payment_icon' -%}
+            {%- liquid
+              assign icon_image = block.settings.image
+              assign icon_url = block.settings.image_url
+              assign icon_name = block.settings.name
+            -%}
+            <li class="ftb__payment-item" {{ block.shopify_attributes }}>
+              {%- if icon_image != blank -%}
+                <img
+                  class="ftb__payment-img"
+                  src="{{ icon_image | image_url: width: 220 }}"
+                  width="{{ icon_image.width }}"
+                  height="{{ icon_image.height }}"
+                  alt="{{ icon_name | escape }}"
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- elsif icon_url != blank -%}
+                <img
+                  class="ftb__payment-img"
+                  src="{{ icon_url }}"
+                  width="210"
+                  height="144"
+                  alt="{{ icon_name | escape }}"
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- endif -%}
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_quote_mark -%}
+    <div class="page-width">
+      <span class="ftb__quote" aria-hidden="true">
+        {%- if quote_image != blank -%}
+          <img
+            src="{{ quote_image | image_url: width: 700 }}"
+            width="{{ quote_image.width }}"
+            height="{{ quote_image.height }}"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          >
+        {%- elsif quote_url != blank -%}
+          <img src="{{ quote_url }}" width="687" height="440" alt="" loading="lazy" decoding="async">
+        {%- else -%}
+          <svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M46 18c-17 0-30 13-30 30 0 15 10.5 27.5 24.5 29.7-2.3 10.8-9.7 19.5-19.3 23.7a2.2 2.2 0 0 0 1.1 4.3c24-4.4 41.7-21.8 41.7-49 0-21.7-7.6-38.7-18-38.7Z"
+            />
+            <circle cx="158" cy="62" r="40"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Footer Bottom",
+  "tag": "section",
+  "class": "section-footer-bottom",
+  "settings": [
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "info": "Leave blank to show the shop name and current year automatically.",
+      "placeholder": "Fyremist Pvt. Ltd. ©2024 All Rights Reserved"
+    },
+    {
+      "type": "header",
+      "content": "Payment icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Brand mark"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_mark",
+      "label": "Show brand mark",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "quote_graphic",
+      "label": "Custom graphic",
+      "info": "Optional. Replaces the graphic below with your own artwork."
+    },
+    {
+      "type": "text",
+      "id": "quote_graphic_url",
+      "label": "Graphic image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_829_2.png?v=1787221191",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "range",
+      "id": "quote_width",
+      "min": 80,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "label": "Graphic width",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "quote_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space above graphic",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "quote_color",
+      "label": "Graphic color",
+      "info": "Only used for the default mark, not a custom graphic.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-5"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "payment_icon",
+      "name": "Payment icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Icon image URL",
+          "info": "Used when no image is picked above."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Payment method name",
+          "info": "Used for alt text."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Bottom",
+      "blocks": [
+        { "type": "payment_icon", "settings": { "name": "UPI", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/UPI.png?v=1787221162" } },
+        { "type": "payment_icon", "settings": { "name": "Visa", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/VISA.png?v=1787221163" } },
+        { "type": "payment_icon", "settings": { "name": "Mastercard", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/MC.png?v=1787221164" } },
+        { "type": "payment_icon", "settings": { "name": "American Express", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/AMEX.png?v=1787221162" } },
+        { "type": "payment_icon", "settings": { "name": "Google Pay", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/GPAY.png?v=1787221162" } },
+        { "type": "payment_icon", "settings": { "name": "Amazon Pay", "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/AP.png?v=1787221163" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

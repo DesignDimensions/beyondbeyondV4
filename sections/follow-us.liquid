@@ -1,0 +1,336 @@
+{{ 'follow-us.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign instagram_url = section.settings.instagram_url
+  if instagram_url == blank
+    assign instagram_url = settings.social_instagram_link
+  endif
+-%}
+
+<div
+  class="fu color-{{ section.settings.color_scheme }} gradient"
+  id="fu-{{ section.id }}"
+  style="
+    --fu-pad-top: {{ section.settings.padding_top }}px;
+    --fu-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --fu-header-gap: {{ section.settings.header_gap }}px;
+    --fu-tile-height: {{ section.settings.tile_height }}px;
+    --fu-tile-width: {{ section.settings.tile_width }}px;
+    --fu-gap: {{ section.settings.gap }}px;
+    --fu-radius: {{ section.settings.radius }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width fu__header">
+    <div class="fu__heading-group">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="fu__heading {{ section.settings.heading_size }}">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.handle != blank -%}
+        {%- if instagram_url != blank -%}
+          <a href="{{ instagram_url }}" class="fu__handle" target="_blank" rel="noopener">
+            {{- section.settings.handle -}}
+          </a>
+        {%- else -%}
+          <span class="fu__handle">{{ section.settings.handle }}</span>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.description != blank -%}
+      <div class="fu__description rte">{{ section.settings.description }}</div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="page-width">
+      <div class="fu__row">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'image' -%}
+              <div class="fu__tile fu__tile--image" {{ block.shopify_attributes }}>
+                {%- if block.settings.link != blank -%}
+                  <a
+                    class="fu__tile-link"
+                    href="{{ block.settings.link }}"
+                    aria-label="{{ block.settings.alt | default: 'Instagram post' | escape }}"
+                    target="_blank"
+                    rel="noopener"
+                  ></a>
+                {%- endif -%}
+                {%- if block.settings.image != blank -%}
+                  <img
+                    class="fu__media"
+                    src="{{ block.settings.image | image_url: width: 800 }}"
+                    srcset="
+                      {{ block.settings.image | image_url: width: 400 }}   400w,
+                      {{ block.settings.image | image_url: width: 800 }}   800w,
+                      {{ block.settings.image | image_url: width: 1200 }} 1200w
+                    "
+                    sizes="{{ section.settings.tile_width }}px"
+                    width="{{ block.settings.image.width }}"
+                    height="{{ block.settings.image.height }}"
+                    alt="{{ block.settings.alt | default: 'Instagram post' | escape }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'fu__media fu__media--placeholder' }}
+                {%- endif -%}
+              </div>
+            {%- when 'quote' -%}
+              <div
+                class="fu__tile fu__tile--quote"
+                style="
+                  --fu-quote-width: {{ block.settings.width }}px;
+                  --fu-quote-bg: {{ block.settings.background_color }};
+                  --fu-quote-text: {{ block.settings.text_color }};
+                  --fu-accent: {{ block.settings.accent_color }};
+                "
+                {{ block.shopify_attributes }}
+              >
+                <div class="fu__quote-top">
+                  {%- if block.settings.eyebrow != blank -%}
+                    <p class="fu__quote-eyebrow">{{ block.settings.eyebrow }}</p>
+                  {%- endif -%}
+                  <span class="fu__quote-mark" aria-hidden="true">&rdquo;</span>
+                </div>
+
+                {%- if block.settings.quote != blank -%}
+                  <div class="fu__quote-text">{{ block.settings.quote }}</div>
+                {%- endif -%}
+
+                {%- if block.settings.button_label != blank -%}
+                  <a href="{{ block.settings.button_link }}" class="fu__quote-cta">
+                    <span>{{ block.settings.button_label }}</span>
+                    <span class="fu__quote-arrow">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                  </a>
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Follow Us",
+  "tag": "section",
+  "class": "section-follow-us",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Follow Us"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "text",
+      "id": "handle",
+      "label": "Instagram handle",
+      "default": "@yourhandle"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram link",
+      "info": "Used for the heading and handle. Falls back to the Instagram link set in Theme settings > Social media."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>See our latest routines, results and behind-the-scenes on Instagram.</p>"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "header",
+      "content": "Tiles"
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 260,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Tile height",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "tile_width",
+      "min": 180,
+      "max": 440,
+      "step": 10,
+      "unit": "px",
+      "label": "Image tile width",
+      "default": 280
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between tiles",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Tile corner radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Read out in place of the image."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Link to the Instagram post."
+        }
+      ]
+    },
+    {
+      "type": "quote",
+      "name": "Quote card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow text",
+          "default": "Beyond Beyond | NAD+ Skincare"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Quote",
+          "default": "<p><strong>Pollution, UV, blue light</strong> — this spray covers it all.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Learn more"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 220,
+          "max": 440,
+          "step": 10,
+          "unit": "px",
+          "label": "Card width",
+          "default": 300
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#121212"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Button color",
+          "default": "#f5e626"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Follow Us",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

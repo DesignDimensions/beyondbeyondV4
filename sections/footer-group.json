@@ -11,25 +11,385 @@
   "name": "t:sections.footer.name",
   "type": "footer",
   "sections": {
-    "footer": {
-      "type": "footer",
+    "follow_us": {
+      "type": "follow-us",
+      "blocks": {
+        "image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-08-17_at_16.18.07_1.png",
+            "alt": "",
+            "link": ""
+          }
+        },
+        "image-2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-08-17_at_16.18.37_1.png",
+            "alt": "",
+            "link": ""
+          }
+        },
+        "image-3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-08-17_at_16.19.05_1.png",
+            "alt": "",
+            "link": ""
+          }
+        },
+        "image_QFYfQL": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-08-17_at_17.16.54_1.png",
+            "alt": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "image-1",
+        "image-2",
+        "image-3",
+        "image_QFYfQL"
+      ],
       "settings": {
-        "color_scheme": "scheme-1",
-        "newsletter_enable": false,
-        "newsletter_heading": "Subscribe to our emails",
-        "enable_follow_on_shop": true,
+        "heading": "Follow Us",
+        "heading_size": "h1",
+        "handle": "@beyondbeyondskincare",
+        "instagram_url": "https://www.instagram.com/beyondbeyondskincare/",
+        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, ons seddo eiusmod tempor incididunt ut labore et dolore </p>",
+        "color_scheme": "scheme-2",
+        "tile_height": 420,
+        "tile_width": 280,
+        "gap": 0,
+        "radius": 0,
+        "header_gap": 40,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    },
+    "footer_main": {
+      "type": "footer-main",
+      "blocks": {
+        "heading-1": {
+          "type": "menu_heading",
+          "settings": {
+            "heading": "Shop",
+            "column": "1"
+          }
+        },
+        "link-1": {
+          "type": "menu_link",
+          "settings": {
+            "title": "The Ultimate Night Repair Super Cream",
+            "url": "/products/the-ultimate-night-repair-supercream"
+          }
+        },
+        "link-2": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Hydro-Active Day Cream",
+            "url": "/products/hydro-active-day-cream"
+          }
+        },
+        "link-3": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Moisture Surge Lip Butter",
+            "url": "/products/moisture-surge-lip-butter"
+          }
+        },
+        "link-4": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Oil-Free ~ Matte Sunscreen",
+            "url": "/products/oil-free-matte-sunscreen"
+          }
+        },
+        "link-5": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Dirt & Makeup Cleanser Jelly",
+            "url": "/products/dirt-makeup-cleanser-jelly"
+          }
+        },
+        "link-6": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Deep Clean Enzyme Cleanser",
+            "url": "/products/deep-clean-enzyme-cleanser"
+          }
+        },
+        "link-7": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Broad Spectrum Active Sunspray",
+            "url": "/products/broad-spectrum-active-sunspray"
+          }
+        },
+        "link-8": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Ultra Hydrating Oligo HA Mist",
+            "url": "/products/ultra-hydrating-oligo-ha-mist"
+          }
+        },
+        "link-9": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Advanced Complexion Corrector Serum",
+            "url": "/products/advanced-complexion-corrector-serum"
+          }
+        },
+        "link-10": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Advanced Cellular Repair Serum",
+            "url": "/products/advanced-cellular-repair-serum"
+          }
+        },
+        "link-11": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Advanced Cellular Hydration Serum",
+            "url": "/products/advanced-cellular-hydration-serum"
+          }
+        },
+        "link-12": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Advanced Antioxidant Defense Serum",
+            "url": "/products/advanced-antioxidant-defense-serum"
+          }
+        },
+        "heading-2": {
+          "type": "menu_heading",
+          "settings": {
+            "heading": "Beyond Beyond",
+            "column": "2"
+          }
+        },
+        "link-13": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Beyond Beyond",
+            "url": "/pages/beyond-beyond"
+          }
+        },
+        "link-14": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Bestsellers",
+            "url": "/collections/bestsellers-1"
+          }
+        },
+        "link-15": {
+          "type": "menu_link",
+          "settings": {
+            "title": "About",
+            "url": "/pages/clean-clinical-skincare"
+          }
+        },
+        "heading-3": {
+          "type": "menu_heading",
+          "settings": {
+            "heading": "Customer care",
+            "column": "2"
+          }
+        },
+        "link-16": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Contact Us",
+            "url": "/pages/contact"
+          }
+        },
+        "link-17": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Track Orders",
+            "url": "/"
+          }
+        },
+        "link-18": {
+          "type": "menu_link",
+          "settings": {
+            "title": "FAQ",
+            "url": "/pages/faqs"
+          }
+        },
+        "heading-4": {
+          "type": "menu_heading",
+          "settings": {
+            "heading": "Learn",
+            "column": "3"
+          }
+        },
+        "link-19": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Journal",
+            "url": "/blogs/news"
+          }
+        },
+        "link-20": {
+          "type": "menu_link",
+          "settings": {
+            "title": "NAD+",
+            "url": "/pages/nad"
+          }
+        },
+        "link-21": {
+          "type": "menu_link",
+          "settings": {
+            "title": "FAQ",
+            "url": "/pages/faqs"
+          }
+        },
+        "heading-5": {
+          "type": "menu_heading",
+          "settings": {
+            "heading": "Legal",
+            "column": "3"
+          }
+        },
+        "link-22": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Return & Refund",
+            "url": "/pages/legal"
+          }
+        },
+        "link-23": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Terms & Conditions",
+            "url": "/pages/legal"
+          }
+        },
+        "link-24": {
+          "type": "menu_link",
+          "settings": {
+            "title": "Privacy Policy",
+            "url": "/pages/legal"
+          }
+        }
+      },
+      "block_order": [
+        "heading-1",
+        "link-1",
+        "link-2",
+        "link-3",
+        "link-4",
+        "link-5",
+        "link-6",
+        "link-7",
+        "link-8",
+        "link-9",
+        "link-10",
+        "link-11",
+        "link-12",
+        "heading-2",
+        "link-13",
+        "link-14",
+        "link-15",
+        "heading-3",
+        "link-16",
+        "link-17",
+        "link-18",
+        "heading-4",
+        "link-19",
+        "link-20",
+        "link-21",
+        "heading-5",
+        "link-22",
+        "link-23",
+        "link-24"
+      ],
+      "settings": {
+        "logo": "shopify://shop_images/Group_1.png",
+        "logo_width": 220,
+        "newsletter_enable": true,
+        "newsletter_heading": "Join our community and get 10% off on your first purchase",
         "show_social": true,
-        "enable_country_selector": true,
-        "enable_language_selector": true,
-        "payment_enable": true,
-        "show_policy": true,
-        "margin_top": 0,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "social_label": "Follow us",
+        "color_scheme": "scheme-1",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "footer_bottom": {
+      "type": "footer-bottom",
+      "blocks": {
+        "payment-1": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/UPI.png?v=1787221162",
+            "name": "UPI"
+          }
+        },
+        "payment-2": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/VISA.png?v=1787221163",
+            "name": "Visa"
+          }
+        },
+        "payment-3": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/MC.png?v=1787221164",
+            "name": "Mastercard"
+          }
+        },
+        "payment-4": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/AMEX.png?v=1787221162",
+            "name": "American Express"
+          }
+        },
+        "payment-5": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/GPAY.png?v=1787221162",
+            "name": "Google Pay"
+          }
+        },
+        "payment-6": {
+          "type": "payment_icon",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/AP.png?v=1787221163",
+            "name": "Amazon Pay"
+          }
+        }
+      },
+      "block_order": [
+        "payment-1",
+        "payment-2",
+        "payment-3",
+        "payment-4",
+        "payment-5",
+        "payment-6"
+      ],
+      "settings": {
+        "copyright_text": "",
+        "show_payment_icons": true,
+        "show_quote_mark": true,
+        "quote_graphic_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_829_2.png?v=1787221191",
+        "quote_width": 260,
+        "quote_gap": 36,
+        "quote_color": "#ffffff",
+        "color_scheme": "scheme-5",
+        "padding_top": 40,
+        "padding_bottom": 64
       }
     }
   },
   "order": [
-    "footer"
+    "follow_us",
+    "footer_main",
+    "footer_bottom"
   ]
 }

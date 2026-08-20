@@ -1,0 +1,182 @@
+/* ==========================================================================
+   Follow Us — curated Instagram strip: a heading/handle row, then a run of
+   photo tiles with one text "quote" tile mixed in among them.
+   ========================================================================== */
+
+.fu {
+  padding-top: var(--fu-pad-top, 60px);
+  padding-bottom: var(--fu-pad-bottom, 60px);
+  background-color: #E6E6E6;
+}
+
+.fu__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: var(--fu-header-gap, 40px);
+}
+
+.fu__heading-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fu__heading {
+  margin: 0;
+  font-weight: 500;
+}
+
+.fu__handle {
+  font-size: 1.6rem;
+  color: #000;
+  text-decoration: none;
+  opacity: 0.75;
+  width: fit-content;
+}
+
+.fu__handle:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.fu__description {
+  max-width: 480px;
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+/* The row scrolls on its own — nothing clipped by the section, so a tile
+   focused at the edge is never cut off by anything but the viewport. */
+.fu__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--fu-gap, 0px);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.fu__row::-webkit-scrollbar {
+  display: none;
+}
+
+.fu__tile {
+  position: relative;
+  flex: 1 1 var(--fu-tile-width, 280px);
+  min-width: 220px;
+  height: fit-content;
+  overflow: hidden;
+  border-radius: var(--fu-radius, 0px);
+  scroll-snap-align: start;
+}
+
+.fu__tile-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.fu__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fu__tile--quote {
+  flex: 0 0 var(--fu-quote-width, 300px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  background: var(--fu-quote-bg, #fff);
+  color: var(--fu-quote-text, #121212);
+}
+
+.fu__quote-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fu__quote-eyebrow {
+  margin: 0;
+  max-width: 72%;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  opacity: 0.6;
+}
+
+.fu__quote-mark {
+  flex-shrink: 0;
+  font-family: Georgia, serif;
+  font-size: 3.4rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.fu__quote-text {
+  margin: 20px 0;
+  font-size: 2.2rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.fu__quote-text strong,
+.fu__quote-text b {
+  font-weight: 700;
+}
+
+.fu__quote-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--fu-accent, #f5e626);
+  color: #121212;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.fu__quote-arrow {
+  display: flex;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+
+.fu__quote-arrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+.fu__quote-cta:hover .fu__quote-arrow {
+  transform: translateX(3px);
+}
+
+@media screen and (max-width: 749px) {
+  .fu__header {
+    flex-direction: column;
+  }
+
+  .fu__description {
+    max-width: none;
+  }
+
+  .fu__tile {
+    min-width: 74vw;
+    height: calc(var(--fu-tile-height, 420px) * 0.8);
+  }
+
+  .fu__tile--quote {
+    flex-basis: 74vw;
+  }
+}
