@@ -59,21 +59,33 @@
                   ></a>
                 {%- endif -%}
                 {%- if block.settings.image != blank -%}
-                  <img
-                    class="fu__media"
-                    src="{{ block.settings.image | image_url: width: 800 }}"
-                    srcset="
-                      {{ block.settings.image | image_url: width: 400 }}   400w,
-                      {{ block.settings.image | image_url: width: 800 }}   800w,
-                      {{ block.settings.image | image_url: width: 1200 }} 1200w
-                    "
-                    sizes="{{ section.settings.tile_width }}px"
-                    width="{{ block.settings.image.width }}"
-                    height="{{ block.settings.image.height }}"
-                    alt="{{ block.settings.alt | default: 'Instagram post' | escape }}"
-                    loading="lazy"
-                    decoding="async"
-                  >
+                  <picture>
+                    {%- if block.settings.image_mobile != blank -%}
+                      <source
+                        media="(max-width: 749px)"
+                        srcset="
+                          {{ block.settings.image_mobile | image_url: width: 400 }} 400w,
+                          {{ block.settings.image_mobile | image_url: width: 800 }} 800w
+                        "
+                        sizes="74vw"
+                      >
+                    {%- endif -%}
+                    <img
+                      class="fu__media"
+                      src="{{ block.settings.image | image_url: width: 800 }}"
+                      srcset="
+                        {{ block.settings.image | image_url: width: 400 }}   400w,
+                        {{ block.settings.image | image_url: width: 800 }}   800w,
+                        {{ block.settings.image | image_url: width: 1200 }} 1200w
+                      "
+                      sizes="{{ section.settings.tile_width }}px"
+                      width="{{ block.settings.image.width }}"
+                      height="{{ block.settings.image.height }}"
+                      alt="{{ block.settings.alt | default: 'Instagram post' | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  </picture>
                 {%- else -%}
                   {{ 'image' | placeholder_svg_tag: 'fu__media fu__media--placeholder' }}
                 {%- endif -%}
@@ -248,7 +260,13 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Image"
+          "label": "Image (desktop)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image (mobile)",
+          "info": "Optional — the mobile row crops to a fixed tile height, so a different crop can keep the subject in frame. Falls back to the desktop image above."
         },
         {
           "type": "text",

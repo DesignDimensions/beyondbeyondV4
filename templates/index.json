@@ -17,6 +17,7 @@
           "settings": {
             "background_color": "#c5c4c7",
             "image_desktop": "shopify://shop_images/prime_banner_bb_1.png",
+            "image_mobile": "shopify://shop_images/Combo_Banner_mob_e4b37e11-1f51-4bd5-b394-e374e5a678da.png",
             "link": "shopify://products/ultra-hydrating-oligo-ha-mist",
             "link_label": "",
             "open_in_new_tab": false,
@@ -222,6 +223,7 @@
       "name": "Video Parallax",
       "settings": {
         "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+        "video_mobile_url": "",
         "video_alt": "",
         "autoplay": true,
         "ratio": "1900 / 670",
@@ -249,8 +251,11 @@
       "settings": {
         "overline": "Personalised skincare consultation",
         "heading": "Meet your skincare consultant",
+        "subheading": "",
         "image": "shopify://shop_images/Beyond_558_2_1.png",
         "cta_label": "Start Consultation",
+        "media_type": "image",
+        "video_image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318902.png?v=1787207344",
         "video_url": "",
         "video_alt": "",
         "color_background": "#e9eef4",
@@ -644,6 +649,7 @@
         "image_alt": "The founders",
         "media_width": 43,
         "media_ratio": "0.815",
+        "media_ratio_mobile": "",
         "heading": "From Our Founders",
         "heading_size": 32,
         "heading_color": "#1a1a1a",

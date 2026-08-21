@@ -466,7 +466,7 @@ blockquote {
   line-height: 1.55;
 }
 
-.section-text > * {
+.section-text>* {
   margin: 0;
 }
 
@@ -1121,6 +1121,11 @@ summary::-webkit-details-marker {
   .grid--peek.slider--mobile {
     margin: 0;
     width: 100%;
+  }
+
+  .section-heading {
+    letter-spacing: 6px;
+    font-size: 1.4rem;
   }
 
   .grid--peek.slider--mobile .grid__item {

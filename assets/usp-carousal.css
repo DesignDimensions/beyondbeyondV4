@@ -20,20 +20,16 @@
    the track slides underneath, and the coloured bar itself never fades. */
 .usp-carousal__viewport {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 var(--usp-fade),
-    #000 calc(100% - var(--usp-fade)),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 var(--usp-fade),
-    #000 calc(100% - var(--usp-fade)),
-    transparent 100%
-  );
+  -webkit-mask-image: linear-gradient(90deg,
+      transparent 0,
+      #000 var(--usp-fade),
+      #000 calc(100% - var(--usp-fade)),
+      transparent 100%);
+  mask-image: linear-gradient(90deg,
+      transparent 0,
+      #000 var(--usp-fade),
+      #000 calc(100% - var(--usp-fade)),
+      transparent 100%);
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -90,6 +86,7 @@
 }
 
 @media (hover: hover) {
+
   /* Hovering the strip recedes every item, then the one under the cursor
      comes back forward. */
   .usp-carousal__viewport:hover .usp-carousal__inner {
@@ -139,5 +136,19 @@
   .usp-carousal__inner,
   .usp-carousal__icon {
     transition: none;
+  }
+}
+
+@media(max-width:756px) {
+  .usp-carousal__track {
+    gap: 30px;
+  }
+
+  .usp-carousal__icon {
+    width: 38px;
+  }
+
+  .usp-carousal__title {
+    font-size: 1.3rem;
   }
 }

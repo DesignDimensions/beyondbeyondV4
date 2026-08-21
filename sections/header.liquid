@@ -77,176 +77,211 @@
 </style>
 
 {%- style -%}
-      .header {
-        padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
-      }
+          .header {
+            padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
+          }
 
-      .section-header {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: 1000;
-        margin-bottom: 0;
-        background: transparent;
-      }
+          .section-header {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-bottom: 0;
+            background: transparent;
+          }
 
-      @media screen and (min-width: 750px) {
-        .section-header {
-          margin-bottom: 0;
-        }
-      }
+          @media screen and (min-width: 750px) {
+            .section-header {
+              margin-bottom: 0;
+            }
+          }
 
-      @media screen and (min-width: 990px) {
-        .header {
-          padding-top: {{ section.settings.padding_top }}px;
-          padding-bottom: {{ section.settings.padding_bottom }}px;
-        }
-      }
+          @media screen and (min-width: 990px) {
+            .header {
+              padding-top: {{ section.settings.padding_top }}px;
+              padding-bottom: {{ section.settings.padding_bottom }}px;
+            }
+          }
 
-      .section-header .header-wrapper,
-      .section-header .header-wrapper.gradient {
-        background-color: rgba(255, 255, 255, 0) !important;
-        background-image: none !important;
-        transition: background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.52s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-        will-change: background-color, backdrop-filter, box-shadow, border-color;
-      }
+          .section-header .header-wrapper,
+          .section-header .header-wrapper.gradient {
+            background-color: rgba(255, 255, 255, 0) !important;
+            background-image: none !important;
+            transition: background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.52s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.52s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: background-color, backdrop-filter, box-shadow, border-color;
+          }
 
-      .section-header.scrolled-past-header .header-wrapper {
-  background-color: rgba(255, 255, 255, 0.66) !important;
-      background-image: none !important;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.45);
-      }
+          .section-header.scrolled-past-header .header-wrapper {
+      background-color: rgba(255, 255, 255, 0.66) !important;
+          background-image: none !important;
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(18px);
+          box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+          }
 
-      .section-header:not(.scrolled-past-header) .header-wrapper {
-        box-shadow: none;
-        border-bottom: none;
-      }
+          .section-header:not(.scrolled-past-header) .header-wrapper {
+            box-shadow: none;
+            border-bottom: none;
+          }
 
-      .shopify-section-header-sticky {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-      }
+          .shopify-section-header-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+          }
 
-      /* Slide out of the way going down, slide back in coming up. The section is
-         `position: fixed`, so the theme's own hidden state — which drops `top` to
-         -(header height) — is outranked by the `top: 0` above and never shows. A
-         transform is the better mechanism regardless: it runs on the compositor,
-         so the slide holds up over a busy page. `top` is pinned here so the two
-         mechanisms can never both fire and hide the header twice over. */
-      .section-header,
-      .section-header.animate {
-        transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
-        will-change: transform;
-      }
+          /* Slide out of the way going down, slide back in coming up. The section is
+             `position: fixed`, so the theme's own hidden state — which drops `top` to
+             -(header height) — is outranked by the `top: 0` above and never shows. A
+             transform is the better mechanism regardless: it runs on the compositor,
+             so the slide holds up over a busy page. `top` is pinned here so the two
+             mechanisms can never both fire and hide the header twice over. */
+          .section-header,
+          .section-header.animate {
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+          }
 
-      .section-header.shopify-section-header-hidden {
-        top: 0;
-        transform: translate3d(0, -100%, 0);
-      }
+          .section-header.shopify-section-header-hidden {
+            top: 0;
+            transform: translate3d(0, -100%, 0);
+          }
 
-      /* An open drawer or menu owns the header — it stays put even if the page
-         scrolls underneath it. */
-      .section-header.shopify-section-header-hidden.menu-open {
-        transform: none;
-      }
+          /* An open drawer or menu owns the header — it stays put even if the page
+             scrolls underneath it. */
+          .section-header.shopify-section-header-hidden.menu-open {
+            transform: none;
+          }
 
-      @media (prefers-reduced-motion: reduce) {
-        .section-header,
-        .section-header.animate {
-          transition: none;
-        }
-      }
+          @media (prefers-reduced-motion: reduce) {
+            .section-header,
+            .section-header.animate {
+              transition: none;
+            }
+          }
 
-      .header__icons {
-        gap: 2.5rem;
-      }
+          .header__icons {
+            gap: 2.5rem;
+          }
 
-      .section-header .header__icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: auto;
-        height: auto;
-        min-width: auto;
-        min-height: auto;
-        padding: 0.35rem;
-        color: rgb(var(--color-foreground));
-      }
+          .section-header .header__icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            height: auto;
+            min-width: auto;
+            min-height: auto;
+            padding: 0.35rem;
+            color: rgb(var(--color-foreground));
+          }
 
-      .section-header .header__icon span {
-        height: auto;
-      }
+          .section-header .header__icon span {
+            height: auto;
+          }
 
-      .section-header .header__icon .svg-wrapper {
-        width: 2rem;
-        height: 2rem;
-      }
+          .section-header .header__icon .svg-wrapper {
+            width: 2rem;
+            height: 2rem;
+          }
 
-      .section-header .header__icon .icon {
-        width: 1.75rem;
-        height: 1.75rem;
-      }
+          .section-header .header__icon .icon {
+            width: 1.75rem;
+            height: 1.75rem;
+          }
 
-      .section-header .header__icon--cart,
-      .section-header .header__icon--account {
-        margin-right: 0;
-      }
+          .section-header .header__icon--cart,
+          .section-header .header__icon--account {
+            margin-right: 0;
+          }
 
-      .header__search {
-        display: inline-flex !important;
-        align-items: center;
-      }
+          .header__search {
+            display: inline-flex !important;
+            align-items: center;
+          }
 
-      .header__icon.header__icon--search,
-      .header__search-trigger {
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none !important;
-      }
-    .header__search-trigger{
-      min-width: 200px;
-      justify-content: space-between !important;
-      margin-bottom: -6px;
-      }
-      .header__search-trigger {
-        gap: 0.75rem;
-        padding-bottom: 5px;
-        text-transform: uppercase;
-        letter-spacing: 0.22em;
-        font-size: 0.75rem;
-        font-weight: 700;
-        border-bottom: 1px solid currentColor;
-        text-decoration: none !important;
-        text-decoration-skip-ink: none;
-      }
+          .header__icon.header__icon--search,
+          .header__search-trigger {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none !important;
+          }
 
-      .header__search-trigger .header__search-label {
-        display: inline-flex;
-        align-items: center;
-        padding-bottom: 0.08rem;
-        text-decoration: none !important;
-      }
+          .header__search-trigger .svg-wrapper {
+            width: 2.2rem;
+            height: 2.2rem;
+          }
 
-      .header__search-trigger .svg-wrapper {
-        width: 2.2rem;
-        height: 2.2rem;
-      }
+          .header__search-trigger .icon {
+            width: 1.8rem;
+            height: 1.8rem;
+          }
 
-      .header__search-trigger .icon {
-        width: 1.8rem;
-        height: 1.8rem;
-      }
-      .header__search-trigger span:first-of-type {
-        font-size: 17px;
-        font-weight: 500;
-      }
+          /* Mobile keeps the icon-only trigger; the expanded text pill below is
+             desktop-only so it doesn't leak onto small screens. */
+          @media screen and (max-width: 989px) {
+            .header__search-trigger span:first-of-type {
+              display: none;
+            }
+
+            .header__search-trigger {
+              min-width: auto;
+              gap: 0;
+              padding-bottom: 0;
+              margin-bottom: 0;
+              border-bottom: none;
+            }
+          }
+
+          @media screen and (min-width: 990px) {
+            .header__search-trigger {
+              min-width: 200px;
+              justify-content: space-between !important;
+              margin-bottom: -6px;
+              gap: 0.75rem;
+              padding-bottom: 5px;
+              text-transform: uppercase;
+              letter-spacing: 0.22em;
+              font-size: 0.75rem;
+              font-weight: 700;
+              border-bottom: 1px solid currentColor;
+              text-decoration: none !important;
+              text-decoration-skip-ink: none;
+            }
+
+            .header__search-trigger .header__search-label {
+              display: inline-flex;
+              align-items: center;
+              padding-bottom: 0.08rem;
+              text-decoration: none !important;
+            }
+
+            .header__search-trigger span:first-of-type {
+              font-size: 17px;
+              font-weight: 500;
+            }
+          }
+  @media(max-width:756px) {
+
+    .header__icons {
+      gap: .7rem;
+      padding-right: 0
+    }
+
+    header-drawer {
+      margin-left: 0.5rem;
+    }
+
+    .section-header .header__icon .svg-wrapper {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+  }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>

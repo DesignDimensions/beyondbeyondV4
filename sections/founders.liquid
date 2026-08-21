@@ -14,6 +14,11 @@
     assign image_src = image | image_url: width: 1200
   endif
 
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
   comment
     With no link chosen, the button still has to go somewhere sensible. The
     store's own about page is looked up by its handle first — which keeps the
@@ -39,6 +44,9 @@
     --fnd-gap: {{ section.settings.column_gap }}px;
     --fnd-media-w: {{ section.settings.media_width }}%;
     --fnd-media-ratio: {{ section.settings.media_ratio }};
+    {%- if section.settings.media_ratio_mobile != blank %}
+      --fnd-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
+    {%- endif %}
     --fnd-heading-size: {{ section.settings.heading_size }}px;
     --fnd-heading-color: {{ section.settings.heading_color }};
     --fnd-heading-gap: {{ section.settings.heading_gap }}px;
@@ -57,19 +65,32 @@
     <div class="fnd__panel">
       <div class="fnd__media">
         {%- if image_src != blank -%}
-          <img
-            class="fnd__img"
-            src="{{ image_src }}"
-            {%- if image != blank %}
-              srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 1200 }} 1200w"
-              width="{{ image.width }}"
-              height="{{ image.height }}"
-            {%- endif %}
-            sizes="(min-width: 750px) 43vw, 90vw"
-            alt="{{ section.settings.image_alt | escape }}"
-            loading="lazy"
-            decoding="async"
-          >
+          <picture>
+            {%- if section.settings.image_mobile != blank -%}
+              <source
+                media="(max-width: 749px)"
+                srcset="
+                  {{ image_mobile | image_url: width: 500 }} 500w,
+                  {{ image_mobile | image_url: width: 800 }} 800w,
+                  {{ image_mobile | image_url: width: 1100 }} 1100w
+                "
+                sizes="90vw"
+              >
+            {%- endif -%}
+            <img
+              class="fnd__img"
+              src="{{ image_src }}"
+              {%- if image != blank %}
+                srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 1200 }} 1200w"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+              {%- endif %}
+              sizes="(min-width: 750px) 43vw, 90vw"
+              alt="{{ section.settings.image_alt | escape }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </picture>
         {%- else -%}
           {{ 'lifestyle-2' | placeholder_svg_tag: 'fnd__img fnd__img--placeholder' }}
         {%- endif -%}
@@ -148,7 +169,13 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Image"
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens, useful when the desktop shape crowds a group shot. Falls back to the desktop image above."
     },
     {
       "type": "text",
@@ -177,7 +204,7 @@
     {
       "type": "select",
       "id": "media_ratio",
-      "label": "Image shape",
+      "label": "Image shape (desktop)",
       "options": [
         { "value": "0.815", "label": "Portrait" },
         { "value": "0.75", "label": "Tall portrait" },
@@ -185,6 +212,20 @@
         { "value": "auto", "label": "Original" }
       ],
       "default": "0.815"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "options": [
+        { "value": "", "label": "Same as desktop" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "0.75", "label": "Tall portrait" },
+        { "value": "1", "label": "Square" },
+        { "value": "1.33", "label": "Landscape" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": ""
     },
     {
       "type": "header",

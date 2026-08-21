@@ -10,10 +10,25 @@
     assign poster = s.video.preview_image
   endif
 
+  assign poster_mobile = s.poster_mobile
+  if poster_mobile == blank
+    assign poster_mobile = poster
+  endif
+
   if s.video != blank
     assign video_alt = s.video.alt | default: s.video_alt
   else
     assign video_alt = s.video_alt
+  endif
+
+  comment
+    The mobile cut is optional — most merchants only ever set the one video,
+    so with nothing mobile-specific picked this falls straight back to it and
+    the section behaves exactly as it did before this setting existed.
+  endcomment
+  assign has_video_mobile = false
+  if s.video_mobile != blank or s.video_mobile_url != blank
+    assign has_video_mobile = true
   endif
 
   assign ratio_mobile = s.ratio_mobile
@@ -96,6 +111,24 @@
         playsinline
         preload="auto"
       >
+        {%- comment -%}
+          The mobile source has to come first: a browser picks the first
+          <source> whose `media` matches, so listing it ahead of the
+          unconditional desktop one is what lets the desktop source act as
+          the fallback for every width the mobile query doesn't claim.
+        {%- endcomment -%}
+        {%- if has_video_mobile -%}
+          {%- if s.video_mobile != blank -%}
+            {%- for source in s.video_mobile.sources -%}
+              {%- if source.format == 'mp4' -%}
+                <source media="(max-width: 749px)" src="{{ source.url }}" type="{{ source.mime_type }}">
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            <source media="(max-width: 749px)" src="{{ s.video_mobile_url }}" type="video/mp4">
+          {%- endif -%}
+        {%- endif -%}
+
         {%- if s.video != blank -%}
           {%- for source in s.video.sources -%}
             {%- if source.format == 'mp4' -%}
@@ -106,6 +139,16 @@
           <source src="{{ s.video_url }}" type="video/mp4">
         {%- endif -%}
       </video>
+      {%- if s.poster_mobile != blank -%}
+        <script>
+          (function () {
+            var video = document.currentScript.previousElementSibling;
+            if (video && window.matchMedia('(max-width: 749px)').matches) {
+              video.poster = {{ poster_mobile | image_url: width: 1600 | json }};
+            }
+          })();
+        </script>
+      {%- endif -%}
     {%- else -%}
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'vpx__video placeholder-svg' }}
     {%- endif -%}
@@ -135,14 +178,26 @@
     {
       "type": "video",
       "id": "video",
-      "label": "Video",
+      "label": "Video (desktop)",
       "info": "Overrides the URL below. Leave empty to use an externally hosted MP4."
     },
     {
       "type": "text",
       "id": "video_url",
-      "label": "MP4 URL",
+      "label": "MP4 URL (desktop)",
       "default": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4"
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Video (mobile)",
+      "info": "Optional — a differently-framed cut for the portrait crop below. The source ratio is a thin strip on a phone, so the same footage often needs its subject reframed. Falls back to the desktop video."
+    },
+    {
+      "type": "text",
+      "id": "video_mobile_url",
+      "label": "MP4 URL (mobile)",
+      "info": "Used only when no mobile video is picked above."
     },
     {
       "type": "text",
@@ -153,8 +208,14 @@
     {
       "type": "image_picker",
       "id": "poster",
-      "label": "Poster image",
+      "label": "Poster image (desktop)",
       "info": "Shown until the first frame is decoded."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_mobile",
+      "label": "Poster image (mobile)",
+      "info": "Optional — falls back to the desktop poster above."
     },
     {
       "type": "checkbox",

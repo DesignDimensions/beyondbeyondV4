@@ -112,6 +112,7 @@
     flex: 0 0 auto;
     max-width: 100%;
     width: 100%;
+    aspect-ratio: var(--fnd-media-ratio-mobile, var(--fnd-media-ratio, 0.815));
   }
 
   .fnd__heading {

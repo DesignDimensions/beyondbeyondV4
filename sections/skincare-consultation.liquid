@@ -30,6 +30,17 @@
     assign media_image_url = s.video_image_url
   endif
 -%}
+{%- liquid
+  assign image_mobile = s.image_mobile
+  if image_mobile == blank
+    assign image_mobile = s.image
+  endif
+
+  assign video_image_mobile = s.video_image_mobile
+  if video_image_mobile == blank
+    assign video_image_mobile = s.video_image
+  endif
+-%}
 
 {{ 'skincare-consultation.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'skincare-consultation.js' | asset_url }}" defer="defer"></script>
@@ -63,20 +74,33 @@
     <div class="sc__grid">
       <div class="sc__media">
         {%- if s.image != blank -%}
-          <img
-            class="sc__image"
-            srcset="
-              {{ s.image | image_url: width: 600 }} 600w,
-              {{ s.image | image_url: width: 900 }} 900w,
-              {{ s.image | image_url: width: 1200 }} 1200w
-            "
-            sizes="(max-width: 749px) 100vw, 50vw"
-            src="{{ s.image | image_url: width: 900 }}"
-            alt="{{ s.image.alt | default: s.heading | escape }}"
-            width="{{ s.image.width }}"
-            height="{{ s.image.height }}"
-            loading="lazy"
-          />
+          <picture>
+            {%- if s.image_mobile != blank -%}
+              <source
+                media="(max-width: 749px)"
+                srcset="
+                  {{ image_mobile | image_url: width: 450 }} 450w,
+                  {{ image_mobile | image_url: width: 750 }} 750w,
+                  {{ image_mobile | image_url: width: 1100 }} 1100w
+                "
+                sizes="100vw"
+              >
+            {%- endif -%}
+            <img
+              class="sc__image"
+              srcset="
+                {{ s.image | image_url: width: 600 }} 600w,
+                {{ s.image | image_url: width: 900 }} 900w,
+                {{ s.image | image_url: width: 1200 }} 1200w
+              "
+              sizes="(max-width: 749px) 100vw, 50vw"
+              src="{{ s.image | image_url: width: 900 }}"
+              alt="{{ s.image.alt | default: s.heading | escape }}"
+              width="{{ s.image.width }}"
+              height="{{ s.image.height }}"
+              loading="lazy"
+            />
+          </picture>
         {%- else -%}
           {{ 'model-1' | placeholder_svg_tag: 'sc__image placeholder-svg' }}
         {%- endif -%}
@@ -127,12 +151,25 @@
           {%- endif -%}
         {%- else -%}
           {%- if media_image_url != blank -%}
-            <img
-              class="sc__video sc__video--fit"
-              src="{{ media_image_url }}"
-              alt="{{ s.video_image.alt | default: video_alt | escape }}"
-              loading="lazy"
-            />
+            <picture>
+              {%- if s.video_image_mobile != blank -%}
+                <source
+                  media="(max-width: 749px)"
+                  srcset="
+                    {{ video_image_mobile | image_url: width: 450 }} 450w,
+                    {{ video_image_mobile | image_url: width: 750 }} 750w,
+                    {{ video_image_mobile | image_url: width: 1100 }} 1100w
+                  "
+                  sizes="100vw"
+                >
+              {%- endif -%}
+              <img
+                class="sc__video sc__video--fit"
+                src="{{ media_image_url }}"
+                alt="{{ s.video_image.alt | default: video_alt | escape }}"
+                loading="lazy"
+              />
+            </picture>
           {%- else -%}
             {{ 'lifestyle-1' | placeholder_svg_tag: 'sc__video placeholder-svg' }}
           {%- endif -%}
@@ -181,7 +218,13 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Image"
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
     },
     {
       "type": "text",
@@ -211,8 +254,14 @@
     {
       "type": "image_picker",
       "id": "video_image",
-      "label": "Image",
+      "label": "Image (desktop)",
       "info": "Used when \"Show\" is set to an image."
+    },
+    {
+      "type": "image_picker",
+      "id": "video_image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
     },
     {
       "type": "text",

@@ -66,7 +66,8 @@
   border: 0;
   background: none;
   color: inherit;
-  font-size: 1.4rem;
+  /* 16px minimum — anything smaller makes iOS Safari zoom the page in on focus. */
+  font-size: 1.6rem;
   outline: none;
 }
 
@@ -200,11 +201,25 @@
 }
 
 @media screen and (max-width: 749px) {
+  /* A single flex column would run all five menus (Shop's twelve links
+     included) down the page one after another. Balancing them into two
+     print-style columns instead — the same 2-column convention the theme's
+     own stock footer uses on mobile — keeps the long Shop list to one column
+     and lets the shorter menus share the other, without the empty gaps a
+     plain 2-col grid would leave beside them. */
   .ftm__menus {
-    flex-direction: column;
+    display: block;
+    column-count: 2;
+    column-gap: 24px;
   }
 
   .ftm__menu-column {
-    flex-basis: auto;
+    width: 100%;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+
+  .ftm__menu-column:not(:last-child) {
+    margin-bottom: 36px;
   }
 }

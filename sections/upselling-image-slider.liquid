@@ -15,7 +15,14 @@
     assign ratio_desktop = first_block.settings.image_mobile.aspect_ratio
   endif
 
-  assign ratio_mobile = ratio_desktop
+  comment
+    Mobile gets its own box — 402x743 — rather than inheriting whatever ratio
+    the desktop banner happens to be: a 1900x670-style banner squashed to
+    phone width is under 3rem tall, nowhere near enough room for the artwork
+    or the product rail docked under it. A dedicated mobile crop still wins
+    when one is picked.
+  endcomment
+  assign ratio_mobile = 402.0 | divided_by: 743.0
   if first_block.settings.image_mobile != blank
     assign ratio_mobile = first_block.settings.image_mobile.aspect_ratio
   endif
@@ -55,9 +62,6 @@
           {%- liquid
             assign image_desktop = block.settings.image_desktop
             assign image_mobile = block.settings.image_mobile
-            if image_mobile == blank
-              assign image_mobile = image_desktop
-            endif
 
             comment
               The <img> carries the desktop art; <source> only overrides it on
@@ -66,6 +70,17 @@
             assign image_main = image_desktop
             if image_main == blank
               assign image_main = image_mobile
+            endif
+
+            comment
+              Desktop and mobile are meant to be different crops, not the same
+              banner squeezed into a different box. With nothing picked for
+              mobile yet, show the dummy placeholder there instead of quietly
+              reusing the desktop art — it should look unfinished, not broken.
+            endcomment
+            assign mobile_is_dummy = false
+            if image_mobile == blank and image_main != blank
+              assign mobile_is_dummy = true
             endif
 
             assign product = block.settings.product
@@ -99,6 +114,10 @@
             data-uis-slide
             data-index="{{ forloop.index0 }}"
             data-uis-bg="{{ slide_background }}"
+            style="
+              --uis-focal-x-mobile: {{ block.settings.hotspot_x_mobile | default: 50 }}%;
+              --uis-focal-x-desktop: {{ block.settings.hotspot_x_desktop | default: 50 }}%;
+            "
             {{ block.shopify_attributes }}
           >
             {%- if block.settings.link != blank -%}
@@ -116,7 +135,7 @@
 
             <picture class="uis__picture">
               {%- if image_main != blank -%}
-                {%- if image_desktop != blank and block.settings.image_mobile != blank -%}
+                {%- if image_mobile != blank -%}
                   <source
                     media="(max-width: 749px)"
                     srcset="
@@ -125,9 +144,17 @@
                       {{ image_mobile | image_url: width: 1100 }} 1100w,
                       {{ image_mobile | image_url: width: 1500 }} 1500w
                     "
-                    sizes="calc(100vw - 3rem)"
+                    sizes="100vw"
                     width="{{ image_mobile.width }}"
                     height="{{ image_mobile.height }}"
+                  >
+                {%- elsif mobile_is_dummy -%}
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="{{ 'hero-mobile-placeholder.svg' | asset_url }}"
+                    sizes="100vw"
+                    width="402"
+                    height="743"
                   >
                 {%- endif -%}
 
@@ -274,6 +301,108 @@
           </div>
         {%- endfor -%}
       </div>
+
+      {%- comment -%}
+        Mobile only: every slide's product, docked to the bottom of the image
+        and always visible, swipeable as its own strip independent of which
+        background slide is showing. The tap-to-reveal hotspot has nowhere
+        near enough room to work in the taller mobile box, so this replaces
+        it there; desktop keeps the hotspot as it was.
+      {%- endcomment -%}
+      {%- assign has_products = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.product != blank -%}
+          {%- assign has_products = true -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if has_products -%}
+        <div class="uis__products" data-uis-products>
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign rail_product = block.settings.product
+              if rail_product == blank
+                continue
+              endif
+
+              assign rail_variant = rail_product.selected_or_first_available_variant | default: rail_product.variants.first
+
+              assign rail_discount = 0
+              if rail_variant.compare_at_price > rail_variant.price
+                assign rail_saved = rail_variant.compare_at_price | minus: rail_variant.price | times: 100.0
+                assign rail_discount = rail_saved | divided_by: rail_variant.compare_at_price | round
+              endif
+            -%}
+            <div class="uis__product-card" {{ block.shopify_attributes }}>
+              <div class="uis__card">
+                <a class="uis__card-media" href="{{ rail_product.url }}" tabindex="-1" aria-hidden="true">
+                  {%- if rail_product.featured_image != blank -%}
+                    <img
+                      src="{{ rail_product.featured_image | image_url: width: 220 }}"
+                      srcset="
+                        {{ rail_product.featured_image | image_url: width: 160 }} 160w,
+                        {{ rail_product.featured_image | image_url: width: 320 }} 320w
+                      "
+                      sizes="70px"
+                      width="{{ rail_product.featured_image.width }}"
+                      height="{{ rail_product.featured_image.height }}"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'uis__card-placeholder' }}
+                  {%- endif -%}
+                </a>
+
+                <div class="uis__card-body">
+                  <a class="uis__card-title" href="{{ rail_product.url }}">{{ rail_product.title }}</a>
+
+                  <span class="uis__card-price">{{ rail_variant.price | money }}</span>
+
+                  {%- if rail_discount > 0 -%}
+                    <span class="uis__card-discount">({{ rail_discount }}% OFF)</span>
+                  {%- endif -%}
+
+                  <form
+                    method="post"
+                    action="{{ routes.cart_add_url }}"
+                    accept-charset="UTF-8"
+                    class="uis__form"
+                    data-uis-form
+                    enctype="multipart/form-data"
+                  >
+                    <input type="hidden" name="form_type" value="product">
+                    <input type="hidden" name="utf8" value="✓">
+                    <input type="hidden" name="id" value="{{ rail_variant.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button
+                      type="submit"
+                      class="uis__add"
+                      data-uis-add
+                      {% unless rail_variant.available %}
+                        disabled
+                      {% endunless %}
+                    >
+                      <svg class="uis__add-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                        <path d="M6 1.5v9M1.5 6h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                      <span class="uis__add-label">
+                        {%- if rail_variant.available -%}
+                          {{ section.settings.add_button_label | default: 'Add' }}
+                        {%- else -%}
+                          {{ 'products.product.sold_out' | t }}
+                        {%- endif -%}
+                      </span>
+                      <span class="uis__add-spinner" aria-hidden="true"></span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
 
       {%- if section.settings.show_arrows and section.blocks.size > 1 -%}
         <button type="button" class="uis__arrow uis__arrow--prev" data-uis-prev aria-label="{{ 'general.slider.previous_slide' | t }}">

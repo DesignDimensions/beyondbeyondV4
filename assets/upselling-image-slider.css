@@ -23,7 +23,7 @@
 .uis__viewport {
   position: relative;
   overflow: hidden;
-  aspect-ratio: var(--uis-ratio-mobile, 2.65);
+  aspect-ratio: var(--uis-ratio-mobile, 402 / 743);
   touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
@@ -63,7 +63,7 @@
 }
 
 .uis__picture,
-.uis__link > .uis__picture {
+.uis__link>.uis__picture {
   display: block;
   width: 100%;
   height: 100%;
@@ -75,7 +75,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  /* Without a dedicated mobile crop the box ratio can differ a lot from the
+     image's own, so most of its width gets cut away by cover — centring
+     that crop on wherever the hotspot already sits keeps the product in
+     frame instead of on the image's geometric (and likely empty) middle. */
+  object-position: var(--uis-focal-x-mobile, 50%) center;
   -webkit-user-drag: none;
   user-select: none;
   pointer-events: none;
@@ -101,6 +105,11 @@
 @media screen and (min-width: 750px) {
   .uis__viewport {
     aspect-ratio: var(--uis-ratio-desktop, 2.65);
+  }
+
+  .uis__image,
+  .uis__image--placeholder {
+    object-position: var(--uis-focal-x-desktop, 50%) center;
   }
 }
 
@@ -195,10 +204,12 @@
     transform: scale(1);
     opacity: 0.5;
   }
+
   70% {
     transform: scale(2.1);
     opacity: 0;
   }
+
   100% {
     transform: scale(2.1);
     opacity: 0;
@@ -444,16 +455,20 @@
 }
 
 @keyframes uis-shake {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   20% {
     transform: translateX(-4px);
   }
+
   45% {
     transform: translateX(4px);
   }
+
   70% {
     transform: translateX(-2px);
   }
@@ -461,6 +476,10 @@
 
 /* Mobile: the card docks to the bottom of the image, so let it stretch. */
 @media screen and (max-width: 749px) {
+  .uis__inner {
+    padding: 0 !important;
+  }
+
   .uis__card-anchor {
     width: auto;
     /* Sits above the + button, which the docked card may overlap. */
@@ -522,6 +541,55 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
+  }
+
+  /* The tap-to-reveal hotspot doesn't have room to work in the taller mobile
+     box; .uis__products (below) replaces it there. Desktop keeps the dot. */
+  .uis__hotspot {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Product rail (mobile) — every slide's product, always visible and docked
+   to the bottom of the image, independent of the desktop hotspot above
+   -------------------------------------------------------------------------- */
+
+.uis__products {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .uis__products {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    gap: 1.2rem;
+    padding: 0 1.6rem 1.6rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .uis__products::-webkit-scrollbar {
+    display: none;
+  }
+
+  .uis__product-card {
+    flex: 0 0 86%;
+    max-width: 34rem;
+    scroll-snap-align: start;
+  }
+
+  /* Reuses .uis__card's frosted-glass look, but this one is always on —
+     the hotspot's hidden/toggle-open state does not apply here. */
+  .uis__product-card .uis__card {
+    opacity: 1;
+    transform: none;
   }
 }
 
