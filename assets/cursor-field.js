@@ -44,6 +44,43 @@
   var STRETCH_MAX = 0.4; // how far a fast pointer elongates a blob along its heading
   var STRETCH_CAP = 46; // px of movement per frame beyond which stretch no longer grows
 
+  // How the wash fades across the soft band at its rim: the fraction of the
+  // way out, against the fraction of full opacity left at that point. Shaped
+  // to sit close to the Gaussian a blur would have produced.
+  var FALLOFF = [
+    [0.35, 0.62],
+    [0.65, 0.26],
+    [0.85, 0.07],
+    [1, 0],
+  ];
+
+  /* The soft edge is painted, not filtered.
+
+     `ctx.filter = 'blur(...)'` is the obvious way to soften a canvas shape and
+     it is what this used to do -- but Safari only implemented it in version 18,
+     and where it is missing the assignment fails silently: no blur, no error,
+     just the hard-edged ellipse underneath. Which is why the field arrived on a
+     Mac as two flat circles following the cursor.
+
+     A radial falloff asks nothing of the browser beyond a gradient, so every
+     browser paints the same wash: flat through the core, then easing away
+     across a band as wide as the blur radius the filter used to spread. It is
+     also markedly cheaper than re-running a 56px blur every frame. */
+  function softBlob(ctx, outer, core, alpha) {
+    var gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, outer);
+    gradient.addColorStop(0, "rgba(" + COLOR + ", " + alpha + ")");
+    gradient.addColorStop(core, "rgba(" + COLOR + ", " + alpha + ")");
+
+    for (var i = 0; i < FALLOFF.length; i++) {
+      gradient.addColorStop(
+        core + (1 - core) * FALLOFF[i][0],
+        "rgba(" + COLOR + ", " + alpha * FALLOFF[i][1] + ")"
+      );
+    }
+
+    return gradient;
+  }
+
   function init() {
     var canvas = document.createElement("canvas");
     canvas.className = "cursor-field";
@@ -162,16 +199,22 @@
         blob.prev.y = blob.pos.y;
 
         var base = config.radius * fx.scale * fx.breathe;
+        // The shape carries its own soft rim, so it reaches a blur's width
+        // further out than the solid ellipse did, and is flat only inside it.
+        var outer = base + config.blur;
+        var core = Math.max(0, base - config.blur) / outer;
 
         ctx.save();
         ctx.translate(blob.pos.x, blob.pos.y);
         ctx.rotate(angle);
-        ctx.filter = "blur(" + config.blur + "px)";
-        ctx.fillStyle = "rgba(" + COLOR + ", " + config.alpha + ")";
-        ctx.beginPath();
         // Elongated along the heading and thinned across it, so a fast pass
-        // reads as a stroke rather than a circle simply growing.
-        ctx.ellipse(0, 0, base * stretch, base / Math.sqrt(stretch), 0, 0, Math.PI * 2);
+        // reads as a stroke rather than a circle simply growing. Scaling the
+        // canvas rather than the ellipse's radii carries the soft rim along
+        // with the shape.
+        ctx.scale(stretch, 1 / Math.sqrt(stretch));
+        ctx.fillStyle = softBlob(ctx, outer, core, config.alpha);
+        ctx.beginPath();
+        ctx.arc(0, 0, outer, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       });

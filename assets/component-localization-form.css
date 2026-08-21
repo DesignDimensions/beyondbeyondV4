@@ -29,7 +29,7 @@
   }
 
   .localization-form:only-child {
-    justify-content: start;
+    justify-content: flex-start;
     width: auto;
     margin: 0 1rem 0 0;
   }
@@ -166,7 +166,7 @@
 
 .country-filter {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   align-items: center;
   gap: 0.5rem;
   padding: 1.5rem 1.5rem 0.6rem;

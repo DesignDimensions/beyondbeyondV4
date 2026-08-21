@@ -1939,7 +1939,7 @@ input[type='checkbox'] {
 }
 
 .customer .field .form__message .svg-wrapper {
-  align-self: start;
+  align-self: flex-start;
 }
 
 .form-status {
