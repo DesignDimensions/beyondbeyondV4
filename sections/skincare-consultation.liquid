@@ -40,6 +40,11 @@
   if video_image_mobile == blank
     assign video_image_mobile = s.video_image
   endif
+
+  assign video_mobile = s.video_mobile
+  if video_mobile == blank
+    assign video_mobile = s.video
+  endif
 -%}
 
 {{ 'skincare-consultation.css' | asset_url | stylesheet_tag }}
@@ -136,6 +141,13 @@
               playsinline
               preload="metadata"
             >
+              {%- if video_mobile != blank -%}
+                {%- for source in video_mobile.sources -%}
+                  {%- if source.format == 'mp4' -%}
+                    <source media="(max-width: 749px)" src="{{ source.url }}" type="{{ source.mime_type }}">
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
               {%- if s.video != blank -%}
                 {%- for source in s.video.sources -%}
                   {%- if source.format == 'mp4' -%}
@@ -275,6 +287,12 @@
       "id": "video",
       "label": "Video",
       "info": "Used when \"Show\" is set to a video. Overrides the URL below -- leave empty to use an externally hosted MP4 instead."
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Video (mobile)",
+      "info": "Optional — a separate cut for small screens. Falls back to the desktop video above. On mobile the video also replaces the left-hand image, with the button fused to it instead."
     },
     {
       "type": "text",

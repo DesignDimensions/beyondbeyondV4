@@ -181,6 +181,27 @@
           {%- endif -%}
         </button>
       {%- endif -%}
+
+      {%- if section.blocks.size > 1 -%}
+        {%- comment -%}
+          Mobile-only (hidden by default in CSS) — desktop already has arrows
+          and a mouse-draggable rail. Real buttons, since these jump the rail
+          on tap rather than just reflecting where it already is.
+        {%- endcomment -%}
+        <div class="bbc__dots" data-bbc-dots>
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign dot_label = block.settings.label | default: block.settings.collection.title
+            -%}
+            <button
+              type="button"
+              class="bbc__dot{% if forloop.first %} is-active{% endif %}"
+              data-bbc-dot
+              aria-label="{{ 'general.slider.name' | t }}: {{ dot_label | escape }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
     </div>
 
     <div class="bbc__panels" data-bbc-panels>

@@ -102,6 +102,11 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .fnd {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
   .fnd__panel {
     flex-direction: column;
     gap: 28px;

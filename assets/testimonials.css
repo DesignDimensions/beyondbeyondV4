@@ -312,6 +312,11 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .tst {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
   .tst__card {
     flex-basis: calc(
       (100% - (var(--tst-columns-mobile, 1.2) - 1) * var(--tst-gap, 34px)) / var(--tst-columns-mobile, 1.2)

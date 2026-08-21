@@ -325,6 +325,11 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .fr {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
   .fr__card {
     flex-basis: calc(
       (100% - (var(--fr-columns-mobile, 1.2) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns-mobile, 1.2)

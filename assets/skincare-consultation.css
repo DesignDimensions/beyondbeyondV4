@@ -143,13 +143,44 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  /* Overrides the shared heading's own margin (base.css), which is sized for
+     a section that doesn't have a tight video sitting right under it. */
+  .sc .section-title {
+    margin-bottom: 1.5rem;
+  }
+
   .sc__grid {
     grid-template-columns: 1fr;
+    gap: 0;
+    padding-top: 0;
+  }
+
+  /* The video takes the image's spot, with the CTA fused to it the same way
+     it's fused to the image on desktop -- so the swap needs both the image
+     hidden and the two grid rows reordered, not just the image hidden. */
+  .sc__image,
+  .sc__media .placeholder-svg {
+    display: none;
   }
 
   .sc__video-wrap {
-    aspect-ratio: 4 / 5;
+    order: -1;
     height: auto;
+    margin-top: 30px;
+  }
+  .sc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  /* Auto margins on the flex item override the wrap's own end-alignment for
+     just this element, so the plain (cover-fit) video stays right-aligned. */
+  .sc__video.sc__video--fit {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sc__rule {
+    display: none;
   }
 }
 

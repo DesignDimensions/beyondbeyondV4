@@ -14,6 +14,12 @@
   var CLICK_CANCEL_DISTANCE = 10;
   var FIT_TOLERANCE = 2;
   var EASE = 'power3.out';
+  // Below this speed (px/ms) a release reads as a deliberate stop, not a
+  // flick, so momentum only kicks in once the throw is fast enough to mean it.
+  var MOMENTUM_MIN_VELOCITY = 0.15;
+  // Converts the release velocity into extra travel distance, so a fast flick
+  // keeps gliding past where the finger let go instead of stopping dead there.
+  var MOMENTUM_DISTANCE = 200;
 
   function reducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,6 +47,7 @@
 
     this.concerns = Array.prototype.slice.call(root.querySelectorAll('[data-bbc-concern]'));
     this.panels = Array.prototype.slice.call(root.querySelectorAll('[data-bbc-panel]'));
+    this.dots = Array.prototype.slice.call(root.querySelectorAll('[data-bbc-dot]'));
     if (!this.concerns.length) return;
 
     this.gsap = window.gsap || null;
@@ -104,6 +111,12 @@
         self.page(1);
       });
     }
+
+    this.dots.forEach(function (dot, index) {
+      dot.addEventListener('click', function () {
+        self.goToDot(index);
+      });
+    });
 
     this.viewport.addEventListener('pointerdown', this.onPointerDown);
     window.addEventListener('resize', this.onResize);
@@ -193,6 +206,43 @@
     }
 
     this.updateArrows();
+    this.updateDots();
+  };
+
+  // The dots track scroll progress, not selection — dragging the rail moves
+  // them without picking a concern, same as a scrollbar. Only once the rail
+  // no longer scrolls at all do they fall back to tracking the selected tab,
+  // since progress along a rail with nothing to scroll isn't meaningful.
+  BrowseByConcern.prototype.updateDots = function () {
+    if (!this.dots.length) return;
+
+    var count = this.dots.length;
+    var activeIndex;
+
+    if (this.maxScroll > 0) {
+      var progress = clamp(-this.x / this.maxScroll, 0, 1);
+      activeIndex = Math.round(progress * (count - 1));
+    } else {
+      activeIndex = this.index;
+    }
+
+    this.dots.forEach(function (dot, i) {
+      dot.classList.toggle('is-active', i === activeIndex);
+    });
+  };
+
+  // The inverse of updateDots's progress math, so a tap lands the rail at
+  // the same point the dot's position on the row promised.
+  BrowseByConcern.prototype.goToDot = function (index) {
+    var count = this.dots.length;
+    if (!count) return;
+
+    if (this.maxScroll > 0) {
+      var progress = count > 1 ? index / (count - 1) : 0;
+      this.setX(clamp(-progress * this.maxScroll, -this.maxScroll, 0));
+    } else {
+      this.select(index);
+    }
   };
 
   BrowseByConcern.prototype.page = function (direction) {
@@ -266,6 +316,9 @@
       originX: this.x,
       active: false,
       distance: 0,
+      lastX: event.clientX,
+      lastTime: event.timeStamp,
+      velocity: 0,
     };
 
     window.addEventListener('pointermove', this.onPointerMove, { passive: false });
@@ -295,6 +348,14 @@
 
     if (event.cancelable) event.preventDefault();
 
+    // Instantaneous speed from the most recent sample, not the average over
+    // the whole drag — a release right after a fast flick should carry the
+    // flick's speed even if the drag started slowly.
+    var dt = event.timeStamp - state.lastTime;
+    if (dt > 0) state.velocity = (event.clientX - state.lastX) / dt;
+    state.lastX = event.clientX;
+    state.lastTime = event.timeStamp;
+
     // Past either end the rail follows at a third speed, which reads as
     // resistance instead of a dead stop.
     var next = state.originX + dx;
@@ -310,13 +371,20 @@
 
     var dragged = state.active;
     var distance = state.distance;
+    var velocity = state.velocity;
 
     this.endDrag();
 
     if (!dragged) return;
 
-    // Settle back inside the bounds the resistance allowed us past.
-    this.setX(clamp(this.x, -this.maxScroll, 0));
+    // A fast flick keeps gliding past the release point and decelerates into
+    // place, rather than always stopping exactly where the finger lifted.
+    var target = this.x;
+    if (Math.abs(velocity) > MOMENTUM_MIN_VELOCITY) {
+      target = this.x + velocity * MOMENTUM_DISTANCE;
+    }
+
+    this.setX(clamp(target, -this.maxScroll, 0));
 
     if (distance > CLICK_CANCEL_DISTANCE) {
       this.swallowClick = true;
@@ -373,6 +441,7 @@
     this.reveal(index);
     this.swapPanels(previous, index);
     this.updateArrows();
+    this.updateDots();
   };
 
   BrowseByConcern.prototype.swapPanels = function (from, to) {

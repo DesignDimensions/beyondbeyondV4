@@ -138,6 +138,11 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .asi {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
   .asi__logo-img {
     height: var(--asi-logo-h-mobile, 32px);
   }

@@ -40,6 +40,10 @@
   position: relative;
   overflow: hidden;
   padding-top: var(--bbc-thumb-lift, 28px);
+  /* Claim horizontal panning for the drag handler up front so the browser
+     never starts its own scroll/zoom gesture before JS decides the swipe is
+     ours — vertical touch scroll still passes through untouched. */
+  touch-action: pan-y;
 }
 
 /* Centred is the resting state — a rail with room to spare sits in the middle
@@ -211,6 +215,52 @@
 }
 
 /* --------------------------------------------------------------------------
+   Dots — a mobile-only scroll-progress readout for the rail, tappable to jump
+   to that point. The transition is what reads as "sliding": each dot just
+   toggles active, and the colour/scale tween carries the motion between them.
+   Desktop already has arrows and a mouse-draggable rail, so the dots would be
+   redundant there.
+   -------------------------------------------------------------------------- */
+
+.bbc__dots {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.bbc__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bbc__dot::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  transition: background-color 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bbc__dot.is-active::before {
+  background-color: var(--bbc-dot-color, #000);
+  transform: scale(1.3);
+}
+
+.bbc__dot:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
    Panels
    -------------------------------------------------------------------------- */
 
@@ -254,6 +304,23 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .bbc__dots {
+    display: flex;
+  }
+
+  .bbc__concern-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+    line-height: 18px;
+    margin-top: 8px;
+  }
+
+  .bbc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
   .bbc__grid {
     grid-template-columns: repeat(var(--bbc-columns-mobile, 2), minmax(0, 1fr));
   }

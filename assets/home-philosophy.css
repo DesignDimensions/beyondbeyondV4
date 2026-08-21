@@ -59,8 +59,7 @@
   align-items: center;
   justify-content: center;
   /* Squash and stretch, rotated onto the axis the bubble is travelling along. */
-  transform: rotate(var(--hp-squeeze-angle, 0deg)) scale(var(--hp-sx, 1), var(--hp-sy, 1))
-    rotate(calc(var(--hp-squeeze-angle, 0deg) * -1));
+  transform: rotate(var(--hp-squeeze-angle, 0deg)) scale(var(--hp-sx, 1), var(--hp-sy, 1)) rotate(calc(var(--hp-squeeze-angle, 0deg) * -1));
   will-change: transform;
 }
 
@@ -297,11 +296,13 @@
 
 @media screen and (max-width: 749px) {
   .home-philosophy {
-    --hp-bubble-size: min(58vw, 260px);
+    --hp-bubble-size: 190px !important;
+    padding-top: 40px;
+    padding-bottom: 40px;
   }
 
   .hp-stage {
-    height: 700px;
+    height: 560px;
     padding: 0 2.4rem;
   }
 
@@ -322,7 +323,7 @@
   }
 
   .hp-bubble-wrap {
-    top: 40%;
+    top: 39%;
   }
 
   .hp-callout {
@@ -331,17 +332,17 @@
   }
 
   .hp-callout[data-index='0'] {
-    left: 26% !important;
-    top: 4% !important;
+    left: 28% !important;
+    top: 8% !important;
   }
 
   .hp-callout[data-index='1'] {
-    left: 3% !important;
-    top: 60% !important;
+    left: 6% !important;
+    top: 59% !important;
   }
 
   .hp-callout[data-index='2'] {
-    left: 40% !important;
+    left: 41% !important;
     top: 78% !important;
   }
 
@@ -359,6 +360,7 @@
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+
   .home-philosophy[data-hp-animate] [data-hp-reveal],
   .home-philosophy[data-hp-animate] .hp-bubble-wrap {
     opacity: 1;
