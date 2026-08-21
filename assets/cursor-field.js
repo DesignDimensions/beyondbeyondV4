@@ -26,6 +26,7 @@
   "use strict";
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!window.matchMedia("(min-width: 990px)").matches) return; // desktop only — no cursor to trail on phone
   if (!window.gsap) return;
 
   var gsap = window.gsap;

@@ -145,7 +145,7 @@
           "type": "callout",
           "settings": {
             "title": "Lorem ipsum",
-            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas.</p>",
+            "text": "<p>Lorem ipsum dolor sit amet</p>",
             "text_x": 4,
             "text_y": 40,
             "dot_x": 24,
@@ -160,7 +160,7 @@
           "type": "callout",
           "settings": {
             "title": "Lorem",
-            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas.</p>",
+            "text": "<p>Lorem ipsum dolor sit amet</p>",
             "text_x": 64,
             "text_y": 6,
             "dot_x": 63,
@@ -175,7 +175,7 @@
           "type": "callout",
           "settings": {
             "title": "Lorem ipsum doret",
-            "text": "<p>Lorem ipsum dolor sit amet consectetur. Mauris et condimentum in odio turpis egestas. mentum in odio turpis egestas.</p>",
+            "text": "<p>Lorem ipsum dolor sit amet</p>",
             "text_x": 64,
             "text_y": 70,
             "dot_x": 63,

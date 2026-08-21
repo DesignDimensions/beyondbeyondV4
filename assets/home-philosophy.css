@@ -165,13 +165,21 @@
    Connector lines and dots
    -------------------------------------------------------------------------- */
 
-.hp-lines {
+.hp-lines,
+.hp-lines--mobile {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
   pointer-events: none;
+}
+
+/* Hidden by default; only the sub-750px block below turns these on — and it
+   relies on this rule coming first, since both are single-class selectors. */
+.hp-lines--mobile,
+.hp-dot--mobile {
+  display: none;
 }
 
 .hp-line {
@@ -293,34 +301,56 @@
   }
 
   .hp-stage {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3.5rem;
+    height: 700px;
     padding: 0 2.4rem;
   }
 
-  .hp-lines,
-  .hp-dot {
+  /* The desktop lines/dots are driven by each block's own x/y settings, tuned
+     for a short, wide stage — swap them for the fixed mobile set instead of
+     trying to reuse those percentages on a tall, narrow one. */
+  .hp-lines {
     display: none;
   }
 
+  .hp-dot:not(.hp-dot--mobile) {
+    display: none;
+  }
+
+  .hp-lines--mobile,
+  .hp-dot--mobile {
+    display: block;
+  }
+
   .hp-bubble-wrap {
-    position: relative;
-    left: auto;
-    top: auto;
-    margin: 1rem 0 1.5rem;
-    order: -1;
+    top: 40%;
   }
 
   .hp-callout {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    width: 100%;
-    max-width: 44rem;
-    text-align: center;
+    width: min(60vw, 230px);
+    text-align: left;
+  }
+
+  .hp-callout[data-index='0'] {
+    left: 26% !important;
+    top: 4% !important;
+  }
+
+  .hp-callout[data-index='1'] {
+    left: 3% !important;
+    top: 60% !important;
+  }
+
+  .hp-callout[data-index='2'] {
+    left: 40% !important;
+    top: 78% !important;
+  }
+
+  .hp-callout__title {
+    font-size: 20px;
+  }
+
+  .hp-callout__text {
+    font-size: 16px;
   }
 }
 

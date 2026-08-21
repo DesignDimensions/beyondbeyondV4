@@ -120,6 +120,46 @@
       ></span>
     {%- endfor -%}
 
+    {%- comment -%}
+      Mobile gets its own fixed diagram rather than reusing the merchant's x/y
+      settings above: those are tuned for a short, wide desktop stage, and the
+      same percentages don't produce a sane layout on a tall, narrow one. Three
+      callouts is a fixed enough shape to hardcode rather than doubling every
+      block's settings with a mobile_* twin of each field.
+    {%- endcomment -%}
+    <svg
+      class="hp-lines hp-lines--mobile"
+      viewBox="0 0 1000 1000"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {%- for block in section.blocks limit: 3 -%}
+        {%- case forloop.index0 -%}
+          {%- when 0 -%}
+            <polyline class="hp-line" points="240,30 320,180 440,320" />
+          {%- when 1 -%}
+            <polyline class="hp-line" points="290,580 340,500 370,440" />
+          {%- when 2 -%}
+            <polyline class="hp-line" points="680,750 640,630 580,490" />
+        {%- endcase -%}
+      {%- endfor -%}
+    </svg>
+
+    {%- for block in section.blocks limit: 3 -%}
+      {%- case forloop.index0 -%}
+        {%- when 0 -%}
+          <span class="hp-dot hp-dot--text hp-dot--mobile" style="left: 24%; top: 3%" aria-hidden="true"></span>
+          <span class="hp-dot hp-dot--anchor hp-dot--mobile" style="left: 44%; top: 32%" aria-hidden="true"></span>
+        {%- when 1 -%}
+          <span class="hp-dot hp-dot--text hp-dot--mobile" style="left: 29%; top: 58%" aria-hidden="true"></span>
+          <span class="hp-dot hp-dot--anchor hp-dot--mobile" style="left: 37%; top: 44%" aria-hidden="true"></span>
+        {%- when 2 -%}
+          <span class="hp-dot hp-dot--text hp-dot--mobile" style="left: 68%; top: 75%" aria-hidden="true"></span>
+          <span class="hp-dot hp-dot--anchor hp-dot--mobile" style="left: 58%; top: 49%" aria-hidden="true"></span>
+      {%- endcase -%}
+    {%- endfor -%}
+
     <div class="hp-bubble-wrap" data-hp-bubble-wrap>
       <div class="hp-bubble" data-hp-bubble>
         {%- comment -%}
@@ -176,6 +216,7 @@
       <div
         class="hp-callout"
         data-hp-reveal
+        data-index="{{ forloop.index0 }}"
         style="
           left: {{ b.text_x }}%;
           top: {{ b.text_y }}%;

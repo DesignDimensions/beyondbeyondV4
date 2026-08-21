@@ -1127,7 +1127,9 @@ summary::-webkit-details-marker {
     letter-spacing: 6px;
     font-size: 1.4rem;
   }
-
+.section-title{
+  font-size: 3rem;
+}
   .grid--peek.slider--mobile .grid__item {
     box-sizing: content-box;
     margin: 0;
