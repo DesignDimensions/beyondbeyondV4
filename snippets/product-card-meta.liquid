@@ -38,6 +38,13 @@
         {%- if forloop.first == false or product.type != blank -%}
           <span class="card__meta-sep" aria-hidden="true">•</span>
         {%- endif -%}
+        {%- comment -%}
+          Just the metric size. A variant titled "50 G | 1.76 OZ" says the same
+          thing twice, and at two cards to a phone's width the second half
+          pushes the line onto a third row and buries the stars under it. The
+          full title is still what the product page shows.
+        {%- endcomment -%}
+        {%- assign variant_label = variant.title | split: '|' | first | strip -%}
         <a
           class="card__variant{% if variant.id == selected.id %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}"
           href="{{ product.url }}?variant={{ variant.id }}"
@@ -48,7 +55,7 @@
           data-variant-available="{{ variant.available }}"
           aria-pressed="{% if variant.id == selected.id %}true{% else %}false{% endif %}"
         >
-          {{- variant.title -}}
+          {{- variant_label -}}
         </a>
       {%- endfor -%}
     {%- endif -%}

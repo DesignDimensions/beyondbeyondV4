@@ -1,0 +1,41 @@
+{%- comment -%}
+  One responsive photo for a stock product card's gallery — the width-gated
+  srcset chain card-product.liquid needs for every photo it shows, pulled out
+  so it's written once instead of once per photo.
+
+  Accepts:
+  - image: {Image} the photo to render
+  - is_active: {Boolean} true for the gallery's starting photo. Default: false
+  - lazy: {Boolean} false skips loading="lazy". Default: true
+
+  Usage:
+  {% render 'product-card-image', image: image, is_active: true %}
+{%- endcomment -%}
+
+{%- liquid
+  assign page_width = settings.page_width | default: 1200
+-%}
+<img
+  srcset="
+    {%- if image.width >= 165 -%}{{ image | image_url: width: 165 }} 165w,{%- endif -%}
+    {%- if image.width >= 360 -%}{{ image | image_url: width: 360 }} 360w,{%- endif -%}
+    {%- if image.width >= 533 -%}{{ image | image_url: width: 533 }} 533w,{%- endif -%}
+    {%- if image.width >= 720 -%}{{ image | image_url: width: 720 }} 720w,{%- endif -%}
+    {%- if image.width >= 940 -%}{{ image | image_url: width: 940 }} 940w,{%- endif -%}
+    {%- if image.width >= 1066 -%}{{ image | image_url: width: 1066 }} 1066w,{%- endif -%}
+    {{ image | image_url }} {{ image.width }}w
+  "
+  src="{{ image | image_url: width: 533 }}"
+  sizes="(min-width: {{ page_width }}px) {{ page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
+  alt="{{ image.alt | escape }}"
+  class="motion-reduce{% if is_active %} is-active{% endif %}"
+  data-card-gallery-image
+  {%- unless lazy == false %}
+    loading="lazy"
+  {%- endunless %}
+  {%- unless is_active %}
+    aria-hidden="true"
+  {%- endunless %}
+  width="{{ image.width }}"
+  height="{{ image.height }}"
+>

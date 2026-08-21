@@ -62,9 +62,18 @@
 }
 
 @media screen and (max-width: 749px) {
+  .ftb {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
   .ftb__row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .ftb__payment-img {
+    height: 30px;
   }
 
   .ftb__quote svg,

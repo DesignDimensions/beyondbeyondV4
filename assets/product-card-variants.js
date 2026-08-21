@@ -27,8 +27,8 @@
     if (!price) return null;
     if (!compare) return '<span class="card__price-now">' + price + '</span>';
     return (
-      '<span class="card__price-sale">' + price + '</span>' +
-      '<s class="card__price-was">' + compare + '</s>'
+      '<s class="card__price-was">' + compare + '</s>' +
+      '<span class="card__price-sale">' + price + '</span>'
     );
   }
 

@@ -63,49 +63,65 @@
             <div class="card__media{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }} gradient{% endif %}">
               <div class="media media--transparent media--hover-effect">
                 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
-                <img
-                  srcset="
-                    {%- if card_product.featured_media.width >= 165 -%}{{ card_product.featured_media | image_url: width: 165 }} 165w,{%- endif -%}
-                    {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
-                    {%- if card_product.featured_media.width >= 533 -%}{{ card_product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
-                    {%- if card_product.featured_media.width >= 720 -%}{{ card_product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
-                    {%- if card_product.featured_media.width >= 940 -%}{{ card_product.featured_media | image_url: width: 940 }} 940w,{%- endif -%}
-                    {%- if card_product.featured_media.width >= 1066 -%}{{ card_product.featured_media | image_url: width: 1066 }} 1066w,{%- endif -%}
-                    {{ card_product.featured_media | image_url }} {{ card_product.featured_media.width }}w
-                  "
-                  src="{{ card_product.featured_media | image_url: width: 533 }}"
-                  sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
-                  alt="{{ card_product.featured_media.alt | escape }}"
-                  class="motion-reduce"
-                  {% unless lazy_load == false %}
-                    loading="lazy"
-                  {% endunless %}
-                  width="{{ card_product.featured_media.width }}"
-                  height="{{ card_product.featured_media.height }}"
-                >
+                {%- render 'product-card-image', image: card_product.featured_media, is_active: true, lazy: lazy_load %}
                 {% comment %}theme-check-enable ImgLazyLoading{% endcomment %}
 
                 {%- if card_product.media[1] != null and show_secondary_image -%}
-                  <img
-                    srcset="
-                      {%- if card_product.media[1].width >= 165 -%}{{ card_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
-                      {%- if card_product.media[1].width >= 360 -%}{{ card_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}
-                      {%- if card_product.media[1].width >= 533 -%}{{ card_product.media[1] | image_url: width: 533 }} 533w,{%- endif -%}
-                      {%- if card_product.media[1].width >= 720 -%}{{ card_product.media[1] | image_url: width: 720 }} 720w,{%- endif -%}
-                      {%- if card_product.media[1].width >= 940 -%}{{ card_product.media[1] | image_url: width: 940 }} 940w,{%- endif -%}
-                      {%- if card_product.media[1].width >= 1066 -%}{{ card_product.media[1] | image_url: width: 1066 }} 1066w,{%- endif -%}
-                      {{ card_product.media[1] | image_url }} {{ card_product.media[1].width }}w
-                    "
-                    src="{{ card_product.media[1] | image_url: width: 533 }}"
-                    sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
-                    alt="{{ card_product.media[1].alt | escape }}"
-                    class="motion-reduce"
-                    loading="lazy"
-                    width="{{ card_product.media[1].width }}"
-                    height="{{ card_product.media[1].height }}"
-                  >
+                  {%- render 'product-card-image', image: card_product.media[1] %}
                 {%- endif -%}
+
+                {%- comment -%}
+                  Beyond the pair above (which desktop already knew how to
+                  show, via the hover-crossfade this snippet had before) —
+                  extra photos exist only for the mobile tap gallery.
+                  product-card.css hides these on desktop outright, so they
+                  don't disturb the existing hover pairing there.
+                {%- endcomment -%}
+                {%- for image in card_product.images offset: 2 limit: 4 -%}
+                  {%- render 'product-card-image', image: image %}
+                {%- endfor -%}
               </div>
+
+              {%- comment -%}
+                Outside `.media` on purpose: base.css's `.media > *` rule
+                absolutely-positions every direct child at `top:0; left:0;
+                height:100%` for the benefit of media content (images,
+                model-viewer), which stretched these buttons to the same spot
+                and stacked them on each other. `.card__media` (this element)
+                only exists to carry the shape/gradient classes and hasn't
+                been claimed by any such rule, so the arrows position
+                correctly here instead.
+              {%- endcomment -%}
+              {%- if card_product.images.size > 1 -%}
+                <button
+                  type="button"
+                  class="card__gallery-arrow card__gallery-arrow--prev"
+                  data-card-gallery-prev
+                  aria-label="{{ 'general.slider.previous_slide' | t }}"
+                >
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_956.png?v=1787305146"
+                    alt=""
+                    width="24"
+                    height="24"
+                    loading="lazy"
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="card__gallery-arrow card__gallery-arrow--next"
+                  data-card-gallery-next
+                  aria-label="{{ 'general.slider.next_slide' | t }}"
+                >
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_952.png?v=1787305147"
+                    alt=""
+                    width="24"
+                    height="24"
+                    loading="lazy"
+                  >
+                </button>
+              {%- endif -%}
             </div>
           {%- endif -%}
           <div class="card__content">

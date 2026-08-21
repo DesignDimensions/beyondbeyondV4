@@ -109,8 +109,8 @@
 
   .fnd__panel {
     flex-direction: column;
-    gap: 28px;
-    padding: calc(var(--fnd-inset, 40px) * 0.6);
+    gap: 18px;
+    padding: 12px;
   }
 
   .fnd__media {
@@ -121,10 +121,11 @@
   }
 
   .fnd__heading {
-    margin-bottom: calc(var(--fnd-heading-gap, 32px) * 0.75);
+    margin-bottom: 15px;
   }
 
   .fnd__cta {
+    height: 40px;
     margin-top: calc(var(--fnd-cta-gap, 40px) * 0.75);
   }
 }

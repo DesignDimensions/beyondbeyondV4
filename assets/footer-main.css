@@ -201,6 +201,11 @@
 }
 
 @media screen and (max-width: 749px) {
+  .ftm {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+
   /* A single flex column would run all five menus (Shop's twelve links
      included) down the page one after another. Balancing them into two
      print-style columns instead — the same 2-column convention the theme's
@@ -211,6 +216,51 @@
     display: block;
     column-count: 2;
     column-gap: 24px;
+    margin-top: 20px;
+  }
+
+  .ftm__logo-img {
+    width: 100px;
+  }
+
+  .ftm__menu-heading {
+    margin: 0 0 5px;
+    font-size: 1.6rem;
+  }
+
+  /* Follow-us goes under the menus here. It is a child of the brand column,
+     and `order` cannot lift a child past its parent's sibling — so the brand
+     column stops being a box of its own and hands its three children straight
+     to the grid, where all four are siblings and can be ordered freely. The
+     15px it used to space them by moves onto the grid with them, which is why
+     the gap is set there rather than here. */
+  .ftm__grid {
+    gap: 15px;
+  }
+
+  .ftm__brand {
+    display: contents;
+  }
+
+  .ftm__menus {
+    order: 1;
+  }
+
+  .ftm__follow {
+    order: 2;
+    border-top: 1px solid #202020;
+    border-bottom: 1px solid #202020;
+    padding: 15px 0;
+  }
+
+  .ftm__social .list-social__link {
+    width: 25px;
+    height: 25px;
+  }
+
+  .ftm__newsletter-heading {
+    font-size: 2.9rem;
+    font-weight: 500;
   }
 
   .ftm__menu-column {

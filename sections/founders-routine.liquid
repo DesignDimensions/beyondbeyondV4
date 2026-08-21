@@ -169,6 +169,18 @@
             </button>
           {%- endif -%}
         </div>
+
+        {%- comment -%}
+          Mobile-only (hidden by default in CSS) — desktop has the arrows.
+          Filled in by the script rather than here: how many dots a rail needs
+          is how many railfuls of cards it holds, and that is a measurement of
+          the window, which Liquid cannot take.
+        {%- endcomment -%}
+        <div
+          class="fr__dots"
+          data-fr-dots
+          data-fr-dot-label="{{ 'general.slider.name' | t | escape }}"
+        ></div>
       </div>
     {%- endfor -%}
   </div>
@@ -303,7 +315,7 @@
         { "value": "1.2", "label": "1 and a peek" },
         { "value": "2", "label": "2" }
       ],
-      "default": "1.2"
+      "default": "2"
     },
     {
       "type": "range",
@@ -313,7 +325,7 @@
       "step": 2,
       "unit": "px",
       "label": "Space between cards",
-      "default": 24
+      "default": 16
     },
     {
       "type": "range",

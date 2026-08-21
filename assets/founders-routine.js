@@ -21,6 +21,10 @@
     return target.closest(selector);
   }
 
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
   function FoundersRoutine(root) {
     this.root = root;
     this.tabs = Array.prototype.slice.call(root.querySelectorAll('[data-fr-tab]'));
@@ -36,7 +40,7 @@
     this.morphTimers = [];
     this.timing = this.readTiming();
 
-    this.onResize = this.markIndicator.bind(this);
+    this.onResize = this.remeasure.bind(this);
 
     this.bind();
     this.markIndicator();
@@ -91,11 +95,22 @@
       if (!rail) return;
       rail.addEventListener('scroll', function () {
         self.updateArrows(panel);
+        self.updateDots(panel);
       }, { passive: true });
-      self.updateArrows(panel);
+      self.syncRail(panel);
     });
 
     window.addEventListener('resize', this.onResize);
+  };
+
+  // Both the mark and the dots are measurements of the laid-out row, so a
+  // resize has to retake both.
+  FoundersRoutine.prototype.remeasure = function () {
+    var self = this;
+    this.markIndicator();
+    this.panels.forEach(function (panel) {
+      self.syncRail(panel);
+    });
   };
 
   FoundersRoutine.prototype.handleKeydown = function (event) {
@@ -248,7 +263,9 @@
 
     incoming.hidden = false;
     incoming.classList.add('is-active');
-    this.updateArrows(incoming);
+    // Only now is there a laid-out rail to measure — a hidden panel has no
+    // width, so this is the first chance its dots have to be counted.
+    this.syncRail(incoming);
 
     if (!this.fx) return;
 
@@ -303,6 +320,87 @@
     var max = rail.scrollWidth - rail.clientWidth;
     prev.classList.toggle('is-disabled', rail.scrollLeft <= 1);
     next.classList.toggle('is-disabled', rail.scrollLeft >= max - 1);
+  };
+
+  FoundersRoutine.prototype.syncRail = function (panel) {
+    this.buildDots(panel);
+    this.updateArrows(panel);
+    this.updateDots(panel);
+  };
+
+  /* ------------------------------------------------------------------
+     Dots
+     ------------------------------------------------------------------ */
+
+  // One dot per railful of cards, so the row of them is as long as the rail
+  // has left to go. A hidden panel measures nothing and gets no dots; it is
+  // built again when the routine it belongs to is chosen.
+  FoundersRoutine.prototype.buildDots = function (panel) {
+    var self = this;
+    var rail = panel.querySelector('[data-fr-rail]');
+    var dots = panel.querySelector('[data-fr-dots]');
+    if (!rail || !dots) return;
+
+    var pages = rail.clientWidth ? Math.ceil(rail.scrollWidth / rail.clientWidth) : 0;
+    // A rail that fits its cards has nothing to page through, and a lone dot
+    // would say nothing.
+    if (pages < 2) pages = 0;
+    if (dots.childElementCount === pages) return;
+
+    var label = dots.dataset.frDotLabel || '';
+    dots.textContent = '';
+
+    for (var i = 0; i < pages; i += 1) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'fr__dot';
+      dot.setAttribute('data-fr-dot', '');
+      dot.setAttribute('aria-label', label ? label + ' ' + (i + 1) : String(i + 1));
+      dots.appendChild(dot);
+
+      (function (index) {
+        dot.addEventListener('click', function () {
+          self.goToDot(panel, index);
+        });
+      })(i);
+    }
+  };
+
+  // Progress, not selection: dragging the rail moves the dots without anything
+  // being chosen, the same way a scrollbar does. Mapping the whole scroll onto
+  // the dots — rather than counting railfuls off the left — is what makes the
+  // last dot light when the rail reaches its end, however short that last page
+  // turns out to be.
+  FoundersRoutine.prototype.updateDots = function (panel) {
+    var rail = panel.querySelector('[data-fr-rail]');
+    var dots = panel.querySelector('[data-fr-dots]');
+    if (!rail || !dots || !dots.childElementCount) return;
+
+    var count = dots.childElementCount;
+    var max = rail.scrollWidth - rail.clientWidth;
+    var progress = max > 0 ? clamp(rail.scrollLeft / max, 0, 1) : 0;
+    var active = Math.round(progress * (count - 1));
+
+    Array.prototype.forEach.call(dots.children, function (dot, index) {
+      var on = index === active;
+      dot.classList.toggle('is-active', on);
+      if (on) dot.setAttribute('aria-current', 'true');
+      else dot.removeAttribute('aria-current');
+    });
+  };
+
+  FoundersRoutine.prototype.goToDot = function (panel, index) {
+    var rail = panel.querySelector('[data-fr-rail]');
+    var dots = panel.querySelector('[data-fr-dots]');
+    if (!rail || !dots) return;
+
+    var count = dots.childElementCount;
+    var max = rail.scrollWidth - rail.clientWidth;
+
+    rail.scrollTo({
+      left: count > 1 ? (index / (count - 1)) * max : 0,
+      behavior: reducedMotion() ? 'auto' : 'smooth',
+    });
   };
 
   /* ------------------------------------------------------------------

@@ -474,6 +474,10 @@ blockquote {
   .section-title {
     margin-bottom: 3rem;
   }
+
+  .section-text {
+    font-size: 1.5rem;
+  }
 }
 
 .caption-large,
@@ -1127,9 +1131,11 @@ summary::-webkit-details-marker {
     letter-spacing: 6px;
     font-size: 1.4rem;
   }
-.section-title{
-  font-size: 3rem;
-}
+
+  .section-title {
+    font-size: 3rem;
+  }
+
   .grid--peek.slider--mobile .grid__item {
     box-sizing: content-box;
     margin: 0;

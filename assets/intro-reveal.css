@@ -131,7 +131,11 @@ html.intro-running .shopify-section-group-footer-group {
   row-gap: 0.12em;
   font-family: var(--font-heading-family);
   font-weight: 700;
-  font-size: clamp(1.9rem, 2.9vw, 3.4rem);
+  /* The middle term is what a phone gets, and it is set so the tagline fills
+     about 85% of the screen there rather than the 60% a 19px floor left it at.
+     It reaches the 3.4rem ceiling by around 500px wide, so every size above a
+     phone is capped exactly where it was before and nothing wider moves. */
+  font-size: clamp(1.9rem, 6.75vw, 3.4rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: #fff;
@@ -149,14 +153,21 @@ html.intro-running .shopify-section-group-footer-group {
 /* Stands in for the accent word. The artwork carries roughly half its canvas
    height as padding, so it is set taller than the text and pulled back into
    the line box to keep the glyphs optically the same size as their neighbours. */
+/* Sized in `em`, so the artwork is always the same multiple of the words
+   beside it. A fixed height only ever looked right at the one font size the
+   tagline reaches on a wide screen: the line shrinks to 19px on a phone while
+   a `6.5rem` image stays 65px, three and a half times the text, and its
+   negative margins — cut for that big size — drag the neighbouring words in
+   under the artwork. Every number below is the pixel value it used to be at
+   the tagline's full 34px, so nothing about the wide layout moves. */
 .intro__accent-img {
   display: block;
-  height: 6.5rem;
+  height: 1.9em;
   width: auto;
-  margin-block: -0.1em;
-  margin-top: -12px;
-  margin-left: -15px;
-  margin-right: -15px;
+  margin-top: -0.35em;
+  margin-bottom: -0.1em;
+  margin-left: -0.44em;
+  margin-right: -0.44em;
 }
 
 .intro__w {
@@ -174,6 +185,16 @@ html.intro-running .shopify-section-group-footer-group {
 .intro__w>span {
   display: block;
   will-change: transform, opacity;
+}
+
+/* 8vw each side leaves a phone only 84% of its width to put the tagline in,
+   which a tagline meant to fill 85% cannot do without wrapping. The stage has
+   room to spare at every larger size — the line is nowhere near the edges
+   there — so only the phone needs the narrower margin. */
+@media screen and (max-width: 749px) {
+  .intro__stage {
+    padding: 6vw;
+  }
 }
 
 .intro__badge {

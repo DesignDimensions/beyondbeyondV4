@@ -239,14 +239,17 @@
   }
 
   .gal__seq {
-    gap: calc(var(--gal-gap, 34px) * 0.6);
-    padding-right: calc(var(--gal-gap, 34px) * 0.6);
+    gap: 15px;
+    padding-right: 15px;
   }
 
   .gal__nav {
     width: 44px;
     height: 44px;
     font-size: 32px;
+  }
+  .gal__item{
+    height: 250px;
   }
 }
 

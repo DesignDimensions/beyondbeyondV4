@@ -159,6 +159,14 @@
   const others = words.filter((w) => w !== badge);
   const navReady = !!(navPill && navPillText && navPill.getBoundingClientRect().width > 0);
 
+  // The highlight is spared the burn-off only because it has somewhere to go:
+  // the pill at the end of the navigation. On a phone that pill is inside the
+  // inline menu, which is display:none at this width, so there is no landing
+  // spot and nothing for it to fly to — it stays behind instead, hanging over
+  // a page that has already arrived. With nowhere to land it is just another
+  // word, and burns off with the rest of them.
+  const burnOff = navReady ? others : words;
+
   const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, onComplete: finish });
 
   tl.set(bg, { xPercent: -50, yPercent: -50, ...spread(['left', 'top', 'width', 'height'], cover) })
@@ -182,9 +190,10 @@
     .call(() => line.classList.add('intro__line--lit'), null, 0.74)
     .to(logo, { filter: filt(1, 0, 2.2), duration: 0.17, yoyo: true, repeat: 1 }, 0.84)
 
-    /* Act III — everything burns off except the highlight */
+    /* Act III — everything burns off except the highlight, where there is a
+       pill for the highlight to land in */
     .to(
-      others,
+      burnOff,
       {
         yPercent: 60,
         opacity: 0,
@@ -224,9 +233,12 @@
       .to(navPillItem, { opacity: 1, duration: 0.14 }, 3.96)
       .to([bg, badge], { opacity: 0, duration: 0.14 }, 3.98);
   } else {
-    tl.to(bg, { ...circleAroundBadge(), duration: 0.6, ease: 'power2.inOut', onUpdate: trackBadge }, 2.54)
-      .to(pageBits, { opacity: 1, duration: 0.5, stagger: 0.045 }, 2.76)
-      .to([bg, badge], { opacity: 0, scale: 0.86, duration: 0.4, ease: 'power2.in' }, 3.56);
+    /* Act V, without a landing — the curtain simply lifts. The words and the
+       highlight have all burned off above, so the blue has nothing left to
+       wrap and no pill to become: it fades out over the page arriving under
+       it, which is the whole of the ending at this width. */
+    tl.to(pageBits, { opacity: 1, duration: 0.5, stagger: 0.045 }, 2.6)
+      .to(bg, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 2.6);
   }
 
   function start() {

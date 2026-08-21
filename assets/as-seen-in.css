@@ -143,6 +143,20 @@
     padding-bottom: 40px;
   }
 
+  /* One row on a phone. Two of them stacked in a window this narrow read as a
+     block of logos rather than a line of press, and the first row already
+     carries every logo — the second is only that same list rotated by one, so
+     nothing is lost by dropping it.
+
+     The row stays in the markup rather than being skipped in Liquid, which
+     has no idea how wide the window is. A hidden row measures zero, and the
+     script already treats a row with no width as one it has nothing to move;
+     it re-measures on resize, so turning a phone sideways past 750px brings
+     the second row back drifting. */
+  .asi__row--2 {
+    display: none;
+  }
+
   .asi__logo-img {
     height: var(--asi-logo-h-mobile, 32px);
   }

@@ -163,22 +163,35 @@
 }
 
 @media screen and (max-width: 749px) {
+  .fu .page-width:last-of-type {
+    padding: 0 !important;
+  }
+
   .fu {
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: 20px;
+    padding-bottom: 0;
+  }
+
+  .fu__tile {
+    min-width: 42vw;
+    height: fit-content;
+    aspect-ratio: 1 / 1;
+  }
+
+
+  .fu__handle {
+    font-size: 1.8rem;
   }
 
   .fu__header {
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
   }
 
   .fu__description {
     max-width: none;
-  }
-
-  .fu__tile {
-    min-width: 74vw;
-    height: calc(var(--fu-tile-height, 420px) * 0.8);
+    font-size: 1.5rem;
   }
 
   .fu__tile--quote {

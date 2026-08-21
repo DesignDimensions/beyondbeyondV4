@@ -476,11 +476,6 @@
 
 /* Mobile: the card docks to the bottom of the image, so let it stretch. */
 @media screen and (max-width: 749px) {
-  .uis {
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-
   .uis__inner {
     padding: 0 !important;
   }

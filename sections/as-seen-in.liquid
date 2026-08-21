@@ -51,7 +51,7 @@
     {%- endcomment -%}
     {%- for row in (1..2) -%}
       <div
-        class="asi__row"
+        class="asi__row asi__row--{{ row }}"
         data-asi-row
         data-direction="{{ section.settings.direction }}"
       >
