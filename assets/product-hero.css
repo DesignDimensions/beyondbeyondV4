@@ -1,0 +1,713 @@
+/* ==========================================================================
+   Product hero — the product page's first fold
+   ==========================================================================
+   The fold as drawn: one full-bleed panel in the brand's pale blue, the
+   product floated on it at the left with its photos strung underneath, and
+   the buying column at the right — stars, name, copy, sizes, price, cart.
+
+   Nothing here invents a look. The stars are the home page's stars, cut from
+   the same mask `product-card.css` publishes on `:root`; the size chips are
+   the card's size chips; the black cart bar is the card's add-to-cart at PDP
+   scale. That sheet loads from `theme.liquid`, so its tokens are already on
+   the page and this one can simply spend them.
+
+   Every number below is a token with a fallback, and the section writes the
+   merchant's settings over them inline. The fallbacks are the design as
+   drawn, so the sheet is still correct on its own.
+   ========================================================================== */
+
+.ph {
+  position: relative;
+  /* The header is fixed and paints nothing of its own until the page has
+     scrolled, so the panel starts at the very top of the document and holds
+     its content down by exactly the header's own height — the fold begins
+     where the header ends, with nothing between them. That is also what puts
+     the header's frosted band over this colour rather than beside it.
+
+     `--header-height` is the theme's own measurement, published on the root
+     by the sticky header. The fallback is only what stands in for the moment
+     before that script runs, and `--ph-top` is the merchant's nudge on top —
+     zero by default, since the ask is no gap at all. */
+  padding-top: calc(var(--header-height, var(--ph-header-fallback, 100px)) + var(--ph-top, 0px));
+  background: var(--ph-bg, #E9EEF4);
+  color: var(--ph-text, #0a0a0b);
+  font-family: var(--font-body-family);
+}
+
+/* Two columns of a declared share each, inside the theme's own page-width
+   container — so the fold's outer edges line up with every other section on
+   the site rather than running to the viewport. What the two shares leave
+   over falls between them as the gutter; there is no gap to keep in step
+   with them separately. */
+.ph__grid {
+  display: grid;
+  grid-template-columns: var(--ph-split, 45%) var(--ph-info-split, 45%);
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   Media
+   -------------------------------------------------------------------------- */
+
+.ph__media {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* One ratio box, the full width of its column, and the fold's height follows
+   from it: at 45% of the page-width container the picture is roughly 540 by
+   573, and the panel is however tall that makes it.
+
+   Every photo sits in the same grid cell so they stack without leaving the
+   flow — absolutely positioned slides contribute no height, and this box
+   wants to size the ones inside it rather than be sized by nothing. */
+.ph__stage {
+  display: grid;
+  /* One explicit row, floored at zero. Without it the row is auto-sized and a
+     tall photo grows the box past the ratio — which is exactly what a source
+     image taller than the ratio was doing. `minmax(0, 1fr)` makes the row
+     exactly the height the ratio asks for and gives the content no say, which
+     is also what turns the slides' `height: 100%` into a real measurement
+     rather than `auto`. */
+  grid-template-rows: minmax(0, 1fr);
+  flex: 0 0 auto;
+  min-height: 0;
+  aspect-ratio: var(--ph-media-ratio, 600 / 637);
+}
+
+/* The panel's own colour, repeated on each slide. A fading layer is a group,
+   and a group is where the picture's multiply looks for its backdrop — take
+   the colour away and a shot on white flashes white for the length of the
+   cross-fade. With it, the blend resolves inside the layer and the two
+   layers simply dissolve into one another over the same ground. */
+.ph__slide {
+  grid-area: 1 / 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ph-bg, #e9eef4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.ph__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Covering the box: the shot fills the ratio's full width and height, and
+   whatever it has spare on the long side is cropped away. A source already
+   cut to the box's ratio loses nothing; a taller one is trimmed top and
+   bottom rather than shown small with the column empty either side of it.
+
+   The blend is the card's: a shot on a white backdrop takes the panel's
+   colour, since white multiplied by the tint is the tint, while the product
+   itself is dark enough to come through nearly unchanged. */
+.ph__slide img {
+  width: var(--ph-image-max, 100%);
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: var(--ph-media-blend, multiply);
+}
+
+/* Stands in for a product with no photos yet, at the size a photo would
+   have taken so the fold does not collapse around it. */
+.ph__placeholder {
+  width: var(--ph-image-max, 100%);
+  height: 100%;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ph__placeholder .placeholder-svg {
+  fill: rgba(0, 0, 0, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   Thumbnails
+   -------------------------------------------------------------------------- */
+
+/* The strip rides over the picture rather than following it: same grid cell
+   as the slides, parked at the bottom of the box. That keeps it on the
+   picture wherever the column's height comes from — the ratio box's own, or
+   a stretch from a taller buying column beside it — which a sibling below
+   the stage could not do. It comes last in the markup, so it paints over the
+   slides without needing to be lifted out of the flow. */
+.ph__thumbs {
+  grid-area: 1 / 1;
+  align-self: end;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 30px 20px;
+  border-radius: var(--ph-thumbs-radius, 2px);
+  box-shadow: var(--ph-thumbs-shadow, 0 12px 30px rgba(0, 0, 0, 0.1));
+}
+
+.ph__thumb-viewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ph__thumb-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* Held at the viewport's width on purpose: the thumbnails size themselves
+   against it, and the ones past the sixth simply overflow it — which is the
+   scroll. A track sized by its own content would leave those percentages
+   with nothing definite to resolve against. */
+.ph__thumb-track {
+  display: flex;
+  width: 100%;
+  gap: var(--ph-thumb-gap, 5px);
+}
+
+/* `isolation` matters now that the strip sits on the picture: the thumbnail
+   blends multiply, and a blend reaches everything painted beneath it in its
+   stacking context — which would be the hero shot, not just this tile. The
+   isolation makes each thumbnail its own context, so the blend finds this
+   tile's colour and stops there. `component-card.css` does the same on the
+   card for the same reason. */
+.ph__thumb {
+  flex: 0 0 calc((100% - (var(--ph-thumbs-visible, 6) - 1) * var(--ph-thumb-gap, 5px)) / var(--ph-thumbs-visible, 6));
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ph-thumb-radius, 0px);
+  background: var(--ph-thumb-bg, #fff);
+  cursor: pointer;
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition: padding 0.25s ease, opacity 0.25s ease;
+}
+
+.ph__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: var(--ph-media-blend, multiply);
+}
+
+.ph__thumb:hover {
+  opacity: 0.85;
+}
+
+/* The chosen thumbnail is matted rather than ringed: its picture is inset by
+   the mat and the panel shows around it. A ring drawn outside the tile was
+   the right answer when the strip sat on the tinted panel — on a white card
+   a white ring is invisible, and the tile is `border-box`, so the inset costs
+   the strip no width and nothing shifts as the selection moves. */
+.ph__thumb.is-active {
+  opacity: 1;
+  padding: var(--ph-thumb-ring, 6px);
+  background: var(--ph-thumbs-bg, #fff);
+}
+
+/* Full-height blocks at each end of the panel. `stretch` rather than a
+   height of its own: the row's height is the thumbnails', and a stretched
+   item is sized to the line without contributing to it — so the arrow
+   follows the tiles at whatever size they end up, with nothing to keep in
+   step by hand. */
+.ph__arrow {
+  flex: 0 0 auto;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--ph-arrow-size, 16px) + 10px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--ph-thumb-radius, 0px);
+  background: var(--ph-arrow-bg, #fff);
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+/* The nudge on hover moved onto the mark itself. It used to be on the button,
+   which was fine while that was nothing but a glyph — now that the button is
+   a filled block, sliding the whole thing would slide the fill with it. */
+.ph__arrow img,
+.ph__arrow-glyph {
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ph__arrow img {
+  width: var(--ph-arrow-size, 16px);
+  height: auto;
+}
+
+.ph__arrow-glyph {
+  font-size: calc(var(--ph-arrow-size, 16px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.ph__arrow--prev:hover img,
+.ph__arrow--prev:hover .ph__arrow-glyph {
+  transform: translateX(-3px);
+}
+
+.ph__arrow--next:hover img,
+.ph__arrow--next:hover .ph__arrow-glyph {
+  transform: translateX(3px);
+}
+
+.ph__arrow.is-disabled,
+.ph__arrow:disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Buying column
+   -------------------------------------------------------------------------- */
+
+.ph__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--ph-info-pad-y, 24px) 0;
+}
+
+.ph__info-inner {
+  width: 100%;
+}
+
+/* Rating */
+
+.ph__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--ph-rating-gap, 10px);
+  margin: 0;
+}
+
+/* The home page's star, exactly: one box with a hard-stopped gradient painted
+   across it — filled up to the rating, empty after — and the star repeated
+   over it as a mask. The mask itself comes from `product-card.css`, so the
+   two never drift; only the size is this fold's own. */
+.ph__stars {
+  --ph-star-w: calc(var(--ph-star-size, 14px) * 15 / 14);
+  display: inline-block;
+  width: calc(var(--ph-star-w) * 5 + var(--ph-star-gap, 2px) * 4);
+  height: var(--ph-star-size, 14px);
+  background-image: linear-gradient(to right,
+      var(--ph-star, #000) var(--percent, 100%),
+      var(--ph-star-empty, #d5d5d5) var(--percent, 100%));
+  -webkit-mask-image: var(--pcard-star-icon);
+  mask-image: var(--pcard-star-icon);
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+  -webkit-mask-repeat: space no-repeat;
+  mask-repeat: space no-repeat;
+  font-size: 0;
+}
+
+.ph__reviews {
+  color: var(--ph-text, #0a0a0b);
+  font-size: var(--ph-reviews-size, 13px);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Title and copy */
+
+.ph__title {
+  margin: var(--ph-gap-title, 22px) 0 0;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: #000000;
+}
+
+.ph__lede {
+  margin: var(--ph-gap-lede, 18px) 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #202020;
+}
+
+.ph__desc {
+  margin: var(--ph-gap-desc, 12px) 0 0;
+  font-size: 16px;
+  color: #000;
+}
+
+.ph__desc>* {
+  margin: 0 0 0.8em;
+}
+
+.ph__desc>*:last-child {
+  margin-bottom: 0;
+}
+
+/* A description written with its opening line in bold already reads as the
+   design's lede, so it is given the lede's weight and colour rather than a
+   second element to keep in step with it. */
+.ph__desc strong,
+.ph__desc b {
+  font-weight: 700;
+  color: var(--ph-text, #0a0a0b);
+}
+
+/* Off unless the merchant sets a line count — a long description would
+   otherwise push the cart bar out of the fold it belongs to. */
+.ph__desc.is-clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--ph-desc-lines, 6);
+  line-clamp: var(--ph-desc-lines, 6);
+  overflow: hidden;
+}
+
+/* Sizes */
+
+/* The card's type line, at reading size and in the product's own words: the
+   variant's full title, since a product page has the room the card does not
+   and "50g | 1.76 oz" is what the label says. */
+.ph__variants {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: var(--ph-gap-variants, 15px) 0 0;
+  font-size: var(--ph-variant-size, 15px);
+  color: var(--ph-muted, #6b6b6b);
+}
+
+.ph__variant-sep {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 0;
+}
+
+.ph__variant {
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ph__variant:hover {
+  color: var(--ph-text, #0a0a0b);
+  text-decoration: underline;
+}
+
+.ph__variant.is-selected {
+  color: var(--ph-text, #0a0a0b);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.ph__variant.is-unavailable {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.ph__rule {
+  height: 1px;
+  margin: var(--ph-gap-rule, 22px) 0 0;
+  border: 0;
+  background: var(--ph-rule-color, rgba(0, 0, 0, 0.15));
+}
+
+/* Price */
+
+.ph__mrp {
+  margin: 18px 0 0;
+  font-size: var(--ph-mrp-size, 15px);
+  color: var(--ph-muted, #6b6b6b);
+}
+
+.ph__mrp s {
+  text-decoration-thickness: 1px;
+}
+
+/* The price and its note sit on one baseline at the left; the saving is
+   pushed to the far edge of the column, which is where the design has it. */
+.ph__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: var(--ph-gap-now, 10px) 0 0;
+}
+
+.ph__price {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #000;
+}
+
+.ph__tax {
+  font-size: 11px;
+  color: #000;
+}
+
+.ph__badge {
+  margin-left: auto;
+  align-self: center;
+  padding: 5px 5px;
+  border-radius: var(--ph-badge-radius, 5px);
+  background: var(--ph-badge-bg, #0107ef);
+  color: var(--ph-badge-fg, #fff);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ph__badge[hidden] {
+  display: none;
+}
+
+/* Quantity and add to cart */
+
+.ph__buy {
+  display: flex;
+  align-items: stretch;
+  margin: var(--ph-gap-buy, 26px) 0 0;
+}
+
+.ph__qty {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--ph-qty-w, 104px);
+  height: var(--ph-cta-h, 48px);
+  border: 1px solid var(--ph-qty-border, #111);
+  background: var(--ph-qty-bg, #fff);
+}
+
+.ph__qty-btn {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ph-text, #000);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.ph__qty-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The spinners a number field draws are a second control beside the two the
+   design has, so they are taken away and the field is left as the readout. */
+.ph__qty-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ph-text, #000);
+  font-family: inherit;
+  font-size: var(--ph-qty-size, 15px);
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  font-weight: 600;
+}
+
+.ph__qty-input::-webkit-outer-spin-button,
+.ph__qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ph__qty-input:focus-visible {
+  outline: none;
+}
+
+/* The card's add-to-cart bar at product-page scale — same black, same
+   uppercase tracking, same height as the field beside it. */
+.ph__atc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--ph-cta-h, 48px);
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: var(--ph-atc-bg, #000);
+  color: var(--ph-atc-fg, #fff);
+  font-family: inherit;
+  font-size: var(--ph-atc-size, 14px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.ph__atc:hover {
+  opacity: 0.88;
+}
+
+.ph__atc[disabled],
+.ph__atc[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.ph__atc .loading__spinner {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ph__atc .loading__spinner.hidden {
+  display: none;
+}
+
+.ph__atc .spinner {
+  width: 18px;
+  height: 18px;
+}
+
+.ph__atc .path {
+  stroke: var(--ph-atc-fg, #fff);
+}
+
+.ph__atc.loading .ph__atc-label {
+  visibility: hidden;
+}
+
+.ph .product-form__error-message-wrapper {
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+
+/* Policy links */
+
+.ph__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: var(--ph-gap-links, 20px) 0 0;
+  font-size: var(--ph-links-size, 12px);
+  font-weight: 700;
+  justify-content: space-between;
+}
+
+.ph__link {
+  color: var(--ph-text, #0a0a0b);
+  text-decoration: none;
+}
+
+.ph__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ph__link-sep {
+  font-weight: 400;
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Stacked
+   --------------------------------------------------------------------------
+   Below the desktop breakpoint the two columns become two rows: the picture
+   and its strip first, then the buying column under it. The picture keeps a
+   ratio of its own here — there is no second column left to borrow a height
+   from. */
+
+@media screen and (max-width: 989px) {
+  .ph {
+    padding-top: calc(var(--header-height, var(--ph-header-fallback-mobile, 76px)) + var(--ph-top-mobile, 0px));
+  }
+
+  .ph__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ph__media {
+    padding: 0;
+  }
+
+  .ph__slide img {
+    width: var(--ph-image-max-mobile, 100%);
+  }
+
+  .ph__thumbs {
+    --ph-thumbs-visible: var(--ph-thumbs-visible-mobile, 5);
+    margin-bottom: var(--ph-thumbs-bottom-mobile, 16px);
+  }
+
+  .ph__info {
+    padding: var(--ph-info-pad-mobile, 28px) 0 0;
+  }
+
+  .ph__title {
+    font-size: var(--ph-title-size-mobile, 30px);
+  }
+
+  .ph__price {
+    font-size: var(--ph-price-size-mobile, 24px);
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .ph__buy {
+    flex-wrap: wrap;
+  }
+
+  .ph__qty {
+    flex: 0 0 96px;
+  }
+}
+
+/* The picture cross-fades and the strip scrolls; neither is information, so
+   both stop for a reader who has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+
+  .ph__slide,
+  .ph__thumb,
+  .ph__arrow,
+  .ph__atc {
+    transition: none;
+  }
+
+  .ph__thumb-viewport {
+    scroll-behavior: auto;
+  }
+}

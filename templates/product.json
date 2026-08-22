@@ -1,1 +1,192 @@
-{"sections":{"main":{"type":"main-product","blocks":{"vendor":{"type":"text","settings":{"text":"{{ product.vendor }}","text_style":"uppercase"}},"title":{"type":"title","settings":{}},"price":{"type":"price","settings":{}},"variant_picker":{"type":"variant_picker","settings":{"picker_type":"button","swatch_shape":"circle"}},"quantity_selector":{"type":"quantity_selector","settings":{}},"buy_buttons":{"type":"buy_buttons","settings":{"show_dynamic_checkout":true,"show_gift_card_recipient":true}},"description":{"type":"description","settings":{}},"share":{"type":"share","settings":{"share_label":"Share"}}},"block_order":["vendor","title","price","variant_picker","quantity_selector","buy_buttons","description","share"],"settings":{"enable_sticky_info":true,"color_scheme":"scheme-1","media_size":"large","constrain_to_viewport":true,"media_fit":"contain","gallery_layout":"stacked","mobile_thumbnails":"hide","media_position":"left","image_zoom":"lightbox","hide_variants":true,"enable_video_looping":false,"padding_top":36,"padding_bottom":12}},"disclosures":{"type":"disclosures","settings":{"padding_top":36,"padding_bottom":0}},"related-products":{"type":"related-products","settings":{"heading":"You may also like","heading_size":"h2","products_to_show":4,"columns_desktop":4,"columns_mobile":"2","color_scheme":"scheme-1","image_ratio":"square","image_shape":"default","show_secondary_image":true,"show_vendor":false,"show_rating":true,"padding_top":36,"padding_bottom":28}}},"order":["main","disclosures","related-products"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-hero",
+      "blocks": {
+        "link_cod": {
+          "type": "link",
+          "settings": {
+            "label": "Cash on Delivery",
+            "url": ""
+          }
+        },
+        "link_shipping": {
+          "type": "link",
+          "settings": {
+            "label": "Free Shipping",
+            "url": ""
+          }
+        },
+        "link_returns": {
+          "type": "link",
+          "settings": {
+            "label": "Return Policy",
+            "url": ""
+          }
+        },
+        "link_terms": {
+          "type": "link",
+          "settings": {
+            "label": "Terms & Conditions",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "link_cod",
+        "link_shipping",
+        "link_returns",
+        "link_terms"
+      ],
+      "settings": {
+        "split": 45,
+        "info_split": 45,
+        "space_above": 0,
+        "space_above_mobile": 0,
+        "padding_bottom": 40,
+        "media_ratio": "600 / 637",
+        "image_width": 100,
+        "image_width_mobile": 100,
+        "media_blend": true,
+        "thumbs_visible": 6,
+        "thumbs_visible_mobile": 5,
+        "thumbs_background": "#ffffff",
+        "thumbs_padding": 14,
+        "thumbs_radius": 2,
+        "thumbs_shadow": true,
+        "thumbs_inset": 24,
+        "thumb_gap": 12,
+        "thumb_ring": 6,
+        "thumb_background": "#ffffff",
+        "show_arrows": true,
+        "arrow_size": 14,
+        "arrow_background": "#ffffff",
+        "arrow_prev_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967",
+        "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
+        "show_rating": true,
+        "star_size": 14,
+        "star_color": "#000000",
+        "reviews_label": "Reviews",
+        "reviews_anchor": "#reviews",
+        "fallback_rating": 5,
+        "fallback_review_count": 20,
+        "title_size": 36,
+        "title_size_mobile": 30,
+        "title_weight": "700",
+        "lede_metafield": "custom.suitable_for",
+        "lede_size": 15,
+        "body_size": 15,
+        "description_lines": 0,
+        "variant_size": 15,
+        "mrp_label": "MRP",
+        "tax_note": "(MRP inclusive of all taxes.)",
+        "price_size": 26,
+        "badge_background": "#0107ef",
+        "badge_text_color": "#ffffff",
+        "atc_label": "Add to cart",
+        "cta_height": 48,
+        "quantity_width": 104,
+        "atc_background": "#000000",
+        "atc_text_color": "#ffffff",
+        "background": "#e9eef4",
+        "text_color": "#0a0a0b",
+        "body_color": "#26262b",
+        "muted_color": "#6b6b6b"
+      }
+    },
+    "usp_carousal_RRB7Yt": {
+      "type": "usp-carousal",
+      "blocks": {
+        "usp_carousal_item_tfmgVD": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Clinically Tested"
+          }
+        },
+        "usp_carousal_item_RUJhKL": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Clean Formulations"
+          }
+        },
+        "usp_carousal_item_7x7VyX": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "Dermatologist Tested"
+          }
+        },
+        "usp_carousal_item_KFYKXw": {
+          "type": "usp_carousal_item",
+          "settings": {
+            "icon": "shopify://shop_images/Group_c4d07955-971e-4a69-911a-e4e1e6a97423.png",
+            "title": "India’s First NAD+ Skincare"
+          }
+        }
+      },
+      "block_order": [
+        "usp_carousal_item_tfmgVD",
+        "usp_carousal_item_RUJhKL",
+        "usp_carousal_item_7x7VyX",
+        "usp_carousal_item_KFYKXw"
+      ],
+      "name": "USP Carousal",
+      "settings": {
+        "speed": 70,
+        "direction": "left",
+        "pause_on_hover": true,
+        "scroll_effect": true,
+        "background_color": "#0107ef",
+        "text_color": "#ffffff",
+        "item_gap": 80,
+        "icon_size": 45
+      }
+    },
+    "disclosures": {
+      "type": "disclosures",
+      "settings": {
+        "heading": "Disclosures",
+        "heading_size": "h2",
+        "open_by_default": false,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You may also like",
+        "heading_size": "h2",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "square",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "padding_top": 36,
+        "padding_bottom": 28
+      }
+    }
+  },
+  "order": [
+    "main",
+    "usp_carousal_RRB7Yt",
+    "disclosures",
+    "related-products"
+  ]
+}

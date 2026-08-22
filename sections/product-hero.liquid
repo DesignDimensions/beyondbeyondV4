@@ -1,0 +1,908 @@
+{{ 'product-hero.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-hero.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  The product page's first fold, drawn the way the home page draws things:
+  the same star, the same size chips, the same black cart bar. Everything the
+  fold can show for any variant is printed once and swapped in place, so
+  choosing a size costs nothing and the page never re-renders under the
+  reader.
+{%- endcomment -%}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+
+  comment
+    A real reviews metafield always wins; the fallbacks are what a product
+    with none shows, exactly as the home page's rails do it.
+  endcomment
+  assign ph_rating = section.settings.fallback_rating
+  assign ph_rating_count = section.settings.fallback_review_count
+  assign ph_rating_max = 5
+  if product.metafields.reviews.rating.value != blank
+    assign ph_rating = product.metafields.reviews.rating.value.rating
+    assign ph_rating_count = product.metafields.reviews.rating_count
+    assign ph_rating_max = product.metafields.reviews.rating.value.scale_max
+  endif
+  assign ph_rating_percent = ph_rating | times: 100.0 | divided_by: ph_rating_max
+
+  comment
+    The lede — 'Suitable for normal, dry and sensitive skin.' — is a fact
+    about this product, so it cannot live in a section setting: one setting
+    would say the same thing on every product sharing the template. It comes
+    from a metafield the merchant names once here, and a description whose
+    opening line is already bold reads as the same thing without one.
+  endcomment
+  assign ph_lede = ''
+  if section.settings.lede_metafield != blank
+    assign lede_parts = section.settings.lede_metafield | split: '.'
+    assign lede_namespace = lede_parts | first
+    assign lede_key = lede_parts | last
+    assign ph_lede = product.metafields[lede_namespace][lede_key].value
+  endif
+
+  comment
+    How wide the picture actually draws on a desktop: the page-width container
+    at its ceiling, less its own gutters, times the media column's share of
+    it, times the picture's share of that column. A hint in vw would describe
+    the viewport, which the container stopped following at 1300px.
+  endcomment
+  assign ph_container = settings.page_width | minus: 100
+  assign ph_image_px = ph_container | times: section.settings.split | times: section.settings.image_width | divided_by: 10000
+
+  assign ph_media = product.media
+  assign arrow_prev = section.settings.arrow_prev_url
+  assign arrow_next = section.settings.arrow_next_url
+-%}
+
+<div
+  class="ph"
+  id="ph-{{ section.id }}"
+  data-ph
+  style="
+    --ph-bg: {{ section.settings.background }};
+    --ph-text: {{ section.settings.text_color }};
+    --ph-body-color: {{ section.settings.body_color }};
+    --ph-muted: {{ section.settings.muted_color }};
+    --ph-rule-color: {{ section.settings.text_color | color_modify: 'alpha', 0.15 }};
+    --ph-top: {{ section.settings.space_above }}px;
+    --ph-top-mobile: {{ section.settings.space_above_mobile }}px;
+    --ph-bottom: {{ section.settings.padding_bottom }}px;
+    --ph-split: {{ section.settings.split }}%;
+    --ph-info-split: {{ section.settings.info_split }}%;
+    --ph-media-ratio: {{ section.settings.media_ratio }};
+    --ph-image-max: {{ section.settings.image_width }}%;
+    --ph-image-max-mobile: {{ section.settings.image_width_mobile }}%;
+    --ph-media-blend: {% if section.settings.media_blend %}multiply{% else %}normal{% endif %};
+    --ph-thumbs-visible: {{ section.settings.thumbs_visible }};
+    --ph-thumbs-visible-mobile: {{ section.settings.thumbs_visible_mobile }};
+    --ph-thumb-gap: {{ section.settings.thumb_gap }}px;
+    --ph-thumbs-bottom: {{ section.settings.thumbs_inset }}px;
+    --ph-thumbs-bg: {{ section.settings.thumbs_background }};
+    --ph-thumbs-pad: {{ section.settings.thumbs_padding }}px;
+    --ph-thumbs-radius: {{ section.settings.thumbs_radius }}px;
+    {% unless section.settings.thumbs_shadow %}--ph-thumbs-shadow: none;{% endunless %}
+    --ph-thumb-ring: {{ section.settings.thumb_ring }}px;
+    --ph-thumb-bg: {{ section.settings.thumb_background }};
+    --ph-arrow-size: {{ section.settings.arrow_size }}px;
+    --ph-arrow-bg: {{ section.settings.arrow_background }};
+    --ph-star: {{ section.settings.star_color }};
+    --ph-star-size: {{ section.settings.star_size }}px;
+    --ph-title-size: {{ section.settings.title_size }}px;
+    --ph-title-size-mobile: {{ section.settings.title_size_mobile }}px;
+    --ph-title-weight: {{ section.settings.title_weight }};
+    --ph-lede-size: {{ section.settings.lede_size }}px;
+    --ph-body-size: {{ section.settings.body_size }}px;
+    --ph-variant-size: {{ section.settings.variant_size }}px;
+    --ph-desc-lines: {{ section.settings.description_lines }};
+    --ph-price-size: {{ section.settings.price_size }}px;
+    --ph-badge-bg: {{ section.settings.badge_background }};
+    --ph-badge-fg: {{ section.settings.badge_text_color }};
+    --ph-cta-h: {{ section.settings.cta_height }}px;
+    --ph-qty-w: {{ section.settings.quantity_width }}px;
+    --ph-atc-bg: {{ section.settings.atc_background }};
+    --ph-atc-fg: {{ section.settings.atc_text_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    <div class="ph__grid">
+      <div class="ph__media">
+        <div class="ph__stage">
+          {%- if ph_media.size > 0 -%}
+            {%- for media in ph_media -%}
+              {%- comment -%}
+                The preview image for every kind of media, not just for photos —
+                for a photo it is the photo, and for anything else it is the
+                still that stands in for it. One shape for the whole strip, and
+                nothing in the fold that can fail to draw.
+              {%- endcomment -%}
+              <div
+                class="ph__slide{% if forloop.first %} is-active{% endif %}"
+                data-ph-slide
+                aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}"
+              >
+                <img
+                  src="{{ media.preview_image | image_url: width: 1400 }}"
+                  srcset="
+                    {{ media.preview_image | image_url: width: 600 }} 600w,
+                    {{ media.preview_image | image_url: width: 900 }} 900w,
+                    {{ media.preview_image | image_url: width: 1400 }} 1400w
+                  "
+                  sizes="(min-width: 990px) {{ ph_image_px }}px, {{ section.settings.image_width_mobile }}vw"
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  width="{{ media.preview_image.width }}"
+                  height="{{ media.preview_image.height }}"
+                  {% if forloop.first %}
+                    fetchpriority="high"
+                  {% else %}
+                    loading="lazy"
+                  {% endif %}
+                  decoding="async"
+                >
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="ph__slide is-active" data-ph-slide>
+              {{ 'product-1' | placeholder_svg_tag: 'ph__placeholder' }}
+            </div>
+          {%- endif -%}
+
+          {%- if ph_media.size > 1 -%}
+            <div class="ph__thumbs">
+              {%- if section.settings.show_arrows -%}
+                <button
+                  class="ph__arrow ph__arrow--prev"
+                  type="button"
+                  data-ph-arrow="prev"
+                  aria-label="{{ 'general.slider.previous_slide' | t }}"
+                >
+                  {%- if arrow_prev != blank -%}
+                    <img src="{{ arrow_prev }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+                  {%- else -%}
+                    <span class="ph__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+                  {%- endif -%}
+                </button>
+              {%- endif -%}
+
+              <div class="ph__thumb-viewport" data-ph-thumb-viewport>
+                <div class="ph__thumb-track">
+                  {%- for media in ph_media -%}
+                    <button
+                      class="ph__thumb{% if forloop.first %} is-active{% endif %}"
+                      type="button"
+                      data-ph-thumb
+                      data-index="{{ forloop.index0 }}"
+                      aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                      aria-label="{{ 'products.product.media.gallery_viewer' | t }} {{ forloop.index }}"
+                    >
+                      <img
+                        src="{{ media.preview_image | image_url: width: 240 }}"
+                        srcset="
+                          {{ media.preview_image | image_url: width: 120 }} 120w,
+                          {{ media.preview_image | image_url: width: 240 }} 240w
+                        "
+                        sizes="120px"
+                        alt=""
+                        width="120"
+                        height="120"
+                        loading="lazy"
+                        decoding="async"
+                      >
+                    </button>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              {%- if section.settings.show_arrows -%}
+                <button
+                  class="ph__arrow ph__arrow--next"
+                  type="button"
+                  data-ph-arrow="next"
+                  aria-label="{{ 'general.slider.next_slide' | t }}"
+                >
+                  {%- if arrow_next != blank -%}
+                    <img src="{{ arrow_next }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+                  {%- else -%}
+                    <span class="ph__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+                  {%- endif -%}
+                </button>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="ph__info">
+        <div class="ph__info-inner">
+          {%- if section.settings.show_rating and ph_rating != blank and ph_rating != 0 -%}
+            <div class="ph__rating">
+              <span
+                class="ph__stars"
+                style="--percent: {{ ph_rating_percent }}%;"
+                role="img"
+                aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: ph_rating, rating_max: ph_rating_max }}"
+              ></span>
+
+              {%- if ph_rating_count != blank and ph_rating_count != 0 -%}
+                <a class="ph__reviews" href="{{ section.settings.reviews_anchor | default: '#reviews' }}">
+                  {{- ph_rating_count }} {{ section.settings.reviews_label | default: 'Reviews' -}}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          <h1 class="ph__title">{{ product.title | escape }}</h1>
+
+          {%- if ph_lede != blank -%}
+            <p class="ph__lede">{{ ph_lede }}</p>
+          {%- endif -%}
+
+          {%- if product.description != blank -%}
+            <div class="ph__desc{% if section.settings.description_lines > 0 %} is-clamped{% endif %}">
+              {{ product.description }}
+            </div>
+          {%- endif -%}
+
+          {%- comment -%}
+            The sizes, as the card writes them but in the product's own words:
+            the variant's whole title, since the fold has the room the card does
+            not. Each one is a real link to this page with that variant chosen,
+            so it still does something with the script switched off.
+          {%- endcomment -%}
+          {%- if product.variants.size > 1 -%}
+            <p class="ph__variants">
+              {%- for variant in product.variants -%}
+                {%- liquid
+                  unless forloop.first
+                    echo '<span class="ph__variant-sep" aria-hidden="true">&bull;</span>'
+                  endunless
+
+                  assign variant_discount = ''
+                  if variant.compare_at_price > variant.price
+                    assign variant_discount = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round
+                  endif
+                -%}
+                <a
+                  class="ph__variant{% if variant.id == current_variant.id %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}"
+                  href="{{ product.url }}?variant={{ variant.id }}"
+                  data-ph-variant
+                  data-variant-id="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  data-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+                  data-discount="{{ variant_discount }}"
+                  data-available="{{ variant.available }}"
+                  data-media-index="{% if variant.featured_media %}{{ variant.featured_media.position | minus: 1 }}{% else %}-1{% endif %}"
+                  aria-pressed="{% if variant.id == current_variant.id %}true{% else %}false{% endif %}"
+                >
+                  {{- variant.title | escape -}}
+                </a>
+              {%- endfor -%}
+            </p>
+          {%- endif -%}
+
+          <hr class="ph__rule">
+
+          {%- liquid
+            assign current_discount = ''
+            if current_variant.compare_at_price > current_variant.price
+              assign current_discount = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round
+            endif
+          -%}
+
+          <p
+            class="ph__mrp"
+            data-ph-mrp
+            {% unless current_variant.compare_at_price > current_variant.price %}
+              hidden
+            {% endunless %}
+          >
+            {{ section.settings.mrp_label }}
+            <s data-ph-mrp-value>{{ current_variant.compare_at_price | money }}</s>
+          </p>
+
+          <div class="ph__price-row">
+            <span class="ph__price" data-ph-price>{{ current_variant.price | money }}</span>
+
+            {%- if section.settings.tax_note != blank -%}
+              <span class="ph__tax">{{ section.settings.tax_note }}</span>
+            {%- endif -%}
+
+            <span class="ph__badge" data-ph-badge {% if current_discount == blank %}hidden{% endif %}>
+              -{{ current_discount }}% OFF
+            </span>
+          </div>
+
+          <product-form class="ph__form" data-hide-errors="false" data-section-id="{{ section.id }}">
+            <div class="product-form__error-message-wrapper" role="alert" hidden>
+              <span class="product-form__error-message"></span>
+            </div>
+
+            {%- form 'product',
+              product,
+              id: product_form_id,
+              class: 'form',
+              novalidate: 'novalidate',
+              data-type: 'add-to-cart-form'
+            -%}
+              <input
+                type="hidden"
+                name="id"
+                value="{{ current_variant.id }}"
+                class="product-variant-id"
+                data-ph-variant-input
+                {% unless current_variant.available %}
+                  disabled
+                {% endunless %}
+              >
+
+              <div class="ph__buy">
+                <div class="ph__qty">
+                  <button
+                    class="ph__qty-btn"
+                    type="button"
+                    data-ph-qty-step="-1"
+                    aria-label="{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}"
+                  >
+                    &minus;
+                  </button>
+                  <input
+                    class="ph__qty-input"
+                    type="number"
+                    name="quantity"
+                    value="{{ current_variant.quantity_rule.min | default: 1 }}"
+                    min="{{ current_variant.quantity_rule.min | default: 1 }}"
+                    step="{{ current_variant.quantity_rule.increment | default: 1 }}"
+                    {% if current_variant.quantity_rule.max != blank %}
+                      max="{{ current_variant.quantity_rule.max }}"
+                    {% endif %}
+                    data-ph-qty-input
+                    aria-label="{{ 'products.product.quantity.label' | t }}"
+                  >
+                  <button
+                    class="ph__qty-btn"
+                    type="button"
+                    data-ph-qty-step="1"
+                    aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  class="ph__atc"
+                  type="submit"
+                  name="add"
+                  data-ph-atc
+                  data-add-label="{{ section.settings.atc_label | escape }}"
+                  data-sold-out-label="{{ 'products.product.sold_out' | t | escape }}"
+                  {% unless current_variant.available %}
+                    disabled
+                  {% endunless %}
+                >
+                  <span class="ph__atc-label" data-ph-atc-label>
+                    {%- if current_variant.available -%}
+                      {{ section.settings.atc_label }}
+                    {%- else -%}
+                      {{ 'products.product.sold_out' | t }}
+                    {%- endif -%}
+                  </span>
+                  {%- render 'loading-spinner' -%}
+                </button>
+              </div>
+            {%- endform -%}
+          </product-form>
+
+          {%- if section.blocks.size > 0 -%}
+            <p class="ph__links">
+              {%- for block in section.blocks -%}
+                {%- unless forloop.first -%}
+                  <span class="ph__link-sep" aria-hidden="true">|</span>
+                {%- endunless -%}
+                <a class="ph__link" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+                  {{- block.settings.label -}}
+                </a>
+              {%- endfor -%}
+            </p>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Hero",
+  "tag": "section",
+  "class": "section-product-hero",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "split",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Media column width",
+      "info": "A share of the page-width container. What this and the content column leave over falls between them as the gutter.",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "info_split",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Content column width",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "space_above",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Extra space below the header",
+      "info": "The fold already starts exactly where the floating header ends. This is added on top of that.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "space_above_mobile",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Extra space below the header — mobile",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below content",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "text",
+      "id": "media_ratio",
+      "label": "Image ratio",
+      "info": "Width / height of the picture's box, as the design draws it. The photo fills the box, cropped on the long side if its own ratio differs.",
+      "default": "600 / 637"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "A share of the media column. The box's ratio sets the height; the photo fills it.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "image_width_mobile",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width — mobile",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "media_blend",
+      "label": "Blend the shot into the background",
+      "info": "Multiply, as the product cards use — a shot on a white backdrop takes the panel's colour.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "thumbs_visible",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "label": "Thumbnails in view",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "thumbs_visible_mobile",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Thumbnails in view — mobile",
+      "default": 5
+    },
+    {
+      "type": "color",
+      "id": "thumbs_background",
+      "label": "Thumbnail strip panel",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "thumbs_padding",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Panel padding",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "thumbs_radius",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Panel corner radius",
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "thumbs_shadow",
+      "label": "Panel shadow",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "thumbs_inset",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Strip's distance from the image's bottom",
+      "info": "The strip sits on top of the picture, not below it.",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "thumb_gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Gap between thumbnails",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "thumb_ring",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Mat on the chosen thumbnail",
+      "info": "How far the chosen thumbnail's picture is inset, so the panel shows around it.",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "thumb_background",
+      "label": "Thumbnail background",
+      "info": "Shows through a picture with transparency. Matches the panel by default.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "arrow_background",
+      "label": "Arrow background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_url",
+      "label": "Previous arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_url",
+      "label": "Next arrow image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968"
+    },
+    {
+      "type": "header",
+      "content": "Rating"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show the rating",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "star_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Star size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star colour",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Word after the review count",
+      "default": "Reviews"
+    },
+    {
+      "type": "text",
+      "id": "reviews_anchor",
+      "label": "Reviews link",
+      "info": "Where the count points — an anchor on this page, such as #reviews.",
+      "default": "#reviews"
+    },
+    {
+      "type": "range",
+      "id": "fallback_rating",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "label": "Rating for a product with no reviews",
+      "default": 5
+    },
+    {
+      "type": "number",
+      "id": "fallback_review_count",
+      "label": "Review count to go with it",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "min": 20,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size — mobile",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "options": [
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "label": "Title weight",
+      "default": "700"
+    },
+    {
+      "type": "text",
+      "id": "lede_metafield",
+      "label": "Subtitle metafield",
+      "info": "namespace.key of the short line under the title. Each product supplies its own text; clear this to fall back on the description's opening line.",
+      "default": "custom.suitable_for"
+    },
+    {
+      "type": "range",
+      "id": "lede_size",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Body size",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "description_lines",
+      "min": 0,
+      "max": 14,
+      "step": 1,
+      "label": "Description lines shown",
+      "info": "0 shows the whole description. Any other number trims it so the cart bar stays in the fold.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "variant_size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Size chip text",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Price"
+    },
+    {
+      "type": "text",
+      "id": "mrp_label",
+      "label": "Word before the struck price",
+      "default": "MRP"
+    },
+    {
+      "type": "text",
+      "id": "tax_note",
+      "label": "Note beside the price",
+      "default": "(MRP inclusive of all taxes.)"
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 18,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "label": "Price size",
+      "default": 26
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Saving badge background",
+      "default": "#0107ef"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Saving badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Add to cart"
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Button label",
+      "default": "Add to cart"
+    },
+    {
+      "type": "range",
+      "id": "cta_height",
+      "min": 36,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Button height",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "quantity_width",
+      "min": 80,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "label": "Quantity box width",
+      "default": 104
+    },
+    {
+      "type": "color",
+      "id": "atc_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "atc_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Panel background",
+      "default": "#e9eef4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#0a0a0b"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Description text",
+      "default": "#26262b"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted text",
+      "default": "#6b6b6b"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Policy link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
