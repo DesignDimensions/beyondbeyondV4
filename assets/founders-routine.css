@@ -268,10 +268,6 @@
   scroll-snap-align: start;
 }
 
-.fr__card .pcard {
-  width: 100%;
-}
-
 .fr__empty {
   color: var(--pcard-muted, #6b6b6b);
 }
@@ -325,10 +321,12 @@
 .fr__arrow {
   position: absolute;
   /* Centred on the images rather than on the whole card, so the copy under
-     them does not pull the arrows down. */
+     them does not pull the arrows down. A picture is `--pcard-media-scale`
+     times its card's width tall, so half of that is where its middle sits. */
   top: 0;
   margin-top: calc(
-    (100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3) / 2
+    (100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3)
+      * var(--pcard-media-scale, 1) / 2
   );
   z-index: 2;
   display: flex;

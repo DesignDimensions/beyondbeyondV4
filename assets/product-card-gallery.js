@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  var CARD_SELECTOR = '.pcard, .card-wrapper';
+  var CARD_SELECTOR = '.card-wrapper';
   var SWIPE_DRAG_THRESHOLD = 6;
   var SWIPE_MIN_DISTANCE = 30;
 
@@ -55,7 +55,7 @@
     prev.addEventListener('click', step(-1));
     next.addEventListener('click', step(1));
 
-    var mediaBox = card.querySelector('.pcard__frame') || card.querySelector('.card__media');
+    var mediaBox = card.querySelector('.card__media');
     if (!mediaBox) return;
 
     var drag = null;

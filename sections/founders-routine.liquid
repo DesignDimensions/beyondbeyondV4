@@ -16,7 +16,6 @@
   class="fr"
   id="fr-{{ section.id }}"
   data-fr
-  data-card-added-label="{{ section.settings.added_label | escape }}"
   style="
     --fr-pad-top: {{ section.settings.padding_top }}px;
     --fr-pad-bottom: {{ section.settings.padding_bottom }}px;
@@ -100,6 +99,17 @@
     {%- for block in section.blocks -%}
       {%- liquid
         comment
+          'Go to the product page' leaves the card with no add-to-cart on it —
+          the picture and the title are already links there — so the setting is
+          the presence of the card's quick add rather than a second kind of
+          button.
+        endcomment
+        assign fr_quick_add = 'standard'
+        if section.settings.cart_behavior == 'link'
+          assign fr_quick_add = false
+        endif
+
+        comment
           A routine with no collection picked yet falls back to every product
           in the shop, so an unconfigured block shows a real rail rather than
           an empty panel.
@@ -145,8 +155,12 @@
                   media_aspect_ratio: 'square',
                   show_secondary_image: false,
                   show_vendor: false,
-                  show_rating: true,
-                  quick_add: 'standard',
+                  show_rating: section.settings.show_rating,
+                  show_meta: section.settings.show_meta,
+                  reviews_label: section.settings.reviews_label,
+                  fallback_rating: section.settings.fallback_rating,
+                  fallback_review_count: section.settings.fallback_review_count,
+                  quick_add: fr_quick_add,
                   skip_styles: skip_card_styles,
                   section_id: section.id,
                   product_view_context: 'founders-routine'
@@ -384,24 +398,6 @@
         { "value": "link", "label": "Go to the product page" }
       ],
       "default": "add"
-    },
-    {
-      "type": "text",
-      "id": "atc_label",
-      "label": "Button label",
-      "default": "Add to Cart"
-    },
-    {
-      "type": "text",
-      "id": "added_label",
-      "label": "Added label",
-      "default": "Added"
-    },
-    {
-      "type": "text",
-      "id": "soldout_label",
-      "label": "Sold out label",
-      "default": "Sold out"
     },
     {
       "type": "header",

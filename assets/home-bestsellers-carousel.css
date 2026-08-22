@@ -1,0 +1,224 @@
+/* ==========================================================================
+   Bestsellers Carousel — heading, one rail, arrows in the gutters
+   ==========================================================================
+   Nothing here styles a card: the rail holds the theme's own product card,
+   which product-card.css already draws for every grid in the store. This
+   sheet only decides how wide a card is, how the row scrolls, and where the
+   two arrows sit.
+   ========================================================================== */
+
+.hbc {
+  padding-top: var(--hbc-pad-top, 60px);
+  padding-bottom: var(--hbc-pad-bottom, 60px);
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   --------------------------------------------------------------------------
+   The section label is the theme's shared `.section-heading`, which is
+   centred everywhere else. Here it shares a line with Shop all, so it is
+   pulled to the left and its bottom margin handed to the row — the gap under
+   the header has to be the same whether or not the link is there.
+   -------------------------------------------------------------------------- */
+
+.hbc__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: var(--hbc-head-gap, 32px);
+}
+
+.hbc__heading {
+  margin: 0;
+  text-align: left;
+}
+
+.hbc__shop-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: #000;
+}
+
+/* Sized off the label rather than in pixels, so the arrow keeps its
+   proportion to the words if the label size ever changes. Height is what is
+   set, not width: what makes an arrow look right beside type is standing as
+   tall as the capitals do, and its own ratio gives it the width from there. */
+.hbc__shop-all-arrow {
+  flex: none;
+  height: 1.2rem;
+  width: auto;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hbc__shop-all:hover .hbc__shop-all-arrow {
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------------------
+   Rail
+   --------------------------------------------------------------------------
+   A card is a share of the content column rather than a width of its own, so
+   the number the merchant asks for always fits it exactly, flush with both
+   edges, whatever page width the theme settles on.
+   -------------------------------------------------------------------------- */
+
+.hbc__frame {
+  position: relative;
+}
+
+.hbc__rail {
+  display: flex;
+  gap: var(--hbc-card-gap, 24px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for the cards' focus rings, which the scroll box would otherwise
+     clip. */
+  padding-bottom: 4px;
+}
+
+.hbc__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.hbc__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+.hbc__card {
+  flex: 0 0 calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns, 3));
+  scroll-snap-align: start;
+}
+
+.hbc__empty {
+  color: var(--pcard-muted, #6b6b6b);
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   --------------------------------------------------------------------------
+   Held outside the content column, level with the middle of the card images
+   rather than the middle of the whole card — the copy under an image would
+   otherwise pull them down past it. A picture is `--pcard-media-scale` times
+   its card's width tall, so half of that is where its middle sits.
+   -------------------------------------------------------------------------- */
+
+.hbc__arrow {
+  position: absolute;
+  top: 0;
+  margin-top: calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns, 3) * var(--pcard-media-scale, 1) / 2);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Explicit, because the ring below is drawn as a border: the button has to
+     take it out of the width it already has rather than growing by it, or an
+     arrow would change size the moment it becomes pressable. */
+  box-sizing: border-box;
+  width: calc(var(--hbc-arrow-size, 18px) + 16px);
+  height: calc(var(--hbc-arrow-size, 18px) + 16px);
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.hbc__arrow--prev {
+  right: calc(100% + var(--hbc-arrow-offset, 20px));
+}
+
+.hbc__arrow--next {
+  left: calc(100% + var(--hbc-arrow-offset, 20px));
+}
+
+.hbc__arrow-glyph {
+  font-size: calc(var(--hbc-arrow-size, 18px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.hbc__arrow--prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.hbc__arrow--next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+/* The ring is what says the arrow can still be pressed: an end of the rail
+   leaves the glyph on its own, with nothing around it to press. Painted on
+   the live state rather than taken off the dead one, so a bare glyph is what
+   the button falls back to. */
+/* .hbc__arrow:not(.is-disabled) {
+  border-color: #8d8d8d;
+  border-radius: 50%;
+  background-color: #f4f4f4;
+} */
+
+.hbc__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Below this there is no gutter left to hang an arrow in — the content
+   column has taken the window. They come inside and sit over the outer edges
+   of the row rather than pushing a horizontal scrollbar onto the page. */
+@media screen and (max-width: 1439px) {
+  .hbc__arrow--prev {
+    right: auto;
+    left: 0;
+  }
+
+  .hbc__arrow--next {
+    left: auto;
+    right: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .hbc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .hbc__card {
+    flex-basis: calc((100% - (var(--hbc-columns-mobile, 1.2) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns-mobile, 1.2));
+  }
+
+  /* A thumb already does what they do, and there is no room beside the cards
+     to put them. */
+  .hbc__arrow {
+    display: none;
+  }
+
+  .hbc__shop-all {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .hbc__arrow,
+  .hbc__shop-all-arrow {
+    transition-duration: 0.01ms;
+  }
+}

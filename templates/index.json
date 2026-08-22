@@ -97,45 +97,25 @@
         "icon_size": 45
       }
     },
-    "home_bestsellers_gtGjFX": {
-      "type": "home-bestsellers",
-      "blocks": {
-        "home_bestsellers_product_tiqrg8": {
-          "type": "home_bestsellers_product",
-          "settings": {
-            "product": "the-ultimate-night-repair-super-cream-1",
-            "middle_logo": "shopify://shop_images/Group_829.png",
-            "product_caption": "DERMATOLOGICALLY APPROVED",
-            "product_title": "The Ultimate Night  Repair Super Cream",
-            "pre_price": "Starts at",
-            "ingredient_bottom": "shopify://shop_images/Group_1112.png",
-            "cta": "Click to shop"
-          }
-        },
-        "home_bestsellers_product_NfUgkN": {
-          "type": "home_bestsellers_product",
-          "settings": {
-            "product": "broad-spectrum-active-sunspray",
-            "middle_logo": "shopify://shop_images/Group_829.png",
-            "product_caption": "DERMATOLOGICALLY APPROVED",
-            "product_title": "Broad Spectrum Active Sunspray",
-            "pre_price": "Starts at",
-            "ingredient_bottom": "shopify://shop_images/Group_1112.png",
-            "cta": "Click to shop"
-          }
-        }
-      },
-      "block_order": [
-        "home_bestsellers_product_tiqrg8",
-        "home_bestsellers_product_NfUgkN"
-      ],
-      "name": "Home Bestsellers",
+    "home_bestsellers_carousel": {
+      "type": "home-bestsellers-carousel",
+      "name": "Bestsellers Carousel",
       "settings": {
-        "heading": "SHOP BESTSELLERS",
-        "card_height": 540,
-        "handover_threshold": 50,
-        "hover_background": "#0107ef",
-        "hover_text": "#ffffff"
+        "heading": "VIEW BESTSELLERS",
+        "collection": "5-discount-eligible",
+        "products_limit": 8,
+        "shop_all_label": "SHOP ALL",
+        "shop_all_url": "",
+        "columns_desktop": 3,
+        "columns_mobile": "1.2",
+        "card_gap": 24,
+        "head_gap": 32,
+        "added_label": "Added",
+        "show_arrows": true,
+        "arrow_size": 18,
+        "arrow_offset": 20,
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "home_philosophy_4kTxNb": {
@@ -356,7 +336,7 @@
         "columns_mobile": "2",
         "grid_gap": 16,
         "card_media_background": "#e6e9fc",
-        "card_media_ratio": "1",
+        "card_media_ratio": "default",
         "card_media_fit": "cover",
         "card_media_blend": true,
         "card_media_padding": 0,
@@ -729,7 +709,7 @@
   "order": [
     "upselling_image_slider",
     "usp_carousal_m8RAJH",
-    "home_bestsellers_gtGjFX",
+    "home_bestsellers_carousel",
     "home_philosophy_4kTxNb",
     "video_parallax_hLmT4c",
     "skincare_consultation",

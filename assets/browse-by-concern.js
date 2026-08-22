@@ -466,7 +466,7 @@
       if (panel === incoming) return;
       panel.hidden = true;
       panel.classList.remove('is-active');
-      if (self.gsap) self.gsap.set(panel.querySelectorAll('.pcard'), { clearProps: 'all' });
+      if (self.gsap) self.gsap.set(panel.querySelectorAll('.card-wrapper'), { clearProps: 'all' });
     });
 
     incoming.hidden = false;
@@ -478,7 +478,7 @@
       return;
     }
 
-    var cards = incoming.querySelectorAll('.pcard');
+    var cards = incoming.querySelectorAll('.card-wrapper');
     var endHeight = incoming.offsetHeight;
 
     this.panelsWrap.classList.add('is-swapping');

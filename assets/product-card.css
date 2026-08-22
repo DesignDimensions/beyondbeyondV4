@@ -5,12 +5,11 @@
    lavender, the product fitted inside it, a black add-to-cart bar held off
    the tile's corners, then title, stars, type line and price.
 
-   They live here as tokens so the two card implementations in the theme —
-   the stock `card-product` snippet used by every collection, search and
-   related-products grid, and the Browse By Concern section's own card —
-   read from the same source and cannot drift apart. A section that offers
-   the merchant a setting still overrides its token; the token is the
-   starting point, not a ceiling.
+   They live here as tokens because one snippet — `card-product` — draws
+   every card in the store: the collection grids, search, related products,
+   the home page rails and Browse By Concern. A section that offers the
+   merchant a setting still overrides its token; the token is the starting
+   point, not a ceiling.
 
    The overrides below are all written under `.card-wrapper` on purpose.
    Sections load `component-card.css` from inside the body, which lands after
@@ -20,11 +19,16 @@
 
 :root {
   --pcard-media-bg: #e6e9fc;
-  /* The same square, in the two notations the two cards need: a
-     padding-bottom for the theme card's ratio box, a number for the brand
-     card's aspect-ratio. */
-  --pcard-media-ratio: 100%;
-  --pcard-media-aspect: 1;
+  /* The picture is a 384 x 549 portrait, filled — the shot covers the whole
+     tile and is cropped to it rather than fitted inside it. The same shape is
+     carried in the three notations the theme needs: a padding-bottom for the
+     card's ratio box, a fraction for anything sized by aspect-ratio, and a
+     plain multiplier for the rails that centre their arrows on the pictures —
+     a picture is this many times its card's width tall. Change one and change
+     all three; they are one shape. */
+  --pcard-media-ratio: 142.96875%;
+  --pcard-media-aspect: 384 / 549;
+  --pcard-media-scale: 1.4296875;
   --pcard-media-fit: cover;
   --pcard-media-blend: multiply;
   --pcard-media-pad: 0px;
@@ -66,9 +70,7 @@
 .card-wrapper .price,
 .card-wrapper .rating-star,
 .card-wrapper .quick-add__submit.button,
-.card__meta,
-.pcard,
-.pcard .pcard__atc {
+.card__meta {
   font-family: var(--font-body-family);
 }
 
@@ -92,10 +94,14 @@
 /* Filled, not fitted: the image covers the whole tile. Multiply still lets a
    product shot on a white backdrop take the tile's colour — white multiplied
    by the tint is the tint, while the product itself is dark enough to come
-   through nearly unchanged. */
+   through nearly unchanged. Both are read from the tokens rather than stated
+   outright, so a section that offers the merchant a choice — Browse By
+   Concern does — can still write its own over them. */
 .card-wrapper .card__media .media img {
-  object-fit: cover;
-  mix-blend-mode: multiply;
+  box-sizing: border-box;
+  padding: var(--pcard-media-pad, 0px);
+  object-fit: var(--pcard-media-fit, cover);
+  mix-blend-mode: var(--pcard-media-blend, multiply);
 }
 
 /* Keeps that blend composited against this tile's own colour rather than
@@ -171,12 +177,18 @@
    Rating
    -------------------------------------------------------------------------- */
 
-/* Dawn prints the rating before the type line; the design reads title, type
-   line, stars, price. The information block is a flex row precisely so the
-   order can be stated here — the markup order is Dawn's and stays put. */
+/* The design reads title, stars, type line, price. The information block is a
+   flex row precisely so that order can be stated here — the markup order is
+   Dawn's and stays put. The stars and their count are the two halves of one
+   line, so they take the first two places and the type line, which claims a
+   full row, drops below them. */
 .card-wrapper .rating {
-  margin: 10px 0 0;
-  order: 2;
+  /* 12px, not the 10 the stars used to take under the type line: this is now
+     the first thing under the title, and 12 is the gap that line held there
+     before. The count carries the same number, so the stars and the words
+     next to them share a baseline. */
+  margin: 12px 0 0;
+  order: 1;
 }
 
 /* A row of five stars is one box: a hard-stopped gradient painted across it —
@@ -192,7 +204,7 @@
   width: calc(var(--pcard-star-w) * 5 + var(--pcard-star-gap) * 4);
   height: var(--pcard-star-size);
   background-image: linear-gradient(to right,
-      var(--pcard-star) var(--percent, 100%),
+      #000 var(--percent, 100%),
       var(--pcard-star-empty) var(--percent, 100%));
   -webkit-mask-image: var(--pcard-star-icon);
   mask-image: var(--pcard-star-icon);
@@ -221,8 +233,8 @@
 }
 
 .card-wrapper .rating-count {
-  margin: 10px 0 0 8px;
-  order: 3;
+  margin: 12px 0 0 8px;
+  order: 2;
   font-size: 11px;
   letter-spacing: 0;
   white-space: nowrap;
@@ -235,8 +247,8 @@
    -------------------------------------------------------------------------- */
 
 /* No ancestor: `card__meta` is this theme's own class, so there is nothing in
-   Dawn for it to lose a specificity tie against, and both cards can share it
-   exactly as written. */
+   Dawn for it to lose a specificity tie against, and it can be written
+   exactly as it reads. */
 .card__meta {
   display: flex;
   flex-wrap: wrap;
@@ -250,7 +262,9 @@
 }
 
 .card__meta-sep {
-  font-size: 10px;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 0;
 }
 
 /* The sizes are controls, so they carry the affordance the type label does
@@ -296,14 +310,14 @@
 }
 
 .card-wrapper .card__meta {
-  order: 1;
+  order: 3;
   flex: 1 0 100%;
 }
 
 .card-wrapper .price {
   order: 4;
   flex: 1 0 100%;
-  margin: 12px 0 0;
+  margin: 0;
   font-size: var(--pcard-price);
   font-weight: 600;
   letter-spacing: 0;
@@ -387,8 +401,7 @@
 
 /* Picking a size that is out of stock leaves the button in place, saying so,
    rather than removing the only thing on the card that explains why. */
-.card-wrapper .quick-add__submit.button.is-unavailable,
-.pcard__atc.is-unavailable {
+.card-wrapper .quick-add__submit.button.is-unavailable {
   background: #8a8a8a;
   cursor: default;
   pointer-events: none;
@@ -401,211 +414,18 @@
 }
 
 /* ==========================================================================
-   The card itself
-   ==========================================================================
-   Rendered by `product-card-brand.liquid`, which is what the home page's own
-   sections use. The rules above dress the theme's stock card to match this
-   one; these are the thing being matched.
-   ========================================================================== */
-
-.pcard {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.pcard__frame {
-  position: relative;
-  overflow: hidden;
-  /* Keeps the image's multiply blend composited against this tile's own
-     colour rather than whatever the page paints behind the card. */
-  isolation: isolate;
-  aspect-ratio: var(--pcard-media-aspect, 1);
-  background-color: var(--pcard-media-bg, #e6e9fc);
-  /* Claims horizontal swipes for the gallery script up front, so the browser
-     never starts its own scroll/zoom gesture before JS decides it's a photo
-     swipe — vertical touch scroll still passes through untouched. */
-  touch-action: pan-y;
-}
-
-.pcard__media {
-  position: absolute;
-  inset: 0;
-  display: block;
-  padding: var(--pcard-media-pad, 0px);
-}
-
-/* Multiply lets a product shot on a white backdrop take the tile's colour:
-   white multiplied by the tint is the tint, while the product itself is dark
-   enough to come through nearly unchanged. */
-.pcard__img {
-  width: 100%;
-  height: 100%;
-  object-fit: var(--pcard-media-fit, contain);
-  mix-blend-mode: var(--pcard-media-blend, normal);
-  display: block;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* .pcard:hover .pcard__img {
-  transform: scale(1.04);
-} */
-
-/* The button is the last thing in the card, where mobile wants it — a bar
-   under the price. Desktop lifts this wrapper back over the picture instead,
-   by laying it over the card from the top edge down and letting the same
-   aspect ratio the frame uses give it exactly the frame's height. No length
-   has to be measured or repeated for that to line up, and the copy under it
-   never moves when the button appears, because the wrapper is out of the flow
-   the whole time it is up there. */
-@media screen and (min-width: 750px) {
-  .pcard__cta {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 3;
-    display: flex;
-    align-items: flex-end;
-    aspect-ratio: var(--pcard-media-aspect, 1);
-    padding: var(--pcard-inset, 16px);
-    /* Only the button itself takes the pointer; the rest of the picture stays
-       the product link it looks like. */
-    pointer-events: none;
-  }
-
-  .pcard__atc {
-    opacity: 0;
-    transform: translate3d(0, calc(100% + var(--pcard-inset, 16px)), 0);
-    pointer-events: none;
-  }
-
-  .pcard:hover .pcard__atc,
-  .pcard:focus-within .pcard__atc {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    pointer-events: auto;
-  }
-}
-
-.pcard__form {
-  width: 100%;
-  margin: 0;
-}
-
-.pcard__atc {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: var(--pcard-atc-h, 50px);
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background-color: var(--pcard-atc-bg, #000);
-  color: var(--pcard-atc-fg, #fff);
-  font-family: inherit;
-  font-size: var(--pcard-atc-text, 14px);
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-align: center;
-  text-transform: uppercase;
-  text-decoration: none;
-  cursor: pointer;
-  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.pcard__atc--soldout {
-  background-color: #8a8a8a;
-  cursor: default;
-  pointer-events: none;
-}
-
-.pcard__atc.is-loading .pcard__atc-label {
-  opacity: 0.55;
-}
-
-.pcard__atc.is-error {
-  animation: bbc-shake 0.45s ease;
-}
-
-@keyframes bbc-shake {
-
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  25% {
-    transform: translate3d(-5px, 0, 0);
-  }
-
-  75% {
-    transform: translate3d(5px, 0, 0);
-  }
-}
-
-.pcard__info {
-  padding: 20px var(--pcard-inset, 16px) 0;
-}
-
-.pcard__title {
-  display: block;
-  font-size: var(--pcard-title, 16px);
-  font-weight: var(--pcard-title-weight, 700);
-  line-height: 1.35;
-  color: var(--pcard-text, #000);
-  text-decoration: none;
-}
-
-.pcard__title:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.pcard__rating {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.pcard__reviews {
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--pcard-muted, #6b6b6b);
-}
-
-.pcard__price {
-  margin: 12px 0 0;
-  font-size: var(--pcard-price, 17px);
-  font-weight: 700;
-  color: var(--pcard-text, #000);
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  .pcard__img,
-  .pcard__atc {
-    transition-duration: 0.01ms;
-  }
-}
-
-/* ==========================================================================
    Phone
    ==========================================================================
    Two cards to a row leaves each one about 170px wide, and the design is
    drawn at that size: the copy runs edge to edge under the picture rather
    than inset from it, the button is a bar across the foot of the card, and
    every size steps down to keep the same proportion to the card it did in
-   the drawing. Written against the tokens where there is one, so both cards
-   step down together.
+   the drawing. Written against the tokens where there is one, so the card
+   steps down as a piece.
    ========================================================================== */
 
 @media screen and (max-width: 749px) {
 
-  .pcard,
   .card-wrapper {
     --pcard-inset: 0px;
     --pcard-title: 14px;
@@ -615,7 +435,6 @@
     --pcard-atc-text: 12px;
   }
 
-  .pcard__info,
   .card-wrapper .card__information {
     padding: 16px 0 0;
   }
@@ -630,33 +449,28 @@
     letter-spacing: 0.5px;
   }
 
-  .pcard__rating,
   .card-wrapper .rating,
   .card-wrapper .rating-count {
     margin-top: 10px;
   }
 
-  .pcard__price,
   .card-wrapper .price {
     margin-top: 10px;
   }
 
-  /* The bar under the price, on both cards. `--pcard-atc-h` stays the
-     merchant's number; the design's button is a little over two thirds of it
-     at this width.
+  /* The bar under the price. `--pcard-atc-h` stays the merchant's number;
+     the design's button is a little over two thirds of it at this width.
 
      `auto` rather than a fixed top margin: cards in a row are stretched to
      the tallest of them, and a bar that starts where its own copy happens to
      end leaves the row's buttons at three different heights. This puts every
      one of them on the card's bottom edge; the padding is the gap the tallest
      card in the row — the one setting the height — keeps under its price. */
-  .pcard__cta,
   .card-wrapper .quick-add {
     margin-top: auto;
     padding-top: 10px;
   }
 
-  .pcard__atc,
   .card-wrapper .quick-add__submit.button {
     height: calc(var(--pcard-atc-h, 50px) * 0.72);
   }
@@ -666,15 +480,13 @@
    Mobile photo gallery
    ==========================================================================
    A tap-through carousel of the product's own photos, mobile only. Desktop
-   is untouched by any of this: the brand card still shows just its one
-   image, and the stock card still shows only its original hover-swapped
-   pair (or one image, where a section never opted into that) — both cards
-   now simply carry extra photos in the DOM for mobile to use, hidden from
-   desktop outright rather than folded into either card's existing hover
-   rules, which know nothing about a third photo and shouldn't have to.
+   is untouched by any of this: it still shows only the card's original
+   hover-swapped pair (or one image, where a section never opted into that).
+   The extra photos are simply carried in the DOM for mobile to use, hidden
+   from desktop outright rather than folded into the existing hover rules,
+   which know nothing about a third photo and shouldn't have to.
    ========================================================================== */
 
-.pcard__gallery-arrow,
 .card__gallery-arrow {
   display: none;
   position: absolute;
@@ -692,17 +504,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pcard__gallery-arrow--prev,
 .card__gallery-arrow--prev {
   left: 8px;
 }
 
-.pcard__gallery-arrow--next,
 .card__gallery-arrow--next {
   right: 8px;
 }
 
-.pcard__gallery-arrow img,
 .card__gallery-arrow img {
   display: block;
   width: 100%;
@@ -727,33 +536,14 @@
 
   /* Anything past the pair the card already knew how to show (one image, or
      two under the existing hover-crossfade) is new and stays out of sight. */
-  .pcard__frame .pcard__media:not(:first-of-type) {
-    display: none;
-  }
-
   .card-wrapper .card__media .media img:nth-of-type(n + 3) {
     display: none;
   }
 }
 
 @media screen and (max-width: 749px) {
-  .pcard__title {
-    font-weight: 600;
-  }
-
-  .pcard__gallery-arrow,
   .card__gallery-arrow {
     display: flex;
-  }
-
-  .pcard__frame .pcard__media {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .pcard__frame .pcard__media.is-active {
-    opacity: 1;
-    z-index: 1;
   }
 
   .card-wrapper .card__media .media img {
@@ -771,7 +561,6 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-  .pcard__frame .pcard__media,
   .card-wrapper .card__media .media img {
     transition-duration: 0.01ms;
   }

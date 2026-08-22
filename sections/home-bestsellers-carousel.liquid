@@ -1,0 +1,289 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+{{ 'home-bestsellers-carousel.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Bestsellers as a plain rail. The cards are the theme's own product card —
+  the same one the collection grids and the Founder's Routine rail render —
+  so this section shows exactly what the rest of the store shows, and the
+  section itself only has to place the header, the rail and the arrows.
+
+  The header sits inside the content column; the arrows sit in the gutters
+  either side of it, so the cards keep the whole column to themselves.
+{%- endcomment -%}
+
+{%- liquid
+  assign collection = section.settings.collection
+  assign products = collection.products
+  if collection == blank
+    assign products = collections.all.products
+  endif
+
+  comment
+    Shop all follows the collection the rail is showing, unless the merchant
+    points it somewhere else. With neither set it still has somewhere real to
+    go — the same every-product page the rail itself falls back to.
+  endcomment
+  assign shop_all_url = section.settings.shop_all_url
+  if shop_all_url == blank
+    assign shop_all_url = collection.url
+  endif
+  if shop_all_url == blank
+    assign shop_all_url = collections.all.url
+  endif
+-%}
+
+<div
+  class="hbc"
+  id="hbc-{{ section.id }}"
+  data-hbc
+  style="
+    --hbc-pad-top: {{ section.settings.padding_top }}px;
+    --hbc-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --hbc-head-gap: {{ section.settings.head_gap }}px;
+    --hbc-columns: {{ section.settings.columns_desktop }};
+    --hbc-columns-mobile: {{ section.settings.columns_mobile }};
+    --hbc-card-gap: {{ section.settings.card_gap }}px;
+    --hbc-arrow-size: {{ section.settings.arrow_size }}px;
+    --hbc-arrow-offset: {{ section.settings.arrow_offset }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- if section.settings.heading != blank or shop_all_url != blank -%}
+    <div class="page-width hbc__head">
+      {%- if section.settings.heading != blank -%}
+        <p class="section-heading hbc__heading">{{ section.settings.heading }}</p>
+      {%- endif -%}
+
+      {%- if shop_all_url != blank and section.settings.shop_all_label != blank -%}
+        {%- comment -%}
+          The arrow is the drawn one rather than a text arrow — the same way
+          the product card carries its gallery chevrons. `alt` is empty on
+          purpose: the label beside it already names where the link goes, and
+          a second reading of "arrow" would only get in the way.
+        {%- endcomment -%}
+        <a class="hbc__shop-all" href="{{ shop_all_url }}">
+          <span class="hbc__shop-all-label">{{ section.settings.shop_all_label }}</span>
+          <img
+            class="hbc__shop-all-arrow"
+            src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394"
+            alt=""
+            width="39"
+            height="29"
+            loading="lazy"
+          >
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="page-width hbc__frame">
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="hbc__arrow hbc__arrow--prev"
+        type="button"
+        data-hbc-arrow="prev"
+        aria-controls="hbc-rail-{{ section.id }}"
+        aria-label="{{ 'general.slider.previous_slide' | t }}"
+      >
+        <span class="hbc__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+      </button>
+    {%- endif -%}
+
+    <div
+      class="hbc__rail"
+      id="hbc-rail-{{ section.id }}"
+      data-hbc-rail
+      tabindex="0"
+      role="group"
+      aria-label="{{ section.settings.heading | default: 'Bestsellers' | escape }}"
+    >
+      {%- assign skip_card_styles = false -%}
+      {%- for product in products limit: section.settings.products_limit -%}
+        <div class="hbc__card">
+          {% render 'card-product',
+            card_product: product,
+            media_aspect_ratio: 'square',
+            show_secondary_image: false,
+            show_vendor: false,
+            show_rating: true,
+            quick_add: 'standard',
+            skip_styles: skip_card_styles,
+            section_id: section.id,
+            product_view_context: 'home-bestsellers'
+          %}
+        </div>
+        {%- assign skip_card_styles = true -%}
+      {%- else -%}
+        <p class="hbc__empty">{{ 'sections.collection_template.empty' | t }}</p>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="hbc__arrow hbc__arrow--next"
+        type="button"
+        data-hbc-arrow="next"
+        aria-controls="hbc-rail-{{ section.id }}"
+        aria-label="{{ 'general.slider.next_slide' | t }}"
+      >
+        <span class="hbc__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<script src="{{ 'home-bestsellers-carousel.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Bestsellers Carousel",
+  "tag": "section",
+  "class": "section-home-bestsellers-carousel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "VIEW BESTSELLERS"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "The products in the rail, and where Shop all goes unless a link is set below."
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "label": "Products shown",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Shop all"
+    },
+    {
+      "type": "text",
+      "id": "shop_all_label",
+      "label": "Label",
+      "default": "SHOP ALL"
+    },
+    {
+      "type": "url",
+      "id": "shop_all_url",
+      "label": "Link",
+      "info": "Leave empty to use the collection above."
+    },
+    {
+      "type": "header",
+      "content": "Rail"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Cards visible on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1 and a peek" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below the heading",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Distance from the cards",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bestsellers Carousel"
+    }
+  ]
+}
+{% endschema %}

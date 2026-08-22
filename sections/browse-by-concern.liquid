@@ -1,4 +1,9 @@
 {{ 'browse-by-concern.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
 
 {%- liquid
   comment
@@ -38,6 +43,16 @@
   assign thumb_lift_min = section.settings.active_lift | times: 0.62 | round: 1
   assign label_cq = section.settings.label_size | divided_by: 12.0
   assign label_min = section.settings.label_size | times: 0.85 | round: 1
+
+  comment
+    'Go to the product page' leaves the card with no add-to-cart on it — the
+    picture and the title are already links to that page — so the setting is
+    the presence of the card's quick add rather than a second kind of button.
+  endcomment
+  assign bbc_quick_add = 'standard'
+  if section.settings.cart_behavior == 'link'
+    assign bbc_quick_add = false
+  endif
 -%}
 
 <div
@@ -45,7 +60,6 @@
   id="bbc-{{ section.id }}"
   data-bbc
   data-loop="{{ section.settings.arrows_loop }}"
-  data-card-added-label="{{ section.settings.added_label | escape }}"
   style="
     --bbc-pad-top: {{ section.settings.padding_top }}px;
     --bbc-pad-bottom: {{ section.settings.padding_bottom }}px;
@@ -68,7 +82,14 @@
     --bbc-columns-mobile: {{ section.settings.columns_mobile }};
     --bbc-grid-gap: {{ section.settings.grid_gap }}px;
     --pcard-media-bg: {{ section.settings.card_media_background }};
-    --pcard-media-aspect: {{ section.settings.card_media_ratio }};
+    {%- comment -%}
+      Left out entirely on 'default', so the card's own shape — the one
+      product-card.css sets for every card in the store — comes through
+      rather than being restated here.
+    {%- endcomment -%}
+    {%- if section.settings.card_media_ratio != 'default' -%}
+      --pcard-media-aspect: {{ section.settings.card_media_ratio }};
+    {%- endif -%}
     --pcard-media-fit: {{ section.settings.card_media_fit }};
     --pcard-media-blend: {% if section.settings.card_media_blend %}multiply{% else %}normal{% endif %};
     --pcard-media-pad: {{ section.settings.card_media_padding }}px;
@@ -225,7 +246,6 @@
           endif
 
           assign limit = section.settings.products_limit
-          assign card_sizes = '(min-width: 990px) calc(100vw / ' | append: section.settings.columns_desktop | append: '), 50vw'
           assign panel_id = 'bbc-panel-' | append: section.id | append: '-' | append: block.id
           assign tab_id = 'bbc-tab-' | append: section.id | append: '-' | append: block.id
         -%}
@@ -239,19 +259,31 @@
           {% unless forloop.first %}hidden{% endunless %}
         >
           <div class="bbc__grid">
+            {%- comment -%}
+              The theme's one product card — the same snippet every collection
+              grid, search page and home rail renders. Its look here is still
+              this section's own: the `--pcard-*` variables written on the
+              section above are what the card reads for its colours, its type
+              sizes and its button.
+            {%- endcomment -%}
+            {%- assign skip_card_styles = false -%}
             {%- for product in concern_products limit: limit -%}
-              {% render 'product-card-brand',
-                product: product,
-                sizes: card_sizes,
+              {% render 'card-product',
+                card_product: product,
+                media_aspect_ratio: 'square',
+                show_secondary_image: false,
+                show_vendor: false,
                 show_rating: section.settings.show_rating,
                 show_meta: section.settings.show_meta,
                 reviews_label: section.settings.reviews_label,
                 fallback_rating: section.settings.fallback_rating,
                 fallback_review_count: section.settings.fallback_review_count,
-                cart_behavior: section.settings.cart_behavior,
-                atc_label: section.settings.atc_label,
-                soldout_label: section.settings.soldout_label
+                quick_add: bbc_quick_add,
+                skip_styles: skip_card_styles,
+                section_id: section.id,
+                product_view_context: 'browse-by-concern'
               %}
+              {%- assign skip_card_styles = true -%}
             {%- else -%}
               <p class="bbc__empty">{{ 'sections.collection_template.empty' | t }}</p>
             {%- endfor -%}
@@ -516,11 +548,12 @@
       "id": "card_media_ratio",
       "label": "Image shape",
       "options": [
+        { "value": "default", "label": "Card default" },
         { "value": "1", "label": "Square" },
         { "value": "1.15", "label": "Landscape" },
         { "value": "0.85", "label": "Portrait" }
       ],
-      "default": "1"
+      "default": "default"
     },
     {
       "type": "select",
@@ -641,24 +674,6 @@
         { "value": "link", "label": "Go to the product page" }
       ],
       "default": "add"
-    },
-    {
-      "type": "text",
-      "id": "atc_label",
-      "label": "Button label",
-      "default": "Add to Cart"
-    },
-    {
-      "type": "text",
-      "id": "added_label",
-      "label": "Added label",
-      "default": "Added"
-    },
-    {
-      "type": "text",
-      "id": "soldout_label",
-      "label": "Sold out label",
-      "default": "Sold out"
     },
     {
       "type": "color",

@@ -6,7 +6,7 @@
   --usp-fade: 4rem;
 
   position: relative;
-  background-color: var(--usp-bg, #0107ef);
+  background-color: #000;
   overflow: hidden;
 }
 

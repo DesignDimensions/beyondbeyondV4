@@ -14,7 +14,7 @@
 (function () {
   'use strict';
 
-  var CARD_SELECTOR = '.pcard, .card-wrapper';
+  var CARD_SELECTOR = '.card-wrapper';
 
   function closestFrom(target, selector) {
     if (!target || typeof target.closest !== 'function') return null;
@@ -32,10 +32,10 @@
     );
   }
 
-  // Dawn's price element carries its own structure; ours carries the hook. The
-  // markup written back is the same either way, and both are styled for it.
+  // Dawn's price element carries its own structure, which this replaces
+  // outright with the two spans the card is styled for.
   function repriceCard(card, chip) {
-    var target = card.querySelector('[data-card-price]') || card.querySelector('.price');
+    var target = card.querySelector('.price');
     if (!target) return;
 
     var markup = priceMarkup(chip);
@@ -59,7 +59,7 @@
 
     if (!button) return;
 
-    var label = button.querySelector('.pcard__atc-label') || button.querySelector('span') || button;
+    var label = button.querySelector('span') || button;
     if (!label.dataset.cardLabel) label.dataset.cardLabel = label.textContent.trim();
 
     button.disabled = !available;
