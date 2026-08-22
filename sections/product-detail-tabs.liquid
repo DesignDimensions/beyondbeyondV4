@@ -1,0 +1,496 @@
+{{ 'product-detail-tabs.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-detail-tabs.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  The product's own copy, three tabs of it, over a full-bleed picture.
+
+  None of the copy is a section setting: a setting would say the same thing on
+  every product sharing the template. Each tab names a JSON metafield instead,
+  and the product fills it. One shape per tab, every product, which is what
+  makes the section worth having rather than a page of hand-built blocks.
+
+  The three tabs share one renderer. A panel draws whichever keys its JSON
+  carries, so a fourth tab is a metafield and a block — not a new template:
+
+    overline      a tracked uppercase line above everything
+    meta          short facts, joined by a bullet:  ["AM", "Every Morning"]
+    items         the two-up list: [{ number, title, body }] — number optional
+    body          paragraphs: ["…", "…"]
+    routine_label + routine   a labelled chain: ["Cleanse", "Serum", …]
+    buttons       [{ label, url, style }] — style is 'primary' or 'outline'
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_parts = section.settings.background_metafield | split: '.'
+  assign bg_namespace = bg_parts | first
+  assign bg_key = bg_parts | last
+  assign bg_url = product.metafields[bg_namespace][bg_key]
+  if bg_url == blank
+    assign bg_url = section.settings.background_fallback
+  endif
+
+  comment
+    A tab with no metafield behind it has nothing to show, so it is dropped
+    from the control as well as from the panels — a segmented control with a
+    dead third is worse than one with two segments.
+  endcomment
+  assign live_blocks = ''
+  for block in section.blocks
+    assign parts = block.settings.metafield_key | split: '.'
+    assign ns = parts | first
+    assign k = parts | last
+    if product.metafields[ns][k].value != blank
+      assign live_blocks = live_blocks | append: block.id | append: ','
+    endif
+  endfor
+-%}
+
+{%- if live_blocks != blank -%}
+  <div
+    class="pdt"
+    id="pdt-{{ section.id }}"
+    data-pdt
+    style="
+      --pdt-bg: {{ section.settings.background_color }};
+      {% if bg_url != blank %}--pdt-bg-image: url('{{ bg_url }}');{% endif %}
+      --pdt-bg-position: {{ section.settings.background_position }};
+      --pdt-scrim: {{ section.settings.background_color | color_modify: 'alpha', 0.88 }};
+      --pdt-text: {{ section.settings.text_color }};
+      --pdt-muted: {{ section.settings.body_color }};
+      --pdt-pad-y: {{ section.settings.padding }}px;
+      --pdt-min-h: {{ section.settings.min_height }}px;
+      --pdt-panel-width: {{ section.settings.panel_width }}%;
+      --pdt-panels-gap: {{ section.settings.panels_gap }}px;
+      --pdt-tabs-bg: {{ section.settings.tabs_background }};
+      --pdt-tabs-radius: {{ section.settings.tabs_radius }}px;
+      --pdt-tabs-inset: {{ section.settings.tabs_inset }}px;
+      --pdt-tab-size: {{ section.settings.tab_size }}px;
+      --pdt-tab-pad-y: {{ section.settings.tab_height }}px;
+      --pdt-tab-active-bg: {{ section.settings.tab_active_background }};
+      --pdt-tab-active-fg: {{ section.settings.tab_active_text }};
+      --pdt-overline-size: {{ section.settings.overline_size }}px;
+      --pdt-overline-tracking: {{ section.settings.overline_tracking }}px;
+      --pdt-body-size: {{ section.settings.body_size }}px;
+      --pdt-columns: {{ section.settings.columns }};
+      --pdt-col-gap: {{ section.settings.column_gap }}px;
+      --pdt-row-gap: {{ section.settings.row_gap }}px;
+      --pdt-button-bg: {{ section.settings.button_background }};
+      --pdt-button-fg: {{ section.settings.button_text }};
+    "
+    {{ section.shopify_attributes }}
+  >
+    <div class="page-width pdt__inner">
+      <div class="pdt__tabs" role="tablist" aria-label="{{ 'products.product.description' | t }}">
+        {%- assign tab_index = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if live_blocks contains block.id -%}
+            <button
+              class="pdt__tab"
+              type="button"
+              role="tab"
+              id="pdt-tab-{{ section.id }}-{{ block.id }}"
+              aria-controls="pdt-panel-{{ section.id }}-{{ block.id }}"
+              aria-selected="{% if tab_index == 0 %}true{% else %}false{% endif %}"
+              tabindex="{% if tab_index == 0 %}0{% else %}-1{% endif %}"
+              data-pdt-tab
+              {{ block.shopify_attributes }}
+            >
+              {{- block.settings.label -}}
+            </button>
+            {%- assign tab_index = tab_index | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="pdt__panels">
+        {%- assign panel_index = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if live_blocks contains block.id -%}
+            {%- liquid
+              assign parts = block.settings.metafield_key | split: '.'
+              assign ns = parts | first
+              assign k = parts | last
+              assign tab = product.metafields[ns][k].value
+            -%}
+            <div
+              class="pdt__panel{% if panel_index == 0 %} is-active{% endif %}"
+              role="tabpanel"
+              id="pdt-panel-{{ section.id }}-{{ block.id }}"
+              aria-labelledby="pdt-tab-{{ section.id }}-{{ block.id }}"
+              aria-hidden="{% if panel_index == 0 %}false{% else %}true{% endif %}"
+              data-pdt-panel
+            >
+              {%- if tab.overline != blank -%}
+                <p class="pdt__overline">{{ tab.overline }}</p>
+              {%- endif -%}
+
+              {%- if tab.meta != blank -%}
+                <p class="pdt__meta">
+                  {%- for fact in tab.meta -%}
+                    {%- unless forloop.first -%}
+                      <span class="pdt__meta-sep" aria-hidden="true">&bull;</span>
+                    {%- endunless -%}
+                    {{ fact }}
+                  {%- endfor -%}
+                </p>
+              {%- endif -%}
+
+              {%- if tab.items != blank -%}
+                <div class="pdt__grid">
+                  {%- for item in tab.items -%}
+                    <div class="pdt__item">
+                      {%- if item.title != blank -%}
+                        <p class="pdt__item-title">
+                          {%- if item.number != blank -%}
+                            <span class="pdt__item-number">{{ item.number }}</span>
+                          {%- endif -%}
+                          {{ item.title }}
+                        </p>
+                      {%- endif -%}
+                      {%- if item.body != blank -%}
+                        <p class="pdt__item-body">{{ item.body }}</p>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if tab.body != blank -%}
+                <div class="pdt__body">
+                  {%- for paragraph in tab.body -%}
+                    <p>{{ paragraph }}</p>
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if tab.routine != blank -%}
+                {%- if tab.routine_label != blank -%}
+                  <p class="pdt__routine-label">{{ tab.routine_label }}</p>
+                {%- endif -%}
+                <p class="pdt__routine">
+                  {%- for step in tab.routine -%}
+                    {%- unless forloop.first -%}
+                      <span class="pdt__routine-arrow" aria-hidden="true">&#10230;</span>
+                    {%- endunless -%}
+                    <span class="pdt__routine-step">{{ step }}</span>
+                  {%- endfor -%}
+                </p>
+              {%- endif -%}
+
+              {%- if tab.buttons != blank -%}
+                <div class="pdt__buttons">
+                  {%- for button in tab.buttons -%}
+                    {%- if button.label != blank -%}
+                      {%- liquid
+                        assign style = button.style | default: 'primary'
+                        comment
+                          A button with nowhere to go is still drawn — the copy
+                          is written before the link exists — but as text, so
+                          nothing offers a click that does nothing.
+                        endcomment
+                      -%}
+                      {%- if button.url != blank -%}
+                        <a class="pdt__button pdt__button--{{ style }}" href="{{ button.url }}">
+                          <span>{{ button.label }}</span>
+                          {%- if style == 'primary' -%}
+                            <span class="pdt__button-arrow" aria-hidden="true">&#10230;</span>
+                          {%- endif -%}
+                        </a>
+                      {%- else -%}
+                        <span class="pdt__button pdt__button--{{ style }}">
+                          <span>{{ button.label }}</span>
+                          {%- if style == 'primary' -%}
+                            <span class="pdt__button-arrow" aria-hidden="true">&#10230;</span>
+                          {%- endif -%}
+                        </span>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            </div>
+            {%- assign panel_index = panel_index | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product Detail Tabs",
+  "tag": "section",
+  "class": "section-product-detail-tabs",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "text",
+      "id": "background_metafield",
+      "label": "Background image metafield",
+      "info": "namespace.key of a URL metafield. Each product can carry its own picture.",
+      "default": "custom.pdp_detail_background"
+    },
+    {
+      "type": "text",
+      "id": "background_fallback",
+      "label": "Fallback image URL",
+      "info": "Used for a product whose metafield is empty.",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_1161.png?v=1787402418"
+    },
+    {
+      "type": "select",
+      "id": "background_position",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "right center", "label": "Right" },
+        { "value": "left center", "label": "Left" }
+      ],
+      "label": "Image position",
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background colour",
+      "info": "Shows before the picture loads, and carries the copy on mobile.",
+      "default": "#d9d2cb"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 320,
+      "max": 1000,
+      "step": 20,
+      "unit": "px",
+      "label": "Minimum height",
+      "default": 640
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "panel_width",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Copy column width",
+      "info": "How much of the page-width the copy takes, leaving the rest to the picture.",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "panels_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space under the tabs",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Columns in the points grid",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid column gap",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 16,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid row gap",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Tabs"
+    },
+    {
+      "type": "color",
+      "id": "tabs_background",
+      "label": "Track",
+      "default": "#efeae5"
+    },
+    {
+      "type": "range",
+      "id": "tabs_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Track corner radius",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "tabs_inset",
+      "min": 0,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Track padding",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "tab_height",
+      "min": 6,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tab padding",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "tab_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tab text size",
+      "default": 17
+    },
+    {
+      "type": "color",
+      "id": "tab_active_background",
+      "label": "Chosen tab",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text",
+      "label": "Chosen tab text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "overline_size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Overline size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "overline_tracking",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Overline letter spacing",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Body size",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Headings",
+      "default": "#2b2724"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body text",
+      "default": "#5f5952"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Filled button",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Filled button text",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "What It Does"
+        },
+        {
+          "type": "text",
+          "id": "metafield_key",
+          "label": "Content metafield",
+          "info": "namespace.key of the JSON metafield holding this tab's copy.",
+          "default": "custom.pdp_what_it_does"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Detail Tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "What It Does", "metafield_key": "custom.pdp_what_it_does" } },
+        { "type": "tab", "settings": { "label": "Ingredients", "metafield_key": "custom.pdp_ingredients" } },
+        { "type": "tab", "settings": { "label": "How To Use", "metafield_key": "custom.pdp_how_to_use" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

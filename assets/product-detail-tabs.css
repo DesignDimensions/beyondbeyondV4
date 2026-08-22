@@ -1,0 +1,296 @@
+/* ==========================================================================
+   Product detail tabs — What It Does / Ingredients / How To Use
+   ==========================================================================
+   One panel of the product's own copy at a time, over a full-bleed image, with
+   a segmented control above it. The copy is not in the section's settings: it
+   comes from a JSON metafield per tab, so every product fills the same shape
+   and the section stays one thing.
+
+   The three tabs share one renderer. A panel draws whichever keys its JSON
+   carries — an overline, a meta line, a grid of items, paragraphs, a routine,
+   a pair of buttons — so a fourth tab needs a metafield, not a new template.
+   ========================================================================== */
+
+.pdt {
+  position: relative;
+  padding: var(--pdt-pad-y, 72px) 0;
+  min-height: var(--pdt-min-h, 640px);
+  display: flex;
+  align-items: center;
+  background-color: var(--pdt-bg, #d9d2cb);
+  background-image: var(--pdt-bg-image, none);
+  background-repeat: no-repeat;
+  background-position: var(--pdt-bg-position, center);
+  background-size: cover;
+  color: var(--pdt-text, #2b2724);
+  font-family: var(--font-body-family);
+}
+
+.pdt__inner {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   The segmented control
+   -------------------------------------------------------------------------- */
+
+/* One track, the segments sharing it equally. The chosen one is a filled block
+   inside the track rather than a different track, so switching moves a mark
+   across a fixed rail instead of redrawing the control. */
+.pdt__tabs {
+  display: flex;
+  gap: var(--pdt-tab-gap, 0px);
+  padding: var(--pdt-tabs-inset, 4px);
+  border-radius: var(--pdt-tabs-radius, 10px);
+  background: var(--pdt-tabs-bg, rgba(255, 255, 255, 0.45));
+}
+
+.pdt__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: var(--pdt-tab-pad-y, 14px) 12px;
+  border: 0;
+  border-radius: var(--pdt-tab-radius, 7px);
+  background: none;
+  color: var(--pdt-text, #2b2724);
+  font-family: inherit;
+  font-size: var(--pdt-tab-size, 17px);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pdt__tab[aria-selected='true'] {
+  background: var(--pdt-tab-active-bg, #000);
+  color: var(--pdt-tab-active-fg, #fff);
+}
+
+.pdt__tab:focus-visible {
+  outline: 2px solid var(--pdt-tab-active-bg, #000);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Panels
+   -------------------------------------------------------------------------- */
+
+/* The copy takes the left of the picture and leaves the rest to it. The panels
+   are stacked in one grid cell rather than shown and hidden in the flow, so the
+   section's height is the tallest tab's and nothing jumps on a switch. */
+.pdt__panels {
+  display: grid;
+  margin-top: var(--pdt-panels-gap, 56px);
+}
+
+.pdt__panel {
+  grid-area: 1 / 1;
+  width: var(--pdt-panel-width, 52%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.pdt__panel.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.pdt__overline {
+  margin: 0 0 var(--pdt-overline-gap, 40px);
+  font-size: var(--pdt-overline-size, 14px);
+  font-weight: 600;
+  letter-spacing: var(--pdt-overline-tracking, 4px);
+  text-transform: uppercase;
+  color: var(--pdt-text, #2b2724);
+}
+
+/* The two-up list of points. Single column on its own row when a panel has
+   only prose, since the grid never gets to be the thing holding the width. */
+.pdt__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--pdt-columns, 2), minmax(0, 1fr));
+  column-gap: var(--pdt-col-gap, 60px);
+  row-gap: var(--pdt-row-gap, 40px);
+}
+
+.pdt__item-title {
+  margin: 0 0 var(--pdt-item-gap, 14px);
+  font-size: var(--pdt-item-title-size, 15px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--pdt-text, #2b2724);
+}
+
+/* The index reads as part of the heading, one space off it, not as a label of
+   its own — so it takes the heading's weight and only loses a little colour. */
+.pdt__item-number {
+  color: var(--pdt-number, #2b2724);
+}
+
+.pdt__item-body,
+.pdt__body p,
+.pdt__meta {
+  margin: 0;
+  font-size: var(--pdt-body-size, 15px);
+  line-height: 1.6;
+  color: var(--pdt-muted, #5f5952);
+}
+
+.pdt__meta {
+  margin: 0 0 var(--pdt-meta-gap, 28px);
+}
+
+.pdt__meta-sep {
+  margin: 0 8px;
+}
+
+.pdt__body p + p {
+  margin-top: var(--pdt-para-gap, 24px);
+}
+
+/* --------------------------------------------------------------------------
+   Routine
+   -------------------------------------------------------------------------- */
+
+.pdt__routine-label {
+  margin: var(--pdt-routine-gap, 44px) 0 var(--pdt-routine-label-gap, 20px);
+  font-size: var(--pdt-routine-label-size, 14px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pdt-text, #2b2724);
+}
+
+.pdt__routine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pdt-routine-step-gap, 18px);
+  margin: 0;
+  font-size: var(--pdt-body-size, 15px);
+  color: var(--pdt-muted, #5f5952);
+}
+
+.pdt__routine-arrow {
+  color: var(--pdt-muted, #5f5952);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+
+.pdt__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pdt-button-gap, 16px);
+  margin-top: var(--pdt-buttons-gap, 48px);
+}
+
+.pdt__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: var(--pdt-button-h, 56px);
+  padding: 0 var(--pdt-button-pad, 28px);
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-size: var(--pdt-button-size, 15px);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.pdt__button--primary {
+  background: var(--pdt-button-bg, #000);
+  color: var(--pdt-button-fg, #fff);
+}
+
+.pdt__button--primary:hover {
+  opacity: 0.85;
+}
+
+/* The second call to action is the quieter of the two, so it is the same
+   shape drawn in a line rather than a fill, and set in the tracked uppercase
+   the rest of the section's labels use. */
+.pdt__button--outline {
+  background: none;
+  border-color: var(--pdt-button-border, rgba(43, 39, 36, 0.55));
+  color: var(--pdt-text, #2b2724);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pdt__button--outline:hover {
+  background: var(--pdt-text, #2b2724);
+  color: var(--pdt-bg, #d9d2cb);
+}
+
+.pdt__button-arrow {
+  font-size: 1.3em;
+  line-height: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Stacked
+   --------------------------------------------------------------------------
+   The picture is composed with its subject on the right, so at narrow widths
+   the copy would sit on top of it. The panel takes the full width and a scrim
+   goes over the picture to carry the text instead. */
+
+@media screen and (max-width: 989px) {
+  .pdt {
+    min-height: 0;
+    padding: var(--pdt-pad-y-mobile, 48px) 0;
+    background-position: var(--pdt-bg-position-mobile, right center);
+  }
+
+  /* Painted over the picture and under the copy — hence the stacking context
+     on the section and the copy lifted above it. */
+  .pdt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--pdt-scrim, rgba(217, 210, 203, 0.88));
+  }
+
+  .pdt__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .pdt__tabs {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pdt__panels {
+    margin-top: var(--pdt-panels-gap-mobile, 36px);
+  }
+
+  .pdt__panel {
+    width: 100%;
+  }
+
+  .pdt__grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--pdt-row-gap-mobile, 32px);
+  }
+
+  .pdt__buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .pdt__tab,
+  .pdt__panel,
+  .pdt__button {
+    transition: none;
+  }
+}
