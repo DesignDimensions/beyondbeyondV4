@@ -153,15 +153,106 @@
         "icon_size": 45
       }
     },
-    "disclosures": {
-      "type": "disclosures",
+    "testimonials_jahMwJ": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_U8kXhr": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_p3NGmA": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        },
+        "testimonial_Kpic6j": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "ultra-hydrating-oligo-ha-mist"
+          }
+        },
+        "testimonial_8ePdfd": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_LFUWnw": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        },
+        "testimonial_jPpGU8": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "ultra-hydrating-oligo-ha-mist"
+          }
+        },
+        "testimonial_hknKyb": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_XWjQgg": {
+          "type": "testimonial",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "product": "broad-spectrum-active-sunspray"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_U8kXhr",
+        "testimonial_p3NGmA",
+        "testimonial_Kpic6j",
+        "testimonial_8ePdfd",
+        "testimonial_LFUWnw",
+        "testimonial_jPpGU8",
+        "testimonial_hknKyb",
+        "testimonial_XWjQgg"
+      ],
+      "name": "Testimonials",
       "settings": {
-        "heading": "Disclosures",
-        "heading_size": "h2",
-        "open_by_default": false,
-        "color_scheme": "",
-        "padding_top": 36,
-        "padding_bottom": 0
+        "heading": "TESTIMONIALS",
+        "heading_gap": 40,
+        "columns_desktop": 3,
+        "columns_mobile": "1.2",
+        "card_gap": 34,
+        "video_ratio": "0.5625",
+        "card_radius": 0,
+        "media_background": "#efefef",
+        "scrim_opacity": 0.8,
+        "card_inset": 18,
+        "thumb_size": 42,
+        "title_size": 13,
+        "price_size": 13,
+        "card_text_color": "#ffffff",
+        "unmute_label": "Unmute Video",
+        "mute_label": "Mute Video",
+        "mute_size": 38,
+        "mute_background": "#ffffff",
+        "mute_color": "#000000",
+        "tag_background": "#000000",
+        "tag_color": "#ffffff",
+        "show_arrows": true,
+        "arrow_prev_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right.png?v=1786971967",
+        "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
+        "arrow_size": 16,
+        "arrow_offset": 20,
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "related-products": {
@@ -169,8 +260,8 @@
       "settings": {
         "heading": "You may also like",
         "heading_size": "h2",
-        "products_to_show": 4,
-        "columns_desktop": 4,
+        "products_to_show": 9,
+        "columns_desktop": 3,
         "columns_mobile": "2",
         "color_scheme": "scheme-1",
         "image_ratio": "square",
@@ -186,7 +277,7 @@
   "order": [
     "main",
     "usp_carousal_RRB7Yt",
-    "disclosures",
+    "testimonials_jahMwJ",
     "related-products"
   ]
 }
