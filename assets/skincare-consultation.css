@@ -47,6 +47,13 @@
   justify-content: center;
 }
 
+.sc__media picture {
+  width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .sc__image,
 .sc__media .placeholder-svg {
   display: block;
@@ -105,12 +112,16 @@
 .sc__video-wrap .placeholder-svg {
   display: block;
   width: 88%;
-  /* Prefixed first, plain second: Safari wants `-webkit-fit-content` for a
-     height and drops the line it does not know, so the order leaves each
-     browser holding the spelling it understands. Without one it understands,
-     the height falls back to `auto` and the wrap stretches the video. */
-  height: -webkit-fit-content;
-  height: fit-content;
+  /* `auto`, not `fit-content`. On a replaced element Safari resolves a
+     fit-content height to the media's own intrinsic height -- the video's
+     full pixel height, ignoring the 88% width -- so the box came out far
+     taller than the frame on macOS and iOS. `auto` derives the height from
+     the intrinsic ratio, which is what the 88% width wants. The stretch this
+     was guarding against came from the wrap's old `align-items: end`, a
+     keyword Safari's flexbox dropped; that line is `flex-end` now, so the
+     wrap no longer stretches its child in any browser. */
+  height: auto;
+  max-height: 100%;
   object-fit: cover;
 }
 
@@ -148,6 +159,7 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+
   /* Overrides the shared heading's own margin (base.css), which is sized for
      a section that doesn't have a tight video sitting right under it. */
   .sc .section-title {
@@ -157,7 +169,7 @@
   .sc__grid {
     grid-template-columns: 1fr;
     gap: 0;
-    padding-top: 0;
+    padding: 0;
   }
 
   /* The video takes the image's spot, with the CTA fused to it the same way
@@ -173,10 +185,12 @@
     height: auto;
     margin-top: 30px;
   }
+
   .sc {
     padding-top: 40px;
     padding-bottom: 40px;
   }
+
   /* Auto margins on the flex item override the wrap's own end-alignment for
      just this element, so the plain (cover-fit) video stays right-aligned. */
   .sc__video.sc__video--fit {

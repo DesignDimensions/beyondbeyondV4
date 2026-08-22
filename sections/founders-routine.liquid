@@ -12,6 +12,12 @@
   shows exactly what the rest of the store shows.
 {%- endcomment -%}
 
+{%- comment -%}
+  Held as a whole number in the editor and turned into a fraction here — a
+  range that counts in twentieths is a range that can land off its own step.
+{%- endcomment -%}
+{%- assign fr_tabs_alpha = section.settings.tabs_opacity | divided_by: 100.0 -%}
+
 <div
   class="fr"
   id="fr-{{ section.id }}"
@@ -21,13 +27,15 @@
     --fr-pad-bottom: {{ section.settings.padding_bottom }}px;
     --fr-tabs-gap: {{ section.settings.tabs_gap }}px;
     --fr-tabs-h: {{ section.settings.tabs_height }}px;
-    --fr-tabs-bg: {{ section.settings.tabs_background }};
-    --fr-tabs-border: {{ section.settings.tabs_border }};
+    --fr-tabs-bg: {{ section.settings.tabs_background | color_modify: 'alpha', fr_tabs_alpha }};
+    --fr-tabs-border: {{ section.settings.tabs_border | color_modify: 'alpha', 0.85 }};
     --fr-tabs-radius: {{ section.settings.tabs_radius }}px;
     --fr-tab-size: {{ section.settings.tab_size }}px;
     --fr-tab-color: {{ section.settings.tab_color }};
-    --fr-tab-active: {{ section.settings.tab_active_color }};
-    --fr-underline: {{ section.settings.underline_height }}px;
+    --fr-tab-pad: {{ section.settings.tab_padding }}px;
+    --fr-pill-bg: {{ section.settings.pill_color }};
+    --fr-pill-text: {{ section.settings.pill_text_color }};
+    --fr-pill-inset: {{ section.settings.pill_inset }}px;
     --fr-rail-gap: {{ section.settings.rail_gap }}px;
     --fr-columns: {{ section.settings.columns_desktop }};
     --fr-columns-mobile: {{ section.settings.columns_mobile }};
@@ -49,11 +57,16 @@
     {%- comment -%}
       A tab list, so the browser's own semantics carry the relationship
       between a routine's name and its rail rather than us describing it
-      twice. The mark under the chosen one is a single element the script
-      slides between them — two labels of different lengths cannot share a
-      border and still line up.
+      twice. The mark on the chosen one is a single pill the script slides
+      between them — one element crossing the track, rather than a background
+      each name switches on and off for itself.
     {%- endcomment -%}
-    <div class="fr__tabs" data-fr-tabs role="tablist" aria-label="{{ section.settings.heading | escape }}">
+    <div
+      class="fr__tabs{% if section.settings.tabs_width == 'full' %} fr__tabs--full{% endif %}"
+      data-fr-tabs
+      role="tablist"
+      aria-label="{{ section.settings.heading | escape }}"
+    >
       {%- for block in section.blocks -%}
         {%- liquid
           assign label = block.settings.label | default: block.settings.collection.title
@@ -76,7 +89,7 @@
         </button>
       {%- endfor -%}
 
-      <span class="fr__underline" data-fr-underline aria-hidden="true"></span>
+      <span class="fr__pill" data-fr-pill aria-hidden="true"></span>
 
       {%- comment -%}
         The same names again, in the colour they take on top of the pill. The
@@ -235,6 +248,16 @@
       "default": 36
     },
     {
+      "type": "select",
+      "id": "tabs_width",
+      "label": "Switcher width",
+      "options": [
+        { "value": "fit", "label": "As wide as the names" },
+        { "value": "full", "label": "Full content width" }
+      ],
+      "default": "fit"
+    },
+    {
       "type": "range",
       "id": "tabs_height",
       "min": 36,
@@ -242,19 +265,40 @@
       "step": 2,
       "unit": "px",
       "label": "Switcher height",
-      "default": 48
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "tab_padding",
+      "min": 8,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space either side of a name",
+      "default": 40
     },
     {
       "type": "color",
       "id": "tabs_background",
       "label": "Switcher background",
-      "default": "#F8F8F9"
+      "default": "#EFEFF1"
+    },
+    {
+      "type": "range",
+      "id": "tabs_opacity",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Switcher background opacity",
+      "info": "Lower it to let the page show through the glass.",
+      "default": 60
     },
     {
       "type": "color",
       "id": "tabs_border",
-      "label": "Switcher border",
-      "default": "#E4E4E7"
+      "label": "Switcher edge",
+      "default": "#FFFFFF"
     },
     {
       "type": "range",
@@ -264,7 +308,7 @@
       "step": 1,
       "unit": "px",
       "label": "Switcher corner radius",
-      "default": 4
+      "default": 14
     },
     {
       "type": "range",
@@ -274,7 +318,7 @@
       "step": 1,
       "unit": "px",
       "label": "Routine name size",
-      "default": 18
+      "default": 16
     },
     {
       "type": "color",
@@ -284,19 +328,25 @@
     },
     {
       "type": "color",
-      "id": "tab_active_color",
-      "label": "Selected routine color",
-      "default": "#0107EF"
+      "id": "pill_color",
+      "label": "Selected routine background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "pill_text_color",
+      "label": "Selected routine name color",
+      "default": "#FFFFFF"
     },
     {
       "type": "range",
-      "id": "underline_height",
-      "min": 0,
-      "max": 8,
+      "id": "pill_inset",
+      "min": 2,
+      "max": 10,
       "step": 1,
       "unit": "px",
-      "label": "Selected routine underline",
-      "default": 3
+      "label": "Gap around the selected routine",
+      "default": 4
     },
     {
       "type": "header",

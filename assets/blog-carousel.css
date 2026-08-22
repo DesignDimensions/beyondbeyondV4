@@ -1,0 +1,316 @@
+/* ==========================================================================
+   Blog Carousel — a statement and its call to action beside a rail of posts
+   ========================================================================== */
+
+.bc {
+  padding-top: var(--bc-pad-top, 60px);
+  padding-bottom: var(--bc-pad-bottom, 60px);
+}
+
+.bc__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bc-split-gap, 48px);
+}
+
+/* --------------------------------------------------------------------------
+   The copy
+   -------------------------------------------------------------------------- */
+
+.bc__intro {
+  flex: 0 0 var(--bc-split, 42%);
+  max-width: var(--bc-split, 42%);
+}
+
+/* The theme's shared statement, turned to the left and held to the size half
+   a column can carry — the full-width display size is a display size, and this
+   is standing next to something. */
+.bc .section-title {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.6rem);
+}
+
+.bc__body {
+  margin-top: var(--bc-body-gap, 16px);
+  max-width: var(--bc-body-max, 44ch);
+  color: var(--bc-body-color, #1a1a1a);
+}
+
+/* --------------------------------------------------------------------------
+   Call to action
+   -------------------------------------------------------------------------- */
+
+.bc__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: var(--bc-cta-max, 470px);
+  height: var(--bc-cta-h, 48px);
+  margin-top: var(--bc-cta-gap, 30px);
+  background-color: var(--bc-cta-bg, #000);
+  color: var(--bc-cta-fg, #fff);
+  font-size: var(--bc-cta-size, 13px);
+  font-weight: 500;
+  letter-spacing: var(--bc-cta-spacing, 1.6px);
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: filter 0.3s ease;
+}
+
+.bc__cta:hover {
+  filter: brightness(1.35);
+}
+
+/* The bestsellers' 'shop all' arrow. Sized off the label rather than in
+   pixels, the same way that one is: what makes an arrow look right beside
+   type is standing as tall as the capitals do, and the file's own ratio gives
+   it the width from there. */
+.bc__cta-arrow {
+  flex: none;
+  height: var(--bc-cta-arrow-h, 1.2rem);
+  width: auto;
+  aspect-ratio: 39 / 29;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Filled with the button's own text colour through the arrow's shape, so a
+   glyph drawn in black still reads on a black button — and follows the text
+   colour wherever the merchant takes it. Held behind a support test: without
+   masking this would be a solid block, and no arrow at all is the better of
+   the two. */
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .bc__cta-arrow {
+    background-color: currentColor;
+    -webkit-mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+}
+
+.bc__cta:hover .bc__cta-arrow {
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------------------
+   The rail
+   --------------------------------------------------------------------------
+   The rail ends where the content column ends: a card that has scrolled past
+   is cut at the page's own edge rather than hanging off the window. Cards are
+   sized in `cqw` — one per cent of that column — so the merchant sets how many
+   share it and the peek of the next one falls out of the same number.
+   -------------------------------------------------------------------------- */
+
+.bc__feed {
+  flex: 1 1 auto;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.bc__rail {
+  display: flex;
+  gap: var(--bc-gap, 18px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for the cards' focus rings, which the scroll box would otherwise
+     clip. */
+  padding-bottom: 4px;
+  cursor: grab;
+}
+
+/* A picture and a link both come with a drag of their own — one hands the
+   browser an image, the other a URL — and either of them would swallow the
+   drag meant for the rail. The rail's own drag is the only one here. */
+.bc__rail img,
+.bc__rail a,
+.bc__rail svg {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+.bc__rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* A dragged rail is being positioned frame by frame; snapping would fight
+   every one of those frames, so it stands down until the drag ends. */
+.bc__rail.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+.bc__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Cards
+   -------------------------------------------------------------------------- */
+
+.bc__card {
+  flex: 0 0 var(--bc-card-w, 55cqw);
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+  background-color: var(--bc-card-bg, #efefef);
+  color: var(--bc-title-color, #111);
+  text-decoration: none;
+}
+
+.bc__card:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.bc__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--bc-media-ratio, 1);
+  background-color: var(--bc-media-bg, #f2f2f2);
+}
+
+.bc__img,
+.bc__media .placeholder-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bc__card:hover .bc__img {
+  transform: scale(1.04);
+}
+
+/* The title block takes whatever height is left, so a row of cards ends on
+   one line however many lines their titles run to. */
+.bc__card-body {
+  flex: 1 1 auto;
+  padding: var(--bc-card-pad, 16px);
+}
+
+.bc__card-title {
+  margin: 0;
+  font-size: var(--bc-title-size, 16px);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.bc__card:hover .bc__card-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Dots
+   --------------------------------------------------------------------------
+   The same dots the other rails in this theme use, and for the same reason:
+   nothing else says how much rail is left. They read scroll progress rather
+   than a selection, so a dragged rail moves them too — and tapping one
+   carries the rail to that share of its travel. Centred on the column, not on
+   the rail, since the rail's right-hand end is off the screen.
+   -------------------------------------------------------------------------- */
+
+.bc__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--bc-dots-gap, 22px);
+}
+
+.bc__dots:empty {
+  display: none;
+}
+
+.bc__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bc__dot::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  transition: background-color 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bc__dot.is-active::before {
+  background-color: var(--bc-dot-color, #000);
+  transform: scale(1.3);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .bc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  /* The copy stops being a column beside the rail and becomes the row above
+     it, so both get the whole width. */
+  .bc__inner {
+    flex-direction: column;
+    gap: var(--bc-split-gap-mobile, 28px);
+  }
+
+  .bc__intro,
+  .bc__feed {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .bc .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+  }
+
+  .bc__body {
+    max-width: none;
+  }
+
+  .bc__cta {
+    max-width: none;
+    height: var(--bc-cta-h-mobile, 44px);
+  }
+
+  .bc__card {
+    flex-basis: var(--bc-card-w-mobile, 78cqw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .bc__cta,
+  .bc__cta-arrow,
+  .bc__img,
+  .bc__dot::before {
+    transition-duration: 0.01ms;
+  }
+}

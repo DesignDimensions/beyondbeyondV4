@@ -387,7 +387,12 @@
   }
 
   .card-wrapper:hover .quick-add__submit.button,
-  .card-wrapper:focus-within .quick-add__submit.button {
+  .card-wrapper:focus-within .quick-add__submit.button,
+  /* A button that has been pressed stays out until the cart has answered it.
+     Adding to the cart takes the focus with it — to the drawer, or to the
+     notification — and a spinner that slides back inside the picture the
+     moment the pointer moves is a spinner nobody sees. */
+  .card-wrapper .quick-add__submit.button.loading {
     opacity: 1;
     transform: translate3d(0, 0, 0);
     pointer-events: auto;
@@ -405,6 +410,39 @@
   background: #8a8a8a;
   cursor: default;
   pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Add to cart — while the cart is being told
+   --------------------------------------------------------------------------
+   The spinner is already in the button and already shown: the form's own
+   script adds `loading` and unhides it the moment a card is submitted, and
+   takes both back when the cart answers. What it cannot do is win against the
+   card's colours, which are set with one class more than the rule that hides
+   the label. So the swap is restated here in the card's terms — the label
+   goes transparent rather than away, so the bar keeps the width its words
+   gave it and cannot flinch as the spinner appears — and the spinner is drawn
+   in the button's own foreground rather than the colour scheme's, which the
+   card sits outside of.
+   -------------------------------------------------------------------------- */
+
+.card-wrapper .quick-add__submit.button.loading {
+  color: transparent;
+  cursor: wait;
+}
+
+.card-wrapper .quick-add__submit.button.loading .path {
+  stroke: var(--pcard-atc-fg);
+}
+
+/* Sized against the bar rather than the page: at the height a phone draws the
+   button, the theme's own spinner is nearly as tall as the bar it turns in.
+   One class more than the rules it is answering, so the size holds wherever
+   this sheet ends up in the order. */
+.card-wrapper .quick-add__submit.button .loading__spinner,
+.card-wrapper .quick-add__submit.button.loading .spinner {
+  width: var(--pcard-atc-spinner, 18px);
+  height: var(--pcard-atc-spinner, 18px);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -458,6 +496,26 @@
     margin-top: 10px;
   }
 
+  /* The auto margin below is the whole mechanism, and it needs two things the
+     card does not otherwise have on a phone.
+
+     A column to spend the free space in: the content layer is a block above,
+     where the button leaves the flow and rides inside the picture instead, and
+     a block box has no free space to give an auto margin.
+
+     And a card as tall as the row it stands in: the wrapper already asks for
+     its full height, but a percentage height only reaches as far as the first
+     ancestor that has a height of its own, and the custom element each section
+     wraps a card in has none. Given one, it passes the row's height through. */
+  product-component {
+    height: 100%;
+  }
+
+  .card-wrapper .card>.card__content {
+    display: flex;
+    flex-direction: column;
+  }
+
   /* The bar under the price. `--pcard-atc-h` stays the merchant's number;
      the design's button is a little over two thirds of it at this width.
 
@@ -473,6 +531,7 @@
 
   .card-wrapper .quick-add__submit.button {
     height: calc(var(--pcard-atc-h, 50px) * 0.72);
+    --pcard-atc-spinner: 15px;
   }
 }
 

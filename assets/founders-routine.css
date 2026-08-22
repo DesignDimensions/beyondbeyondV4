@@ -9,13 +9,13 @@
 
 /* --------------------------------------------------------------------------
    Switcher
+   --------------------------------------------------------------------------
+   A segmented control: one black pill riding a glass track, no wider than the
+   two names need. The pill's two edges are registered custom properties, so
+   the pill and the light copy of the names below are driven by the same two
+   numbers and cannot drift apart mid-slide.
    -------------------------------------------------------------------------- */
 
-/* The indicator is one element for the whole bar: at rest a thin bar under the
-   chosen routine, and on a change it swells into a filled pill, carries the
-   choice across, then settles back into a bar. Its two edges are animated as
-   registered custom properties so the pill and the white-text mask below are
-   driven by the same two numbers and cannot drift apart mid-flight. */
 @property --fr-l {
   syntax: '<length>';
   inherits: true;
@@ -28,158 +28,116 @@
   initial-value: 0px;
 }
 
-/* How far each end of the mark runs past its edge mid-journey. Held as fixed
-   lengths rather than falling out of the easing, so a routine sitting right
-   across the bar stretches the mark by the same amount a close one does. */
-@property --fr-lead {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0px;
-}
-
-@property --fr-trail {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0px;
-}
-
-/* The routines split the bar evenly, so the two names sit either side of the
-   middle however long they are. */
+/* Equal columns sized to the longest name: a grid asked for its own width
+   gives every `1fr` track the width of the widest one, so the two halves match
+   without either name being cramped. */
 .fr__tabs {
   position: relative;
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: fit-content;
+  max-width: 100%;
   height: var(--fr-tabs-h, 48px);
-  margin-bottom: var(--fr-tabs-gap, 36px);
-  border: 1px solid var(--fr-tabs-border, #e4e4e7);
-  border-radius: var(--fr-tabs-radius, 4px);
-  background-color: var(--fr-tabs-bg, #f8f8f9);
+  margin: 0 auto var(--fr-tabs-gap, 36px);
+  padding: var(--fr-pill-inset, 4px);
+  border-radius: var(--fr-tabs-radius, 14px);
+  /* Glass: the merchant's grey carried at part strength so what the section
+     sits on shows through it, blurred behind, with a highlight along the top
+     edge and a hairline drawn as a shadow — a real border would inset the
+     padding box the script measures the pill against. */
+  background-color: var(--fr-tabs-bg, rgba(240, 240, 243, 0.6));
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18));
+  box-shadow:
+    inset 0 0 0 1px var(--fr-tabs-border, rgba(255, 255, 255, 0.75)),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(16, 16, 20, 0.04),
+    0 1px 3px rgba(16, 16, 20, 0.06);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
   overflow: hidden;
 
-  /* Bar shape — where the indicator rests. */
-  --fr-ind-top: calc(100% - var(--fr-underline, 3px));
-  --fr-ind-bottom: 0px;
-  --fr-ind-pad: 2px;
-
-  /* Read back by the script, so the phases it sequences stay in step with the
-     durations declared here. */
-  --fr-morph: 0.24s;
-  --fr-slide: 0.46s;
-  --fr-land: 0.08s;
-
-  --fr-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --fr-ease-travel: cubic-bezier(0.5, 0, 0.2, 1);
-
-  /* The stretch leans into the direction of travel: the end going first runs
-     further ahead than the end being dragged behind. */
-  --fr-grow-l: var(--fr-trail);
-  --fr-grow-r: var(--fr-lead);
-
-  transition: none;
+  --fr-slide: 0.52s;
+  --fr-ease: cubic-bezier(0.34, 1.24, 0.5, 1);
 }
 
-.fr__tabs.is-reverse {
-  --fr-grow-l: var(--fr-lead);
-  --fr-grow-r: var(--fr-trail);
+.fr__tabs--full {
+  width: 100%;
 }
 
-/* Pill shape — where the indicator goes while a change is in flight. */
-.fr__tabs.is-morphing {
-  --fr-ind-top: var(--fr-pill-inset, 5px);
-  --fr-ind-bottom: var(--fr-pill-inset, 5px);
-  --fr-ind-pad: var(--fr-pill-pad, 14px);
+/* The sheen — a single soft pass of light across the glass, under everything
+   else on the track. */
+.fr__tabs::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    112deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.12) 34%,
+    rgba(255, 255, 255, 0) 58%
+  );
+  pointer-events: none;
 }
 
-/* The resting bar's corners are square at the floor because it sits on one;
-   the pill has left the floor, so it goes fully round again. */
-.fr__tabs.is-morphing .fr__underline {
-  border-radius: 999px;
-}
-
-/* Only the travel leg animates the edges; the swell and the settle leave them
-   parked and are carried by the transitions on the indicator itself. Both
-   edges share one curve, so the journey itself is rigid and the stretch comes
-   entirely from the two amounts below. */
-.fr__tabs.is-sliding {
+/* Nothing to animate from until the first measurement has landed, so the
+   slide only comes on for the frame after the pill's first placement. */
+.fr__tabs.is-ready {
   transition:
-    --fr-l var(--fr-slide) var(--fr-ease-travel),
-    --fr-r var(--fr-slide) var(--fr-ease-travel);
-  animation:
-    fr-lead var(--fr-slide) var(--fr-ease-travel),
-    fr-trail var(--fr-slide) var(--fr-ease-travel);
-}
-
-@keyframes fr-lead {
-  0%,
-  100% {
-    --fr-lead: 0px;
-  }
-
-  38% {
-    --fr-lead: var(--fr-stretch, 36px);
-  }
-}
-
-@keyframes fr-trail {
-  0%,
-  100% {
-    --fr-trail: 0px;
-  }
-
-  38% {
-    --fr-trail: calc(var(--fr-stretch, 36px) * 0.35);
-  }
+    --fr-l var(--fr-slide) var(--fr-ease),
+    --fr-r var(--fr-slide) var(--fr-ease);
 }
 
 .fr__tab {
   position: relative;
-  z-index: 1;
-  flex: 1 1 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0 var(--fr-tab-pad, 34px);
   border: 0;
   background: none;
   color: var(--fr-tab-color, #1a1a1a);
   font-family: inherit;
-  font-size: var(--fr-tab-size, 18px);
+  font-size: var(--fr-tab-size, 16px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color 0.35s ease;
+  transition: opacity 0.3s ease;
 }
 
-.fr__tab.is-active {
-  color: var(--fr-tab-active, #0107ef);
+.fr__tab:not(.is-active):hover {
+  opacity: 0.65;
 }
 
 .fr__tab:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: -4px;
+  border-radius: calc(var(--fr-tabs-radius, 14px) - var(--fr-pill-inset, 4px));
 }
 
-/* One mark for both routines, slid and resized between them by the script:
-   two labels of different lengths cannot share a border and still each be
-   underlined to their own width. */
-.fr__underline {
+/* One pill for both routines, slid and resized between them by the script.
+   Placed off the same two edges the mask below is clipped to, and given no
+   transition of its own: both follow the animated edges frame for frame. */
+.fr__pill {
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   left: 0;
-  top: var(--fr-ind-top);
-  bottom: var(--fr-ind-bottom);
-  width: calc(var(--fr-r) - var(--fr-l) + var(--fr-ind-pad) * 2 + var(--fr-grow-l) + var(--fr-grow-r));
-  translate: calc(var(--fr-l) - var(--fr-ind-pad) - var(--fr-grow-l)) 0;
-  /* Rounded where it shows and square where it meets the bar's floor, so the
-     bar reads as sitting on the edge rather than floating above it. */
-  border-radius: 5px 5px 0 0;
-  background-color: var(--fr-tab-active, #0107ef);
+  top: var(--fr-pill-inset, 4px);
+  bottom: var(--fr-pill-inset, 4px);
+  width: calc(var(--fr-r) - var(--fr-l));
+  translate: var(--fr-l) 0;
+  border-radius: calc(var(--fr-tabs-radius, 14px) - var(--fr-pill-inset, 4px));
+  background-color: var(--fr-pill-bg, #000);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 58%);
+  box-shadow:
+    0 1px 2px rgba(16, 16, 20, 0.22),
+    0 3px 8px rgba(16, 16, 20, 0.12);
   pointer-events: none;
-  transition:
-    top var(--fr-morph) var(--fr-ease),
-    bottom var(--fr-morph) var(--fr-ease),
-    width var(--fr-morph) var(--fr-ease),
-    border-radius var(--fr-morph) var(--fr-ease),
-    translate var(--fr-morph) var(--fr-ease);
 }
 
 /* A second set of the names, in the colour they take on top of the pill,
@@ -188,38 +146,26 @@
    half-lit. */
 .fr__tabs-mask {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   inset: 0;
-  display: flex;
-  align-items: stretch;
-  color: var(--fr-tab-on-pill, #ffffff);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: var(--fr-pill-inset, 4px);
+  color: var(--fr-pill-text, #fff);
   pointer-events: none;
   clip-path: inset(
-    var(--fr-ind-top)
-    calc(100% - var(--fr-r) - var(--fr-ind-pad) - var(--fr-grow-r))
-    var(--fr-ind-bottom)
-    calc(var(--fr-l) - var(--fr-ind-pad) - var(--fr-grow-l))
-    round 999px
+    var(--fr-pill-inset, 4px)
+    calc(100% - var(--fr-r))
+    var(--fr-pill-inset, 4px)
+    var(--fr-l)
+    round calc(var(--fr-tabs-radius, 14px) - var(--fr-pill-inset, 4px))
   );
-  transition: clip-path var(--fr-morph) var(--fr-ease);
 }
 
 .fr__tabs-mask .fr__tab {
   color: inherit;
   cursor: default;
-  transition: none;
-}
-
-/* In flight the edges are already being animated; letting the indicator run
-   its own transition on top of that would have it chase a moving target. */
-.fr__tabs.is-sliding .fr__underline,
-.fr__tabs.is-sliding .fr__tabs-mask {
-  transition: none;
-}
-
-/* Nothing to animate from until the first measurement has landed. */
-.fr__tabs:not(.is-ready) .fr__underline,
-.fr__tabs:not(.is-ready) .fr__tabs-mask {
   transition: none;
 }
 
@@ -393,23 +339,24 @@
     display: flex;
   }
 
-  .fr__tab {
-    font-size: calc(var(--fr-tab-size, 18px) * 0.85);
+  /* A phone has no room to spare either side of the control, so it takes the
+     content column whole and the names give back the padding they were
+     holding. Set on the tabs rather than the section, so it out-ranks the
+     inline `--fr-tab-pad` the section settings write further up the tree. */
+  .fr__tabs {
+    width: 100%;
+    --fr-tab-pad: 12px;
   }
 
-  /* The bar is the only thing marking the chosen tab, and at the size a phone
-     draws this row the merchant's desktop hairline all but disappears. Set on
-     the tabs rather than the section, so it out-ranks the inline
-     `--fr-underline` the section settings write further up the tree. */
-  .fr__tabs {
-    --fr-underline: 6px;
+  .fr__tab {
+    font-size: calc(var(--fr-tab-size, 16px) * 0.9);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fr__tabs,
   .fr__tab,
-  .fr__underline,
+  .fr__pill,
   .fr__tabs-mask,
   .fr__arrow {
     transition-duration: 0.01ms;
