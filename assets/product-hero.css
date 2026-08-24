@@ -333,7 +333,7 @@
 /* Title and copy */
 
 .ph__title {
-  margin: var(--ph-gap-title, 22px) 0 0;
+  margin: 16px 0 0;
   font-family: var(--font-body-family);
   font-size: 40px;
   font-weight: 500;
@@ -343,7 +343,7 @@
 }
 
 .ph__lede {
-  margin: var(--ph-gap-lede, 18px) 0 0;
+  margin: 16px 0 0;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
@@ -351,9 +351,11 @@
 }
 
 .ph__desc {
-  margin: var(--ph-gap-desc, 12px) 0 0;
-  font-size: 16px;
+  margin: 16px 0 0;
+  font-size: 15px;
   color: #000;
+  line-height: 25px;
+  font-weight: 400;
 }
 
 .ph__desc>* {
@@ -393,7 +395,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: var(--ph-gap-variants, 15px) 0 0;
+  margin: 16px 0 0;
   font-size: var(--ph-variant-size, 15px);
   color: var(--ph-muted, #6b6b6b);
 }
@@ -431,7 +433,7 @@
 
 .ph__rule {
   height: 1px;
-  margin: var(--ph-gap-rule, 22px) 0 0;
+  margin: 16px 0 0;
   border: 0;
   background: var(--ph-rule-color, rgba(0, 0, 0, 0.15));
 }
@@ -439,7 +441,7 @@
 /* Price */
 
 .ph__mrp {
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   font-size: var(--ph-mrp-size, 15px);
   color: var(--ph-muted, #6b6b6b);
 }
@@ -455,7 +457,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
-  margin: var(--ph-gap-now, 10px) 0 0;
+  margin: 6px 0 0;
 }
 
 .ph__price {
@@ -492,7 +494,7 @@
 .ph__buy {
   display: flex;
   align-items: stretch;
-  margin: var(--ph-gap-buy, 26px) 0 0;
+  margin: 16px 0 0;
 }
 
 .ph__qty {
