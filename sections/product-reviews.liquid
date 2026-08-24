@@ -1,0 +1,554 @@
+{{ 'product-reviews.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-reviews.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  The product's own reviews, kept by the store rather than by a review app.
+
+  Where they live: one JSON metafield on the product, an array of objects,
+  newest first. Each one is
+
+    { "author": "…", "rating": 5, "body": "…",
+      "date": "2026-07-02", "verified": true, "approved": true }
+
+  `approved` has to be there — the list is filtered on it, so an entry without
+  it is not shown. The form writes it on every review it takes; a review typed
+  by hand in the admin needs it typed too.
+
+  Where they come from: the Write a Review form posts to a small endpoint the
+  merchant hosts, which appends to that metafield with an Admin API token. The
+  token is the reason it cannot be done from here — a storefront cannot hold
+  one. See cpanel/reviews-endpoint.php.
+
+  The summary at the top counts the reviews below it. With none yet it falls
+  back to whatever aggregate the store's review app has already recorded on the
+  product, so a product with a rating and no written reviews still shows the
+  rating it has rather than a nought.
+{%- endcomment -%}
+
+{%- liquid
+  assign reviews_parts = section.settings.reviews_metafield | split: '.'
+  assign reviews_ns = reviews_parts | first
+  assign reviews_key = reviews_parts | last
+  assign stored = product.metafields[reviews_ns][reviews_key].value
+  assign reviews = stored | where: 'approved', true
+  assign review_count = reviews.size
+
+  assign image_parts = section.settings.image_metafield | split: '.'
+  assign image_ns = image_parts | first
+  assign image_key = image_parts | last
+  assign reviews_image = product.metafields[image_ns][image_key].value
+
+  assign rating_max = 5
+
+  if review_count > 0
+    assign rating_sum = 0
+    for review in reviews
+      assign rating_sum = rating_sum | plus: review.rating
+    endfor
+    assign average = rating_sum | times: 1.0 | divided_by: review_count
+    assign summary_count = review_count
+  else
+    comment
+      Nothing written yet. The review app's own aggregate is real data, so it
+      is what the summary says rather than a zero this store has not earned.
+    endcomment
+    assign app_rating = product.metafields.reviews.rating.value
+    if app_rating != blank
+      assign average = app_rating.rating | times: 1.0
+      assign rating_max = app_rating.scale_max | times: 1.0 | round
+      assign summary_count = product.metafields.reviews.rating_count | plus: 0
+    endif
+  endif
+
+  if average != blank and average > 0
+    assign average_display = average | round: 1
+    assign average_percent = average | times: 100.0 | divided_by: rating_max
+    assign has_summary = true
+  endif
+
+  assign summary_text = section.settings.summary_text
+  assign summary_text = summary_text | replace: '[rating]', average_display
+  assign summary_text = summary_text | replace: '[max]', rating_max
+  assign summary_text = summary_text | replace: '[count]', summary_count
+
+  assign page_size = section.settings.page_size
+-%}
+
+<div
+  class="prv"
+  data-prv
+  style="
+    --prv-bg: {{ section.settings.background }};
+    --prv-pad-top: {{ section.settings.padding_top }}px;
+    --prv-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --prv-gap: {{ section.settings.column_gap }}px;
+    --prv-list-w: {{ section.settings.list_width }}%;
+    --prv-heading-size: {{ section.settings.heading_size }}px;
+    --prv-text: {{ section.settings.text_color }};
+    --prv-muted: {{ section.settings.muted_color }};
+    --prv-rule: {{ section.settings.rule_color }};
+    --prv-star: {{ section.settings.star_color }};
+    --prv-summary-star: {{ section.settings.summary_star_color }};
+    --prv-button-bg: {{ section.settings.button_background }};
+    --prv-button-fg: {{ section.settings.button_text }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    <div class="prv__head">
+      <div class="prv__head-left">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="prv__title">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+
+        <button class="prv__write" type="button" data-prv-open>
+          {{- section.settings.write_label -}}
+        </button>
+      </div>
+
+      {%- if has_summary -%}
+        <div class="prv__summary">
+          <p class="prv__score">
+            <span class="prv__score-value">{{ average_display }}/{{ rating_max }}</span>
+            {%- comment -%}
+              The same row of stars the product hero draws at the top of this
+              page: one band of colour, filled to the rating and grey after it,
+              with five stars punched out of it as a mask. So 4.3 out of 5 stops
+              three tenths of the way into the fourth star rather than rounding
+              to a whole one — and it is one element, not a glyph per star.
+            {%- endcomment -%}
+            <span
+              class="prv__stars"
+              style="--percent: {{ average_percent }}%;"
+              role="img"
+              aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: average_display, rating_max: rating_max }}"
+            ></span>
+          </p>
+
+          {%- if summary_text != blank -%}
+            <p class="prv__summary-text">{{ summary_text }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="prv__body">
+      <div class="prv__list-col">
+        {%- if review_count > 0 -%}
+          <ul class="prv__list" role="list" data-prv-list data-prv-page-size="{{ page_size }}">
+            {%- for review in reviews -%}
+              <li
+                class="prv__review"
+                data-prv-review
+                {% if forloop.index0 >= page_size %}hidden{% endif %}
+              >
+                <div class="prv__review-meta">
+                  <p class="prv__review-author">{{ review.author | escape }}</p>
+                  {%- if review.verified -%}
+                    <p class="prv__review-verified">{{ section.settings.verified_label }}</p>
+                  {%- endif -%}
+                  {%- if review.date != blank -%}
+                    <p class="prv__review-date">
+                      <time datetime="{{ review.date }}">{{ review.date | date: '%-m/%d/%Y' }}</time>
+                    </p>
+                  {%- endif -%}
+                </div>
+
+                <div class="prv__review-content">
+                  {%- assign review_percent = review.rating | times: 100.0 | divided_by: 5 -%}
+                  <span
+                    class="prv__review-stars"
+                    style="--percent: {{ review_percent }}%;"
+                    role="img"
+                    aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: review.rating, rating_max: 5 }}"
+                  ></span>
+                  <p class="prv__review-body">{{ review.body | escape | newline_to_br }}</p>
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {%- comment -%}
+            Paging is done in the browser: every review is already in the page,
+            so a page is a matter of which ones are shown. Without the script
+            the reviews past the first page are still in the markup and the
+            style below brings them back, which is a longer page but a whole
+            one — better than controls that cannot do anything.
+          {%- endcomment -%}
+          <noscript>
+            <style>
+              .prv__review[hidden] {
+                display: grid !important;
+              }
+            </style>
+          </noscript>
+
+          <nav class="prv__pages" data-prv-pages aria-label="{{ section.settings.pages_label }}"></nav>
+        {%- else -%}
+          <p class="prv__empty">{{ section.settings.empty_text }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if reviews_image != blank -%}
+        <div class="prv__media">
+          <img
+            class="prv__img"
+            src="{{ reviews_image | image_url: width: 1000 }}"
+            srcset="
+              {{ reviews_image | image_url: width: 600 }} 600w,
+              {{ reviews_image | image_url: width: 1000 }} 1000w,
+              {{ reviews_image | image_url: width: 1400 }} 1400w
+            "
+            sizes="(min-width: 750px) 45vw, 90vw"
+            width="{{ reviews_image.width }}"
+            height="{{ reviews_image.height }}"
+            alt="{{ reviews_image.alt | default: product.title | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%}
+    A native dialog, so the browser handles the modal's focus and its escape
+    key rather than this section reimplementing both.
+  {%- endcomment -%}
+  <dialog class="prv__modal" data-prv-modal aria-labelledby="prv-modal-title-{{ section.id }}">
+    <form class="prv__form" method="dialog" data-prv-form novalidate>
+      <div class="prv__form-head">
+        <h3 class="prv__form-title" id="prv-modal-title-{{ section.id }}">
+          {{- section.settings.form_title -}}
+        </h3>
+        <button class="prv__form-close" type="button" data-prv-close aria-label="{{ 'accessibility.close' | t }}">
+          &times;
+        </button>
+      </div>
+
+      <fieldset class="prv__field prv__field--rating">
+        <legend class="prv__label">{{ section.settings.rating_label }}</legend>
+        {%- comment -%}
+          Five radios, drawn as stars and laid out in reverse, so that the CSS
+          sibling selector can light every star before the hovered one without
+          a line of script.
+        {%- endcomment -%}
+        <div class="prv__starpick">
+          {%- for i in (1..5) -%}
+            {%- assign value = 6 | minus: i -%}
+            <input
+              class="prv__starpick-input visually-hidden"
+              type="radio"
+              name="rating"
+              id="prv-star-{{ section.id }}-{{ value }}"
+              value="{{ value }}"
+              required
+            >
+            <label class="prv__starpick-star" for="prv-star-{{ section.id }}-{{ value }}">
+              <span class="visually-hidden">{{ value }}</span>
+              <span aria-hidden="true">&#9733;</span>
+            </label>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <div class="prv__field">
+        <label class="prv__label" for="prv-name-{{ section.id }}">{{ section.settings.name_label }}</label>
+        <input class="prv__input" type="text" id="prv-name-{{ section.id }}" name="author" maxlength="80" required>
+      </div>
+
+      <div class="prv__field">
+        <label class="prv__label" for="prv-email-{{ section.id }}">{{ section.settings.email_label }}</label>
+        <input class="prv__input" type="email" id="prv-email-{{ section.id }}" name="email" maxlength="120">
+      </div>
+
+      <div class="prv__field">
+        <label class="prv__label" for="prv-body-{{ section.id }}">{{ section.settings.body_label }}</label>
+        <textarea class="prv__input prv__textarea" id="prv-body-{{ section.id }}" name="body" rows="5" maxlength="2000" required></textarea>
+      </div>
+
+      {%- comment -%}
+        Left empty by a person and filled in by most robots, which is what the
+        endpoint checks before it writes anything.
+      {%- endcomment -%}
+      <div class="prv__honeypot" aria-hidden="true">
+        <label for="prv-website-{{ section.id }}">Website</label>
+        <input type="text" id="prv-website-{{ section.id }}" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <input type="hidden" name="product_handle" value="{{ product.handle }}">
+
+      <p class="prv__form-message" data-prv-message role="status" hidden></p>
+
+      <button class="prv__submit" type="submit" data-prv-submit>
+        {{- section.settings.submit_label -}}
+      </button>
+    </form>
+  </dialog>
+
+  {%- comment -%}
+    Where the form posts. Nothing is sent anywhere until the merchant fills this
+    in, and the script says so plainly rather than failing quietly.
+  {%- endcomment -%}
+  <script type="application/json" data-prv-config>
+    {
+      "endpoint": {{ section.settings.endpoint | default: '' | json }},
+      "success": {{ section.settings.success_text | json }},
+      "error": {{ section.settings.error_text | json }},
+      "unconfigured": {{ section.settings.unconfigured_text | json }}
+    }
+  </script>
+</div>
+
+{% schema %}
+{
+  "name": "Product Reviews",
+  "tag": "section",
+  "class": "section-product-reviews",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Reviews"
+    },
+    {
+      "type": "text",
+      "id": "write_label",
+      "label": "Button label",
+      "default": "Write a Review"
+    },
+    {
+      "type": "text",
+      "id": "summary_text",
+      "label": "Summary line",
+      "info": "[rating], [max] and [count] are filled in from the reviews.",
+      "default": "This product is rated [rating]/[max], based on over [count] reviews from verified purchases."
+    },
+    {
+      "type": "text",
+      "id": "verified_label",
+      "label": "Verified buyer label",
+      "default": "Verified Buyer"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "No reviews yet",
+      "default": "No reviews yet. Be the first to write one."
+    },
+    {
+      "type": "header",
+      "content": "Where the reviews are"
+    },
+    {
+      "type": "text",
+      "id": "endpoint",
+      "label": "Review form endpoint",
+      "info": "The full URL of reviews-endpoint.php on your server. Until this is set, the form will not send."
+    },
+    {
+      "type": "text",
+      "id": "reviews_metafield",
+      "label": "Reviews metafield",
+      "default": "custom.product_reviews"
+    },
+    {
+      "type": "text",
+      "id": "image_metafield",
+      "label": "Image metafield",
+      "default": "custom.reviews_section_image"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "page_size",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Reviews per page",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "list_width",
+      "min": 35,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Review column width",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between reviews and image",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 34
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FBF9F7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Secondary text",
+      "default": "#8A8A8A"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Divider",
+      "default": "#D8D3CD"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Review stars",
+      "default": "#FE7300"
+    },
+    {
+      "type": "color",
+      "id": "summary_star_color",
+      "label": "Summary stars",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Review form"
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form title",
+      "default": "Write a Review"
+    },
+    {
+      "type": "text",
+      "id": "rating_label",
+      "label": "Rating label",
+      "default": "Your rating"
+    },
+    {
+      "type": "text",
+      "id": "name_label",
+      "label": "Name label",
+      "default": "Your name"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email label",
+      "default": "Email (not published)"
+    },
+    {
+      "type": "text",
+      "id": "body_label",
+      "label": "Review label",
+      "default": "Your review"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit label",
+      "default": "Submit Review"
+    },
+    {
+      "type": "text",
+      "id": "pages_label",
+      "label": "Pagination label",
+      "info": "Read out to describe the page numbers.",
+      "default": "Reviews pages"
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Sent message",
+      "default": "Thank you — your review has been received."
+    },
+    {
+      "type": "text",
+      "id": "error_text",
+      "label": "Failed message",
+      "default": "Sorry, your review could not be sent. Please try again."
+    },
+    {
+      "type": "text",
+      "id": "unconfigured_text",
+      "label": "Not set up message",
+      "default": "The review form is not connected yet."
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Reviews"
+    }
+  ]
+}
+{% endschema %}

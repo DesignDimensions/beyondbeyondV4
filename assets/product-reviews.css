@@ -1,0 +1,497 @@
+/* ==========================================================================
+   Product Reviews — the store's own, not an app's
+   ==========================================================================
+   Two bands inside one ground. The first is the heading and the button on the
+   left with the score on the right; the second is the reviews on the left with
+   a picture on the right. They are separate rows rather than one four-cell
+   grid, because the two do not share a column split: the score sits at the far
+   right of the band, while the picture takes a little under half of it.
+   ========================================================================== */
+
+.prv {
+  padding-top: var(--prv-pad-top, 64px);
+  padding-bottom: var(--prv-pad-bottom, 64px);
+  background-color: var(--prv-bg, #fbf9f7);
+  color: var(--prv-text, #1a1a1a);
+}
+
+/* --------------------------------------------------------------------------
+   The head band
+   -------------------------------------------------------------------------- */
+
+.prv__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 56px;
+}
+
+.prv__title {
+  margin: 0 0 20px;
+  font-family: var(--font-body-family);
+  font-size: var(--prv-heading-size, 34px);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--prv-text, #1a1a1a);
+}
+
+/* Sized to its own words with a floor, so the button is the same block on a
+   product whose heading is one word and on one whose heading is four. */
+.prv__write {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 290px;
+  min-height: 44px;
+  padding: 12px 28px;
+  border: 0;
+  background: var(--prv-button-bg, #000);
+  color: var(--prv-button-fg, #fff);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.prv__write:hover {
+  opacity: 0.88;
+}
+
+.prv__summary {
+  width: 30%;
+}
+
+.prv__score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.prv__score-value {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--prv-text, #1a1a1a);
+}
+
+/* The stars are the product hero's, not the product card's: a band of colour
+   with five stars punched out of it as a mask, rather than five glyphs of text.
+   One element, and the fill is a gradient stop, so a rating of 4.3 stops three
+   tenths of the way into the fourth star.
+
+   The mask itself comes from `product-card.css`, which the theme loads on every
+   page, so this row and the hero's can never drift apart — and the star is
+   drawn on a 15x14 box, which is where the width below comes from. */
+.prv__stars,
+.prv__review-stars {
+  --prv-star-w: calc(var(--prv-star-size, 15px) * 15 / 14);
+  display: inline-block;
+  width: calc(var(--prv-star-w) * 5 + var(--prv-star-gap, 2px) * 4);
+  height: var(--prv-star-size, 15px);
+  -webkit-mask-image: var(--pcard-star-icon);
+  mask-image: var(--pcard-star-icon);
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+  -webkit-mask-repeat: space no-repeat;
+  mask-repeat: space no-repeat;
+  font-size: 0;
+}
+
+/* `--percent` is written onto the element by the section, so the two colours
+   below are only ever the ends of one gradient with a hard stop between them. */
+.prv__stars {
+  background-image: linear-gradient(to right,
+      var(--prv-summary-star, #111) var(--percent, 100%),
+      var(--prv-star-empty, #d5d5d5) var(--percent, 100%));
+}
+
+.prv__summary-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--prv-text, #1a1a1a);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   The reviews band
+   -------------------------------------------------------------------------- */
+
+.prv__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--prv-gap, 40px);
+}
+
+/* The column takes the height of the row rather than of its own reviews, so
+   that the pages below can be pushed to the foot of it. The row is as tall as
+   whichever side is taller — usually the picture — and the pages sit level with
+   the bottom of it instead of riding up and down as a page of two long reviews
+   is followed by a page of two short ones. */
+.prv__list-col {
+  flex: 0 0 var(--prv-list-w, 50%);
+  max-width: var(--prv-list-w, 50%);
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.prv__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Two columns: who wrote it, and what they wrote. The rule under a review is
+   the review's own bottom edge rather than a separator element, so a review
+   removed takes its line with it. */
+.prv__review {
+  display: grid;
+  grid-template-columns: minmax(0, 145px) minmax(0, 1fr);
+  column-gap: 20px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--prv-rule, #d8d3cd);
+}
+
+.prv__review+.prv__review {
+  padding-top: 28px;
+}
+
+/* `hidden` is a user-agent rule, and any author `display` beats it — so the
+   `display: grid` above would keep a hidden review on the page and the whole of
+   the paging below would do nothing visible. Every element given a display and
+   also hidden needs this line; it is not optional tidying. */
+.prv__review[hidden] {
+  display: none;
+}
+
+.prv__review-author {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--prv-text, #1a1a1a);
+}
+
+.prv__review-verified,
+.prv__review-date {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--prv-muted, #8a8a8a);
+  font-weight: 400;
+}
+
+.prv__review-stars {
+  display: block;
+  margin-bottom: 10px;
+  background-image: linear-gradient(to right,
+      var(--prv-star, #fe7300) var(--percent, 100%),
+      var(--prv-star-empty, #d5d5d5) var(--percent, 100%));
+}
+
+.prv__review-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--prv-text, #1a1a1a);
+  font-weight: 400;
+}
+
+.prv__empty {
+  margin: 0;
+  font-size: 15px;
+  color: var(--prv-muted, #8a8a8a);
+}
+
+/* --------------------------------------------------------------------------
+   Pages
+   --------------------------------------------------------------------------
+   Built by the script, since how many there are is a matter of how many
+   reviews there are. Numbered 01, 02 — the same two-digit numbering the
+   routine list uses, so a page number and an item number read alike.
+   -------------------------------------------------------------------------- */
+
+/* `auto` is what does the pushing. The space above is padding rather than
+   margin, because an auto margin has no size of its own to keep — when the
+   reviews are the taller side and there is nothing to push against, the padding
+   is what still holds the pages off the last review. */
+.prv__pages:not(:empty) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.prv__page {
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--prv-muted, #8a8a8a);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.prv__page:hover {
+  color: var(--prv-text, #1a1a1a);
+}
+
+.prv__page[aria-current='true'] {
+  color: var(--prv-text, #1a1a1a);
+  font-weight: 700;
+}
+
+.prv__page-gap {
+  color: var(--prv-muted, #8a8a8a);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   The picture
+   -------------------------------------------------------------------------- */
+
+.prv__media {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.prv__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --------------------------------------------------------------------------
+   The form
+   -------------------------------------------------------------------------- */
+
+.prv__modal {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: var(--prv-text, #1a1a1a);
+}
+
+.prv__modal::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.prv__form {
+  padding: 28px;
+}
+
+.prv__form-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.prv__form-title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.prv__form-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--prv-text, #1a1a1a);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prv__field {
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+
+.prv__label {
+  display: block;
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--prv-text, #1a1a1a);
+}
+
+.prv__input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--prv-rule, #d8d3cd);
+  border-radius: 0;
+  background: #fff;
+  color: var(--prv-text, #1a1a1a);
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.prv__input:focus-visible {
+  outline: 2px solid var(--prv-text, #1a1a1a);
+  outline-offset: -1px;
+}
+
+.prv__textarea {
+  resize: vertical;
+}
+
+/* The five stars are laid out in reverse so that `~` reaches the ones before
+   the hovered star — a sibling selector only ever looks forwards, and reversing
+   the row is what turns "the ones after it in the markup" into "the ones before
+   it on the screen". */
+.prv__starpick {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.prv__starpick-star {
+  color: var(--prv-rule, #d8d3cd);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.prv__starpick-star:hover,
+.prv__starpick-star:hover~.prv__starpick-star,
+.prv__starpick-input:checked~.prv__starpick-star,
+.prv__starpick-input:checked+.prv__starpick-star {
+  color: var(--prv-star, #f26522);
+}
+
+.prv__starpick-input:focus-visible+.prv__starpick-star {
+  outline: 2px solid var(--prv-text, #1a1a1a);
+  outline-offset: 2px;
+}
+
+.prv__honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.prv__form-message:not([hidden]) {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  background: #f4f4f4;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.prv__form-message.is-error {
+  background: #fdecef;
+  color: #b3093c;
+}
+
+.prv__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 24px;
+  border: 0;
+  background: var(--prv-button-bg, #000);
+  color: var(--prv-button-fg, #fff);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.prv__submit[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .prv {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .prv__head {
+    flex-direction: column;
+    gap: 28px;
+    margin-bottom: 32px;
+  }
+
+  .prv__write {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .prv__summary {
+    flex: 0 0 auto;
+  }
+
+  .prv__body {
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .prv__list-col {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* The name and the date go above what was written rather than beside it —
+     a 145px column beside a phone's text column leaves neither room. */
+  .prv__review {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+  }
+
+  .prv__title {
+    font-size: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .prv__write,
+  .prv__submit,
+  .prv__page,
+  .prv__starpick-star {
+    transition-duration: 0.01ms;
+  }
+}
