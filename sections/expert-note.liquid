@@ -1,0 +1,299 @@
+{{ 'expert-note.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  A person and what they have to say about the product: a portrait on one half,
+  a name and a paragraph on the other.
+
+  There is no background setting. The section is meant to sit under a panel that
+  has one — the detail tabs, on the product page — and a second tint directly
+  beneath the first reads as a seam rather than as two sections. What separates
+  it from what is above it is the padding, not a colour.
+
+  Everything here is a section setting rather than a metafield: unlike the tabs
+  above it, the same person says the same thing on every product sharing the
+  template, so a setting is the right shape and a metafield per product would be
+  the same copy typed many times.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    An image picked in the editor is the usual case; the URL field is for a
+    portrait that lives somewhere else, and is only consulted when no image is
+    picked. Both end up as one src, so the markup below asks about it once.
+  endcomment
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1200
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+-%}
+
+<div
+  class="exn{% if section.settings.image_position == 'right' %} exn--reversed{% endif %}"
+  style="
+    --exn-pad-top: {{ section.settings.padding_top }}px;
+    --exn-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --exn-gap: {{ section.settings.column_gap }}px;
+    --exn-align: {{ section.settings.vertical_alignment }};
+    --exn-media-w: {{ section.settings.media_width }}%;
+    --exn-media-ratio: {{ section.settings.media_ratio }};
+    --exn-heading-size: {{ section.settings.heading_size }}px;
+    --exn-heading-weight: {{ section.settings.heading_weight }};
+    --exn-heading-color: {{ section.settings.heading_color }};
+    --exn-heading-gap: {{ section.settings.heading_gap }}px;
+    --exn-body-color: {{ section.settings.body_color }};
+    --exn-body-gap: {{ section.settings.body_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    <div class="exn__row">
+      {%- comment -%}
+        The portrait keeps its DOM place whichever side it is shown on — the
+        swap is a flex direction, not a reordering — so it is still announced
+        before the copy it belongs to.
+      {%- endcomment -%}
+      <div class="exn__media">
+        {%- if image_src != blank -%}
+          <picture>
+            {%- if section.settings.image_mobile != blank -%}
+              <source
+                media="(max-width: 749px)"
+                srcset="
+                  {{ image_mobile | image_url: width: 500 }} 500w,
+                  {{ image_mobile | image_url: width: 800 }} 800w,
+                  {{ image_mobile | image_url: width: 1100 }} 1100w
+                "
+                sizes="90vw"
+              >
+            {%- endif -%}
+            <img
+              class="exn__img"
+              src="{{ image_src }}"
+              {%- if image != blank %}
+                srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 1200 }} 1200w"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+              {%- endif %}
+              sizes="(min-width: 750px) 45vw, 90vw"
+              alt="{{ section.settings.image_alt | escape }}"
+              loading="lazy"
+              decoding="async"
+            >
+          </picture>
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'exn__img exn__img--placeholder' }}
+        {%- endif -%}
+      </div>
+
+      <div class="exn__copy">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="exn__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="exn__body section-text">{{ section.settings.body }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Expert note",
+  "tag": "section",
+  "class": "section-expert-note",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Name",
+      "default": "Dr. Uktara Numshum"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>A short word from the person behind the formula — what it is for, who it is for, and how it fits a routine.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image.",
+      "default": "Portrait"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image side",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 30,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "0.8", "label": "Portrait (4:5)" },
+        { "value": "0.75", "label": "Portrait (3:4)" },
+        { "value": "1.333", "label": "Landscape (4:3)" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between image and text",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Text alignment",
+      "info": "Where the text sits against the image.",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Name size",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Name weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Name",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space under the name",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 56
+    }
+  ],
+  "presets": [
+    {
+      "name": "Expert note"
+    }
+  ]
+}
+{% endschema %}

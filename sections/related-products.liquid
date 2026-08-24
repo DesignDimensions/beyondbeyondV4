@@ -1,14 +1,32 @@
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'section-related-products.css' | asset_url | stylesheet_tag }}
+{{ 'related-products-carousel.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  The card carries its add-to-cart everywhere it appears, so this grid loads
-  what that button needs even though the section has no setting for it.
+  The recommendations as a rail rather than a grid — the same row the
+  Bestsellers Carousel draws, so the two read as one pattern: the theme's own
+  product card, a scroll box, and an arrow in each gutter.
+
+  The heading is the theme's shared `.section-heading`, left where it sits by
+  default. The bestsellers rail pulls that heading to the left because it shares
+  its line with a Shop all link; this one has the line to itself, so it keeps the
+  centring the class already has.
+
+  The card carries its add-to-cart everywhere it appears, so this section loads
+  what that button needs even though it has no setting for it.
 {%- endcomment -%}
 {{ 'quick-add.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Loaded out here rather than beside the rail below. Everything inside
+  <product-recommendations> is fetched and written back in as innerHTML, and a
+  script written in that way never runs — so the rail's script has to already be
+  on the page when its markup arrives.
+{%- endcomment -%}
+<script src="{{ 'related-products-carousel.js' | asset_url }}" defer="defer"></script>
 
 {% if section.settings.image_shape == 'blob' %}
   {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
@@ -36,31 +54,83 @@
     data-product-id="{{ product.id }}"
   >
     {% if recommendations.performed and recommendations.products_count > 0 %}
-      <h2 class="related-products__heading inline-richtext {{ section.settings.heading_size }}">
-        {{ section.settings.heading }}
-      </h2>
-      <ul
-        class="grid product-grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down"
-        role="list"
+      {%- comment -%}
+        The rail's root is inside the custom element, not around it: only what is
+        inside is kept when the recommendations are written back in, so anything
+        carrying the section's settings has to be in here to survive the swap.
+      {%- endcomment -%}
+      <div
+        class="rp"
+        data-rp
+        style="
+          --rp-head-gap: {{ section.settings.head_gap }}px;
+          --rp-columns: {{ section.settings.columns_desktop }};
+          --rp-columns-mobile: {{ section.settings.columns_mobile }};
+          --rp-card-gap: {{ section.settings.card_gap }}px;
+          --rp-arrow-size: {{ section.settings.arrow_size }}px;
+          --rp-arrow-offset: {{ section.settings.arrow_offset }}px;
+        "
       >
-        {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}
-          <li class="grid__item">
-            {% render 'card-product',
-              card_product: recommendation,
-              media_aspect_ratio: section.settings.image_ratio,
-              image_shape: section.settings.image_shape,
-              show_secondary_image: section.settings.show_secondary_image,
-              show_vendor: section.settings.show_vendor,
-              show_rating: section.settings.show_rating,
-              skip_styles: skip_card_product_styles,
-              quick_add: 'standard',
-              product_view_context: 'recommendation'
-            %}
-          </li>
-          {%- assign skip_card_product_styles = true -%}
-        {% endfor %}
-      </ul>
+        {%- if section.settings.heading != blank -%}
+          <h2 class="section-heading rp__heading inline-richtext">
+            {{- section.settings.heading -}}
+          </h2>
+        {%- endif -%}
+
+        <div class="rp__frame">
+          {%- if section.settings.show_arrows -%}
+            <button
+              class="rp__arrow rp__arrow--prev"
+              type="button"
+              data-rp-arrow="prev"
+              aria-controls="rp-rail-{{ section.id }}"
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              <span class="rp__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+            </button>
+          {%- endif -%}
+
+          <div
+            class="rp__rail"
+            id="rp-rail-{{ section.id }}"
+            data-rp-rail
+            tabindex="0"
+            role="group"
+            aria-label="{{ section.settings.heading | strip_html | default: 'Recommendations' | escape }}"
+          >
+            {% assign skip_card_product_styles = false %}
+            {% for recommendation in recommendations.products %}
+              <div class="rp__card">
+                {% render 'card-product',
+                  card_product: recommendation,
+                  media_aspect_ratio: section.settings.image_ratio,
+                  image_shape: section.settings.image_shape,
+                  show_secondary_image: section.settings.show_secondary_image,
+                  show_vendor: section.settings.show_vendor,
+                  show_rating: section.settings.show_rating,
+                  skip_styles: skip_card_product_styles,
+                  quick_add: 'standard',
+                  section_id: section.id,
+                  product_view_context: 'recommendation'
+                %}
+              </div>
+              {%- assign skip_card_product_styles = true -%}
+            {% endfor %}
+          </div>
+
+          {%- if section.settings.show_arrows -%}
+            <button
+              class="rp__arrow rp__arrow--next"
+              type="button"
+              data-rp-arrow="next"
+              aria-controls="rp-rail-{{ section.id }}"
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              <span class="rp__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+            </button>
+          {%- endif -%}
+        </div>
+      </div>
     {% endif %}
   </product-recommendations>
   {% if section.settings.image_shape == 'arch' %}
@@ -85,34 +155,6 @@
       "label": "t:sections.related-products.settings.heading.label"
     },
     {
-      "type": "select",
-      "id": "heading_size",
-      "options": [
-        {
-          "value": "h2",
-          "label": "t:sections.all.heading_size.options__1.label"
-        },
-        {
-          "value": "h1",
-          "label": "t:sections.all.heading_size.options__2.label"
-        },
-        {
-          "value": "h0",
-          "label": "t:sections.all.heading_size.options__3.label"
-        },
-        {
-          "value": "hxl",
-          "label": "t:sections.all.heading_size.options__4.label"
-        },
-        {
-          "value": "hxxl",
-          "label": "t:sections.all.heading_size.options__5.label"
-        }
-      ],
-      "default": "h1",
-      "label": "t:sections.all.heading_size.label"
-    },
-    {
       "type": "range",
       "id": "products_to_show",
       "min": 2,
@@ -122,36 +164,85 @@
       "label": "t:sections.related-products.settings.products_to_show.label"
     },
     {
-      "type": "range",
-      "id": "columns_desktop",
-      "min": 1,
-      "max": 6,
-      "step": 1,
-      "default": 4,
-      "label": "t:sections.related-products.settings.columns_desktop.label"
-    },
-    {
-      "type": "select",
-      "id": "columns_mobile",
-      "default": "2",
-      "label": "t:sections.related-products.settings.columns_mobile.label",
-      "options": [
-        {
-          "value": "1",
-          "label": "t:sections.related-products.settings.columns_mobile.options__1.label"
-        },
-        {
-          "value": "2",
-          "label": "t:sections.related-products.settings.columns_mobile.options__2.label"
-        }
-      ]    
-    },
-    {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "info": "t:sections.all.colors.has_cards_info",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Rail"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Cards visible on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1 and a peek" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below the heading",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Distance from the cards",
+      "default": 20
     },
     {
       "type": "header",
@@ -174,7 +265,7 @@
           "label": "t:sections.related-products.settings.image_ratio.options__3.label"
         }
       ],
-      "default": "adapt",
+      "default": "square",
       "label": "t:sections.related-products.settings.image_ratio.label"
     },
     {

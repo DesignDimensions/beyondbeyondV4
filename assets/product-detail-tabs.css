@@ -36,16 +36,242 @@
 
 /* One track, the segments sharing it equally. The chosen one is a filled block
    inside the track rather than a different track, so switching moves a mark
-   across a fixed rail instead of redrawing the control. */
+   across a fixed rail instead of redrawing the control.
+
+   The track is glass: it blurs and lifts the product picture behind it instead
+   of covering it, which is the only reason a translucent control reads as an
+   object rather than as a washed-out patch. Three things together make that
+   read, and it needs all three —
+
+     the blur      a wide blur, plus saturate, because a plain blur greys out
+                   what it samples and the picture behind this one is warm
+     the body      a top-to-bottom lightening over the track's own colour, so
+                   the sheet has a thickness rather than one flat tint
+     the rim       a hairline that is bright where a light above would catch
+                   it and nearly gone on the shaded side — see .pdt__tabs::after
+
+   The blur samples whatever is painted behind, so on mobile it picks up the
+   scrim rather than the picture, which is correct: it is glass over what is
+   actually there. */
 .pdt__tabs {
+  position: relative;
+  isolation: isolate;
   display: flex;
   gap: var(--pdt-tab-gap, 0px);
   padding: var(--pdt-tabs-inset, 4px);
   border-radius: var(--pdt-tabs-radius, 10px);
-  background: var(--pdt-tabs-bg, rgba(255, 255, 255, 0.45));
+  background-color: var(--pdt-tabs-bg, rgba(255, 255, 255, 0.45));
+  background-image: linear-gradient(to bottom,
+      rgba(255, 255, 255, var(--pdt-glass-top, 0.4)),
+      rgba(255, 255, 255, 0) 42%,
+      rgba(255, 255, 255, var(--pdt-glass-bottom, 0.14)));
+  -webkit-backdrop-filter: blur(var(--pdt-glass-blur, 22px)) saturate(var(--pdt-glass-saturate, 180%));
+  backdrop-filter: blur(var(--pdt-glass-blur, 22px)) saturate(var(--pdt-glass-saturate, 180%));
+  box-shadow:
+    /* the sheet sitting off the picture */
+    0 14px 34px -18px rgba(0, 0, 0, 0.42),
+    0 2px 6px -3px rgba(0, 0, 0, 0.12),
+    /* light landing on the inside of the top edge, and bouncing off the floor */
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.22);
+  /* The block runs edge to edge, so the glass is what gives it its corners. An
+     element's own box-shadow is not clipped by its overflow, so the sheet keeps
+     the shadow it casts on the picture. */
+  overflow: hidden;
+}
+
+/* The specular: one soft sweep across the upper corner, the highlight a curved
+   sheet would carry. It is a pseudo-element rather than another background
+   layer so it can be clipped to the radius and kept under the tabs. */
+.pdt__tabs::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(118deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.14) 18%,
+      rgba(255, 255, 255, 0) 44%,
+      rgba(255, 255, 255, 0) 78%,
+      rgba(255, 255, 255, 0.16) 100%);
+  pointer-events: none;
+}
+
+/* The rim. A gradient cannot be a border directly, so this is a full-bleed
+   gradient with the middle punched out: mask the padding box away and only the
+   1px frame survives. It is the topmost layer, above the sliding block, so the
+   edge of the track stays unbroken when the block parks against it. */
+.pdt__tabs::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.4) 22%,
+      rgba(255, 255, 255, 0.06) 48%,
+      rgba(255, 255, 255, 0.28) 72%,
+      rgba(255, 255, 255, 0.7) 100%) border-box;
+  -webkit-mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Without a backdrop filter the translucency has nothing behind it but the
+   picture at full sharpness, and the copy on the tabs stops being readable.
+   Thicken the sheet instead. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+
+  .pdt__tabs {
+    background-image: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.82),
+        rgba(255, 255, 255, 0.62));
+  }
+}
+
+/* Asked for less transparency, the sheet becomes a surface. */
+@media (prefers-reduced-transparency: reduce) {
+
+  .pdt__tabs {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-image: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0.74));
+  }
+
+  .pdt__tabs::before {
+    display: none;
+  }
+}
+
+/* The mark itself, in two parts, because it is doing two things at once and a
+   single element cannot do both: an element has one transform, so a deformation
+   set partway through a journey replaces the journey's transform and the travel
+   restarts from wherever it had got to — which is seen as the block stopping
+   dead in the middle of the track and setting off again.
+
+   So the outer element only ever travels and the inner one only ever deforms.
+   Neither can interrupt the other.
+
+   The outer one is given its place by the script, which sets the four custom
+   properties from the chosen tab's box. It is drawn edge to edge — the tab's
+   box grown by the track's inset on every side — so the block fills the glass
+   rather than floating in it, and reaches the ends of the track on the first
+   and last tab. */
+.pdt__tabs-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--pdt-pill-w, 0px) + var(--pdt-tabs-inset, 4px) * 2);
+  height: calc(var(--pdt-pill-h, 0px) + var(--pdt-tabs-inset, 4px) * 2);
+  transform: translate3d(calc(var(--pdt-pill-x, 0px) - var(--pdt-tabs-inset, 4px)),
+      calc(var(--pdt-pill-y, 0px) - var(--pdt-tabs-inset, 4px)),
+      0);
+  /* Its own compositor layer. Without one, each frame of the journey repaints
+     inside an element carrying a backdrop-filter, and the blur is recomputed
+     over and over for a backdrop that never actually changed. */
+  will-change: transform;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--pdt-pill-duration, 440ms) var(--pdt-pill-ease, cubic-bezier(0.32, 0.72, 0, 1)),
+    width var(--pdt-pill-duration, 440ms) var(--pdt-pill-ease, cubic-bezier(0.32, 0.72, 0, 1)),
+    height var(--pdt-pill-duration, 440ms) var(--pdt-pill-ease, cubic-bezier(0.32, 0.72, 0, 1)),
+    opacity 0.2s ease;
+}
+
+/* The face carries the look, and the squash. A slab, not a rectangle of ink:
+   lit along the top edge, darker where it meets the track. Its corners take the
+   track's radius rather than a tab's, since edge to edge they are the same
+   corners. */
+.pdt__tabs-pill-face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--pdt-tabs-radius, 10px);
+  background-color: var(--pdt-tab-active-bg, #000);
+  background-image: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.04) 46%,
+      rgba(0, 0, 0, 0.12));
+  box-shadow:
+    0 6px 14px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transform-origin: center;
+}
+
+/* The deformation: it thins across the axis it is crossing as it sets off and
+   fills back out as it lands, the way something with mass would. It only ever
+   gets smaller — edge to edge there is no room to grow into — and it is one
+   animation rather than two transitions, so there is no moment in the middle
+   where a second instruction arrives and the motion has to start over. */
+@keyframes pdt-pill-squash-x {
+  0% {
+    transform: scaleY(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
+  34% {
+    transform: scaleY(0.93);
+    animation-timing-function: cubic-bezier(0.22, 0.8, 0.3, 1);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pdt-pill-squash-y {
+  0% {
+    transform: scaleX(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
+  34% {
+    transform: scaleX(0.93);
+    animation-timing-function: cubic-bezier(0.22, 0.8, 0.3, 1);
+  }
+
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* The control is a row on desktop and a column on mobile, so which axis is
+   crossed is not a fixed fact: the script reads it off the move it is making. */
+.pdt__tabs-pill.is-crossing-x .pdt__tabs-pill-face {
+  animation: pdt-pill-squash-x var(--pdt-pill-duration, 440ms) both;
+}
+
+.pdt__tabs-pill.is-crossing-y .pdt__tabs-pill-face {
+  animation: pdt-pill-squash-y var(--pdt-pill-duration, 440ms) both;
+}
+
+/* Measured: the mark takes over the fill from the tab underneath it. */
+.pdt__tabs.is-pill-ready .pdt__tabs-pill {
+  opacity: 1;
+}
+
+/* The first placement, and every re-measure after a resize, must not be a
+   journey across the control — only a switch is. */
+.pdt__tabs.is-pill-instant .pdt__tabs-pill {
+  transition: opacity 0.2s ease;
 }
 
 .pdt__tab {
+  position: relative;
+  z-index: 1;
   flex: 1 1 0;
   min-width: 0;
   padding: var(--pdt-tab-pad-y, 14px) 12px;
@@ -67,9 +293,29 @@
   color: var(--pdt-tab-active-fg, #fff);
 }
 
+/* With the mark in play the tab keeps only its text: the fill is the thing
+   sliding, so a second one behind it would flash on every switch.
+
+   The labels change colour on a short window in the middle of the journey,
+   which is where the block actually is: the curve below covers most of the
+   ground early, so by ~200ms the tab being left is clear and the tab being
+   arrived at is covered. Flipping them any later leaves white text sitting on
+   glass; any earlier, dark text sitting on black. */
+.pdt__tabs.is-pill-ready .pdt__tab[aria-selected='true'] {
+  background: transparent;
+}
+
+.pdt__tabs.is-pill-ready .pdt__tab {
+  transition: color 0.18s ease 0.06s, background-color 0.25s ease;
+}
+
+.pdt__tabs.is-pill-ready .pdt__tab:hover:not([aria-selected='true']) {
+  background: rgba(255, 255, 255, 0.28);
+}
+
 .pdt__tab:focus-visible {
-  outline: 2px solid var(--pdt-tab-active-bg, #000);
-  outline-offset: 2px;
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
 }
 
 /* --------------------------------------------------------------------------
@@ -82,6 +328,10 @@
 .pdt__panels {
   display: grid;
   margin-top: var(--pdt-panels-gap, 56px);
+}
+
+.pdt__panels .pdt__panel:last-of-type {
+  width: 38%;
 }
 
 .pdt__panel {
@@ -99,11 +349,11 @@
 
 .pdt__overline {
   margin: 0 0 var(--pdt-overline-gap, 40px);
-  font-size: var(--pdt-overline-size, 14px);
-  font-weight: 600;
-  letter-spacing: var(--pdt-overline-tracking, 4px);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 7px;
   text-transform: uppercase;
-  color: var(--pdt-text, #2b2724);
+  color: #000;
 }
 
 /* The two-up list of points. Single column on its own row when a panel has
@@ -120,13 +370,15 @@
   font-size: var(--pdt-item-title-size, 15px);
   font-weight: 700;
   line-height: 1.3;
-  color: var(--pdt-text, #2b2724);
+  color: #000;
+  display: flex;
+  gap: 7px;
 }
 
 /* The index reads as part of the heading, one space off it, not as a label of
    its own — so it takes the heading's weight and only loses a little colour. */
 .pdt__item-number {
-  color: var(--pdt-number, #2b2724);
+  color: #000;
 }
 
 .pdt__item-body,
@@ -135,7 +387,8 @@
   margin: 0;
   font-size: var(--pdt-body-size, 15px);
   line-height: 1.6;
-  color: var(--pdt-muted, #5f5952);
+  color: #000;
+  font-weight: 400;
 }
 
 .pdt__meta {
@@ -146,7 +399,7 @@
   margin: 0 8px;
 }
 
-.pdt__body p + p {
+.pdt__body p+p {
   margin-top: var(--pdt-para-gap, 24px);
 }
 
@@ -193,8 +446,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  min-height: var(--pdt-button-h, 56px);
-  padding: 0 var(--pdt-button-pad, 28px);
+  padding: 10px 35px;
   border: 1px solid transparent;
   border-radius: 0;
   font-size: var(--pdt-button-size, 15px);
@@ -207,6 +459,7 @@
 .pdt__button--primary {
   background: var(--pdt-button-bg, #000);
   color: var(--pdt-button-fg, #fff);
+
 }
 
 .pdt__button--primary:hover {
@@ -289,8 +542,14 @@
 @media (prefers-reduced-motion: reduce) {
 
   .pdt__tab,
+  .pdt__tabs.is-pill-ready .pdt__tab,
+  .pdt__tabs-pill,
   .pdt__panel,
   .pdt__button {
     transition: none;
+  }
+
+  .pdt__tabs-pill-face {
+    animation: none;
   }
 }

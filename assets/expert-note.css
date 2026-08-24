@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Expert note — a portrait on one half, a name and a paragraph on the other
+   ==========================================================================
+   Deliberately without a background. The section is drawn to sit under a panel
+   that has one, and a second tint immediately beneath the first reads as a seam
+   rather than as two sections; the padding is what separates them.
+   ========================================================================== */
+
+.exn {
+  padding-top: var(--exn-pad-top, 56px);
+  padding-bottom: var(--exn-pad-bottom, 56px);
+}
+
+.exn__row {
+  display: flex;
+  align-items: var(--exn-align, flex-start);
+  gap: var(--exn-gap, 32px);
+}
+
+/* The side the portrait is shown on is a direction, not an order: the image
+   stays first in the markup either way, so it is still read out with the copy
+   it belongs to rather than after it. */
+.exn--reversed .exn__row {
+  flex-direction: row-reverse;
+}
+
+/* The image is given its share of the row and holds a fixed shape, so a
+   portrait that arrives at some other aspect fills the same half of the section
+   as the one before it rather than resizing the row around itself. */
+.exn__media {
+  flex: 0 0 var(--exn-media-w, 48%);
+  max-width: var(--exn-media-w, 48%);
+  aspect-ratio: var(--exn-media-ratio, 1);
+  overflow: hidden;
+}
+
+.exn__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.exn__img--placeholder {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* The copy takes whatever the image leaves, so the two together always come to
+   the content column's width exactly. `min-width: 0` is what lets it be the one
+   that gives: without it a long unbroken word sets the column's floor and the
+   image is squeezed instead. */
+.exn__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.exn__heading {
+  margin: 0 0 var(--exn-heading-gap, 16px);
+  font-family: var(--font-heading-family);
+  font-size: 42px;
+  font-weight: var(--exn-heading-weight, 500);
+  line-height: 1.25;
+  letter-spacing: 1px;
+  color: var(--exn-heading-color, #1a1a1a);
+}
+
+/* Size and leading come from `.section-text`, which the other panels read too —
+   only the tint and the space between paragraphs belong to this one. The margin
+   reset comes with it. */
+.exn__body {
+  color: var(--exn-body-color, #3d3d3d);
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.exn__body>*+* {
+  margin-top: var(--exn-body-gap, 16px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+/* Stacked, and the portrait above the copy whichever side it takes on desktop:
+   reversing a column would put the name under the paragraph it names. */
+@media screen and (max-width: 749px) {
+  .exn {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .exn__row,
+  .exn--reversed .exn__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .exn__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}

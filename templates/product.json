@@ -153,6 +153,89 @@
         "icon_size": 45
       }
     },
+    "detail_tabs": {
+      "type": "product-detail-tabs",
+      "blocks": {
+        "tab_what": {
+          "type": "tab",
+          "settings": {
+            "label": "What It Does",
+            "metafield_key": "custom.pdp_what_it_does"
+          }
+        },
+        "tab_ingr": {
+          "type": "tab",
+          "settings": {
+            "label": "Ingredients",
+            "metafield_key": "custom.pdp_ingredients"
+          }
+        },
+        "tab_how": {
+          "type": "tab",
+          "settings": {
+            "label": "How To Use",
+            "metafield_key": "custom.pdp_how_to_use"
+          }
+        }
+      },
+      "block_order": [
+        "tab_what",
+        "tab_ingr",
+        "tab_how"
+      ],
+      "settings": {
+        "background_metafield": "custom.pdp_detail_background",
+        "background_fallback": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_1161.png?v=1787402418",
+        "background_position": "center",
+        "background_color": "#d9d2cb",
+        "min_height": 640,
+        "padding": 72,
+        "panel_width": 52,
+        "panels_gap": 56,
+        "columns": 2,
+        "column_gap": 60,
+        "row_gap": 40,
+        "tabs_background": "#efeae5",
+        "tabs_opacity": 45,
+        "tabs_blur": 22,
+        "tabs_radius": 10,
+        "tabs_inset": 4,
+        "tab_height": 14,
+        "tab_size": 17,
+        "tab_active_background": "#000000",
+        "tab_active_text": "#ffffff",
+        "overline_size": 14,
+        "overline_tracking": 4,
+        "body_size": 15,
+        "text_color": "#2b2724",
+        "body_color": "#5f5952",
+        "button_background": "#000000",
+        "button_text": "#ffffff"
+      }
+    },
+    "expert_note": {
+      "type": "expert-note",
+      "settings": {
+        "heading": "Dr. Uktara Numshum",
+        "body": "<p>Lorem ipsum dolor sit amet consectetur. Enim scelerisque diam eget egestas scelerisque viverra ipsum aliquet. Ultricies semper cras sed vivamus. Quis amet et gravida bibendum hendrerit nec. Maecenas arcu nam eu ac. Sem sed ornare quis enim eget gravida vel. Viverra suspendisse semper dignissim massa aliquet. Lorem ipsum dolor sit amet consectetur. Enim scelerisque diam eget egestas scelerisque viverra ipsum aliquet. Ultricies semper cras sed vivamus. Quis amet et gravida bibendum hendrerit nec. Maecenas arcu nam eu ac. Sem sed ornare quis enim eget gravida vel. Viverra suspendisse semper dignissim massa aliquet. <br/><br/></p>",
+        "image": "shopify://shop_images/Frame_1321319530.png",
+        "image_url": "",
+        "image_alt": "Dr. Uktara Numshum",
+        "image_position": "left",
+        "media_width": 48,
+        "media_ratio": "1",
+        "column_gap": 32,
+        "vertical_alignment": "flex-start",
+        "heading_size": 30,
+        "heading_weight": "500",
+        "heading_color": "#1a1a1a",
+        "heading_gap": 16,
+        "body_color": "#3d3d3d",
+        "body_gap": 16,
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
     "testimonials_jahMwJ": {
       "type": "testimonials",
       "blocks": {
@@ -225,7 +308,7 @@
       ],
       "name": "Testimonials",
       "settings": {
-        "heading": "TESTIMONIALS",
+        "heading": "WATCH AND SHOP",
         "heading_gap": 40,
         "columns_desktop": 3,
         "columns_mobile": "1.2",
@@ -259,10 +342,14 @@
       "type": "related-products",
       "settings": {
         "heading": "You may also like",
-        "heading_size": "h2",
         "products_to_show": 9,
         "columns_desktop": 3,
-        "columns_mobile": "2",
+        "columns_mobile": "1.2",
+        "card_gap": 24,
+        "head_gap": 32,
+        "show_arrows": true,
+        "arrow_size": 18,
+        "arrow_offset": 20,
         "color_scheme": "scheme-1",
         "image_ratio": "square",
         "image_shape": "default",
@@ -272,70 +359,13 @@
         "padding_top": 36,
         "padding_bottom": 28
       }
-    },
-    "detail_tabs": {
-      "type": "product-detail-tabs",
-      "blocks": {
-        "tab_what": {
-          "type": "tab",
-          "settings": {
-            "label": "What It Does",
-            "metafield_key": "custom.pdp_what_it_does"
-          }
-        },
-        "tab_ingr": {
-          "type": "tab",
-          "settings": {
-            "label": "Ingredients",
-            "metafield_key": "custom.pdp_ingredients"
-          }
-        },
-        "tab_how": {
-          "type": "tab",
-          "settings": {
-            "label": "How To Use",
-            "metafield_key": "custom.pdp_how_to_use"
-          }
-        }
-      },
-      "block_order": [
-        "tab_what",
-        "tab_ingr",
-        "tab_how"
-      ],
-      "settings": {
-        "background_metafield": "custom.pdp_detail_background",
-        "background_fallback": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_1161.png?v=1787402418",
-        "background_position": "center",
-        "background_color": "#d9d2cb",
-        "min_height": 640,
-        "padding": 72,
-        "panel_width": 52,
-        "panels_gap": 56,
-        "columns": 2,
-        "column_gap": 60,
-        "row_gap": 40,
-        "tabs_background": "#efeae5",
-        "tabs_radius": 10,
-        "tabs_inset": 4,
-        "tab_height": 14,
-        "tab_size": 17,
-        "tab_active_background": "#000000",
-        "tab_active_text": "#ffffff",
-        "overline_size": 14,
-        "overline_tracking": 4,
-        "body_size": 15,
-        "text_color": "#2b2724",
-        "body_color": "#5f5952",
-        "button_background": "#000000",
-        "button_text": "#ffffff"
-      }
     }
   },
   "order": [
     "main",
-    "detail_tabs",
     "usp_carousal_RRB7Yt",
+    "detail_tabs",
+    "expert_note",
     "testimonials_jahMwJ",
     "related-products"
   ]

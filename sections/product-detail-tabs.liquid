@@ -21,6 +21,15 @@
 {%- endcomment -%}
 
 {%- liquid
+  comment
+    The track is glass, so its colour has to let the picture through: the
+    merchant picks a tint and how much of it, and the two are combined here
+    rather than asking for a colour with an alpha the colour picker can't set.
+  endcomment
+  assign tabs_opacity = section.settings.tabs_opacity | default: 45
+  assign tabs_alpha = tabs_opacity | times: 0.01
+  assign tabs_blur = section.settings.tabs_blur | default: 22
+
   assign bg_parts = section.settings.background_metafield | split: '.'
   assign bg_namespace = bg_parts | first
   assign bg_key = bg_parts | last
@@ -61,7 +70,8 @@
       --pdt-min-h: {{ section.settings.min_height }}px;
       --pdt-panel-width: {{ section.settings.panel_width }}%;
       --pdt-panels-gap: {{ section.settings.panels_gap }}px;
-      --pdt-tabs-bg: {{ section.settings.tabs_background }};
+      --pdt-tabs-bg: {{ section.settings.tabs_background | color_modify: 'alpha', tabs_alpha }};
+      --pdt-glass-blur: {{ tabs_blur }}px;
       --pdt-tabs-radius: {{ section.settings.tabs_radius }}px;
       --pdt-tabs-inset: {{ section.settings.tabs_inset }}px;
       --pdt-tab-size: {{ section.settings.tab_size }}px;
@@ -80,7 +90,26 @@
     {{ section.shopify_attributes }}
   >
     <div class="page-width pdt__inner">
-      <div class="pdt__tabs" role="tablist" aria-label="{{ 'products.product.description' | t }}">
+      <div
+        class="pdt__tabs"
+        role="tablist"
+        aria-label="{{ 'products.product.description' | t }}"
+        data-pdt-tabs
+      >
+        {%- comment -%}
+          The filled block behind the chosen tab is its own element rather than
+          that tab's background, so a switch slides one mark across the track
+          instead of repainting two segments. It is hidden until the script has
+          measured a tab, which leaves the CSS-only fill in charge without JS.
+
+          Two elements, not one, because they carry two different transforms:
+          the outer one travels and the inner one deforms. Sharing a transform
+          would mean the deformation restarts the travel halfway across.
+        {%- endcomment -%}
+        <span class="pdt__tabs-pill" data-pdt-pill aria-hidden="true">
+          <span class="pdt__tabs-pill-face"></span>
+        </span>
+
         {%- assign tab_index = 0 -%}
         {%- for block in section.blocks -%}
           {%- if live_blocks contains block.id -%}
@@ -343,8 +372,29 @@
     {
       "type": "color",
       "id": "tabs_background",
-      "label": "Track",
+      "label": "Track tint",
       "default": "#efeae5"
+    },
+    {
+      "type": "range",
+      "id": "tabs_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Track tint strength",
+      "info": "Lower lets more of the picture through the glass.",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "tabs_blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Track blur",
+      "default": 22
     },
     {
       "type": "range",

@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Related products — a centred heading over one rail, arrows in the gutters
+   ==========================================================================
+   The same row the Bestsellers Carousel draws, and for the same reason: the
+   cards are the theme's own product card, which component-card.css already
+   draws for every grid in the store. This sheet only decides how wide a card
+   is, how the row scrolls, and where the two arrows sit.
+
+   Geometry is deliberately the bestsellers rail's, so the two sections stay
+   the same row. If one of them is ever retuned, the other wants the same
+   change — or the pair wants to be lifted into a shared rail component.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Heading
+   --------------------------------------------------------------------------
+   Face, size and tracking are the theme's shared `.section-heading`, which is
+   already centred; only the space under it is this section's, since the gap
+   above the row belongs to the row.
+   -------------------------------------------------------------------------- */
+
+.rp__heading {
+  margin: 0 0 var(--rp-head-gap, 32px);
+}
+
+/* --------------------------------------------------------------------------
+   Rail
+   --------------------------------------------------------------------------
+   A card is a share of the content column rather than a width of its own, so
+   the number the merchant asks for always fits it exactly, flush with both
+   edges, whatever page width the theme settles on.
+   -------------------------------------------------------------------------- */
+
+.rp__frame {
+  position: relative;
+}
+
+.rp__rail {
+  display: flex;
+  gap: var(--rp-card-gap, 24px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for the cards' focus rings, which the scroll box would otherwise
+     clip. */
+  padding-bottom: 4px;
+}
+
+.rp__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rp__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+.rp__card {
+  flex: 0 0 calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns, 3));
+  scroll-snap-align: start;
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   --------------------------------------------------------------------------
+   Held outside the content column, level with the middle of the card images
+   rather than the middle of the whole card — the copy under an image would
+   otherwise pull them down past it. A picture is `--pcard-media-scale` times
+   its card's width tall, so half of that is where its middle sits.
+   -------------------------------------------------------------------------- */
+
+.rp__arrow {
+  position: absolute;
+  top: 0;
+  margin-top: calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns, 3) * var(--pcard-media-scale, 1) / 2);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: calc(var(--rp-arrow-size, 18px) + 16px);
+  height: calc(var(--rp-arrow-size, 18px) + 16px);
+  padding: 0;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.rp__arrow--prev {
+  right: calc(100% + var(--rp-arrow-offset, 20px));
+}
+
+.rp__arrow--next {
+  left: calc(100% + var(--rp-arrow-offset, 20px));
+}
+
+.rp__arrow-glyph {
+  font-size: calc(var(--rp-arrow-size, 18px) * 1.6);
+  line-height: 1;
+  color: #000;
+}
+
+.rp__arrow--prev:hover {
+  transform: translateY(-50%) translateX(-3px);
+}
+
+.rp__arrow--next:hover {
+  transform: translateY(-50%) translateX(3px);
+}
+
+/* An end of the rail leaves the arrow with nothing left to reach. */
+.rp__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Below this there is no gutter left to hang an arrow in — the content column
+   has taken the window. They come inside and sit over the outer edges of the
+   row rather than pushing a horizontal scrollbar onto the page. */
+@media screen and (max-width: 1439px) {
+  .rp__arrow--prev {
+    right: auto;
+    left: 0;
+  }
+
+  .rp__arrow--next {
+    left: auto;
+    right: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .rp__card {
+    flex-basis: calc((100% - (var(--rp-columns-mobile, 1.2) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns-mobile, 1.2));
+  }
+
+  /* A thumb already does what they do, and there is no room beside the cards
+     to put them. */
+  .rp__arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rp__arrow {
+    transition-duration: 0.01ms;
+  }
+}
