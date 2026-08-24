@@ -91,6 +91,24 @@
   background-color: var(--pcard-media-bg);
 }
 
+/* The picture's link to the product. It lives in the badge layer over the
+   picture, which is the element that actually receives presses on a tile — see
+   the note beside it in `card-product.liquid`.
+
+   `display` is stated and not droppable: `base.css` hides every empty `a`
+   outright, and this one is empty by design, being a surface to press rather
+   than a thing to read. Positioning does not rescue it — `display: none` takes
+   the element out before `position` is ever considered.
+
+   No z-index. The layer it sits in is already the top one, and staying at
+   `auto` keeps it under the sizes and the hover add-to-cart, which raise
+   themselves deliberately and must still take their own clicks. */
+.card-wrapper .card__media-link {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
 /* Filled, not fitted: the image covers the whole tile. Multiply still lets a
    product shot on a white backdrop take the tile's colour — white multiplied
    by the tint is the tint, while the product itself is dark enough to come

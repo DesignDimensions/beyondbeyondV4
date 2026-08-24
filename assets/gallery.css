@@ -3,8 +3,6 @@
    ========================================================================== */
 
 .gal {
-  padding-top: var(--gal-pad-top, 60px);
-  padding-bottom: var(--gal-pad-bottom, 60px);
   overflow: hidden;
 }
 

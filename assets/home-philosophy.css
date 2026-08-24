@@ -8,18 +8,14 @@
    ========================================================================== */
 
 .home-philosophy {
-  --hp-bg: #fff;
   --hp-text: #000;
   --hp-line: #0107ef;
   --hp-bubble-size: 220px;
   --hp-stage-h: 500px;
-  --hp-pad-top: 60px;
   --hp-pad-bottom: 60px;
-
   position: relative;
-  background: var(--hp-bg);
   color: var(--hp-text);
-  padding: var(--hp-pad-top) 0 var(--hp-pad-bottom);
+  padding: 0 0 var(--hp-pad-bottom);
   overflow: hidden;
 }
 

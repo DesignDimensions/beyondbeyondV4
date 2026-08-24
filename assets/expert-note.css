@@ -7,8 +7,8 @@
    ========================================================================== */
 
 .exn {
-  padding-top: var(--exn-pad-top, 56px);
-  padding-bottom: var(--exn-pad-bottom, 56px);
+  padding-top: var(--exn-pad-top, 60px);
+  padding-bottom: var(--exn-pad-bottom, 60px);
 }
 
 .exn__row {

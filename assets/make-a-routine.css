@@ -11,8 +11,6 @@
    ========================================================================== */
 
 .mar {
-  padding-top: var(--mar-pad-top, 60px);
-  padding-bottom: var(--mar-pad-bottom, 60px);
   color: var(--mar-text, #1a1a1a);
 }
 

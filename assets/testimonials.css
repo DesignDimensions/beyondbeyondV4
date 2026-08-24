@@ -3,8 +3,7 @@
    ========================================================================== */
 
 .tst {
-  padding-top: var(--tst-pad-top, 56px);
-  padding-bottom: var(--tst-pad-bottom, 56px);
+  padding-bottom: var(--tst-pad-bottom, 60px);
 }
 
 .tst__heading {
@@ -89,7 +88,7 @@
 
 .tst__mute {
   position: absolute;
-  z-index: 3;
+  z-index: 2;
   top: var(--tst-inset, 18px);
   right: var(--tst-inset, 18px);
   display: flex;

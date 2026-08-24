@@ -13,7 +13,7 @@
 
 .pdt {
   position: relative;
-  padding: var(--pdt-pad-y, 72px) 0;
+  padding: var(--pdt-pad-y, 60px) 0;
   min-height: var(--pdt-min-h, 640px);
   display: flex;
   align-items: center;

@@ -243,8 +243,8 @@
         "show_accent_line": true,
         "radius": 4,
         "column_gap": 32,
-        "padding_top": 96,
-        "padding_bottom": 96
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "browse_by_concern": {
@@ -421,8 +421,8 @@
         "glow_width": 620,
         "glow_height": 340,
         "glow_offset": 0,
-        "padding_top": 56,
-        "padding_bottom": 56
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "testimonials": {
@@ -523,8 +523,8 @@
         "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
         "arrow_size": 16,
         "arrow_offset": 20,
-        "padding_top": 56,
-        "padding_bottom": 56
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "gallery": {
@@ -642,8 +642,8 @@
         "cta_radius": 0,
         "cta_background": "#0107ef",
         "cta_color": "#ffffff",
-        "padding_top": 56,
-        "padding_bottom": 56
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "founders_routine": {

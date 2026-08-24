@@ -4,7 +4,6 @@
 
 .bbc {
   padding-top: var(--bbc-pad-top, 60px);
-  padding-bottom: var(--bbc-pad-bottom, 60px);
 }
 
 /* The rail sizes itself against this column rather than the window, so the

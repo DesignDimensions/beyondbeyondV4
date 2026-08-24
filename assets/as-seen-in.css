@@ -4,8 +4,8 @@
 
 .asi {
   position: relative;
-  padding-top: var(--asi-pad-top, 56px);
-  padding-bottom: var(--asi-pad-bottom, 56px);
+  padding-top: var(--asi-pad-top, 60px);
+  padding-bottom: var(--asi-pad-bottom, 60px);
   overflow: hidden;
 }
 

@@ -189,7 +189,7 @@
         "background_position": "center",
         "background_color": "#d9d2cb",
         "min_height": 640,
-        "padding": 72,
+        "padding": 60,
         "panel_width": 52,
         "panels_gap": 56,
         "columns": 2,
@@ -232,8 +232,8 @@
         "heading_gap": 16,
         "body_color": "#3d3d3d",
         "body_gap": 16,
-        "padding_top": 56,
-        "padding_bottom": 56
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "testimonials_jahMwJ": {
@@ -334,8 +334,8 @@
         "arrow_next_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Chevron_Right_1.png?v=1786971968",
         "arrow_size": 16,
         "arrow_offset": 20,
-        "padding_top": 56,
-        "padding_bottom": 56
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "product_reviews": {
@@ -371,8 +371,8 @@
         "success_text": "Thank you \u2014 your review has been received.",
         "error_text": "Sorry, your review could not be sent. Please try again.",
         "unconfigured_text": "The review form is not connected yet.",
-        "padding_top": 64,
-        "padding_bottom": 64
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     },
     "make_a_routine": {
@@ -424,8 +424,8 @@
         "show_secondary_image": true,
         "show_vendor": false,
         "show_rating": true,
-        "padding_top": 36,
-        "padding_bottom": 28
+        "padding_top": 60,
+        "padding_bottom": 60
       }
     }
   },

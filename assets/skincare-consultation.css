@@ -5,8 +5,8 @@
    ========================================================================== */
 
 .sc {
-  padding-top: var(--sc-pad-top, 96px);
-  padding-bottom: var(--sc-pad-bottom, 96px);
+  padding-top: var(--sc-pad-top, 60px);
+  padding-bottom: var(--sc-pad-bottom, 60px);
   background: var(--sc-bg, #ffffff);
 }
 

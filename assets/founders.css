@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .fnd {
-  padding-top: var(--fnd-pad-top, 56px);
-  padding-bottom: var(--fnd-pad-bottom, 56px);
+  padding-top: var(--fnd-pad-top, 60px);
+  padding-bottom: var(--fnd-pad-bottom, 60px);
 }
 
 /* One inset, repeated on all four sides, is what makes the panel read as a

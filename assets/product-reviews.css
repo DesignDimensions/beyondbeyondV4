@@ -9,8 +9,8 @@
    ========================================================================== */
 
 .prv {
-  padding-top: var(--prv-pad-top, 64px);
-  padding-bottom: var(--prv-pad-bottom, 64px);
+  padding-top: var(--prv-pad-top, 60px);
+  padding-bottom: var(--prv-pad-bottom, 60px);
   background-color: var(--prv-bg, #fbf9f7);
   color: var(--prv-text, #1a1a1a);
 }
