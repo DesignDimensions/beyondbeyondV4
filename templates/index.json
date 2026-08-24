@@ -260,6 +260,7 @@
         },
         "concern_2": {
           "type": "concern",
+          "disabled": true,
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
             "label": "Acne & Blemishes",
