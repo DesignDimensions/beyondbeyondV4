@@ -1,0 +1,338 @@
+/* ==========================================================================
+   Make a Routine — the combo's picture, and what is in it
+   ==========================================================================
+   Two columns: the routine product's own picture on the left, carrying its
+   badge and its add-to-cart, and on the right the overline, its reviews, its
+   title, its description and the products it is made of.
+
+   Everything drawn here belongs to the routine product, not to the product
+   whose page it is on. The section is transparent, since it sits between two
+   sections that have their own grounds.
+   ========================================================================== */
+
+.mar {
+  padding-top: var(--mar-pad-top, 60px);
+  padding-bottom: var(--mar-pad-bottom, 60px);
+  color: var(--mar-text, #1a1a1a);
+}
+
+.mar__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mar-gap, 40px);
+}
+
+/* --------------------------------------------------------------------------
+   The picture
+   --------------------------------------------------------------------------
+   Its own positioning context: the badge and the button are laid over it, and
+   both are placed against the picture's edges rather than the column's.
+   -------------------------------------------------------------------------- */
+
+.mar__media {
+  position: relative;
+  flex: 0 0 var(--mar-media-w, 40%);
+  max-width: var(--mar-media-w, 40%);
+  aspect-ratio: var(--mar-media-ratio, 0.7);
+}
+
+.mar__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mar__img--placeholder {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* A circle, so its two axes are one measurement: the width is a share of the
+   picture and the height follows it, which keeps it round at every column
+   width without a second number to keep in step. */
+.mar__badge {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33%;
+  aspect-ratio: 1;
+  padding: 6%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: #00000059;
+  color: var(--mar-badge-fg, #fff);
+  text-align: center;
+}
+
+/* `.hb-card__caption` on the home page — the store's small caption. Held to a
+   clamp rather than a flat 13px because this one has a circle to fit inside,
+   and the circle is a share of a column that changes width. */
+.mar__badge-text {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+/* --------------------------------------------------------------------------
+   Add to cart
+   --------------------------------------------------------------------------
+   Over the foot of the picture rather than under it, so the picture stays one
+   block and the two columns keep the heights the row was drawn to.
+   -------------------------------------------------------------------------- */
+
+.mar__form {
+  position: absolute;
+  right: 5%;
+  bottom: 5%;
+  left: 5%;
+  z-index: 1;
+  display: block;
+}
+
+.mar__cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  background: var(--mar-button-bg, #000);
+  color: var(--mar-button-fg, #fff);
+  font-family: inherit;
+  /* `.ph__atc`, the add-to-cart at the top of this page. It is the same button
+     doing the same job, so it is set the same way. */
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.mar__cart:hover {
+  opacity: 0.88;
+}
+
+.mar__cart[disabled],
+.mar__cart[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mar__cart .loading__spinner {
+  width: 18px;
+  height: 18px;
+}
+
+.mar__error:not([hidden]) {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  color: #b3093c;
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   The copy
+   -------------------------------------------------------------------------- */
+
+.mar__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The small tracked label the store uses everywhere: `.section-heading` sets it
+   at 19/700/7 for a section header, and `.pdt__overline` — the detail tabs, a
+   few sections up this same page — sets it at 15/700/7 for a label inside a
+   panel. This is the second of those, so it takes the second of those. */
+.mar__overline {
+  margin: 0 0 14px;
+  font-size: var(--mar-overline-size, 15px);
+  font-weight: 700;
+  letter-spacing: var(--mar-overline-tracking, 7px);
+  text-transform: uppercase;
+  color: var(--mar-text, #1a1a1a);
+}
+
+.mar__reviews {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* The stars come from component-rating.css, which every product card in the
+   store already draws. That sheet sizes the glyph off two variables it only
+   sets under `.product` and `.card-wrapper`, so a row of stars anywhere else
+   has to bring its own — without them the row's font-size resolves to nothing
+   and the stars do not draw at all. */
+.mar__stars {
+  line-height: 1;
+}
+
+.mar__stars .rating-star {
+  /* The gap between the stars is this, not a margin: the row is one string of
+     five glyphs, so what separates them is the letter-spacing of the text. The
+     sheet's own contexts set it at 0.7 and 0.8 of a rem, which is wide for a
+     row this size — the five stars read as five marks rather than one rating. */
+  --letter-spacing: 0.2;
+  --font-size: 1.5;
+  --color-rating-star: var(--mar-text, #1a1a1a);
+}
+
+/* `.ph__reviews` — the same line under the title at the top of this page. */
+.mar__reviews-count {
+  color: var(--mar-text, #1a1a1a);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* This is a product title on a product page, so it is drawn the way this page
+   already draws one: `.ph__title` — the body face, 500, tight leading and a
+   hair of negative tracking. Only the size steps down, because the hero's 40px
+   title is the page's, and this one is a section's. */
+.mar__title {
+  margin: 0 0 14px;
+  font-family: var(--font-body-family);
+  font-size: var(--mar-title-size, 34px);
+  font-weight: var(--mar-title-weight, 500);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--mar-text, #1a1a1a);
+}
+
+/* Size and leading come from `.section-text`, which the other panels read too —
+   only the tint is this section's. The margin reset comes with it. */
+.mar__description {
+  color: #000;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.mar__description>*+* {
+  margin-top: 12px;
+}
+
+.mar__rule {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #00000030;
+}
+
+/* --------------------------------------------------------------------------
+   What is in it
+   --------------------------------------------------------------------------
+   The number is drawn by the list rather than written into the markup, so the
+   rows cannot be numbered wrongly and a row removed in the admin renumbers the
+   ones under it. `decimal-leading-zero` is what gives 01 rather than 1.
+   -------------------------------------------------------------------------- */
+
+.mar__list {
+  counter-reset: mar-item;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Two columns: the number, then the name with its sizes under it. The sizes
+   line starts where the name does — one column, not an indent guessed in px. */
+.mar__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 18px;
+  counter-increment: mar-item;
+}
+
+.mar__item+.mar__item {
+  margin-top: 20px;
+}
+
+/* The number and the name are one heading in two columns, so they are one
+   setting: `.pdt__item-title` and `.pdt__item-number` in the detail tabs, which
+   is the same numbered list of points on the same page. The number keeps the
+   name's size and weight and only loses colour. */
+.mar__item::before {
+  content: counter(mar-item, decimal-leading-zero);
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #000;
+  font-variant-numeric: tabular-nums;
+}
+
+.mar__item-name {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--mar-text, #1a1a1a);
+}
+
+/* The sizes under a product name are the product card's `.card__meta` — the
+   same line, in the same role, on every card in the store: 12px, tracked a
+   point, muted. The card also uppercases it; this does not, because the units
+   are written into the variant titles in lower case and "30 G | 1.05 OZ" is
+   not what the merchant typed. */
+.mar__item-sizes {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .mar {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .mar__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .mar__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* The hero drops its 40px title to 30 on mobile. This one takes the same
+     step so the two stay in proportion down the page. */
+  .mar__title {
+    font-size: var(--mar-title-size-mobile, 26px);
+  }
+
+  .mar__badge-text {
+    font-size: 1.1rem;
+  }
+
+  .mar__item+.mar__item {
+    margin-top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mar__cart {
+    transition-duration: 0.01ms;
+  }
+}

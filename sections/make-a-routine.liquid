@@ -1,0 +1,516 @@
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+{{ 'make-a-routine.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  The routine this product belongs to: the combo's own picture on the left, and
+  on the right what it is and what is in it.
+
+  Nothing here is the current product's copy. The product only names the routine
+  — one product reference in a metafield — and everything shown is read off the
+  routine product itself: its picture, its reviews, its title, its description
+  and the variants it is made of. That is what lets one combo be written once
+  and shown on every product in it.
+
+  A product with no routine named renders nothing at all, so the section can sit
+  in the template for every product and only appear where there is one.
+
+  Which metafields are read is left as settings, the way the detail tabs leave
+  theirs, because the store already had some of this: the description is the
+  combo description these products were written with, not a second copy of it.
+{%- endcomment -%}
+
+{%- liquid
+  assign routine_parts = section.settings.routine_metafield | split: '.'
+  assign routine_ns = routine_parts | first
+  assign routine_key = routine_parts | last
+  assign routine = product.metafields[routine_ns][routine_key].value
+
+  if routine != blank
+    assign desc_parts = section.settings.description_metafield | split: '.'
+    assign desc_ns = desc_parts | first
+    assign desc_key = desc_parts | last
+    assign routine_description = routine.metafields[desc_ns][desc_key].value
+
+    assign badge_parts = section.settings.badge_metafield | split: '.'
+    assign badge_ns = badge_parts | first
+    assign badge_key = badge_parts | last
+    assign routine_badge = routine.metafields[badge_ns][badge_key].value
+
+    assign var_parts = section.settings.variants_metafield | split: '.'
+    assign var_ns = var_parts | first
+    assign var_key = var_parts | last
+    assign routine_variants = routine.metafields[var_ns][var_key].value
+
+    comment
+      The rating is whatever the review app wrote onto the routine product. No
+      rating, no row — the section is not the place to explain that a combo has
+      not been reviewed yet.
+    endcomment
+    assign rating = routine.metafields.reviews.rating.value
+    assign rating_count = routine.metafields.reviews.rating_count
+    if rating != blank
+      assign rating_max = rating.scale_max
+      assign rating_value = rating.rating
+      assign rating_percent = rating_value | times: 100.0 | divided_by: rating_max
+      assign rating_floor = rating_value | floor
+      assign rating_decimal = 0
+      assign decimal = rating_value | modulo: 1
+      if decimal >= 0.3 and decimal <= 0.7
+        assign rating_decimal = 0.5
+      elsif decimal > 0.7
+        assign rating_decimal = 1
+      endif
+    endif
+
+    assign form_id = 'mar-form-' | append: section.id | append: '-' | append: routine.id
+  endif
+-%}
+
+{%- if routine != blank -%}
+  <div
+    class="mar"
+    style="
+      --mar-pad-top: {{ section.settings.padding_top }}px;
+      --mar-pad-bottom: {{ section.settings.padding_bottom }}px;
+      --mar-media-w: {{ section.settings.media_width }}%;
+      --mar-media-ratio: {{ section.settings.media_ratio }};
+      --mar-gap: {{ section.settings.column_gap }}px;
+      --mar-overline-size: {{ section.settings.overline_size }}px;
+      --mar-overline-tracking: {{ section.settings.overline_tracking }}px;
+      --mar-title-size: {{ section.settings.title_size }}px;
+      --mar-title-weight: {{ section.settings.title_weight }};
+      --mar-number-size: {{ section.settings.number_size }}px;
+      --mar-item-size: {{ section.settings.item_size }}px;
+      --mar-text: {{ section.settings.text_color }};
+      --mar-muted: {{ section.settings.muted_color }};
+      --mar-rule: {{ section.settings.rule_color }};
+      --mar-badge-bg: {{ section.settings.badge_background }};
+      --mar-badge-fg: {{ section.settings.badge_text }};
+      --mar-button-bg: {{ section.settings.button_background }};
+      --mar-button-fg: {{ section.settings.button_text }};
+    "
+    {{ section.shopify_attributes }}
+  >
+    <div class="page-width mar__row">
+      <div class="mar__media">
+        {%- if routine.featured_image != blank -%}
+          <img
+            class="mar__img"
+            src="{{ routine.featured_image | image_url: width: 900 }}"
+            srcset="
+              {{ routine.featured_image | image_url: width: 500 }} 500w,
+              {{ routine.featured_image | image_url: width: 900 }} 900w,
+              {{ routine.featured_image | image_url: width: 1300 }} 1300w
+            "
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 90vw"
+            width="{{ routine.featured_image.width }}"
+            height="{{ routine.featured_image.height }}"
+            alt="{{ routine.featured_image.alt | default: routine.title | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'mar__img mar__img--placeholder' }}
+        {%- endif -%}
+
+        {%- if routine_badge != blank -%}
+          <span class="mar__badge"><span class="mar__badge-text">{{ routine_badge }}</span></span>
+        {%- endif -%}
+
+        {%- comment -%}
+          The button is the routine's, not this product's: it adds the combo.
+          It sits over the foot of the picture rather than under it, so the
+          picture stays one block and the two columns keep their heights.
+        {%- endcomment -%}
+        <product-form class="mar__form" data-section-id="{{ section.id }}">
+          {%- form 'product',
+            routine,
+            id: form_id,
+            class: 'form',
+            novalidate: 'novalidate',
+            data-type: 'add-to-cart-form'
+          -%}
+            <input
+              type="hidden"
+              name="id"
+              value="{{ routine.selected_or_first_available_variant.id }}"
+              class="product-variant-id"
+              {% if routine.selected_or_first_available_variant.available == false %}
+                disabled
+              {% endif %}
+            >
+            <button
+              id="{{ form_id }}-submit"
+              class="mar__cart"
+              type="submit"
+              name="add"
+              aria-live="polite"
+              data-sold-out-message="true"
+              {% if routine.selected_or_first_available_variant.available == false %}
+                disabled
+              {% endif %}
+            >
+              <span>
+                {%- if routine.selected_or_first_available_variant.available -%}
+                  {{ section.settings.cart_label }}
+                {%- else -%}
+                  {{ 'products.product.sold_out' | t }}
+                {%- endif -%}
+              </span>
+              <span class="sold-out-message hidden">{{ 'products.product.sold_out' | t }}</span>
+              {%- render 'loading-spinner' -%}
+            </button>
+            <div class="product-form__error-message-wrapper mar__error" role="alert" hidden>
+              <span class="product-form__error-message"></span>
+            </div>
+          {%- endform -%}
+        </product-form>
+      </div>
+
+      <div class="mar__copy">
+        {%- if section.settings.overline != blank -%}
+          <p class="mar__overline">{{ section.settings.overline }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.show_rating and rating != blank and rating_value != 0 -%}
+          <div class="mar__reviews">
+            {%- comment -%}
+              The same one masked row the product cards draw, painted to a
+              percentage rather than counted out in filled glyphs, so a half
+              star falls out of the number itself.
+            {%- endcomment -%}
+            <div
+              class="rating mar__stars"
+              role="img"
+              aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating_value, rating_max: rating_max }}"
+            >
+              <span
+                aria-hidden="true"
+                class="rating-star"
+                style="--rating: {{ rating_floor }}; --rating-max: {{ rating_max }}; --rating-decimal: {{ rating_decimal }}; --percent: {{ rating_percent }}%;"
+              ></span>
+            </div>
+
+            {%- if rating_count != blank and rating_count != 0 -%}
+              <a class="mar__reviews-count" href="{{ routine.url }}">
+                <span aria-hidden="true">{{ rating_count }} {{ section.settings.reviews_label }}</span>
+                <span class="visually-hidden">
+                  {{- rating_count }} {{ 'accessibility.total_reviews' | t -}}
+                </span>
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <h2 class="mar__title">{{ routine.title | escape }}</h2>
+
+        {%- if routine_description != blank -%}
+          <div class="mar__description section-text">{{ routine_description }}</div>
+        {%- endif -%}
+
+        {%- if routine_variants != blank and routine_variants.size > 0 -%}
+          <hr class="mar__rule">
+
+          {%- comment -%}
+            One line per product, not per variant: a routine that carries two
+            sizes of the same cleanser is still one cleanser in it.
+
+            Liquid cannot group as it goes — a row would have to be left open
+            across iterations — so the distinct products are collected first, in
+            the order the metafield lists them, and each row then gathers its
+            own variants. The ids are held between commas so that one id cannot
+            match inside another.
+          {%- endcomment -%}
+          {%- assign seen_ids = ',' -%}
+          {%- for variant in routine_variants -%}
+            {%- assign needle = variant.product.id | prepend: ',' | append: ',' -%}
+            {%- unless seen_ids contains needle -%}
+              {%- assign seen_ids = seen_ids | append: variant.product.id | append: ',' -%}
+            {%- endunless -%}
+          {%- endfor -%}
+
+          <ol class="mar__list" role="list">
+            {%- assign product_ids = seen_ids | split: ',' -%}
+            {%- for product_id in product_ids -%}
+              {%- liquid
+                assign row_title = ''
+                assign row_sizes = ''
+                for variant in routine_variants
+                  assign variant_product_id = variant.product.id | append: ''
+                  if variant_product_id == product_id
+                    assign row_title = variant.product.title
+                    unless variant.title == 'Default Title'
+                      assign safe_title = variant.title | escape
+                      assign row_sizes = row_sizes | append: safe_title | append: '|'
+                    endunless
+                  endif
+                endfor
+              -%}
+
+              {%- if row_title != blank -%}
+                <li class="mar__item">
+                  <span class="mar__item-name">{{ row_title | escape }}</span>
+                  {%- if row_sizes != blank -%}
+                    <span class="mar__item-sizes">
+                      {{- row_sizes | split: '|' | join: ' &nbsp;&bull;&nbsp; ' -}}
+                    </span>
+                  {%- endif -%}
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ol>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Make a Routine",
+  "tag": "section",
+  "class": "section-make-a-routine",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the routine named in this product's Routine Product metafield. Products without one show nothing."
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "default": "MAKE A ROUTINE"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Button label",
+      "default": "ADD TO CART"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show reviews",
+      "info": "Only appears when the routine product has a rating.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reviews_label",
+      "label": "Reviews word",
+      "default": "Reviews"
+    },
+    {
+      "type": "header",
+      "content": "Metafields"
+    },
+    {
+      "type": "text",
+      "id": "routine_metafield",
+      "label": "Routine product",
+      "info": "On this product. The combo to show.",
+      "default": "custom.routine_product"
+    },
+    {
+      "type": "text",
+      "id": "description_metafield",
+      "label": "Short description",
+      "info": "On the routine product.",
+      "default": "custom.combo_description"
+    },
+    {
+      "type": "text",
+      "id": "variants_metafield",
+      "label": "Variants in the routine",
+      "info": "On the routine product. A list of variants, grouped by product when shown.",
+      "default": "custom.routine_variants"
+    },
+    {
+      "type": "text",
+      "id": "badge_metafield",
+      "label": "Circle badge",
+      "info": "On the routine product. Empty hides the circle.",
+      "default": "custom.routine_badge"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 25,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "0.7", "label": "Portrait (7:10)" },
+        { "value": "0.8", "label": "Portrait (4:5)" },
+        { "value": "1", "label": "Square" }
+      ],
+      "default": "0.7"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between image and text",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "overline_size",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Overline size",
+      "info": "15px is the detail tabs' overline.",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "overline_tracking",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Overline tracking",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 34
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Title weight",
+      "info": "The product title at the top of the page is Medium.",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "item_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Product name size",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "number_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Number size",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Secondary text",
+      "default": "#5F5952"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Divider",
+      "default": "#D8D3CD"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge background",
+      "default": "#8C8C8C"
+    },
+    {
+      "type": "color",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Make a Routine"
+    }
+  ]
+}
+{% endschema %}

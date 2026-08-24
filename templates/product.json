@@ -338,6 +338,37 @@
         "padding_bottom": 56
       }
     },
+    "make_a_routine": {
+      "type": "make-a-routine",
+      "settings": {
+        "overline": "MAKE A ROUTINE",
+        "cart_label": "ADD TO CART",
+        "show_rating": true,
+        "reviews_label": "Reviews",
+        "routine_metafield": "custom.routine_product",
+        "description_metafield": "custom.combo_description",
+        "variants_metafield": "custom.routine_variants",
+        "badge_metafield": "custom.routine_badge",
+        "media_width": 40,
+        "media_ratio": "0.7",
+        "column_gap": 40,
+        "overline_size": 15,
+        "overline_tracking": 7,
+        "title_size": 34,
+        "title_weight": "500",
+        "item_size": 15,
+        "number_size": 15,
+        "text_color": "#1a1a1a",
+        "muted_color": "#5f5952",
+        "rule_color": "#d8d3cd",
+        "badge_background": "#8c8c8c",
+        "badge_text": "#ffffff",
+        "button_background": "#000000",
+        "button_text": "#ffffff",
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    },
     "related-products": {
       "type": "related-products",
       "settings": {
@@ -367,6 +398,7 @@
     "detail_tabs",
     "expert_note",
     "testimonials_jahMwJ",
+    "make_a_routine",
     "related-products"
   ]
 }
