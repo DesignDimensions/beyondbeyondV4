@@ -72,14 +72,6 @@
     <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
 
     {%- comment -%}
-      Site-wide, so it belongs in the layout rather than any one section --
-      the canvas it paints into sits above every section's own background
-      regardless of which page loaded it.
-    {%- endcomment -%}
-    {{ 'cursor-field.css' | asset_url | stylesheet_tag }}
-    <script src="{{ 'cursor-field.js' | asset_url }}" defer="defer"></script>
-
-    {%- comment -%}
       The intro covers the page while it plays, but the page underneath is laid
       out and on screen as far as IntersectionObserver is concerned — so every
       entry animation above the fold used to run and finish behind the curtain,
