@@ -1,0 +1,156 @@
+/* ==========================================================================
+   About Statement — a label and a sentence on the left, the paragraph that
+   answers them on the right
+   ==========================================================================
+   The band is full-bleed and its row is the theme's content column, so the
+   background reaches both edges of the screen while the type stays on the
+   same grid as every other section of the page.
+   ========================================================================== */
+
+.abs {
+  padding-top: var(--abs-pad-top, 72px);
+  padding-bottom: var(--abs-pad-bottom, 72px);
+  background-color: var(--abs-bg, #fff);
+}
+
+.abs__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--abs-gap, 80px);
+}
+
+/* The heading column is the width that was asked for; the copy takes the
+   rest, so the two always come to the content column exactly whatever page
+   width the theme is set to. */
+.abs__lead {
+  flex: 0 1 var(--abs-lead-w, 52%);
+  max-width: var(--abs-lead-w, 52%);
+  min-width: 0;
+}
+
+.abs__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Drawn level with the heading rather than with the label above it. Padding
+     rather than a margin so the column's own background, if it ever gets one,
+     still starts at the top of the row. */
+  padding-top: var(--abs-copy-offset, 28px);
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+
+.abs__eyebrow {
+  margin: 0 0 var(--abs-eyebrow-gap, 20px);
+  font-size: var(--abs-eyebrow-size, 12px);
+  font-weight: 500;
+  letter-spacing: var(--abs-eyebrow-tracking, 3px);
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--abs-eyebrow-color, #1a1a1a);
+}
+
+.abs__heading {
+  margin: 0;
+  font-size: var(--abs-heading-size, 36px);
+  font-weight: var(--abs-heading-weight, 400);
+  line-height: var(--abs-heading-leading, 1.25);
+  letter-spacing: -0.01em;
+  color: var(--abs-heading-color, #0a0a0b);
+}
+
+/* Size and leading come from `.section-text`, which every panel on the page
+   shares; only the tint and the space between paragraphs belong here. */
+.abs__body {
+  color: var(--abs-body-color, #3d3d3d);
+}
+
+.abs__body > * + * {
+  margin-top: var(--abs-body-gap, 16px);
+}
+
+/* --------------------------------------------------------------------------
+   Button
+   -------------------------------------------------------------------------- */
+
+.abs__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-sizing: border-box;
+  min-width: var(--abs-cta-min-w, 380px);
+  max-width: 100%;
+  height: var(--abs-cta-h, 48px);
+  padding: 0 24px;
+  margin-top: var(--abs-cta-gap, 32px);
+  border-radius: var(--abs-cta-radius, 0px);
+  background-color: var(--abs-cta-bg, #000);
+  color: var(--abs-cta-fg, #fff);
+  font-size: var(--abs-cta-size, 14px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: filter 0.3s ease;
+}
+
+.abs__cta:hover {
+  filter: brightness(1.35);
+}
+
+.abs__cta-arrow {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 10px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.abs__cta:hover .abs__cta-arrow {
+  transform: translateX(5px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Stacked, the two columns are one column, so the width share and the drop
+   that separated them are both meaningless and are given back.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .abs {
+    padding-top: calc(var(--abs-pad-top, 72px) * 0.6);
+    padding-bottom: calc(var(--abs-pad-bottom, 72px) * 0.6);
+  }
+
+  .abs__row {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .abs__lead,
+  .abs__copy {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .abs__heading {
+    font-size: clamp(2.4rem, 7vw, var(--abs-heading-size, 36px));
+  }
+
+  .abs__cta {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abs__cta,
+  .abs__cta-arrow {
+    transition-duration: 0.01ms;
+  }
+}

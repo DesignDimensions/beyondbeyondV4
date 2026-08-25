@@ -1,0 +1,390 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "mindset": {
+      "type": "about-statement",
+      "settings": {
+        "background": "#ffffff",
+        "lead_width": 52,
+        "column_gap": 80,
+        "copy_offset": 28,
+        "eyebrow": "OUR MINDSET",
+        "eyebrow_size": 12,
+        "eyebrow_tracking": 3,
+        "eyebrow_color": "#1a1a1a",
+        "eyebrow_gap": 20,
+        "heading": "A Brand that doesn't just sit on your shelf, it fits into your life.",
+        "heading_size": 36,
+        "heading_weight": "400",
+        "heading_leading": 1.3,
+        "heading_color": "#0a0a0b",
+        "body": "<p>In a world bursting with choices, we believe skincare should stand out not by shouting louder, but by meaning more. Beyond Beyond is about bringing together science, care, and intention to create something truly significant.</p>",
+        "body_color": "#3d3d3d",
+        "body_gap": 16,
+        "cta_label": "Shop The Product",
+        "cta_link": "/collections/all",
+        "cta_gap": 32,
+        "cta_min_width": 380,
+        "cta_height": 48,
+        "cta_size": 14,
+        "cta_radius": 0,
+        "cta_background": "#000000",
+        "cta_color": "#ffffff",
+        "padding_top": 72,
+        "padding_bottom": 56
+      }
+    },
+    "banner": {
+      "type": "about-banner",
+      "settings": {
+        "image": "shopify://shop_images/Frame_1321319581.png",
+        "image_url": "",
+        "image_alt": "Beyond Beyond skincare applied",
+        "full_width": true,
+        "ratio": "1440 / 637",
+        "ratio_mobile": "4 / 5",
+        "background": "#3b322b",
+        "overlay_image_url": "",
+        "overlay_alt": "Beyond Beyond",
+        "show_quote_mark": false,
+        "quote_size": 96,
+        "lockup_gap": 20,
+        "overlay_width": 240,
+        "overlay_heading": "",
+        "overlay_heading_size": 18,
+        "overlay_color": "#ffffff",
+        "overlay_align": "left",
+        "overlay_x": 6,
+        "overlay_y": 50,
+        "scrim_color": "#000000",
+        "scrim_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "belief": {
+      "type": "about-media-text",
+      "settings": {
+        "media_position": "left",
+        "media_width": 42,
+        "column_gap": 56,
+        "vertical_alignment": "flex-start",
+        "background": "#ffffff",
+        "image": "shopify://shop_images/Frame_1321319586.png",
+        "image_url": "",
+        "image_alt": "",
+        "media_ratio": "1.15",
+        "media_ratio_mobile": "",
+        "media_background": "#d9d9d9",
+        "media_radius": 0,
+        "eyebrow": "OUR BELIEF",
+        "eyebrow_size": 12,
+        "eyebrow_tracking": 3,
+        "eyebrow_color": "#1a1a1a",
+        "eyebrow_gap": 18,
+        "heading": "Skincare shouldn't overwhelm, It should restore.",
+        "heading_size": 34,
+        "heading_weight": "400",
+        "heading_leading": 1.3,
+        "heading_color": "#0a0a0b",
+        "heading_gap": 20,
+        "body": "<p>At Beyond Beyond, we design purposeful formulations that do more with less. Free from alcohol, parabens, and fragrance, every product is a <em><strong>conscious blend of science-backed ingredients crafted for real, visible results.</strong></em></p>",
+        "body_color": "#3d3d3d",
+        "body_gap": 16,
+        "cta_label": "",
+        "cta_link": "",
+        "cta_gap": 32,
+        "cta_min_width": 300,
+        "cta_height": 48,
+        "cta_size": 14,
+        "cta_radius": 0,
+        "cta_background": "#000000",
+        "cta_color": "#ffffff",
+        "padding_top": 88,
+        "padding_bottom": 88
+      }
+    },
+    "minds": {
+      "type": "about-minds",
+      "blocks": {
+        "person_1": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image_url": "",
+            "name": "Dr. Uktara Numshum",
+            "role": "The Art & Science of \nTimeless Beauty",
+            "link": ""
+          }
+        },
+        "person_YHWL46": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image_url": "",
+            "name": "Dr. Uktara Numshum",
+            "role": "The Art & Science of \nTimeless Beauty",
+            "link": ""
+          }
+        },
+        "person_nn7djr": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image_url": "",
+            "name": "Dr. Uktara Numshum",
+            "role": "The Art & Science of \nTimeless Beauty",
+            "link": ""
+          }
+        },
+        "person_WmAEwj": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image_url": "",
+            "name": "Dr. Uktara Numshum",
+            "role": "The Art & Science of \nTimeless Beauty",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "person_1",
+        "person_YHWL46",
+        "person_nn7djr",
+        "person_WmAEwj"
+      ],
+      "name": "Minds Behind",
+      "settings": {
+        "heading": "Minds Behind Beyond Beyond",
+        "heading_size": 28,
+        "heading_weight": "500",
+        "heading_color": "#0a0a0b",
+        "body": "<p>A collective of industry pioneers shaping the future of clean clinical skincare, powered by NAD+.</p>",
+        "body_color": "#3d3d3d",
+        "body_width": 420,
+        "head_gap": 36,
+        "show_quote_mark": true,
+        "quote_size": 56,
+        "quote_color": "#1a1a1a",
+        "columns_desktop": 3,
+        "columns_mobile": "1.2",
+        "card_gap": 8,
+        "media_ratio": "1",
+        "card_radius": 0,
+        "card_background": "#c9ccd6",
+        "card_inset": 18,
+        "scrim_color": "#000000",
+        "scrim_opacity": 70,
+        "name_size": 18,
+        "role_size": 12,
+        "card_text_color": "#ffffff",
+        "show_arrows": true,
+        "arrow_size": 16,
+        "arrow_offset": 16,
+        "arrow_color": "#1a1a1a",
+        "background": "#e8edf7",
+        "padding_top": 72,
+        "padding_bottom": 72
+      }
+    },
+    "philosophy": {
+      "type": "about-philosophy",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        },
+        "card_QBQqrn": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        },
+        "card_DBDEGx": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        },
+        "card_qcBYNT": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        },
+        "card_x8KjEm": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        },
+        "card_8a6Mh4": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Frame_1321319591.png",
+            "image_url": "",
+            "image_alt": "",
+            "title": "Clean Clinical Science",
+            "text": "<p>Backed by research, our products bridge skin physiology and clinical-grade actives like NAD+ to deliver results from the inside out.</p>",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_QBQqrn",
+        "card_DBDEGx",
+        "card_qcBYNT",
+        "card_x8KjEm",
+        "card_8a6Mh4"
+      ],
+      "name": "Philosophy Cards",
+      "settings": {
+        "heading": "Our Philosophy",
+        "heading_size": 32,
+        "heading_weight": "400",
+        "heading_color": "#0a0a0b",
+        "body": "<p>Lorem ipsum dolor sit amet consectetur. Vivamus diam purus in vel quam viverra commodo non odio.</p>",
+        "body_color": "#3d3d3d",
+        "body_width": 620,
+        "alignment": "center",
+        "head_gap": 40,
+        "columns_desktop": 3,
+        "columns_mobile": "1",
+        "card_gap": 10,
+        "media_ratio": "0.72",
+        "card_radius": 0,
+        "card_background": "#d9d9d9",
+        "caption_background": "#2b2b2b",
+        "caption_opacity": 85,
+        "caption_inset": 16,
+        "title_size": 17,
+        "text_size": 12,
+        "card_text_color": "#ffffff",
+        "background": "#ffffff",
+        "padding_top": 72,
+        "padding_bottom": 72
+      }
+    },
+    "approach": {
+      "type": "about-statement",
+      "settings": {
+        "background": "#e5debb",
+        "lead_width": 52,
+        "column_gap": 80,
+        "copy_offset": 34,
+        "eyebrow": "OUR APPROACH",
+        "eyebrow_size": 12,
+        "eyebrow_tracking": 3,
+        "eyebrow_color": "#1a1a1a",
+        "eyebrow_gap": 20,
+        "heading": "Zero Harsh Additives.\n100% Thoughtful Skincare.",
+        "heading_size": 34,
+        "heading_weight": "400",
+        "heading_leading": 1.3,
+        "heading_color": "#0a0a0b",
+        "body": "<p>We've stripped away the unnecessary: no alcohol, no parabens, no fragrance. Only what truly matters. Our vegan, dermatologist-tested products are packaged consciously, respecting not just your skin but the world around us.</p>",
+        "body_color": "#3d3d3d",
+        "body_gap": 16,
+        "cta_label": "",
+        "cta_link": "",
+        "cta_gap": 32,
+        "cta_min_width": 0,
+        "cta_height": 48,
+        "cta_size": 14,
+        "cta_radius": 0,
+        "cta_background": "#000000",
+        "cta_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "nad": {
+      "type": "about-media-text",
+      "settings": {
+        "media_position": "right",
+        "media_width": 45,
+        "column_gap": 64,
+        "vertical_alignment": "center",
+        "background": "#ffffff",
+        "image": "shopify://shop_images/Frame_1321319586.png",
+        "image_url": "",
+        "image_alt": "",
+        "media_ratio": "1.15",
+        "media_ratio_mobile": "",
+        "media_background": "#d9d9d9",
+        "media_radius": 0,
+        "eyebrow": "LOREM IPSUM",
+        "eyebrow_size": 12,
+        "eyebrow_tracking": 3,
+        "eyebrow_color": "#1a1a1a",
+        "eyebrow_gap": 18,
+        "heading": "Made with NAD+",
+        "heading_size": 34,
+        "heading_weight": "400",
+        "heading_leading": 1.3,
+        "heading_color": "#0a0a0b",
+        "heading_gap": 20,
+        "body": "<p>At its core is 'NAD+', an ingredient with an untapped story. Derived from the resilient <strong>Sunflower Shoot</strong>, it's a breakthrough in Indian skincare, combining stability, efficacy, and a touch of brilliance to transform how we think about self-care.</p>",
+        "body_color": "#3d3d3d",
+        "body_gap": 16,
+        "cta_label": "Learn More About NAD+",
+        "cta_link": "/pages/nad",
+        "cta_gap": 32,
+        "cta_min_width": 300,
+        "cta_height": 48,
+        "cta_size": 14,
+        "cta_radius": 0,
+        "cta_background": "#000000",
+        "cta_color": "#ffffff",
+        "padding_top": 88,
+        "padding_bottom": 88
+      }
+    }
+  },
+  "order": [
+    "mindset",
+    "banner",
+    "belief",
+    "minds",
+    "philosophy",
+    "approach",
+    "nad"
+  ]
+}

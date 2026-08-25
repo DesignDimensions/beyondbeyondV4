@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Minds Behind — a rail of portraits, each with a name and a role over its
+   foot, on a tinted band
+   ========================================================================== */
+
+.mnd {
+  padding-top: var(--mnd-pad-top, 72px);
+  padding-bottom: var(--mnd-pad-bottom, 72px);
+  background-color: var(--mnd-bg, #e8edf7);
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.mnd__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: var(--mnd-head-gap, 36px);
+}
+
+.mnd__head-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mnd__heading {
+  margin: 0 0 10px;
+  font-size: var(--mnd-heading-size, 28px);
+  font-weight: var(--mnd-heading-weight, 500);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--mnd-heading-color, #0a0a0b);
+}
+
+.mnd__body {
+  max-width: var(--mnd-body-w, 420px);
+  color: var(--mnd-body-color, #3d3d3d);
+}
+
+.mnd__body > * + * {
+  margin-top: 10px;
+}
+
+/* Set on its own line box and pulled tight, so the mark sits level with the
+   heading rather than hanging a line's worth below it. */
+.mnd__quote {
+  flex: 0 0 auto;
+  font-size: var(--mnd-quote-size, 56px);
+  line-height: 0.72;
+  font-weight: 700;
+  color: var(--mnd-quote-color, #1a1a1a);
+}
+
+/* --------------------------------------------------------------------------
+   Rail
+   --------------------------------------------------------------------------
+   A card is a share of the content column rather than a width of its own, so
+   the number asked for fits the column exactly, flush with both edges, at
+   whatever page width the theme is set to.
+   -------------------------------------------------------------------------- */
+
+.mnd__frame {
+  position: relative;
+}
+
+.mnd__rail {
+  display: flex;
+  gap: var(--mnd-card-gap, 8px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Room for a focused card's ring, which the scroll box would otherwise
+     clip. */
+  padding-bottom: 4px;
+}
+
+.mnd__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.mnd__rail:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+.mnd__card {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--mnd-columns, 3) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns, 3));
+  aspect-ratio: var(--mnd-card-ratio, 1);
+  overflow: hidden;
+  border-radius: var(--mnd-card-radius, 0px);
+  background-color: var(--mnd-card-bg, #c9ccd6);
+  scroll-snap-align: start;
+}
+
+.mnd__card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.mnd__media,
+.mnd__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mnd__img {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mnd__card:hover .mnd__img {
+  transform: scale(1.04);
+}
+
+/* --------------------------------------------------------------------------
+   Caption
+   --------------------------------------------------------------------------
+   A gradient rather than a flat bar: the portraits behind it are all
+   different, and a fade that starts at nothing halfway up the card keeps the
+   name legible over any of them without drawing a band across the picture.
+   -------------------------------------------------------------------------- */
+
+.mnd__scrim {
+  position: absolute;
+  inset: 40% 0 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, transparent, var(--mnd-scrim, #000));
+  opacity: var(--mnd-scrim-opacity, 0.7);
+  pointer-events: none;
+}
+
+.mnd__caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  padding: var(--mnd-card-inset, 18px);
+  color: var(--mnd-card-text, #fff);
+}
+
+.mnd__name {
+  margin: 0 0 4px;
+  font-size: var(--mnd-name-size, 18px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: currentColor;
+}
+
+.mnd__role {
+  margin: 0;
+  font-size: var(--mnd-role-size, 12px);
+  font-weight: 400;
+  line-height: 1.4;
+  opacity: 0.85;
+  color: currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   Arrows
+   --------------------------------------------------------------------------
+   Held outside the content column and level with the middle of a card. A card
+   is `1 / ratio` times its own width tall, so half of that — measured from
+   the width one card takes of the column — is where its middle sits.
+   -------------------------------------------------------------------------- */
+
+.mnd__arrow {
+  position: absolute;
+  top: 0;
+  margin-top: calc(
+    (100% - (var(--mnd-columns, 3) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns, 3) /
+      var(--mnd-card-ratio, 1) / 2
+  );
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Explicit, because the button is sized from its glyph: without it the two
+     arrows would be different widths, one holding a ‹ and the other a ›. */
+  box-sizing: border-box;
+  width: calc(var(--mnd-arrow-size, 16px) + 16px);
+  height: calc(var(--mnd-arrow-size, 16px) + 16px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mnd__arrow--prev {
+  right: calc(100% + var(--mnd-arrow-offset, 16px));
+}
+
+.mnd__arrow--next {
+  left: calc(100% + var(--mnd-arrow-offset, 16px));
+}
+
+.mnd__arrow-glyph {
+  font-size: calc(var(--mnd-arrow-size, 16px) * 1.6);
+  line-height: 1;
+  color: var(--mnd-arrow-color, #1a1a1a);
+}
+
+/* Kept in place rather than removed: an arrow that disappears at the end of
+   the rail moves the other one, and the reader loses the target they were
+   pressing. */
+.mnd__arrow.is-disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.mnd__arrow:not(.is-disabled):hover {
+  transform: translateY(-50%) scale(1.12);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   The arrows go: at this width there is no gutter to hold them, and the rail
+   is already the thing a thumb swipes.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .mnd {
+    padding-top: calc(var(--mnd-pad-top, 72px) * 0.6);
+    padding-bottom: calc(var(--mnd-pad-bottom, 72px) * 0.6);
+  }
+
+  .mnd__head {
+    gap: 16px;
+  }
+
+  .mnd__quote {
+    font-size: calc(var(--mnd-quote-size, 56px) * 0.7);
+  }
+
+  .mnd__card {
+    flex: 0 0 calc(
+      (100% - (var(--mnd-columns-mobile, 1.2) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns-mobile, 1.2)
+    );
+  }
+
+  .mnd__arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mnd__img,
+  .mnd__arrow {
+    transition-duration: 0.01ms;
+  }
+}

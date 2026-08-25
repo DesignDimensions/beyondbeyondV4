@@ -1,0 +1,376 @@
+{{ 'about-statement.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  A statement band: a small tracked label over a large sentence on the left,
+  and the paragraph that answers it — with an optional button — on the right.
+
+  The about page uses this shape twice, once on white with a button ("Our
+  Mindset") and once on a tinted band without one ("Our Approach"). They are
+  the same section rather than two, because the only things that differ are a
+  colour and whether the button is filled in — and a merchant editing one of
+  them should not have to learn a second set of controls to edit the other.
+
+  The band itself runs the full width of the viewport while its contents keep
+  to the theme's content column, so a tint reaches both edges of the screen
+  without the copy ever leaving the grid the rest of the page sits on.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    The heading is a textarea rather than a single-line field: the design
+    breaks "Zero Harsh Additives. / 100% Thoughtful Skincare." over two lines
+    at a point no automatic wrap would choose. Escaped first, so the line
+    breaks are the only markup that survives.
+  endcomment
+  assign heading = section.settings.heading | escape | newline_to_br
+-%}
+
+<div
+  class="abs"
+  style="
+    --abs-pad-top: {{ section.settings.padding_top }}px;
+    --abs-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --abs-bg: {{ section.settings.background }};
+    --abs-gap: {{ section.settings.column_gap }}px;
+    --abs-lead-w: {{ section.settings.lead_width }}%;
+    --abs-copy-offset: {{ section.settings.copy_offset }}px;
+    --abs-eyebrow-size: {{ section.settings.eyebrow_size }}px;
+    --abs-eyebrow-tracking: {{ section.settings.eyebrow_tracking }}px;
+    --abs-eyebrow-color: {{ section.settings.eyebrow_color }};
+    --abs-eyebrow-gap: {{ section.settings.eyebrow_gap }}px;
+    --abs-heading-size: {{ section.settings.heading_size }}px;
+    --abs-heading-weight: {{ section.settings.heading_weight }};
+    --abs-heading-leading: {{ section.settings.heading_leading }};
+    --abs-heading-color: {{ section.settings.heading_color }};
+    --abs-body-color: {{ section.settings.body_color }};
+    --abs-body-gap: {{ section.settings.body_gap }}px;
+    --abs-cta-gap: {{ section.settings.cta_gap }}px;
+    --abs-cta-min-w: {{ section.settings.cta_min_width }}px;
+    --abs-cta-h: {{ section.settings.cta_height }}px;
+    --abs-cta-size: {{ section.settings.cta_size }}px;
+    --abs-cta-radius: {{ section.settings.cta_radius }}px;
+    --abs-cta-bg: {{ section.settings.cta_background }};
+    --abs-cta-fg: {{ section.settings.cta_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width abs__row">
+    <div class="abs__lead">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="abs__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if heading != blank -%}
+        <h2 class="abs__heading">{{ heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="abs__copy">
+      {%- if section.settings.body != blank -%}
+        <div class="abs__body section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_label != blank -%}
+        <a class="abs__cta" href="{{ section.settings.cta_link | default: '#' }}">
+          <span class="abs__cta-label">{{ section.settings.cta_label }}</span>
+          {%- comment -%}
+            Drawn rather than typed, for the same reason the founders panel
+            draws its own: no arrow glyph is dependable across every face a
+            theme might be set to, and a drawn one can slide on hover.
+          {%- endcomment -%}
+          <svg class="abs__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
+            <path
+              d="M0 5h31.5M27.5 1 32 5l-4.5 4"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About Statement",
+  "tag": "section",
+  "class": "section-about-statement",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Runs the full width of the screen. The copy keeps to the content column.",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "lead_width",
+      "min": 35,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Heading column width",
+      "info": "As a share of the content column. The text beside it takes what is left.",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between columns",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "copy_offset",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Drop the text column",
+      "info": "Nudges the right column down so it starts level with the heading rather than with the label above it.",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label",
+      "default": "OUR MINDSET"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Label size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_tracking",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Label letter spacing",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Label colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below label",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Press Enter to break the heading onto a new line.",
+      "default": "A Brand that doesn't just sit on your shelf, it fits into your life."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "heading_leading",
+      "min": 1,
+      "max": 1.8,
+      "step": 0.1,
+      "label": "Heading line height",
+      "default": 1.3
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>In a world bursting with choices, we believe skincare should stand out not by shouting louder, but by meaning more. Beyond Beyond is about bringing together science, care, and intention to create something truly significant.</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button.",
+      "default": "Shop The Product"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "cta_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above button",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "cta_min_width",
+      "min": 0,
+      "max": 560,
+      "step": 10,
+      "unit": "px",
+      "label": "Button minimum width",
+      "info": "0 lets the button size itself to its label.",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "cta_height",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Button height",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cta_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Button corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Statement"
+    }
+  ]
+}
+{% endschema %}

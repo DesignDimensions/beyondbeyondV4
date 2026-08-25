@@ -1,0 +1,363 @@
+{{ 'about-banner.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The full-bleed image that separates the page's opening statement from the
+  belief that follows it, with the brand lockup laid over it.
+
+  The lockup is positioned as a percentage of the frame rather than in pixels.
+  A banner this wide is cropped differently at every screen size, and a mark
+  pinned 4% in from the left stays in the same place over the photograph at
+  any of them, where a mark pinned 60px in would drift across the subject's
+  face as the crop changes.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    An image picked in the editor is the usual case; the URL field is for
+    artwork that lives somewhere else. Both end up as one src so the markup
+    below only has to ask about it once. The same for the mobile crop, which
+    falls back to the desktop image rather than to nothing.
+  endcomment
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 2200
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+
+  assign overlay = section.settings.overlay_image
+  assign overlay_src = section.settings.overlay_image_url
+  if overlay != blank
+    assign overlay_src = overlay | image_url: width: 1200
+  endif
+
+  assign overlay_heading = section.settings.overlay_heading | escape | newline_to_br
+
+  assign ratio = section.settings.ratio | default: '1440 / 637'
+  assign ratio_mobile = section.settings.ratio_mobile | default: ratio
+-%}
+
+<div
+  class="abb{% unless section.settings.full_width %} abb--contained{% endunless %}"
+  style="
+    --abb-pad-top: {{ section.settings.padding_top }}px;
+    --abb-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --abb-ratio: {{ ratio }};
+    --abb-ratio-mobile: {{ ratio_mobile }};
+    --abb-bg: {{ section.settings.background }};
+    --abb-scrim: {{ section.settings.scrim_color }};
+    --abb-scrim-opacity: {{ section.settings.scrim_opacity | divided_by: 100.0 }};
+    --abb-overlay-x: {{ section.settings.overlay_x }}%;
+    --abb-overlay-y: {{ section.settings.overlay_y }}%;
+    --abb-overlay-w: {{ section.settings.overlay_width }}px;
+    --abb-overlay-color: {{ section.settings.overlay_color }};
+    --abb-quote-size: {{ section.settings.quote_size }}px;
+    --abb-lockup-gap: {{ section.settings.lockup_gap }}px;
+    --abb-heading-size: {{ section.settings.overlay_heading_size }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="abb__frame">
+    {%- if image_src != blank -%}
+      <picture>
+        {%- if image_mobile != blank -%}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ image_mobile | image_url: width: 750 }} 750w,
+              {{ image_mobile | image_url: width: 1100 }} 1100w,
+              {{ image_mobile | image_url: width: 1500 }} 1500w
+            "
+            sizes="100vw"
+          >
+        {%- endif -%}
+        <img
+          class="abb__img"
+          src="{{ image_src }}"
+          {%- if image != blank %}
+            srcset="
+              {{ image | image_url: width: 900 }} 900w,
+              {{ image | image_url: width: 1400 }} 1400w,
+              {{ image | image_url: width: 1900 }} 1900w,
+              {{ image | image_url: width: 2400 }} 2400w
+            "
+            width="{{ image.width }}"
+            height="{{ image.height }}"
+          {%- endif %}
+          sizes="100vw"
+          alt="{{ section.settings.image_alt | escape }}"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'abb__img abb__img--placeholder' }}
+    {%- endif -%}
+
+    {%- if section.settings.scrim_opacity > 0 -%}
+      <div class="abb__scrim" aria-hidden="true"></div>
+    {%- endif -%}
+
+    {%- if overlay_src != blank or overlay_heading != blank or section.settings.show_quote_mark -%}
+      <div class="abb__overlay abb__overlay--{{ section.settings.overlay_align }}">
+        <div class="abb__lockup">
+          {%- comment -%}
+            The mark is decoration beside the wordmark, not a quotation, so it
+            is hidden from assistive technology — the lockup's alt text already
+            says whose banner this is.
+          {%- endcomment -%}
+          {%- if section.settings.show_quote_mark -%}
+            <span class="abb__quote" aria-hidden="true">&rdquo;</span>
+          {%- endif -%}
+
+          {%- if overlay_src != blank -%}
+            <img
+              class="abb__lockup-img"
+              src="{{ overlay_src }}"
+              {%- if overlay != blank %}
+                width="{{ overlay.width }}"
+                height="{{ overlay.height }}"
+              {%- endif %}
+              alt="{{ section.settings.overlay_alt | escape }}"
+              loading="lazy"
+              decoding="async"
+            >
+          {%- endif -%}
+        </div>
+
+        {%- if overlay_heading != blank -%}
+          <p class="abb__overlay-heading">{{ overlay_heading }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About Banner",
+  "tag": "section",
+  "class": "section-about-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a banner this wide crops hard on a phone. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "info": "Off keeps the banner inside the content column.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "ratio",
+      "label": "Shape (desktop)",
+      "info": "Width and height, e.g. 1440 / 637.",
+      "default": "1440 / 637"
+    },
+    {
+      "type": "text",
+      "id": "ratio_mobile",
+      "label": "Shape (mobile)",
+      "info": "Leave empty to use the desktop shape.",
+      "default": "4 / 5"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Shows in the frame while the image loads.",
+      "default": "#3B322B"
+    },
+    {
+      "type": "header",
+      "content": "Lockup"
+    },
+    {
+      "type": "image_picker",
+      "id": "overlay_image",
+      "label": "Lockup image",
+      "info": "The brand mark laid over the photograph."
+    },
+    {
+      "type": "text",
+      "id": "overlay_image_url",
+      "label": "Lockup image URL",
+      "info": "Used when no lockup image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "overlay_alt",
+      "label": "Lockup description",
+      "default": "Beyond Beyond"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_mark",
+      "label": "Show quote mark",
+      "info": "Draws the brand's quote mark to the left of the lockup.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "min": 20,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Quote mark size",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "lockup_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between mark and lockup",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "overlay_width",
+      "min": 80,
+      "max": 640,
+      "step": 10,
+      "unit": "px",
+      "label": "Lockup width",
+      "default": 240
+    },
+    {
+      "type": "textarea",
+      "id": "overlay_heading",
+      "label": "Text under the lockup",
+      "info": "Optional. Press Enter to break it onto a new line."
+    },
+    {
+      "type": "range",
+      "id": "overlay_heading_size",
+      "min": 12,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Lockup colour",
+      "info": "Applies to the quote mark and the text.",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "select",
+      "id": "overlay_align",
+      "label": "Lockup alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "overlay_x",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Lockup position — across",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "overlay_y",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Lockup position — down",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Scrim"
+    },
+    {
+      "type": "color",
+      "id": "scrim_color",
+      "label": "Scrim colour",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Scrim strength",
+      "info": "Darkens the photograph so the lockup stays legible.",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Banner"
+    }
+  ]
+}
+{% endschema %}

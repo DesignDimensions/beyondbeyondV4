@@ -1,0 +1,161 @@
+/* ==========================================================================
+   Philosophy Cards — three pictures, each with its idea written across the
+   foot
+   ========================================================================== */
+
+.phc {
+  padding-top: var(--phc-pad-top, 72px);
+  padding-bottom: var(--phc-pad-bottom, 72px);
+  background-color: var(--phc-bg, #fff);
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.phc__head {
+  margin-bottom: var(--phc-head-gap, 40px);
+  text-align: var(--phc-align, center);
+}
+
+.phc__heading {
+  margin: 0 0 12px;
+  font-size: var(--phc-heading-size, 32px);
+  font-weight: var(--phc-heading-weight, 400);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--phc-heading-color, #0a0a0b);
+}
+
+/* Auto margins do the centring, so the intro sits under the middle of the
+   heading when the header is centred and flush left when it is not — one
+   width setting covering both. */
+.phc__intro {
+  max-width: var(--phc-body-w, 620px);
+  margin-inline: auto;
+  color: var(--phc-body-color, #3d3d3d);
+}
+
+.phc--left .phc__intro {
+  margin-inline: 0;
+}
+
+.phc__intro > * + * {
+  margin-top: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Grid
+   -------------------------------------------------------------------------- */
+
+.phc__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--phc-columns, 3), minmax(0, 1fr));
+  gap: var(--phc-card-gap, 10px);
+}
+
+.phc__card {
+  position: relative;
+  aspect-ratio: var(--phc-card-ratio, 0.72);
+  overflow: hidden;
+  border-radius: var(--phc-card-radius, 0px);
+  background-color: var(--phc-card-bg, #d9d9d9);
+}
+
+.phc__card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.phc__media,
+.phc__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.phc__img {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phc__card:hover .phc__img {
+  transform: scale(1.04);
+}
+
+/* --------------------------------------------------------------------------
+   Caption
+   --------------------------------------------------------------------------
+   Laid over the foot of the picture rather than under it, so a longer
+   description grows up into the image instead of making one card taller than
+   the two beside it.
+   -------------------------------------------------------------------------- */
+
+.phc__caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  padding: var(--phc-caption-inset, 16px);
+  color: var(--phc-card-text, #fff);
+}
+
+/* The tint is a layer of its own rather than the caption's own background:
+   the words have to stay at full strength while the plate behind them is
+   dialled down, and one opacity on the element would fade both. */
+.phc__caption::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--phc-caption-bg, #2b2b2b);
+  opacity: var(--phc-caption-opacity, 0.85);
+}
+
+.phc__title {
+  margin: 0 0 6px;
+  font-size: var(--phc-title-size, 17px);
+  font-weight: 500;
+  line-height: 1.25;
+  color: currentColor;
+}
+
+.phc__text {
+  font-size: var(--phc-text-size, 12px);
+  line-height: 1.45;
+  opacity: 0.88;
+  color: currentColor;
+}
+
+.phc__text > * {
+  margin: 0;
+}
+
+.phc__text > * + * {
+  margin-top: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .phc {
+    padding-top: calc(var(--phc-pad-top, 72px) * 0.6);
+    padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.6);
+  }
+
+  .phc__heading {
+    font-size: clamp(2.2rem, 6.5vw, var(--phc-heading-size, 32px));
+  }
+
+  .phc__grid {
+    grid-template-columns: repeat(var(--phc-columns-mobile, 1), minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phc__img {
+    transition-duration: 0.01ms;
+  }
+}

@@ -1,0 +1,164 @@
+/* ==========================================================================
+   About Media & Text — a picture on one side, the copy that belongs to it on
+   the other
+   ========================================================================== */
+
+.amt {
+  padding-top: var(--amt-pad-top, 80px);
+  padding-bottom: var(--amt-pad-bottom, 80px);
+  background-color: var(--amt-bg, #fff);
+}
+
+.amt__row {
+  display: flex;
+  align-items: var(--amt-align, flex-start);
+  gap: var(--amt-gap, 56px);
+}
+
+/* Mirrored by direction rather than by order, so the image keeps its place in
+   the document beside the copy it belongs to. */
+.amt--reversed .amt__row {
+  flex-direction: row-reverse;
+}
+
+.amt__media {
+  flex: 0 0 var(--amt-media-w, 45%);
+  max-width: var(--amt-media-w, 45%);
+  aspect-ratio: var(--amt-media-ratio, 1.15);
+  overflow: hidden;
+  border-radius: var(--amt-media-radius, 0px);
+  /* Standing in for the picture before one is chosen, this is what makes the
+     section hold its drawn shape in the editor rather than collapsing to the
+     height of the copy. */
+  background-color: var(--amt-media-bg, #d9d9d9);
+}
+
+.amt__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.amt__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+
+.amt__eyebrow {
+  margin: 0 0 var(--amt-eyebrow-gap, 18px);
+  font-size: var(--amt-eyebrow-size, 12px);
+  font-weight: 500;
+  letter-spacing: var(--amt-eyebrow-tracking, 3px);
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--amt-eyebrow-color, #1a1a1a);
+}
+
+.amt__heading {
+  margin: 0 0 var(--amt-heading-gap, 20px);
+  font-size: var(--amt-heading-size, 34px);
+  font-weight: var(--amt-heading-weight, 400);
+  line-height: var(--amt-heading-leading, 1.25);
+  letter-spacing: -0.01em;
+  color: var(--amt-heading-color, #0a0a0b);
+}
+
+.amt__body {
+  color: var(--amt-body-color, #3d3d3d);
+}
+
+.amt__body > * + * {
+  margin-top: var(--amt-body-gap, 16px);
+}
+
+/* --------------------------------------------------------------------------
+   Button
+   -------------------------------------------------------------------------- */
+
+.amt__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-sizing: border-box;
+  min-width: var(--amt-cta-min-w, 300px);
+  max-width: 100%;
+  height: var(--amt-cta-h, 48px);
+  padding: 0 24px;
+  margin-top: var(--amt-cta-gap, 32px);
+  border-radius: var(--amt-cta-radius, 0px);
+  background-color: var(--amt-cta-bg, #000);
+  color: var(--amt-cta-fg, #fff);
+  font-size: var(--amt-cta-size, 14px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: filter 0.3s ease;
+}
+
+.amt__cta:hover {
+  filter: brightness(1.35);
+}
+
+.amt__cta-arrow {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 10px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.amt__cta:hover .amt__cta-arrow {
+  transform: translateX(5px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Both arrangements stack picture-first: mirroring the columns was about the
+   rhythm of a wide page, and in one column it would only mean the copy for
+   one section arriving before its image and after it in the next.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .amt {
+    padding-top: calc(var(--amt-pad-top, 80px) * 0.6);
+    padding-bottom: calc(var(--amt-pad-bottom, 80px) * 0.6);
+  }
+
+  .amt__row,
+  .amt--reversed .amt__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .amt__media {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: var(--amt-media-ratio-mobile, var(--amt-media-ratio, 1.15));
+  }
+
+  .amt__heading {
+    font-size: clamp(2.2rem, 6.5vw, var(--amt-heading-size, 34px));
+  }
+
+  .amt__cta {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amt__cta,
+  .amt__cta-arrow {
+    transition-duration: 0.01ms;
+  }
+}

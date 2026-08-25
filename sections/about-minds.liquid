@@ -1,0 +1,499 @@
+{{ 'about-minds.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The people behind the brand, as a rail of portraits with a name and a role
+  laid over the foot of each.
+
+  The rail is a native scroll box: a swipe on a phone and a trackpad on a
+  desktop already move it, and the arrows in the gutters only have to step it
+  on by a card and say when there is nothing left in that direction. That is
+  also why the section still works with JavaScript off — it degrades to a row
+  the reader can scroll, not to a row they cannot reach the end of.
+{%- endcomment -%}
+
+<div
+  class="mnd"
+  data-mnd
+  style="
+    --mnd-pad-top: {{ section.settings.padding_top }}px;
+    --mnd-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --mnd-bg: {{ section.settings.background }};
+    --mnd-head-gap: {{ section.settings.head_gap }}px;
+    --mnd-heading-size: {{ section.settings.heading_size }}px;
+    --mnd-heading-weight: {{ section.settings.heading_weight }};
+    --mnd-heading-color: {{ section.settings.heading_color }};
+    --mnd-body-color: {{ section.settings.body_color }};
+    --mnd-body-w: {{ section.settings.body_width }}px;
+    --mnd-quote-size: {{ section.settings.quote_size }}px;
+    --mnd-quote-color: {{ section.settings.quote_color }};
+    --mnd-columns: {{ section.settings.columns_desktop }};
+    --mnd-columns-mobile: {{ section.settings.columns_mobile }};
+    --mnd-card-gap: {{ section.settings.card_gap }}px;
+    --mnd-card-ratio: {{ section.settings.media_ratio }};
+    --mnd-card-radius: {{ section.settings.card_radius }}px;
+    --mnd-card-bg: {{ section.settings.card_background }};
+    --mnd-card-inset: {{ section.settings.card_inset }}px;
+    --mnd-scrim: {{ section.settings.scrim_color }};
+    --mnd-scrim-opacity: {{ section.settings.scrim_opacity | divided_by: 100.0 }};
+    --mnd-name-size: {{ section.settings.name_size }}px;
+    --mnd-role-size: {{ section.settings.role_size }}px;
+    --mnd-card-text: {{ section.settings.card_text_color }};
+    --mnd-arrow-size: {{ section.settings.arrow_size }}px;
+    --mnd-arrow-offset: {{ section.settings.arrow_offset }}px;
+    --mnd-arrow-color: {{ section.settings.arrow_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width mnd__head">
+    <div class="mnd__head-copy">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="mnd__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="mnd__body section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Decoration rather than a quotation — there is nothing being quoted — so
+      it is kept away from assistive technology entirely.
+    {%- endcomment -%}
+    {%- if section.settings.show_quote_mark -%}
+      <span class="mnd__quote" aria-hidden="true">&rdquo;</span>
+    {%- endif -%}
+  </div>
+
+  <div class="page-width mnd__frame">
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="mnd__arrow mnd__arrow--prev"
+        type="button"
+        data-mnd-arrow="prev"
+        aria-controls="mnd-rail-{{ section.id }}"
+        aria-label="{{ 'general.slider.previous_slide' | t }}"
+      >
+        <span class="mnd__arrow-glyph" aria-hidden="true">&lsaquo;</span>
+      </button>
+    {%- endif -%}
+
+    <div
+      class="mnd__rail"
+      id="mnd-rail-{{ section.id }}"
+      data-mnd-rail
+      tabindex="0"
+      role="group"
+      aria-label="{{ section.settings.heading | default: 'The people behind the brand' | escape }}"
+    >
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign image = block.settings.image
+          assign image_src = block.settings.image_url
+          if image != blank
+            assign image_src = image | image_url: width: 900
+          endif
+          assign role = block.settings.role | escape | newline_to_br
+        -%}
+
+        <article class="mnd__card" data-mnd-card {{ block.shopify_attributes }}>
+          {%- comment -%}
+            The whole card is the link when one is set, laid over the portrait
+            rather than wrapped around it — a link around a figure with text
+            inside it reads back as one long run of words, where this keeps the
+            name as the accessible name of the link and the rest as content.
+          {%- endcomment -%}
+          {%- if block.settings.link != blank -%}
+            <a class="mnd__card-link" href="{{ block.settings.link }}">
+              <span class="visually-hidden">{{ block.settings.name }}</span>
+            </a>
+          {%- endif -%}
+
+          <div class="mnd__media">
+            {%- if image_src != blank -%}
+              <img
+                class="mnd__img"
+                src="{{ image_src }}"
+                {%- if image != blank %}
+                  srcset="
+                    {{ image | image_url: width: 400 }} 400w,
+                    {{ image | image_url: width: 700 }} 700w,
+                    {{ image | image_url: width: 1000 }} 1000w
+                  "
+                  width="{{ image.width }}"
+                  height="{{ image.height }}"
+                {%- endif %}
+                sizes="(min-width: 750px) calc(100vw / {{ section.settings.columns_desktop }}), 70vw"
+                alt="{{ block.settings.name | escape }}"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- endif -%}
+          </div>
+
+          <div class="mnd__scrim" aria-hidden="true"></div>
+
+          <div class="mnd__caption">
+            {%- if block.settings.name != blank -%}
+              <h3 class="mnd__name">{{ block.settings.name }}</h3>
+            {%- endif -%}
+            {%- if role != blank -%}
+              <p class="mnd__role">{{ role }}</p>
+            {%- endif -%}
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_arrows -%}
+      <button
+        class="mnd__arrow mnd__arrow--next"
+        type="button"
+        data-mnd-arrow="next"
+        aria-controls="mnd-rail-{{ section.id }}"
+        aria-label="{{ 'general.slider.next_slide' | t }}"
+      >
+        <span class="mnd__arrow-glyph" aria-hidden="true">&rsaquo;</span>
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<script src="{{ 'about-minds.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Minds Behind",
+  "tag": "section",
+  "class": "section-about-minds",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Minds Behind Beyond Beyond"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 28
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>A collective of industry pioneers shaping the future of clean clinical skincare, powered by NAD+.</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_width",
+      "min": 240,
+      "max": 720,
+      "step": 10,
+      "unit": "px",
+      "label": "Text width",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below header",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_mark",
+      "label": "Show quote mark",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "min": 20,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Quote mark size",
+      "default": 56
+    },
+    {
+      "type": "color",
+      "id": "quote_color",
+      "label": "Quote mark colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Cards per row (desktop)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards per row (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1 and a peek" },
+        { "value": "1.5", "label": "1 and a half" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1.2"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Card shape",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "0.9", "label": "Slight portrait" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "0.75", "label": "Tall portrait" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Card corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "info": "Shows while a portrait loads, and in place of one before it is chosen.",
+      "default": "#C9CCD6"
+    },
+    {
+      "type": "range",
+      "id": "card_inset",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Caption inset",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "scrim_color",
+      "label": "Caption scrim",
+      "info": "Fades up from the foot of the portrait so the name stays legible over any photograph.",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Scrim strength",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "name_size",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Name size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "role_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Role size",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Caption colour",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Arrow size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Arrow distance from the cards",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#E8EDF7"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "person",
+      "name": "Person",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Portrait"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Portrait URL",
+          "info": "Used when no portrait is picked above."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Aparna Kakrania"
+        },
+        {
+          "type": "textarea",
+          "id": "role",
+          "label": "Role",
+          "info": "Press Enter to break the role onto a new line.",
+          "default": "Brand Builder, Designer\nStoryteller"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional — makes the whole card clickable."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minds Behind",
+      "blocks": [
+        { "type": "person" },
+        { "type": "person" },
+        { "type": "person" }
+      ]
+    }
+  ]
+}
+{% endschema %}

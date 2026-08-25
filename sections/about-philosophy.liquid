@@ -1,0 +1,401 @@
+{{ 'about-philosophy.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The three ideas the brand is built on, as a row of pictures with the idea
+  written across the foot of each.
+
+  The caption is laid over the picture rather than placed under it, so the
+  three cards are the same height whatever length the descriptions run to —
+  the row reads as three plates rather than three columns of uneven text.
+{%- endcomment -%}
+
+<div
+  class="phc{% if section.settings.alignment == 'left' %} phc--left{% endif %}"
+  style="
+    --phc-pad-top: {{ section.settings.padding_top }}px;
+    --phc-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --phc-bg: {{ section.settings.background }};
+    --phc-align: {{ section.settings.alignment }};
+    --phc-head-gap: {{ section.settings.head_gap }}px;
+    --phc-heading-size: {{ section.settings.heading_size }}px;
+    --phc-heading-weight: {{ section.settings.heading_weight }};
+    --phc-heading-color: {{ section.settings.heading_color }};
+    --phc-body-color: {{ section.settings.body_color }};
+    --phc-body-w: {{ section.settings.body_width }}px;
+    --phc-columns: {{ section.settings.columns_desktop }};
+    --phc-columns-mobile: {{ section.settings.columns_mobile }};
+    --phc-card-gap: {{ section.settings.card_gap }}px;
+    --phc-card-ratio: {{ section.settings.media_ratio }};
+    --phc-card-radius: {{ section.settings.card_radius }}px;
+    --phc-card-bg: {{ section.settings.card_background }};
+    --phc-caption-bg: {{ section.settings.caption_background }};
+    --phc-caption-opacity: {{ section.settings.caption_opacity | divided_by: 100.0 }};
+    --phc-caption-inset: {{ section.settings.caption_inset }}px;
+    --phc-title-size: {{ section.settings.title_size }}px;
+    --phc-text-size: {{ section.settings.text_size }}px;
+    --phc-card-text: {{ section.settings.card_text_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- if section.settings.heading != blank or section.settings.body != blank -%}
+    <div class="page-width phc__head">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="phc__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="phc__intro section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="page-width">
+    <div class="phc__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign image = block.settings.image
+          assign image_src = block.settings.image_url
+          if image != blank
+            assign image_src = image | image_url: width: 900
+          endif
+          assign title = block.settings.title
+        -%}
+
+        <article class="phc__card" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a class="phc__card-link" href="{{ block.settings.link }}">
+              <span class="visually-hidden">{{ title }}</span>
+            </a>
+          {%- endif -%}
+
+          <div class="phc__media">
+            {%- if image_src != blank -%}
+              <img
+                class="phc__img"
+                src="{{ image_src }}"
+                {%- if image != blank %}
+                  srcset="
+                    {{ image | image_url: width: 400 }} 400w,
+                    {{ image | image_url: width: 700 }} 700w,
+                    {{ image | image_url: width: 1000 }} 1000w
+                  "
+                  width="{{ image.width }}"
+                  height="{{ image.height }}"
+                {%- endif %}
+                sizes="(min-width: 750px) calc(100vw / {{ section.settings.columns_desktop }}), 90vw"
+                alt="{{ block.settings.image_alt | default: title | escape }}"
+                loading="lazy"
+                decoding="async"
+              >
+            {%- endif -%}
+          </div>
+
+          <div class="phc__caption">
+            {%- if title != blank -%}
+              <h3 class="phc__title">{{ title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="phc__text">{{ block.settings.text }}</div>
+            {%- endif -%}
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Philosophy Cards",
+  "tag": "section",
+  "class": "section-about-philosophy",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Philosophy"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>Lorem ipsum dolor sit amet consectetur. Vivamus diam purus in vel quam viverra commodo non odio.</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_width",
+      "min": 280,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "label": "Text width",
+      "default": 620
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Header alignment",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Space below header",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Cards per row (desktop)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Cards per row (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between cards",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Card shape",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "0.9", "label": "Slight portrait" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "0.72", "label": "Tall portrait" }
+      ],
+      "default": "0.72"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Card corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "info": "Shows while an image loads, and in place of one before it is chosen.",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "header",
+      "content": "Caption"
+    },
+    {
+      "type": "color",
+      "id": "caption_background",
+      "label": "Caption background",
+      "default": "#2B2B2B"
+    },
+    {
+      "type": "range",
+      "id": "caption_opacity",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Caption strength",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "caption_inset",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Caption inset",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Caption colour",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Image URL",
+          "info": "Used when no image is picked above."
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Image description",
+          "info": "Read out in place of the image. Falls back to the title."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Intentional Formulation"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Description",
+          "default": "<p>We use only proven, effective ingredients at functional levels. No fillers. No guesswork.</p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional — makes the whole card clickable."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Philosophy Cards",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" }
+      ]
+    }
+  ]
+}
+{% endschema %}

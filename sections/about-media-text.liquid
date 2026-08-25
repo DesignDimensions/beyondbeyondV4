@@ -1,0 +1,499 @@
+{{ 'about-media-text.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  An image on one side, and on the other the label, sentence and paragraph
+  that belong to it — with a button when the copy is leading somewhere.
+
+  The about page uses this twice, mirrored: the belief statement with the
+  picture on the left, and the NAD+ note with it on the right. The swap is a
+  flex direction rather than a reordering of the markup, so the image is still
+  announced with the copy it belongs to whichever side it is shown on.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1600
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
+  assign heading = section.settings.heading | escape | newline_to_br
+-%}
+
+<div
+  class="amt{% if section.settings.media_position == 'right' %} amt--reversed{% endif %}"
+  style="
+    --amt-pad-top: {{ section.settings.padding_top }}px;
+    --amt-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --amt-bg: {{ section.settings.background }};
+    --amt-gap: {{ section.settings.column_gap }}px;
+    --amt-align: {{ section.settings.vertical_alignment }};
+    --amt-media-w: {{ section.settings.media_width }}%;
+    --amt-media-ratio: {{ section.settings.media_ratio }};
+    {%- if section.settings.media_ratio_mobile != blank %}
+      --amt-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
+    {%- endif %}
+    --amt-media-bg: {{ section.settings.media_background }};
+    --amt-media-radius: {{ section.settings.media_radius }}px;
+    --amt-eyebrow-size: {{ section.settings.eyebrow_size }}px;
+    --amt-eyebrow-tracking: {{ section.settings.eyebrow_tracking }}px;
+    --amt-eyebrow-color: {{ section.settings.eyebrow_color }};
+    --amt-eyebrow-gap: {{ section.settings.eyebrow_gap }}px;
+    --amt-heading-size: {{ section.settings.heading_size }}px;
+    --amt-heading-weight: {{ section.settings.heading_weight }};
+    --amt-heading-leading: {{ section.settings.heading_leading }};
+    --amt-heading-color: {{ section.settings.heading_color }};
+    --amt-heading-gap: {{ section.settings.heading_gap }}px;
+    --amt-body-color: {{ section.settings.body_color }};
+    --amt-body-gap: {{ section.settings.body_gap }}px;
+    --amt-cta-gap: {{ section.settings.cta_gap }}px;
+    --amt-cta-min-w: {{ section.settings.cta_min_width }}px;
+    --amt-cta-h: {{ section.settings.cta_height }}px;
+    --amt-cta-size: {{ section.settings.cta_size }}px;
+    --amt-cta-radius: {{ section.settings.cta_radius }}px;
+    --amt-cta-bg: {{ section.settings.cta_background }};
+    --amt-cta-fg: {{ section.settings.cta_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width amt__row">
+    <div class="amt__media">
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 600 }} 600w,
+                {{ image_mobile | image_url: width: 900 }} 900w,
+                {{ image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="92vw"
+            >
+          {%- endif -%}
+          <img
+            class="amt__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 600 }} 600w,
+                {{ image | image_url: width: 900 }} 900w,
+                {{ image | image_url: width: 1400 }} 1400w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 92vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+
+    <div class="amt__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="amt__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if heading != blank -%}
+        <h2 class="amt__heading">{{ heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="amt__body section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_label != blank -%}
+        <a class="amt__cta" href="{{ section.settings.cta_link | default: '#' }}">
+          <span class="amt__cta-label">{{ section.settings.cta_label }}</span>
+          <svg class="amt__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
+            <path
+              d="M0 5h31.5M27.5 1 32 5l-4.5 4"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About Media & Text",
+  "tag": "section",
+  "class": "section-about-media-text",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the content column. The copy takes what is left.",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between image and copy",
+      "default": 56
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Copy alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape (desktop)",
+      "options": [
+        { "value": "1.15", "label": "Wide" },
+        { "value": "1.33", "label": "Landscape" },
+        { "value": "1", "label": "Square" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": "1.15"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "options": [
+        { "value": "", "label": "Same as desktop" },
+        { "value": "1.33", "label": "Landscape" },
+        { "value": "1", "label": "Square" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": ""
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Image background",
+      "info": "Shows while the image loads, and in place of it before one is chosen.",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Image corner radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label",
+      "default": "OUR BELIEF"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Label size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_tracking",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Label letter spacing",
+      "default": 3
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Label colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below label",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Press Enter to break the heading onto a new line.",
+      "default": "Skincare shouldn't overwhelm, It should restore."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 34
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "heading_leading",
+      "min": 1,
+      "max": 1.8,
+      "step": 0.1,
+      "label": "Heading line height",
+      "default": 1.3
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below heading",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>At Beyond Beyond, we design purposeful formulations that do more with less. Free from alcohol, parabens, and fragrance, every product is a <em><strong>conscious blend of science-backed ingredients crafted for real, visible results.</strong></em></p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#3D3D3D"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button."
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "cta_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above button",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "cta_min_width",
+      "min": 0,
+      "max": 560,
+      "step": 10,
+      "unit": "px",
+      "label": "Button minimum width",
+      "info": "0 lets the button size itself to its label.",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "cta_height",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Button height",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cta_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Button corner radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "Button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Media & Text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,124 @@
+/* ==========================================================================
+   About Banner — a full-bleed photograph with the brand lockup laid over it
+   ========================================================================== */
+
+.abb {
+  padding-top: var(--abb-pad-top, 0px);
+  padding-bottom: var(--abb-pad-bottom, 0px);
+}
+
+.abb--contained .abb__frame {
+  max-width: var(--page-width);
+  margin-inline: auto;
+}
+
+.abb__frame {
+  position: relative;
+  aspect-ratio: var(--abb-ratio, 1440 / 637);
+  overflow: hidden;
+  background-color: var(--abb-bg, #3b322b);
+}
+
+.abb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.abb__scrim {
+  position: absolute;
+  inset: 0;
+  background-color: var(--abb-scrim, #000);
+  opacity: var(--abb-scrim-opacity, 0);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Lockup
+   --------------------------------------------------------------------------
+   Placed as a share of the frame, then pulled back by half its own size, so
+   the position setting reads as "where the lockup sits" rather than "where
+   its top-left corner sits" — which is what a merchant dragging a slider
+   expects, and what keeps it steady as the banner re-crops.
+   -------------------------------------------------------------------------- */
+
+.abb__overlay {
+  position: absolute;
+  left: var(--abb-overlay-x, 6%);
+  top: var(--abb-overlay-y, 50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 80%;
+  color: var(--abb-overlay-color, #fff);
+  transform: translateY(-50%);
+}
+
+.abb__overlay--center {
+  align-items: center;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.abb__overlay--right {
+  align-items: flex-end;
+  text-align: right;
+  transform: translate(-100%, -50%);
+}
+
+.abb__lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--abb-lockup-gap, 20px);
+}
+
+/* The mark is set on its own line box and pulled up: quotation glyphs sit on
+   the cap line, and left alone the wordmark beside it would hang well below
+   the mark's optical centre. */
+.abb__quote {
+  flex: 0 0 auto;
+  font-size: var(--abb-quote-size, 96px);
+  line-height: 0.72;
+  font-weight: 700;
+  align-self: flex-start;
+  color: currentColor;
+}
+
+.abb__lockup-img {
+  display: block;
+  width: var(--abb-overlay-w, 240px);
+  max-width: 100%;
+  height: auto;
+}
+
+.abb__overlay-heading {
+  margin: 0;
+  font-size: var(--abb-heading-size, 18px);
+  font-weight: 400;
+  line-height: 1.35;
+  color: currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .abb__frame {
+    aspect-ratio: var(--abb-ratio-mobile, var(--abb-ratio, 1440 / 637));
+  }
+
+  .abb__quote {
+    font-size: calc(var(--abb-quote-size, 96px) * 0.6);
+  }
+
+  .abb__lockup-img {
+    width: calc(var(--abb-overlay-w, 240px) * 0.7);
+  }
+
+  .abb__overlay-heading {
+    font-size: calc(var(--abb-heading-size, 18px) * 0.85);
+  }
+}
