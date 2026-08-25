@@ -1,0 +1,139 @@
+/* ==========================================================================
+   NAD Feature — a picture on one side of the content column, the argument
+   that goes with it on the other
+   ========================================================================== */
+
+.nft {
+  padding-top: var(--nft-pad-top, 80px);
+  padding-bottom: var(--nft-pad-bottom, 80px);
+  background-color: var(--nft-bg, #fff);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page has to hold its content clear of it.
+   `--header-height` is the theme's own measurement, published on the root by
+   the header script; the fallback only stands in for the moment before that
+   runs. This is the product hero's mechanism, used here for the same reason. */
+.nft--under-header {
+  padding-top: calc(var(--header-height, var(--nft-header-fallback, 100px)) + var(--nft-pad-top, 80px));
+}
+
+.nft__row {
+  display: flex;
+  align-items: var(--nft-align, flex-start);
+  gap: var(--nft-gap, 56px);
+}
+
+/* Mirrored by direction rather than by order, so the picture keeps its place
+   in the document beside the copy it belongs to. */
+.nft--reversed .nft__row {
+  flex-direction: row-reverse;
+}
+
+.nft__media {
+  flex: 0 0 var(--nft-media-w, 42%);
+  max-width: var(--nft-media-w, 42%);
+  aspect-ratio: var(--nft-media-ratio, 0.8);
+  overflow: hidden;
+  background-color: var(--nft-media-bg, #dedede);
+}
+
+.nft__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nft__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------
+   The same two the split bands use: the product page's 15/700/7 overline and
+   the statement size the rest of the site settles on. Restated here rather
+   than inherited, so `base.css`'s narrow-screen step-down on the shared label
+   cannot reach them.
+   -------------------------------------------------------------------------- */
+
+.nft .section-heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 7px;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--nft-ink, #0a0a0b);
+}
+
+.nft .section-title {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--nft-ink, #0a0a0b);
+}
+
+/* Browsers draw an inset border on `hr` of their own, which is why the border
+   is cleared before the line is drawn back as a single top edge. */
+.nft__rule {
+  height: 0;
+  margin: var(--nft-rule-gap, 18px) 0;
+  border: 0;
+  border-top: 1px solid var(--nft-rule-color, #1a1a1a);
+}
+
+/* Without a rule the paragraph still has to clear the heading, so the gap the
+   rule would have carried is handed to the body instead. */
+.nft__rule + .nft__body {
+  margin-top: 0;
+}
+
+.nft__body {
+  margin-top: var(--nft-rule-gap, 18px);
+  color: var(--nft-body-color, #1a1a1a);
+}
+
+.nft__body > * + * {
+  margin-top: var(--nft-body-gap, 14px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .nft {
+    padding-top: calc(var(--nft-pad-top, 80px) * 0.6);
+    padding-bottom: calc(var(--nft-pad-bottom, 80px) * 0.6);
+  }
+
+  .nft--under-header {
+    padding-top: calc(
+      var(--header-height, var(--nft-header-fallback-mobile, 76px)) + var(--nft-pad-top, 80px) * 0.6
+    );
+  }
+
+  .nft__row,
+  .nft--reversed .nft__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .nft__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: var(--nft-media-ratio-mobile, var(--nft-media-ratio, 0.8));
+  }
+
+  .nft .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+}

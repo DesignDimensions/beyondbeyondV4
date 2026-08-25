@@ -1,0 +1,210 @@
+/* ==========================================================================
+   NAD Split — a picture running to one edge of the screen, a tinted panel
+   carrying the copy against it
+   ==========================================================================
+   Full-bleed on purpose: these bands checker down the page and any content
+   column between them would open a white seam along the join. The copy inside
+   the panel is held to its own width instead, which is what keeps the lines
+   readable without a grid to sit on.
+   ========================================================================== */
+
+.nsp {
+  background-color: var(--nsp-bg, #000);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page has to hold its content clear of it.
+   `--header-height` is the theme's own measurement, published on the root by
+   the header script; the fallback only stands in for the moment before that
+   runs. This is the product hero's mechanism, used here for the same reason. */
+.nsp--under-header {
+  padding-top: var(--header-height, var(--nsp-header-fallback, 100px));
+}
+
+.nsp__row {
+  display: flex;
+  height: 750px;
+  align-items: stretch;
+}
+
+/* The side the picture takes is a direction, not an order: it stays first in
+   the markup either way, so it is still read out with the copy it belongs to
+   rather than after it. */
+.nsp--reversed .nsp__row {
+  flex-direction: row-reverse;
+}
+
+/* The half is a ratio box and the photograph is laid over it, so the two
+   halves are always exactly as tall as each other. Whichever wants more
+   height sets the row's; the picture fills whatever it is given rather than
+   stretching the row to its own proportions. */
+/* The half itself carries no height of its own, so it is free to stretch to
+   whatever the row settles on — which is what guarantees the picture reaches
+   the bottom of the band even when the copy opposite is the taller half. */
+.nsp__media {
+  position: relative;
+  flex: 0 0 var(--nsp-media-w, 50%);
+  max-width: var(--nsp-media-w, 50%);
+  overflow: hidden;
+  background-color: var(--nsp-media-bg, #dedede);
+}
+
+/* An empty element carries the height instead. Stating it outright rather
+   than deriving it from the picture's shape is what makes the three bands
+   agree: a ratio ties the height to the viewport, so every screen width gave
+   a different one. This gives the same band at every width.
+
+   It is a floor rather than a ceiling. Should the copy opposite ever need
+   more room than this, the row grows and the half stretches with it — the
+   picture keeps filling its side either way, which is the whole reason the
+   height sits on this element and not on the half itself. */
+.nsp__media picture {
+  display: block;
+}
+
+.nsp__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The copy sits on the theme's own content grid rather than on a padding of
+   its own. `.page-width` is a centred box of `--page-width` with a 5rem inner
+   gutter, so the distance from the screen edge to where its text begins is
+   `(row - page-width) / 2 + 5rem`. That is exactly what the panel's outer
+   padding is set to, which puts a heading in here on the same vertical as one
+   in any ordinary section above or below it.
+
+   The percentage resolves against `.nsp__row`, which is the real content
+   width. `100vw` would have been the obvious way to write it and would have
+   been wrong — it counts the scrollbar, and every heading on the page would
+   sit a few pixels off the grid on any desktop that shows one.
+
+   `max()` covers the narrow end: below `--page-width` the grid is the full
+   screen less its gutter, so the gutter alone is the right answer and the
+   subtraction would otherwise go negative. */
+.nsp__panel {
+  --nsp-grid-edge: max(var(--nsp-grid-pad, 5rem),
+      calc(50% - var(--page-width, 130rem) / 2 + var(--nsp-grid-pad, 5rem)));
+
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: end;
+  padding-block: var(--nsp-pad-y, 64px);
+  /* Outer side to the grid, inner side to the join with the picture. */
+  padding-inline: var(--nsp-pad-inner, 60px) var(--nsp-grid-edge);
+  background-color: var(--nsp-bg, #000);
+}
+
+/* Reversed, the panel is on the left, so the two sides swap: the grid edge is
+   now the one facing the screen. */
+.nsp--reversed .nsp__panel {
+  padding-inline: var(--nsp-grid-edge) var(--nsp-pad-inner, 60px);
+}
+
+.nsp__copy {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------
+   The label is the product page's overline at 15/700/7, restated here for the
+   reason it is restated on the About page: `base.css` steps the shared label
+   down to 14/6 under 750px and the overline it is matching has no such step.
+   The statement is the size the rest of the site settles on. Only the tints
+   are the section's own, because every band here is a different colour.
+   -------------------------------------------------------------------------- */
+
+.nsp .section-heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 7px;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--nsp-ink, #fff);
+}
+
+.nsp .section-title {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--nsp-ink, #fff);
+}
+
+/* Browsers draw an inset border on `hr` of their own, which is why the border
+   is cleared before the line is drawn back as a single top edge. */
+.nsp__rule {
+  height: 0;
+  margin: var(--nsp-rule-gap, 18px) 0;
+  border: 0;
+  border-top: 1px solid var(--nsp-rule-color, #fff);
+}
+
+/* Without a rule the paragraph still needs to clear the heading, so the gap
+   the rule would have carried is handed to the body instead. */
+.nsp__rule+.nsp__body {
+  margin-top: 0;
+  font-weight: 400;
+}
+
+.nsp__body {
+  margin-top: var(--nsp-rule-gap, 18px);
+  color: var(--nsp-body-color, #fff);
+}
+
+.nsp__body>*+* {
+  margin-top: var(--nsp-body-gap, 14px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Stacked, and the picture above the copy whichever side it takes on a wide
+   screen: reversing a column would open the band with an image and leave the
+   heading that names it underneath.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .nsp--under-header {
+    padding-top: var(--header-height, var(--nsp-header-fallback-mobile, 76px));
+  }
+
+  .nsp__row,
+  .nsp--reversed .nsp__row {
+    flex-direction: column;
+  }
+
+  .nsp__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Stacked, the picture is the full width of a phone, where a fixed height
+     would crop it to a letterbox. It goes back to a shape here. */
+  .nsp__sizer {
+    height: auto;
+    aspect-ratio: var(--nsp-ratio-mobile, 1 / 1);
+  }
+
+  /* Stacked, there is no join to hold the copy off and no half-grid to align
+     to, so the panel simply takes `.page-width`'s own narrow-screen gutter. */
+  .nsp__panel,
+  .nsp--reversed .nsp__panel {
+    padding-block: 32px 40px;
+    padding-inline: 1.5rem;
+  }
+
+  .nsp .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+}

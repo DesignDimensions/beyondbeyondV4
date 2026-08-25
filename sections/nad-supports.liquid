@@ -1,0 +1,319 @@
+{{ 'nad-supports.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  What NAD+ does for skin, as a two-column run of points, each with its own
+  line drawing. A tinted band rather than white, so it reads as the summary
+  between the explanation above it and the argument below.
+
+  The points are blocks so their order and number are the merchant's, and the
+  grid fills across rather than down — the pair on each row belong beside each
+  other, and a fifth point should start a new row rather than lengthen a
+  column.
+{%- endcomment -%}
+
+<div
+  class="nsu{% if section.settings.offset_header %} nsu--under-header{% endif %}"
+  style="
+    --nsu-pad-top: {{ section.settings.padding_top }}px;
+    --nsu-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --nsu-bg: {{ section.settings.background }};
+    --nsu-ink: {{ section.settings.ink }};
+    --nsu-body-color: {{ section.settings.body_color }};
+    --nsu-body-w: {{ section.settings.body_width }}px;
+    --nsu-head-gap: {{ section.settings.head_gap }}px;
+    --nsu-columns: {{ section.settings.columns_desktop }};
+    --nsu-col-gap: {{ section.settings.column_gap }}px;
+    --nsu-row-gap: {{ section.settings.row_gap }}px;
+    --nsu-icon-size: {{ section.settings.icon_size }}px;
+    --nsu-icon-gap: {{ section.settings.icon_gap }}px;
+    --nsu-title-size: {{ section.settings.title_size }}px;
+    --nsu-title-color: {{ section.settings.title_color }};
+    --nsu-text-size: {{ section.settings.text_size }}px;
+    --nsu-text-color: {{ section.settings.text_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.body != blank -%}
+      <div class="nsu__intro section-text">{{ section.settings.body }}</div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="nsu__grid">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign icon = block.settings.icon
+            assign icon_src = block.settings.icon_url
+            if icon != blank
+              assign icon_src = icon | image_url: width: 240
+            endif
+          -%}
+
+          <div class="nsu__item" {{ block.shopify_attributes }}>
+            {%- comment -%}
+              The drawing repeats what the title beside it already says, so it
+              carries an empty alt rather than a description a reader would
+              have to hear twice.
+            {%- endcomment -%}
+            {%- if icon_src != blank -%}
+              <img
+                class="nsu__icon"
+                src="{{ icon_src }}"
+                {%- if icon != blank %}
+                  width="{{ icon.width }}"
+                  height="{{ icon.height }}"
+                {%- endif %}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              >
+            {%- else -%}
+              <span class="nsu__icon nsu__icon--empty" aria-hidden="true"></span>
+            {%- endif -%}
+
+            <div class="nsu__copy">
+              {%- if block.settings.title != blank -%}
+                <h3 class="nsu__title">{{ block.settings.title }}</h3>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="nsu__text">{{ block.settings.text }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "NAD Supports",
+  "tag": "section",
+  "class": "section-nad-supports",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Set in the theme's shared section statement.",
+      "default": "How NAD+ Supports Your Skin"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Intro",
+      "default": "<p>NAD+ can be replenished through topical formulations, supplements, or NAD+ precursors such as <strong>Nicotinamide Riboside (NR)</strong> and <strong>Nicotinamide Mononucleotide (NMN)</strong>. In skincare, stabilized forms of NAD+ or its precursors help:</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Intro colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "body_width",
+      "min": 400,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "label": "Intro width",
+      "default": 1180
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below the intro",
+      "default": 44
+    },
+    {
+      "type": "header",
+      "content": "Points"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Columns (desktop)",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between columns",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 16,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rows",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "icon_gap",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between icon and copy",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Description colour",
+      "default": "#4A4A4A"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#F2F2F2"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Point",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "icon_url",
+          "label": "Icon URL",
+          "info": "Used when no icon is picked above."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Enhance skin repair"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Description",
+          "default": "<p>Boosts DNA repair mechanisms, reducing oxidative damage from environmental aggressors</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "NAD Supports",
+      "blocks": [
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" }
+      ]
+    }
+  ]
+}
+{% endschema %}

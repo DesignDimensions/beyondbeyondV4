@@ -1,0 +1,215 @@
+{
+  "sections": {
+    "hero": {
+      "type": "nad-split",
+      "settings": {
+        "eyebrow": "",
+        "heading": "NAD+ - The Pro-Ageing Miracle Molecule",
+        "show_rule": true,
+        "body": "<p>Ageing is an inevitable process, but science is unlocking new ways to harness its mechanisms for healthier, more radiant skin. One such groundbreaking discovery is Nicotinamide Adenine Dinucleotide (NAD+), a coenzyme that plays a pivotal role in cellular health and longevity. Often dubbed the &lsquo;miracle molecule&rsquo; in longevity research, NAD+ is now emerging as a pro-ageing hero in skincare, redefining how we approach skin rejuvenation and repair.</p>",
+        "body_gap": 14,
+        "background": "#ffffff",
+        "ink": "#0a0a0b",
+        "body_color": "#1a1a1a",
+        "rule_color": "#1a1a1a",
+        "rule_gap": 18,
+        "panel_pad_inner": 60,
+        "panel_pad_y": 64,
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-hero-cell.png?v=1787657586",
+        "image_alt": "A cell rendered in blue, suspended in fluid",
+        "band_height": 850,
+        "media_ratio_mobile": "1 / 1",
+        "media_background": "#dedede",
+        "media_position": "right",
+        "media_width": 50,
+        "offset_header": true
+      }
+    },
+    "what_is": {
+      "type": "nad-split",
+      "settings": {
+        "eyebrow": "",
+        "heading": "What is NAD+",
+        "show_rule": true,
+        "body": "<p>NAD+ is a vital coenzyme found in every living cell. It serves as a crucial energy carrier, facilitating various biological processes such as DNA repair, mitochondrial function, and cellular metabolism. As we age, NAD+ levels decline, leading to diminished cellular function, increased oxidative stress, and visible signs of ageing, such as wrinkles, fine lines, and loss of skin elasticity.</p>",
+        "body_gap": 14,
+        "background": "#000000",
+        "ink": "#ffffff",
+        "body_color": "#ffffff",
+        "rule_color": "#ffffff",
+        "rule_gap": 18,
+        "panel_pad_inner": 60,
+        "panel_pad_y": 64,
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-what-is-nad.png?v=1787657590",
+        "image_alt": "Cells on the skin surface, lit warm",
+        "band_height": 850,
+        "media_ratio_mobile": "1 / 1",
+        "media_background": "#dedede",
+        "media_position": "left",
+        "media_width": 50,
+        "offset_header": false
+      }
+    },
+    "science": {
+      "type": "nad-split",
+      "settings": {
+        "eyebrow": "",
+        "heading": "The Science behind NAD+\nand Skin Ageing",
+        "show_rule": true,
+        "body": "<p>NAD+ is critical in mitochondrial biogenesis, ensuring that skin cells generate sufficient energy to maintain their structure and function. When NAD+ levels are restored, skin cells become more efficient at repairing oxidative damage, maintaining hydration, and fighting external stressors like UV radiation and pollution.</p>",
+        "body_gap": 14,
+        "background": "#000000",
+        "ink": "#ffffff",
+        "body_color": "#ffffff",
+        "rule_color": "#ffffff",
+        "rule_gap": 18,
+        "panel_pad_inner": 60,
+        "panel_pad_y": 64,
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-science-molecules.png?v=1787657606",
+        "image_alt": "Skin close-up with gold molecules suspended beside it",
+        "band_height": 850,
+        "media_ratio_mobile": "1 / 1",
+        "media_background": "#dedede",
+        "media_position": "right",
+        "media_width": 50,
+        "offset_header": false
+      }
+    },
+    "supports": {
+      "type": "nad-supports",
+      "blocks": {
+        "point_repair": {
+          "type": "benefit",
+          "settings": {
+            "icon_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-icon-repair.png?v=1787657620",
+            "title": "Enhance skin repair",
+            "text": "<p>Boosts DNA repair mechanisms, reducing oxidative damage from environmental aggressors</p>"
+          }
+        },
+        "point_inflammation": {
+          "type": "benefit",
+          "settings": {
+            "icon_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-icon-inflammation.png?v=1787657622",
+            "title": "Reduce inflammation",
+            "text": "<p>Mitigates oxidative stress and prevents premature ageing caused by chronic inflammation</p>"
+          }
+        },
+        "point_elasticity": {
+          "type": "benefit",
+          "settings": {
+            "icon_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-icon-elasticity.png?v=1787657625",
+            "title": "Improve skin elasticity",
+            "text": "<p>Stimulates collagen and elastin production, leading to plumper, firmer skin</p>"
+          }
+        },
+        "point_energy": {
+          "type": "benefit",
+          "settings": {
+            "icon_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-icon-energy.png?v=1787657627",
+            "title": "Increase skin energy production",
+            "text": "<p>Supports mitochondrial function for optimal cellular turnover and renewal</p>"
+          }
+        },
+        "point_hydration": {
+          "type": "benefit",
+          "settings": {
+            "icon_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-icon-hydration.png?v=1787657629",
+            "title": "Boost hydration",
+            "text": "<p>Strengthens the skin barrier, reducing transepidermal water loss (TEWL)</p>"
+          }
+        }
+      },
+      "block_order": [
+        "point_repair",
+        "point_inflammation",
+        "point_elasticity",
+        "point_energy",
+        "point_hydration"
+      ],
+      "name": "NAD Supports",
+      "settings": {
+        "heading": "How NAD+ Supports Your Skin",
+        "ink": "#0a0a0b",
+        "body": "<p>NAD+ can be replenished through topical formulations, supplements, or NAD+ precursors such as <strong>Nicotinamide Riboside (NR)</strong> and <strong>Nicotinamide Mononucleotide (NMN)</strong>. In skincare, stabilized forms of NAD+ or its precursors help:</p>",
+        "body_color": "#1a1a1a",
+        "body_width": 1180,
+        "head_gap": 44,
+        "columns_desktop": 2,
+        "column_gap": 64,
+        "row_gap": 40,
+        "icon_size": 64,
+        "icon_gap": 20,
+        "title_size": 16,
+        "title_color": "#0a0a0b",
+        "text_size": 13,
+        "text_color": "#4a4a4a",
+        "background": "#f2f2f2",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "offset_header": false
+      }
+    },
+    "paradigm": {
+      "type": "nad-feature",
+      "settings": {
+        "eyebrow": "",
+        "heading": "Pro-Ageing Vs. Anti-Ageing:\nA Paradigm Shift",
+        "show_rule": false,
+        "body": "<p>Traditional skincare has largely focused on anti-ageing, attempting to reverse or slow down visible signs of ageing. However, the concept of pro-ageing shifts the narrative towards embracing ageing gracefully&mdash;not by erasing time but by enhancing cellular health to ensure skin ages optimally. NAD+ epitomizes this philosophy by working at the molecular level to revitalize, rather than simply conceal the effects of ageing.</p><p>Ageing is not about resisting time&mdash;it&rsquo;s about optimising how we age. With NAD+ at the forefront, Beyond Beyond offers a science-backed pathway to pro-ageing skincare.</p>",
+        "body_gap": 14,
+        "ink": "#0a0a0b",
+        "body_color": "#1a1a1a",
+        "rule_color": "#1a1a1a",
+        "rule_gap": 18,
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-paradigm-skin.png?v=1787657612",
+        "image_alt": "A freckled face in profile, eyes closed",
+        "media_ratio": "0.8",
+        "media_ratio_mobile": "",
+        "media_background": "#dedede",
+        "media_position": "left",
+        "media_width": 45,
+        "column_gap": 56,
+        "vertical_alignment": "center",
+        "background": "#ffffff",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "offset_header": false
+      }
+    },
+    "future": {
+      "type": "nad-feature",
+      "settings": {
+        "eyebrow": "NAD+",
+        "heading": "The Future is Here",
+        "show_rule": true,
+        "body": "<p>NAD+ supplementation and topical applications are gaining traction in the world of biological skincare, where science-driven formulations take precedence over conventional beauty trends. Brands incorporating NAD+ into their skincare products focus on cellular longevity, rather than just surface-level improvements.</p><p>Beyond Beyond&rsquo;s The Ultimate Night Repair Supercream harnesses the power of NAD+ derived from Sunflower Shoot Extract&mdash;a revolutionary, stable form designed for superior bioavailability. By replenishing NAD+ levels overnight, the skin experiences deep restoration, waking up visibly firmer, smoother, and more resilient against daily stressors.</p>",
+        "body_gap": 14,
+        "ink": "#0a0a0b",
+        "body_color": "#1a1a1a",
+        "rule_color": "#1a1a1a",
+        "rule_gap": 18,
+        "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/bb-nad-future-packaging.png?v=1787657616",
+        "image_alt": "Beyond Beyond packaging, open box with the night cream",
+        "media_ratio": "0.76",
+        "media_ratio_mobile": "",
+        "media_background": "#dedede",
+        "media_position": "right",
+        "media_width": 45,
+        "column_gap": 56,
+        "vertical_alignment": "center",
+        "background": "#ffffff",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "offset_header": false
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "what_is",
+    "science",
+    "supports",
+    "paradigm",
+    "future"
+  ]
+}

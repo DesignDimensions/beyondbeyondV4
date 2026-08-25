@@ -1,0 +1,336 @@
+{{ 'nad-split.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  A full-bleed half-and-half band: a picture running to one edge of the screen
+  and a tinted panel carrying the copy against it.
+
+  The NAD+ page is built from three of these, alternating sides so the pictures
+  and the panels checker down the page. They are one section rather than three
+  because only the side, the tint and the words change between them — the hero
+  is the same shape as the two dark panels under it, just drawn on white.
+
+  Nothing here sets a type size. The label is `.section-heading` at the size
+  the product page's overline takes, the statement is `.section-title` at the
+  size the About page settles on, and the paragraph is `.section-text`. Only
+  the tints belong to the section, because each band is a different colour.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1600
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
+  assign heading = section.settings.heading | escape | newline_to_br
+
+  comment
+    On a wide screen the band is given a height outright, so there is no ratio
+    to resolve. Stacked, a fixed height would be absurd on a phone, so the
+    picture goes back to a shape there and this is the only ratio left.
+  endcomment
+  assign ratio_mobile = section.settings.media_ratio_mobile | default: '1 / 1'
+-%}
+
+<div
+  class="nsp{% if section.settings.media_position == 'right' %} nsp--reversed{% endif %}{% if section.settings.offset_header %} nsp--under-header{% endif %}"
+  style="
+    --nsp-bg: {{ section.settings.background }};
+    --nsp-ink: {{ section.settings.ink }};
+    --nsp-body-color: {{ section.settings.body_color }};
+    --nsp-media-w: {{ section.settings.media_width }}%;
+    --nsp-h: {{ section.settings.band_height }}px;
+    --nsp-ratio-mobile: {{ ratio_mobile }};
+    --nsp-media-bg: {{ section.settings.media_background }};
+    --nsp-pad-inner: {{ section.settings.panel_pad_inner }}px;
+    --nsp-pad-y: {{ section.settings.panel_pad_y }}px;
+    --nsp-rule-color: {{ section.settings.rule_color }};
+    --nsp-rule-gap: {{ section.settings.rule_gap }}px;
+    --nsp-body-gap: {{ section.settings.body_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="nsp__row">
+    {%- comment -%}
+      The picture comes first in the markup, so it sits on the left until the
+      row is reversed — which is why "right" is what adds `--reversed`, not
+      "left". Getting that backwards mirrors every band on the page at once.
+
+      It is laid over its half rather than placed in it, so the two
+      halves are always exactly as tall as each other: whichever of them wants
+      more height sets it, and the photograph fills whatever it is given
+      instead of stretching the row to its own proportions.
+    {%- endcomment -%}
+    <div class="nsp__media">
+      {%- comment -%}
+        An empty element carries the shape. It, not the picture, is what tells
+        the row how tall this half wants to be — which leaves the half itself
+        free to stretch to whatever the row settles on, so the picture always
+        fills it edge to edge even when the copy opposite is the taller of the
+        two.
+      {%- endcomment -%}
+      <div class="nsp__sizer" aria-hidden="true"></div>
+
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 750 }} 750w,
+                {{ image_mobile | image_url: width: 1100 }} 1100w
+              "
+              sizes="100vw"
+            >
+          {%- endif -%}
+          <img
+            class="nsp__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 700 }} 700w,
+                {{ image | image_url: width: 1100 }} 1100w,
+                {{ image | image_url: width: 1600 }} 1600w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 100vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+
+    <div class="nsp__panel">
+      <div class="nsp__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="section-heading">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if heading != blank -%}
+          <h2 class="section-title">{{ heading }}</h2>
+        {%- endif -%}
+
+        {%- comment -%}
+          A real `<hr>`: what sits between the name of the idea and the
+          explanation of it is a thematic break, and that is the element that
+          says so. Its own border is cleared in the stylesheet, since browsers
+          draw one of their own.
+        {%- endcomment -%}
+        {%- if section.settings.show_rule -%}
+          <hr class="nsp__rule">
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="nsp__body section-text">{{ section.settings.body }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "NAD Split",
+  "tag": "section",
+  "class": "section-nad-split",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label",
+      "info": "Optional. Set in the theme's shared section label."
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
+      "default": "What is NAD+"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Rule under the heading",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>NAD+ is a vital coenzyme found in every living cell.</p>"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Panel"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Panel background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "info": "Tints the label and the heading together.",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rule colour",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "rule_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space around the rule",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "panel_pad_inner",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between the copy and the image",
+      "info": "The outer side needs no setting — the copy is aligned to the theme's content column automatically, so it starts level with every other section on the page.",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "panel_pad_y",
+      "min": 16,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Panel padding — top and bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "range",
+      "id": "band_height",
+      "min": 300,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Band height",
+      "info": "The height of the band on a wide screen. Stacked on a phone the picture takes the shape below instead. A band still grows past this if its copy needs the room.",
+      "default": 850
+    },
+    {
+      "type": "text",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "info": "Width and height, e.g. 1 / 1. Used only once the band stacks.",
+      "default": "1 / 1"
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Image background",
+      "info": "Shows while the image loads, and in place of it before one is chosen.",
+      "default": "#DEDEDE"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image side",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the screen. The panel takes what is left, so 50 puts the join on the centre line and runs the picture to the outer edge.",
+      "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "NAD Split"
+    }
+  ]
+}
+{% endschema %}

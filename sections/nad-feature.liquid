@@ -1,0 +1,332 @@
+{{ 'nad-feature.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  A picture on one side of the content column and the argument that goes with
+  it on the other. Unlike the split bands above it, this one keeps to the grid
+  the rest of the site sits on — these two sections are the page coming back
+  to the page, after the full-bleed halves have had their say.
+
+  The About page has a section of this shape too. This is a separate one
+  because these need the rule under the heading and carry no button, and
+  because folding the two together would put "About Media & Text" in the
+  editor's section list on the NAD+ page.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1400
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
+  assign heading = section.settings.heading | escape | newline_to_br
+-%}
+
+<div
+  class="nft{% if section.settings.media_position == 'right' %} nft--reversed{% endif %}{% if section.settings.offset_header %} nft--under-header{% endif %}"
+  style="
+    --nft-pad-top: {{ section.settings.padding_top }}px;
+    --nft-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --nft-bg: {{ section.settings.background }};
+    --nft-ink: {{ section.settings.ink }};
+    --nft-body-color: {{ section.settings.body_color }};
+    --nft-body-gap: {{ section.settings.body_gap }}px;
+    --nft-gap: {{ section.settings.column_gap }}px;
+    --nft-align: {{ section.settings.vertical_alignment }};
+    --nft-media-w: {{ section.settings.media_width }}%;
+    --nft-media-ratio: {{ section.settings.media_ratio }};
+    {%- if section.settings.media_ratio_mobile != blank %}
+      --nft-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
+    {%- endif %}
+    --nft-media-bg: {{ section.settings.media_background }};
+    --nft-rule-color: {{ section.settings.rule_color }};
+    --nft-rule-gap: {{ section.settings.rule_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width nft__row">
+    <div class="nft__media">
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 600 }} 600w,
+                {{ image_mobile | image_url: width: 900 }} 900w,
+                {{ image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="92vw"
+            >
+          {%- endif -%}
+          <img
+            class="nft__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 600 }} 600w,
+                {{ image | image_url: width: 900 }} 900w,
+                {{ image | image_url: width: 1400 }} 1400w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 92vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+
+    <div class="nft__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-heading">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if heading != blank -%}
+        <h2 class="section-title">{{ heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.show_rule -%}
+        <hr class="nft__rule">
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="nft__body section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "NAD Feature",
+  "tag": "section",
+  "class": "section-nad-feature",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Label",
+      "info": "Optional. Set in the theme's shared section label."
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
+      "default": "The Future is Here"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Rule under the heading",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>NAD+ supplementation and topical applications are gaining traction in the world of biological skincare.</p>"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between paragraphs",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "info": "Tints the label and the heading together.",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rule colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "rule_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space around the rule",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape (desktop)",
+      "options": [
+        { "value": "0.8", "label": "Portrait" },
+        { "value": "0.76", "label": "Tall portrait" },
+        { "value": "1", "label": "Square" },
+        { "value": "1.15", "label": "Wide" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": "0.8"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "options": [
+        { "value": "", "label": "Same as desktop" },
+        { "value": "0.8", "label": "Portrait" },
+        { "value": "1", "label": "Square" },
+        { "value": "1.15", "label": "Wide" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": ""
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Image background",
+      "info": "Shows while the image loads, and in place of it before one is chosen.",
+      "default": "#DEDEDE"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 30,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the content column. The copy takes what is left.",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between image and copy",
+      "default": 56
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Copy alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "NAD Feature"
+    }
+  ]
+}
+{% endschema %}
