@@ -35,8 +35,7 @@
 }
 
 .amt__media {
-  flex: 0 0 var(--amt-media-w, 45%);
-  max-width: var(--amt-media-w, 45%);
+  width: 48%;
   aspect-ratio: var(--amt-media-ratio, 1.15);
   overflow: hidden;
   border-radius: var(--amt-media-radius, 0px);
@@ -54,8 +53,7 @@
 }
 
 .amt__copy {
-  flex: 1 1 auto;
-  min-width: 0;
+  width: 40%;
 }
 
 /* --------------------------------------------------------------------------

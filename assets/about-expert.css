@@ -1,0 +1,126 @@
+/* ==========================================================================
+   About Expert — a portrait on one half, a name, a rule and a paragraph on
+   the other
+   ==========================================================================
+   The name is the About page's shared statement, so it holds the same size
+   and leading as every other heading on the page rather than the product
+   page's own 42px expert note. Everything under it is `.section-text` at the
+   size the rest of the page reads at.
+   ========================================================================== */
+
+.aex {
+  padding-top: var(--aex-pad-top, 80px);
+  background-color: var(--aex-bg, #fff);
+}
+
+.aex__row {
+  display: flex;
+  align-items: var(--aex-align, flex-start);
+  gap: var(--aex-gap, 48px);
+}
+
+/* The side the portrait takes is a direction, not an order: it stays first in
+   the markup either way, so it is still read out with the copy it belongs to
+   rather than after it. */
+.aex--reversed .aex__row {
+  flex-direction: row-reverse;
+}
+
+/* The portrait holds a fixed shape, so one that arrives at some other aspect
+   fills the same half of the row as the one before it rather than resizing
+   the section around itself. */
+.aex__media {
+  flex: 0 0 var(--aex-media-w, 50%);
+  max-width: var(--aex-media-w, 50%);
+  aspect-ratio: var(--aex-media-ratio, 1);
+  overflow: hidden;
+  background-color: var(--aex-media-bg, #ede6e0);
+}
+
+.aex__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The copy takes whatever the portrait leaves. `min-width: 0` is what lets it
+   be the one that gives: without it a long unbroken word sets the column's
+   floor and the portrait is squeezed instead. */
+.aex__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+
+/* One statement size across the whole About page, taken from the band that
+   opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
+   column it shares. Change it in one of the page's sections and change it in
+   all of them. */
+.aex .section-title {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--aex-ink, #0a0a0b);
+}
+
+/* Browsers draw an inset border on `hr` of their own, which is why the border
+   is cleared before the line is drawn back as a single top edge. */
+.aex__rule {
+  height: 0;
+  margin: var(--aex-rule-gap, 18px) 0;
+  border: 0;
+  border-top: 1px solid #000;
+}
+
+.aex__lead {
+  margin: 0 0 var(--aex-lead-gap, 6px);
+  font-style: italic;
+  color: var(--aex-lead-color, #1a1a1a);
+}
+
+.aex__body {
+  color: var(--aex-body-color, #1a1a1a);
+}
+
+.aex__body > * + * {
+  margin-top: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Stacked, and the portrait above the copy whichever side it takes on a wide
+   screen: reversing a column would put the name under the paragraph it names.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .aex {
+    padding-top: calc(var(--aex-pad-top, 80px) * 0.6);
+    padding-bottom: calc(var(--aex-pad-bottom, 80px) * 0.6);
+  }
+
+  .aex__row,
+  .aex--reversed .aex__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .aex__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: var(--aex-media-ratio-mobile, var(--aex-media-ratio, 1));
+  }
+
+  .aex .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+}

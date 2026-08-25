@@ -1,0 +1,341 @@
+{{ 'about-expert.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  A person and what they stand for: a portrait on one half, and on the other a
+  name, a rule, the line that sits under it in italic, and the paragraph.
+
+  The product page has a section of its own for this shape — `expert-note` —
+  and this is deliberately not that one. That section is drawn to the product
+  page's finish: a 42px name in the heading face, no rule, no italic line, and
+  no background of its own because it sits beneath a panel that has one. This
+  page's version takes the About page's shared statement size instead, adds
+  the two rows the design asks for, and tints its own band. Folding both into
+  one section would mean forking every one of those anyway.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1400
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+-%}
+
+<div
+  class="aex{% if section.settings.media_position == 'right' %} aex--reversed{% endif %}"
+  style="
+    --aex-pad-top: {{ section.settings.padding_top }}px;
+    --aex-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --aex-bg: {{ section.settings.background }};
+    --aex-ink: {{ section.settings.ink }};
+    --aex-gap: {{ section.settings.column_gap }}px;
+    --aex-align: {{ section.settings.vertical_alignment }};
+    --aex-media-w: {{ section.settings.media_width }}%;
+    --aex-media-ratio: {{ section.settings.media_ratio }};
+    {%- if section.settings.media_ratio_mobile != blank %}
+      --aex-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
+    {%- endif %}
+    --aex-media-bg: {{ section.settings.media_background }};
+    --aex-rule-color: {{ section.settings.rule_color }};
+    --aex-rule-gap: {{ section.settings.rule_gap }}px;
+    --aex-lead-color: {{ section.settings.lead_color }};
+    --aex-lead-gap: {{ section.settings.lead_gap }}px;
+    --aex-body-color: {{ section.settings.body_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width aex__row">
+    <div class="aex__media">
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 600 }} 600w,
+                {{ image_mobile | image_url: width: 900 }} 900w,
+                {{ image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="92vw"
+            >
+          {%- endif -%}
+          <img
+            class="aex__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 600 }} 600w,
+                {{ image | image_url: width: 900 }} 900w,
+                {{ image | image_url: width: 1400 }} 1400w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 92vw"
+            alt="{{ section.settings.image_alt | default: section.settings.heading | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+
+    <div class="aex__copy">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="section-title">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- comment -%}
+        A real `<hr>` rather than a bordered element: what separates the name
+        from what follows is a thematic break, and that is the element that
+        says so. Its own border is cleared in the stylesheet, since browsers
+        still draw one of their own.
+      {%- endcomment -%}
+      {%- if section.settings.show_rule -%}
+        <hr class="aex__rule">
+      {%- endif -%}
+
+      {%- if section.settings.lead != blank -%}
+        <p class="aex__lead section-text">{{ section.settings.lead | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="aex__body section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About Expert",
+  "tag": "section",
+  "class": "section-about-expert",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Name",
+      "info": "Set in the theme's shared section statement.",
+      "default": "Dr. Uktara Numshum"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Rule under the name",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "lead",
+      "label": "Italic line",
+      "info": "Sits between the rule and the paragraph.",
+      "default": "The Art & Science of Timeless Beauty"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>Lorem ipsum dolor sit amet consectetur. Nibh congue non dui posuere volutpat sed pretium. Etiam ut sed semper ultrices fringilla dapibus ultricies. Interdum senectus ut egestas adipiscing purus aliquet sollicitudin. Nec pellentesque viverra lorem dignissim lorem quam nulla.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Portrait (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Portrait (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop portrait above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Portrait URL",
+      "info": "Used when no portrait is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Portrait description",
+      "info": "Read out in place of the portrait. Falls back to the name."
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Portrait shape (desktop)",
+      "options": [
+        { "value": "1", "label": "Square" },
+        { "value": "0.9", "label": "Slight portrait" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "1.15", "label": "Wide" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Portrait shape (mobile)",
+      "options": [
+        { "value": "", "label": "Same as desktop" },
+        { "value": "1", "label": "Square" },
+        { "value": "0.815", "label": "Portrait" },
+        { "value": "1.15", "label": "Wide" },
+        { "value": "auto", "label": "Original" }
+      ],
+      "default": ""
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Portrait background",
+      "info": "Shows while the portrait loads, and in place of it before one is chosen.",
+      "default": "#EDE6E0"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Portrait position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 30,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Portrait width",
+      "info": "As a share of the content column. The copy takes what is left.",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between portrait and copy",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Copy alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Name colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "header",
+      "content": "Rule and italic line"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rule colour",
+      "default": "#B7B7B7"
+    },
+    {
+      "type": "range",
+      "id": "rule_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space around the rule",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "lead_color",
+      "label": "Italic line colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "lead_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below the italic line",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Expert"
+    }
+  ]
+}
+{% endschema %}

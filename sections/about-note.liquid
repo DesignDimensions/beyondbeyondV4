@@ -1,0 +1,132 @@
+{{ 'about-note.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  One sentence on its own band, closing the page.
+
+  There is no heading and no label here on purpose: the line is the whole
+  section, and anything above it would turn a closing remark into another
+  block of content. It is richtext rather than plain text so the phrase the
+  design sets in bold can be set in bold by the merchant rather than being
+  baked into the markup.
+{%- endcomment -%}
+
+<div
+  class="anb{% if section.settings.alignment == 'center' %} anb--center{% endif %}"
+  style="
+    --anb-pad-top: {{ section.settings.padding_top }}px;
+    --anb-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --anb-bg: {{ section.settings.background }};
+    --anb-color: {{ section.settings.text_color }};
+    --anb-size: {{ section.settings.text_size }}px;
+    --anb-leading: {{ section.settings.line_height }};
+    --anb-align: {{ section.settings.alignment }};
+    {%- if section.settings.text_width > 0 %}
+      --anb-max: {{ section.settings.text_width }}px;
+    {%- endif %}
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    {%- if section.settings.text != blank -%}
+      <div class="anb__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About Note",
+  "tag": "section",
+  "class": "section-about-note",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "info": "Bold the phrase you want to carry the emphasis.",
+      "default": "<p>No fillers, no shortcuts, just skincare that is <strong>honest, effective, and thoughtfully crafted</strong> for skin that thrives.</p>"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "min": 1,
+      "max": 2.2,
+      "step": 0.1,
+      "label": "Line height",
+      "default": 1.6
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "range",
+      "id": "text_width",
+      "min": 0,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "label": "Text width",
+      "info": "Holds the line to this width so it breaks where you want it. 0 lets it run the full content column.",
+      "default": 1180
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centre" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Note"
+    }
+  ]
+}
+{% endschema %}

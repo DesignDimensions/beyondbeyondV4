@@ -95,7 +95,7 @@
 }
 
 .abs__body {
-  margin-top: var(--abs-body-gap, 16px);
+  margin-top: 0;
   color: var(--abs-body-color, #1a1a1a);
   line-height: 28px;
   width: 100%;

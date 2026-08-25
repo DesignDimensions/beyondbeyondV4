@@ -1,0 +1,59 @@
+/* ==========================================================================
+   About Note — one sentence on its own band, closing the page
+   ==========================================================================
+   The band is full-bleed and the sentence keeps to the theme's content
+   column, so a tint reaches both edges of the screen while the line stays on
+   the same grid as everything above it.
+   ========================================================================== */
+
+.anb {
+  padding-top: 140px;
+  padding-bottom: 140px;
+}
+
+/* Held to a width so the sentence breaks where it was drawn to. Unset, the
+   max-width falls back to `none` and the line runs the full column. */
+.anb__text {
+  max-width: var(--anb-max, none);
+  margin-inline: 0;
+  font-size: 40px;
+  line-height: var(--anb-leading, 1.6);
+  text-align: var(--anb-align, left);
+  color: var(--anb-color, #0a0a0b);
+}
+
+/* Centring has to move the block, not just the words inside it: held to a
+   width narrower than the column, a left-margined block with centred text
+   would sit against the left edge with its line floating in the middle of
+   itself. */
+.anb--center .anb__text {
+  margin-inline: auto;
+}
+
+.anb__text>* {
+  margin: 0;
+}
+
+.anb__text>*+* {
+  margin-top: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   The width that sets the line break on a wide screen is meaningless once the
+   column is narrower than it, so it is handed back rather than left to fight
+   the viewport.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .anb {
+    padding-top: calc(var(--anb-pad-top, 72px) * 0.6);
+    padding-bottom: calc(var(--anb-pad-bottom, 72px) * 0.6);
+  }
+
+  .anb__text {
+    max-width: none;
+    font-size: clamp(1.7rem, 4.6vw, var(--anb-size, 22px));
+  }
+}

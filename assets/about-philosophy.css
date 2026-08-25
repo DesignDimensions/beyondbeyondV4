@@ -1,6 +1,10 @@
 /* ==========================================================================
-   Philosophy Cards — three pictures, each with its idea written across the
-   foot
+   Philosophy — a numbered list of points beside one picture
+   ==========================================================================
+   Each point is a title and its number on one line, a rule beneath them, and
+   the sentence under that. The rule belongs to the point above it, not to the
+   gap between points, which is why it sits inside the item rather than being
+   a border on the boundary between two.
    ========================================================================== */
 
 .phc {
@@ -9,148 +13,154 @@
   background-color: var(--phc-bg, #fff);
 }
 
+.phc__row {
+  display: flex;
+  align-items: var(--phc-align, flex-start);
+  gap: var(--phc-gap, 40px);
+}
+
+/* The side the picture takes is a direction, not an order: the list stays
+   first in the markup either way, so the heading that names this section is
+   still read before the picture that decorates it. */
+.phc--reversed .phc__row {
+  flex-direction: row-reverse;
+}
+
+.phc__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.phc__media {
+  flex: 0 0 var(--phc-media-w, 48%);
+  max-width: var(--phc-media-w, 48%);
+  aspect-ratio: var(--phc-media-ratio, 1);
+  overflow: hidden;
+  border-radius: var(--phc-media-radius, 0px);
+  /* Standing in for the picture before one is chosen, so the section holds
+     its drawn shape in the editor rather than collapsing to the list. */
+  background-color: var(--phc-media-bg, #dedede);
+}
+
+.phc__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* --------------------------------------------------------------------------
    Header
    -------------------------------------------------------------------------- */
 
-.phc__head {
-  margin-bottom: var(--phc-head-gap, 40px);
-  text-align: var(--phc-align, center);
-}
-
 /* One statement size across the whole About page, taken from the band that
    opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
-   column it shares. The leading is a flat 50px rather than a ratio because
-   that is how it is specified — which is also why the narrow-screen rule
-   below hands it back as a proportion, since 50px against 24px type would be
-   double-spaced. Change it in one of these four and change it in all four. */
-/* Left centred, as `.section-title` already is everywhere else on the site —
-   only the type is shared with the other bands, not the alignment. The bottom
-   margin is closed up because the intro paragraph belongs to this heading
-   rather than following it at the usual arm's length. */
+   column it shares. Change it in one of the page's sections and change it in
+   all of them. */
 .phc .section-title {
-  margin-bottom: 12px;
+  margin: 0 0 var(--phc-head-gap, 48px);
+  max-width: none;
+  text-align: left;
   font-size: clamp(2.6rem, 2.6vw, 3.4rem);
   line-height: 50px;
   color: var(--phc-ink, #0a0a0b);
 }
 
-.phc--left .section-title {
-  margin-inline: 0;
-  max-width: none;
-  text-align: left;
-}
-
-/* Auto margins do the centring, so the intro sits under the middle of the
-   heading when the header is centred and flush left when it is not — one
-   width setting covering both. */
+/* With an intro present it, not the heading, is what the list sits under —
+   so the heading closes up and hands the gap over. */
 .phc__intro {
-  max-width: var(--phc-body-w, 620px);
-  margin-inline: auto;
-  color: var(--phc-body-color, #3d3d3d);
+  margin: calc(var(--phc-head-gap, 48px) * -0.6) 0 var(--phc-head-gap, 48px);
+  color: var(--phc-text-color, #1a1a1a);
 }
 
-.phc--left .phc__intro {
-  margin-inline: 0;
-}
-
-.phc__intro > * + * {
+.phc__intro>*+* {
   margin-top: 10px;
 }
 
 /* --------------------------------------------------------------------------
-   Grid
+   The list
    -------------------------------------------------------------------------- */
 
-.phc__grid {
-  display: grid;
-  grid-template-columns: repeat(var(--phc-columns, 3), minmax(0, 1fr));
-  gap: var(--phc-card-gap, 10px);
+.phc__list {
+  margin: 0;
+  padding: 0;
+  /* The order is carried by the element itself; the printed numbers are the
+     visible form of it, not a second list. */
+  list-style: none;
 }
 
-.phc__card {
-  position: relative;
-  aspect-ratio: var(--phc-card-ratio, 0.72);
-  overflow: hidden;
-  border-radius: var(--phc-card-radius, 0px);
-  background-color: var(--phc-card-bg, #d9d9d9);
+.phc__item+.phc__item {
+  margin-top: 25px;
 }
 
-.phc__card-link {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-}
-
-.phc__media,
-.phc__img {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.phc__img {
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.phc__card:hover .phc__img {
-  transform: scale(1.04);
-}
-
-/* --------------------------------------------------------------------------
-   Caption
-   --------------------------------------------------------------------------
-   Laid over the foot of the picture rather than under it, so a longer
-   description grows up into the image instead of making one card taller than
-   the two beside it.
-   -------------------------------------------------------------------------- */
-
-.phc__caption {
-  position: absolute;
-  inset: auto 0 0 0;
-  z-index: 2;
-  padding: var(--phc-caption-inset, 16px);
-  color: var(--phc-card-text, #fff);
-}
-
-/* The tint is a layer of its own rather than the caption's own background:
-   the words have to stay at full strength while the plate behind them is
-   dialled down, and one opacity on the element would fade both. */
-.phc__caption::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-color: var(--phc-caption-bg, #2b2b2b);
-  opacity: var(--phc-caption-opacity, 0.85);
+/* Title left, number right, both sitting on the same line. The number is
+   pushed out rather than positioned, so a title long enough to wrap pushes it
+   down with the last line instead of colliding with it. */
+.phc__item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .phc__title {
-  margin: 0 0 6px;
+  margin: 0;
+  min-width: 0;
   font-size: var(--phc-title-size, 16px);
-  font-weight: 500;
-  line-height: 1.25;
-  color: currentColor;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--phc-ink, #0a0a0b);
+}
+
+.phc__title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.phc__title-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.phc__number {
+  flex: 0 0 auto;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #000;
+}
+
+/* Browsers draw an inset border on `hr` of their own, which is why the border
+   is cleared before the line is drawn back as a single top edge. */
+.phc__rule {
+  height: 0;
+  margin: var(--phc-rule-gap, 12px) 0;
+  border: 0;
+  border-top: 1px solid var(--phc-rule-color, #1a1a1a);
 }
 
 .phc__text {
   font-size: var(--phc-text-size, 13px);
-  line-height: 1.45;
-  opacity: 0.88;
-  color: currentColor;
+  line-height: 1.75;
+  color: #000;
+  width: 73%;
 }
 
-.phc__text > * {
+.phc__text>* {
   margin: 0;
 }
 
-.phc__text > * + * {
+.phc__text>*+* {
   margin-top: 6px;
 }
 
 /* --------------------------------------------------------------------------
    Mobile
+   --------------------------------------------------------------------------
+   Stacked, and the list above the picture whichever side it takes on a wide
+   screen: reversing a column would open the section with an image and leave
+   the heading that names it underneath.
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
@@ -159,18 +169,22 @@
     padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.6);
   }
 
+  .phc__row,
+  .phc--reversed .phc__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+
+  .phc__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: var(--phc-media-ratio-mobile, var(--phc-media-ratio, 1));
+  }
+
   .phc .section-title {
     font-size: clamp(2.4rem, 7vw, 3.2rem);
     line-height: 1.45;
-  }
-
-  .phc__grid {
-    grid-template-columns: repeat(var(--phc-columns-mobile, 1), minmax(0, 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .phc__img {
-    transition-duration: 0.01ms;
   }
 }
