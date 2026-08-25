@@ -18,13 +18,27 @@
   text-align: var(--phc-align, center);
 }
 
-.phc__heading {
-  margin: 0 0 12px;
-  font-size: var(--phc-heading-size, 32px);
-  font-weight: var(--phc-heading-weight, 400);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--phc-heading-color, #0a0a0b);
+/* One statement size across the whole About page, taken from the band that
+   opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
+   column it shares. The leading is a flat 50px rather than a ratio because
+   that is how it is specified — which is also why the narrow-screen rule
+   below hands it back as a proportion, since 50px against 24px type would be
+   double-spaced. Change it in one of these four and change it in all four. */
+/* Left centred, as `.section-title` already is everywhere else on the site —
+   only the type is shared with the other bands, not the alignment. The bottom
+   margin is closed up because the intro paragraph belongs to this heading
+   rather than following it at the usual arm's length. */
+.phc .section-title {
+  margin-bottom: 12px;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--phc-ink, #0a0a0b);
+}
+
+.phc--left .section-title {
+  margin-inline: 0;
+  max-width: none;
+  text-align: left;
 }
 
 /* Auto margins do the centring, so the intro sits under the middle of the
@@ -114,14 +128,14 @@
 
 .phc__title {
   margin: 0 0 6px;
-  font-size: var(--phc-title-size, 17px);
+  font-size: var(--phc-title-size, 16px);
   font-weight: 500;
   line-height: 1.25;
   color: currentColor;
 }
 
 .phc__text {
-  font-size: var(--phc-text-size, 12px);
+  font-size: var(--phc-text-size, 13px);
   line-height: 1.45;
   opacity: 0.88;
   color: currentColor;
@@ -145,8 +159,9 @@
     padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.6);
   }
 
-  .phc__heading {
-    font-size: clamp(2.2rem, 6.5vw, var(--phc-heading-size, 32px));
+  .phc .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
   }
 
   .phc__grid {

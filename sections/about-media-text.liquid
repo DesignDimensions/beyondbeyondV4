@@ -8,6 +8,10 @@
   picture on the left, and the NAD+ note with it on the right. The swap is a
   flex direction rather than a reordering of the markup, so the image is still
   announced with the copy it belongs to whichever side it is shown on.
+
+  As in the statement band, no type size is set here: the label is the theme's
+  `.section-heading` and the sentence its `.section-title`, held to the size a
+  half column can carry. Only the tint belongs to the section.
 {%- endcomment -%}
 
 {%- liquid
@@ -26,11 +30,12 @@
 -%}
 
 <div
-  class="amt{% if section.settings.media_position == 'right' %} amt--reversed{% endif %}"
+  class="amt{% if section.settings.media_position == 'right' %} amt--reversed{% endif %}{% if section.settings.offset_header %} amt--under-header{% endif %}"
   style="
     --amt-pad-top: {{ section.settings.padding_top }}px;
     --amt-pad-bottom: {{ section.settings.padding_bottom }}px;
     --amt-bg: {{ section.settings.background }};
+    --amt-ink: {{ section.settings.ink }};
     --amt-gap: {{ section.settings.column_gap }}px;
     --amt-align: {{ section.settings.vertical_alignment }};
     --amt-media-w: {{ section.settings.media_width }}%;
@@ -40,19 +45,10 @@
     {%- endif %}
     --amt-media-bg: {{ section.settings.media_background }};
     --amt-media-radius: {{ section.settings.media_radius }}px;
-    --amt-eyebrow-size: {{ section.settings.eyebrow_size }}px;
-    --amt-eyebrow-tracking: {{ section.settings.eyebrow_tracking }}px;
-    --amt-eyebrow-color: {{ section.settings.eyebrow_color }};
-    --amt-eyebrow-gap: {{ section.settings.eyebrow_gap }}px;
-    --amt-heading-size: {{ section.settings.heading_size }}px;
-    --amt-heading-weight: {{ section.settings.heading_weight }};
-    --amt-heading-leading: {{ section.settings.heading_leading }};
-    --amt-heading-color: {{ section.settings.heading_color }};
-    --amt-heading-gap: {{ section.settings.heading_gap }}px;
     --amt-body-color: {{ section.settings.body_color }};
     --amt-body-gap: {{ section.settings.body_gap }}px;
     --amt-cta-gap: {{ section.settings.cta_gap }}px;
-    --amt-cta-min-w: {{ section.settings.cta_min_width }}px;
+    --amt-cta-max: {{ section.settings.cta_width }}px;
     --amt-cta-h: {{ section.settings.cta_height }}px;
     --amt-cta-size: {{ section.settings.cta_size }}px;
     --amt-cta-radius: {{ section.settings.cta_radius }}px;
@@ -98,12 +94,16 @@
     </div>
 
     <div class="amt__copy">
+      {%- comment -%}
+        Adjacent siblings, so `base.css` can close the gap between the label
+        and the statement under it with `:has(+ .section-title)`.
+      {%- endcomment -%}
       {%- if section.settings.eyebrow != blank -%}
-        <p class="amt__eyebrow">{{ section.settings.eyebrow }}</p>
+        <p class="section-heading">{{ section.settings.eyebrow }}</p>
       {%- endif -%}
 
       {%- if heading != blank -%}
-        <h2 class="amt__heading">{{ heading }}</h2>
+        <h2 class="section-title">{{ heading }}</h2>
       {%- endif -%}
 
       {%- if section.settings.body != blank -%}
@@ -137,6 +137,13 @@
     {
       "type": "header",
       "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
     },
     {
       "type": "select",
@@ -185,6 +192,13 @@
       "id": "background",
       "label": "Background",
       "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "info": "Tints the label and the heading together.",
+      "default": "#0A0A0B"
     },
     {
       "type": "header",
@@ -258,112 +272,21 @@
     },
     {
       "type": "header",
-      "content": "Label"
+      "content": "Copy"
     },
     {
       "type": "text",
       "id": "eyebrow",
       "label": "Label",
+      "info": "Set in the theme's shared section label.",
       "default": "OUR BELIEF"
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_size",
-      "min": 9,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Label size",
-      "default": 12
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_tracking",
-      "min": 0,
-      "max": 8,
-      "step": 0.5,
-      "unit": "px",
-      "label": "Label letter spacing",
-      "default": 3
-    },
-    {
-      "type": "color",
-      "id": "eyebrow_color",
-      "label": "Label colour",
-      "default": "#1A1A1A"
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_gap",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "label": "Space below label",
-      "default": 18
-    },
-    {
-      "type": "header",
-      "content": "Heading"
     },
     {
       "type": "textarea",
       "id": "heading",
       "label": "Heading",
-      "info": "Press Enter to break the heading onto a new line.",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
       "default": "Skincare shouldn't overwhelm, It should restore."
-    },
-    {
-      "type": "range",
-      "id": "heading_size",
-      "min": 18,
-      "max": 60,
-      "step": 1,
-      "unit": "px",
-      "label": "Heading size",
-      "default": 34
-    },
-    {
-      "type": "select",
-      "id": "heading_weight",
-      "label": "Heading weight",
-      "options": [
-        { "value": "300", "label": "Light" },
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semi bold" },
-        { "value": "700", "label": "Bold" }
-      ],
-      "default": "400"
-    },
-    {
-      "type": "range",
-      "id": "heading_leading",
-      "min": 1,
-      "max": 1.8,
-      "step": 0.1,
-      "label": "Heading line height",
-      "default": 1.3
-    },
-    {
-      "type": "color",
-      "id": "heading_color",
-      "label": "Heading colour",
-      "default": "#0A0A0B"
-    },
-    {
-      "type": "range",
-      "id": "heading_gap",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "label": "Space below heading",
-      "default": 20
-    },
-    {
-      "type": "header",
-      "content": "Text"
     },
     {
       "type": "richtext",
@@ -375,17 +298,17 @@
       "type": "color",
       "id": "body_color",
       "label": "Text colour",
-      "default": "#3D3D3D"
+      "default": "#1A1A1A"
     },
     {
       "type": "range",
       "id": "body_gap",
       "min": 0,
-      "max": 40,
+      "max": 60,
       "step": 2,
       "unit": "px",
-      "label": "Space between paragraphs",
-      "default": 16
+      "label": "Space above the text",
+      "default": 20
     },
     {
       "type": "header",
@@ -410,18 +333,18 @@
       "step": 2,
       "unit": "px",
       "label": "Space above button",
-      "default": 32
+      "default": 30
     },
     {
       "type": "range",
-      "id": "cta_min_width",
-      "min": 0,
-      "max": 560,
+      "id": "cta_width",
+      "min": 160,
+      "max": 640,
       "step": 10,
       "unit": "px",
-      "label": "Button minimum width",
-      "info": "0 lets the button size itself to its label.",
-      "default": 300
+      "label": "Button width",
+      "info": "The button fills its column up to this width.",
+      "default": 400
     },
     {
       "type": "range",
@@ -441,7 +364,7 @@
       "step": 1,
       "unit": "px",
       "label": "Button text size",
-      "default": 14
+      "default": 16
     },
     {
       "type": "range",
@@ -477,7 +400,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 80
+      "default": 60
     },
     {
       "type": "range",
@@ -487,7 +410,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 80
+      "default": 60
     }
   ],
   "presets": [

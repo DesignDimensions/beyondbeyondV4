@@ -17,9 +17,7 @@
     --phc-bg: {{ section.settings.background }};
     --phc-align: {{ section.settings.alignment }};
     --phc-head-gap: {{ section.settings.head_gap }}px;
-    --phc-heading-size: {{ section.settings.heading_size }}px;
-    --phc-heading-weight: {{ section.settings.heading_weight }};
-    --phc-heading-color: {{ section.settings.heading_color }};
+    --phc-ink: {{ section.settings.ink }};
     --phc-body-color: {{ section.settings.body_color }};
     --phc-body-w: {{ section.settings.body_width }}px;
     --phc-columns: {{ section.settings.columns_desktop }};
@@ -40,7 +38,7 @@
   {%- if section.settings.heading != blank or section.settings.body != blank -%}
     <div class="page-width phc__head">
       {%- if section.settings.heading != blank -%}
-        <h2 class="phc__heading">{{ section.settings.heading }}</h2>
+        <h2 class="section-title">{{ section.settings.heading }}</h2>
       {%- endif -%}
 
       {%- if section.settings.body != blank -%}
@@ -118,34 +116,12 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
+      "info": "Set in the theme's shared section statement.",
       "default": "Our Philosophy"
     },
     {
-      "type": "range",
-      "id": "heading_size",
-      "min": 18,
-      "max": 56,
-      "step": 1,
-      "unit": "px",
-      "label": "Heading size",
-      "default": 32
-    },
-    {
-      "type": "select",
-      "id": "heading_weight",
-      "label": "Heading weight",
-      "options": [
-        { "value": "300", "label": "Light" },
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semi bold" },
-        { "value": "700", "label": "Bold" }
-      ],
-      "default": "400"
-    },
-    {
       "type": "color",
-      "id": "heading_color",
+      "id": "ink",
       "label": "Heading colour",
       "default": "#0A0A0B"
     },
@@ -291,7 +267,7 @@
       "step": 1,
       "unit": "px",
       "label": "Title size",
-      "default": 17
+      "default": 16
     },
     {
       "type": "range",
@@ -301,7 +277,7 @@
       "step": 1,
       "unit": "px",
       "label": "Description size",
-      "default": 12
+      "default": 13
     },
     {
       "type": "color",

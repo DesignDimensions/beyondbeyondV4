@@ -26,13 +26,21 @@
   min-width: 0;
 }
 
-.mnd__heading {
+/* One statement size across the whole About page, taken from the band that
+   opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
+   column it shares. The leading is a flat 50px rather than a ratio because
+   that is how it is specified — which is also why the narrow-screen rule
+   below hands it back as a proportion, since 50px against 24px type would be
+   double-spaced. Change it in one of these four and change it in all four. */
+/* Turned to the left: this one stands beside the quote mark and over a rail,
+   rather than opening a page on its own. */
+.mnd .section-title {
   margin: 0 0 10px;
-  font-size: var(--mnd-heading-size, 28px);
-  font-weight: var(--mnd-heading-weight, 500);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--mnd-heading-color, #0a0a0b);
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--mnd-ink, #0a0a0b);
 }
 
 .mnd__body {
@@ -44,14 +52,23 @@
   margin-top: 10px;
 }
 
-/* Set on its own line box and pulled tight, so the mark sits level with the
-   heading rather than hanging a line's worth below it. */
+/* The brand's mark as artwork rather than a glyph. Width is what is set;
+   the height follows the file's own proportions, so swapping the artwork for
+   a differently shaped one never squashes it. */
 .mnd__quote {
   flex: 0 0 auto;
-  font-size: var(--mnd-quote-size, 56px);
-  line-height: 0.72;
-  font-weight: 700;
-  color: var(--mnd-quote-color, #1a1a1a);
+  display: block;
+  width: var(--mnd-quote-w, 48px);
+  height: auto;
+}
+
+/* Only the URL path takes a declared ratio. An image picked in the editor
+   carries its own width and height attributes, which already reserve the
+   right space — imposing this ratio on top of them would letterbox any mark
+   that is not the default one's shape. */
+.mnd__quote--url {
+  aspect-ratio: var(--mnd-quote-ratio, 213 / 138);
+  object-fit: contain;
 }
 
 /* --------------------------------------------------------------------------
@@ -68,6 +85,10 @@
 
 .mnd__rail {
   display: flex;
+  /* Each card is exactly as tall as its own portrait. Left to stretch, a card
+     with a shorter picture would be padded out to match the tallest and its
+     caption would come away from the foot of the image it belongs to. */
+  align-items: flex-start;
   gap: var(--mnd-card-gap, 8px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -90,7 +111,6 @@
 .mnd__card {
   position: relative;
   flex: 0 0 calc((100% - (var(--mnd-columns, 3) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns, 3));
-  aspect-ratio: var(--mnd-card-ratio, 1);
   overflow: hidden;
   border-radius: var(--mnd-card-radius, 0px);
   background-color: var(--mnd-card-bg, #c9ccd6);
@@ -103,127 +123,92 @@
   z-index: 3;
 }
 
-.mnd__media,
-.mnd__img {
-  width: 100%;
-  height: 100%;
+/* The portrait is shown whole: full width of the card, and whatever height
+   its own proportions give it. Nothing is cropped, which is also why there is
+   no hover zoom here — scaling the picture up inside a clipped card would
+   crop it back on hover, which is the one thing this must not do. */
+.mnd__media {
   display: block;
+  width: 100%;
 }
 
 .mnd__img {
-  object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-.mnd__card:hover .mnd__img {
-  transform: scale(1.04);
+/* Before a portrait is chosen there is no picture to give the card a height,
+   so the empty state carries the drawn proportion itself and the section
+   still holds its shape in the editor. */
+.mnd__media--empty {
+  aspect-ratio: 0.69;
+  background-color: var(--mnd-card-bg, #c9ccd6);
 }
 
 /* --------------------------------------------------------------------------
    Caption
    --------------------------------------------------------------------------
-   A gradient rather than a flat bar: the portraits behind it are all
-   different, and a fade that starts at nothing halfway up the card keeps the
-   name legible over any of them without drawing a band across the picture.
+   A flat translucent panel across the foot of the portrait, as drawn — not
+   the gradient that was here before. The tint is a layer of its own rather
+   than the caption's own background: the words have to stay at full strength
+   while the plate behind them is dialled down, and one opacity on the element
+   would fade both. This is the philosophy cards' arrangement, for the same
+   reason.
    -------------------------------------------------------------------------- */
-
-.mnd__scrim {
-  position: absolute;
-  inset: 40% 0 0;
-  z-index: 1;
-  background: linear-gradient(to bottom, transparent, var(--mnd-scrim, #000));
-  opacity: var(--mnd-scrim-opacity, 0.7);
-  pointer-events: none;
-}
 
 .mnd__caption {
   position: absolute;
   inset: auto 0 0 0;
   z-index: 2;
-  padding: var(--mnd-card-inset, 18px);
+  padding: var(--mnd-card-inset, 28px);
   color: var(--mnd-card-text, #fff);
 }
 
+.mnd__caption::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--mnd-caption-bg, #5c5c5c);
+  opacity: var(--mnd-caption-opacity, 0.9);
+}
+
 .mnd__name {
-  margin: 0 0 4px;
-  font-size: var(--mnd-name-size, 18px);
+  position: relative;
+  margin: 0 0 12px;
+  padding-bottom: 12px;
+  font-size: var(--mnd-name-size, 24px);
   font-weight: 500;
   line-height: 1.2;
   color: currentColor;
 }
 
+/* The rule the design draws between the name and the role. Painted in the
+   caption's own colour at a fraction of its strength, so it follows the tint
+   wherever the merchant takes it instead of being pinned to white. */
+.mnd__name::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background-color: currentColor;
+  opacity: 0.4;
+}
+
 .mnd__role {
   margin: 0;
-  font-size: var(--mnd-role-size, 12px);
+  font-size: var(--mnd-role-size, 15px);
   font-weight: 400;
-  line-height: 1.4;
-  opacity: 0.85;
+  line-height: 1.5;
+  opacity: 0.9;
   color: currentColor;
 }
 
 /* --------------------------------------------------------------------------
-   Arrows
-   --------------------------------------------------------------------------
-   Held outside the content column and level with the middle of a card. A card
-   is `1 / ratio` times its own width tall, so half of that — measured from
-   the width one card takes of the column — is where its middle sits.
-   -------------------------------------------------------------------------- */
-
-.mnd__arrow {
-  position: absolute;
-  top: 0;
-  margin-top: calc(
-    (100% - (var(--mnd-columns, 3) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns, 3) /
-      var(--mnd-card-ratio, 1) / 2
-  );
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Explicit, because the button is sized from its glyph: without it the two
-     arrows would be different widths, one holding a ‹ and the other a ›. */
-  box-sizing: border-box;
-  width: calc(var(--mnd-arrow-size, 16px) + 16px);
-  height: calc(var(--mnd-arrow-size, 16px) + 16px);
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  transform: translateY(-50%);
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.mnd__arrow--prev {
-  right: calc(100% + var(--mnd-arrow-offset, 16px));
-}
-
-.mnd__arrow--next {
-  left: calc(100% + var(--mnd-arrow-offset, 16px));
-}
-
-.mnd__arrow-glyph {
-  font-size: calc(var(--mnd-arrow-size, 16px) * 1.6);
-  line-height: 1;
-  color: var(--mnd-arrow-color, #1a1a1a);
-}
-
-/* Kept in place rather than removed: an arrow that disappears at the end of
-   the rail moves the other one, and the reader loses the target they were
-   pressing. */
-.mnd__arrow.is-disabled {
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-.mnd__arrow:not(.is-disabled):hover {
-  transform: translateY(-50%) scale(1.12);
-}
-
-/* --------------------------------------------------------------------------
    Mobile
-   --------------------------------------------------------------------------
-   The arrows go: at this width there is no gutter to hold them, and the rail
-   is already the thing a thumb swipes.
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
@@ -236,8 +221,13 @@
     gap: 16px;
   }
 
+  .mnd .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+
   .mnd__quote {
-    font-size: calc(var(--mnd-quote-size, 56px) * 0.7);
+    width: calc(var(--mnd-quote-w, 48px) * 0.7);
   }
 
   .mnd__card {
@@ -245,15 +235,5 @@
       (100% - (var(--mnd-columns-mobile, 1.2) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns-mobile, 1.2)
     );
   }
-
-  .mnd__arrow {
-    display: none;
-  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mnd__img,
-  .mnd__arrow {
-    transition-duration: 0.01ms;
-  }
-}

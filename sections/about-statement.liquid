@@ -1,14 +1,22 @@
 {{ 'about-statement.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  A statement band: a small tracked label over a large sentence on the left,
-  and the paragraph that answers it — with an optional button — on the right.
+  A statement band: the theme's shared overline over its shared statement on
+  the left, and the paragraph that answers them — with an optional button — on
+  the right.
 
   The about page uses this shape twice, once on white with a button ("Our
   Mindset") and once on a tinted band without one ("Our Approach"). They are
   the same section rather than two, because the only things that differ are a
   colour and whether the button is filled in — and a merchant editing one of
   them should not have to learn a second set of controls to edit the other.
+
+  Nothing here sets a type size. The overline is `.section-heading` and the
+  statement is `.section-title`, the two `base.css` publishes for every
+  section on the site, held to the size a half column can carry exactly the
+  way the blog carousel holds them. Only the tint is claimed back, the way the
+  consultation panel claims it — each band on this page is a different colour,
+  but none of them is a different typeface.
 
   The band itself runs the full width of the viewport while its contents keep
   to the theme's content column, so a tint reaches both edges of the screen
@@ -26,26 +34,19 @@
 -%}
 
 <div
-  class="abs"
+  class="abs{% if section.settings.offset_header %} abs--under-header{% endif %}"
   style="
     --abs-pad-top: {{ section.settings.padding_top }}px;
     --abs-pad-bottom: {{ section.settings.padding_bottom }}px;
     --abs-bg: {{ section.settings.background }};
+    --abs-ink: {{ section.settings.ink }};
     --abs-gap: {{ section.settings.column_gap }}px;
     --abs-lead-w: {{ section.settings.lead_width }}%;
     --abs-copy-offset: {{ section.settings.copy_offset }}px;
-    --abs-eyebrow-size: {{ section.settings.eyebrow_size }}px;
-    --abs-eyebrow-tracking: {{ section.settings.eyebrow_tracking }}px;
-    --abs-eyebrow-color: {{ section.settings.eyebrow_color }};
-    --abs-eyebrow-gap: {{ section.settings.eyebrow_gap }}px;
-    --abs-heading-size: {{ section.settings.heading_size }}px;
-    --abs-heading-weight: {{ section.settings.heading_weight }};
-    --abs-heading-leading: {{ section.settings.heading_leading }};
-    --abs-heading-color: {{ section.settings.heading_color }};
     --abs-body-color: {{ section.settings.body_color }};
     --abs-body-gap: {{ section.settings.body_gap }}px;
     --abs-cta-gap: {{ section.settings.cta_gap }}px;
-    --abs-cta-min-w: {{ section.settings.cta_min_width }}px;
+    --abs-cta-max: {{ section.settings.cta_width }}px;
     --abs-cta-h: {{ section.settings.cta_height }}px;
     --abs-cta-size: {{ section.settings.cta_size }}px;
     --abs-cta-radius: {{ section.settings.cta_radius }}px;
@@ -56,12 +57,18 @@
 >
   <div class="page-width abs__row">
     <div class="abs__lead">
+      {%- comment -%}
+        Kept adjacent siblings on purpose: `base.css` closes the gap between
+        an overline and the statement under it with `:has(+ .section-title)`,
+        and anything between the two would break that pairing and leave the
+        label floating at arm's length.
+      {%- endcomment -%}
       {%- if section.settings.eyebrow != blank -%}
-        <p class="abs__eyebrow">{{ section.settings.eyebrow }}</p>
+        <p class="section-heading">{{ section.settings.eyebrow }}</p>
       {%- endif -%}
 
       {%- if heading != blank -%}
-        <h2 class="abs__heading">{{ heading }}</h2>
+        <h2 class="section-title">{{ heading }}</h2>
       {%- endif -%}
     </div>
 
@@ -74,8 +81,8 @@
         <a class="abs__cta" href="{{ section.settings.cta_link | default: '#' }}">
           <span class="abs__cta-label">{{ section.settings.cta_label }}</span>
           {%- comment -%}
-            Drawn rather than typed, for the same reason the founders panel
-            draws its own: no arrow glyph is dependable across every face a
+            The founders panel's arrow, drawn rather than typed for the reason
+            given there: no long arrow glyph is dependable across every face a
             theme might be set to, and a drawn one can slide on hover.
           {%- endcomment -%}
           <svg class="abs__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
@@ -104,11 +111,25 @@
       "content": "Layout"
     },
     {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
+    },
+    {
       "type": "color",
       "id": "background",
       "label": "Background",
       "info": "Runs the full width of the screen. The copy keeps to the content column.",
       "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "info": "Tints the label and the heading together.",
+      "default": "#0A0A0B"
     },
     {
       "type": "range",
@@ -140,106 +161,25 @@
       "unit": "px",
       "label": "Drop the text column",
       "info": "Nudges the right column down so it starts level with the heading rather than with the label above it.",
-      "default": 28
+      "default": 38
     },
     {
       "type": "header",
-      "content": "Label"
+      "content": "Copy"
     },
     {
       "type": "text",
       "id": "eyebrow",
       "label": "Label",
+      "info": "Set in the theme's shared section label.",
       "default": "OUR MINDSET"
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_size",
-      "min": 9,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Label size",
-      "default": 12
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_tracking",
-      "min": 0,
-      "max": 8,
-      "step": 0.5,
-      "unit": "px",
-      "label": "Label letter spacing",
-      "default": 3
-    },
-    {
-      "type": "color",
-      "id": "eyebrow_color",
-      "label": "Label colour",
-      "default": "#1A1A1A"
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_gap",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "label": "Space below label",
-      "default": 20
-    },
-    {
-      "type": "header",
-      "content": "Heading"
     },
     {
       "type": "textarea",
       "id": "heading",
       "label": "Heading",
-      "info": "Press Enter to break the heading onto a new line.",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
       "default": "A Brand that doesn't just sit on your shelf, it fits into your life."
-    },
-    {
-      "type": "range",
-      "id": "heading_size",
-      "min": 20,
-      "max": 64,
-      "step": 1,
-      "unit": "px",
-      "label": "Heading size",
-      "default": 36
-    },
-    {
-      "type": "select",
-      "id": "heading_weight",
-      "label": "Heading weight",
-      "options": [
-        { "value": "300", "label": "Light" },
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semi bold" },
-        { "value": "700", "label": "Bold" }
-      ],
-      "default": "400"
-    },
-    {
-      "type": "range",
-      "id": "heading_leading",
-      "min": 1,
-      "max": 1.8,
-      "step": 0.1,
-      "label": "Heading line height",
-      "default": 1.3
-    },
-    {
-      "type": "color",
-      "id": "heading_color",
-      "label": "Heading colour",
-      "default": "#0A0A0B"
-    },
-    {
-      "type": "header",
-      "content": "Text"
     },
     {
       "type": "richtext",
@@ -251,16 +191,16 @@
       "type": "color",
       "id": "body_color",
       "label": "Text colour",
-      "default": "#3D3D3D"
+      "default": "#1A1A1A"
     },
     {
       "type": "range",
       "id": "body_gap",
       "min": 0,
-      "max": 40,
+      "max": 60,
       "step": 2,
       "unit": "px",
-      "label": "Space between paragraphs",
+      "label": "Space above the text",
       "default": 16
     },
     {
@@ -287,17 +227,17 @@
       "step": 2,
       "unit": "px",
       "label": "Space above button",
-      "default": 32
+      "default": 30
     },
     {
       "type": "range",
-      "id": "cta_min_width",
-      "min": 0,
-      "max": 560,
+      "id": "cta_width",
+      "min": 160,
+      "max": 640,
       "step": 10,
       "unit": "px",
-      "label": "Button minimum width",
-      "info": "0 lets the button size itself to its label.",
+      "label": "Button width",
+      "info": "The button fills its column up to this width.",
       "default": 380
     },
     {
@@ -318,7 +258,7 @@
       "step": 1,
       "unit": "px",
       "label": "Button text size",
-      "default": 14
+      "default": 16
     },
     {
       "type": "range",
@@ -354,7 +294,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 72
+      "default": 60
     },
     {
       "type": "range",
@@ -364,7 +304,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 72
+      "default": 60
     }
   ],
   "presets": [

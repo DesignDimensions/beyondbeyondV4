@@ -2,96 +2,132 @@
    About Statement — a label and a sentence on the left, the paragraph that
    answers them on the right
    ==========================================================================
+   The type is the store's own: the overline is `.section-heading` set to the
+   product page's 15/700/7 rather than a section header's 19/700/7, and the
+   sentence is `.section-title` at the size this page settles on, well under
+   the full-width display size — that one is a display size, and this is
+   standing next to something.
+
    The band is full-bleed and its row is the theme's content column, so the
    background reaches both edges of the screen while the type stays on the
    same grid as every other section of the page.
    ========================================================================== */
 
 .abs {
-  padding-top: var(--abs-pad-top, 72px);
-  padding-bottom: var(--abs-pad-bottom, 72px);
+  padding-top: var(--abs-pad-top, 60px);
+  padding-bottom: var(--abs-pad-bottom, 60px);
   background-color: var(--abs-bg, #fff);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page has to hold its content clear of it.
+   `--header-height` is the theme's own measurement, published on the root by
+   the header script; the fallback only stands in for the moment before that
+   runs. This is the product hero's mechanism, used here for the same reason. */
+.abs--under-header {
+  padding-top: calc(var(--header-height, var(--abs-header-fallback, 100px)) + var(--abs-pad-top, 60px));
 }
 
 .abs__row {
   display: flex;
   align-items: flex-start;
-  gap: var(--abs-gap, 80px);
+  gap: 60px;
 }
 
 /* The heading column is the width that was asked for; the copy takes the
    rest, so the two always come to the content column exactly whatever page
    width the theme is set to. */
 .abs__lead {
-  flex: 0 1 var(--abs-lead-w, 52%);
-  max-width: var(--abs-lead-w, 52%);
-  min-width: 0;
+  width: 50%;
 }
 
 .abs__copy {
-  flex: 1 1 auto;
-  min-width: 0;
-  /* Drawn level with the heading rather than with the label above it. Padding
-     rather than a margin so the column's own background, if it ever gets one,
-     still starts at the top of the row. */
-  padding-top: var(--abs-copy-offset, 28px);
+  width: 50%;
+  padding-top: var(--abs-copy-offset, 38px);
 }
 
 /* --------------------------------------------------------------------------
    Type
+   --------------------------------------------------------------------------
+   The label is the product page's overline, not the home page's. The store
+   sets its small tracked label at two sizes: `.section-heading` at 19/700/7
+   when it opens a whole section, and `.pdt__overline` / `.mar__overline` at
+   15/700/7 when it sits with copy instead. Everything on this page is the
+   second kind, so the size, tracking and 14px drop are restated here rather
+   than inherited.
+
+   They have to be restated. `base.css` steps the shared label down to 14/6
+   under 750px and `.mar__overline` has no such step — it holds 15/7 at every
+   width — so these declarations are written to outrank that narrow-screen
+   rule on specificity and keep the label where the product page puts it.
+
+   Line height is deliberately absent. `.mar__overline` declares none either,
+   so it inherits the body's `calc(1 + 0.8 / var(--font-body-scale))` — and
+   pinning a number here would part the two the moment that scale is touched.
+
+   The tint stays the section's own, which is what `.mar__overline` does too:
+   it takes `--mar-text` from the panel it happens to sit in.
    -------------------------------------------------------------------------- */
 
-.abs__eyebrow {
-  margin: 0 0 var(--abs-eyebrow-gap, 20px);
-  font-size: var(--abs-eyebrow-size, 12px);
-  font-weight: 500;
-  letter-spacing: var(--abs-eyebrow-tracking, 3px);
-  line-height: 1.2;
+.abs .section-heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 7px;
+  text-align: left;
   text-transform: uppercase;
-  color: var(--abs-eyebrow-color, #1a1a1a);
+  color: var(--abs-ink, #0a0a0b);
 }
 
-.abs__heading {
+/* One statement size across the whole About page, taken from the band that
+   opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
+   column it shares. The leading is a flat 50px rather than a ratio because
+   that is how it is specified — which is also why the narrow-screen rule
+   below hands it back as a proportion, since 50px against 24px type would be
+   double-spaced. Change it in one of these four and change it in all four. */
+.abs .section-title {
   margin: 0;
-  font-size: var(--abs-heading-size, 36px);
-  font-weight: var(--abs-heading-weight, 400);
-  line-height: var(--abs-heading-leading, 1.25);
-  letter-spacing: -0.01em;
-  color: var(--abs-heading-color, #0a0a0b);
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  color: var(--abs-ink, #0a0a0b);
+  line-height: 50px;
 }
 
-/* Size and leading come from `.section-text`, which every panel on the page
-   shares; only the tint and the space between paragraphs belong here. */
 .abs__body {
-  color: var(--abs-body-color, #3d3d3d);
+  margin-top: var(--abs-body-gap, 16px);
+  color: var(--abs-body-color, #1a1a1a);
+  line-height: 28px;
+  width: 100%;
 }
 
-.abs__body > * + * {
-  margin-top: var(--abs-body-gap, 16px);
+.abs__body>*+* {
+  margin-top: 12px;
 }
 
 /* --------------------------------------------------------------------------
    Button
+   --------------------------------------------------------------------------
+   The founders panel's button: the foot of its column rather than a shape
+   sitting loose inside it, filling the column up to a width the merchant sets.
    -------------------------------------------------------------------------- */
 
 .abs__cta {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
+  gap: 20px;
   box-sizing: border-box;
-  min-width: var(--abs-cta-min-w, 380px);
-  max-width: 100%;
+  width: 100%;
+  max-width: var(--abs-cta-max, 380px);
   height: var(--abs-cta-h, 48px);
-  padding: 0 24px;
-  margin-top: var(--abs-cta-gap, 32px);
+  margin-top: var(--abs-cta-gap, 30px);
   border-radius: var(--abs-cta-radius, 0px);
   background-color: var(--abs-cta-bg, #000);
   color: var(--abs-cta-fg, #fff);
-  font-size: var(--abs-cta-size, 14px);
+  font-size: var(--abs-cta-size, 16px);
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.02em;
   text-decoration: none;
   transition: filter 0.3s ease;
 }
@@ -108,7 +144,7 @@
 }
 
 .abs__cta:hover .abs__cta-arrow {
-  transform: translateX(5px);
+  transform: translateX(6px);
 }
 
 /* --------------------------------------------------------------------------
@@ -120,8 +156,12 @@
 
 @media screen and (max-width: 749px) {
   .abs {
-    padding-top: calc(var(--abs-pad-top, 72px) * 0.6);
-    padding-bottom: calc(var(--abs-pad-bottom, 72px) * 0.6);
+    padding-top: calc(var(--abs-pad-top, 60px) * 0.6);
+    padding-bottom: calc(var(--abs-pad-bottom, 60px) * 0.6);
+  }
+
+  .abs--under-header {
+    padding-top: calc(var(--header-height, var(--abs-header-fallback-mobile, 76px)) + var(--abs-pad-top, 60px) * 0.6);
   }
 
   .abs__row {
@@ -137,18 +177,23 @@
     padding-top: 0;
   }
 
-  .abs__heading {
-    font-size: clamp(2.4rem, 7vw, var(--abs-heading-size, 36px));
+  .abs .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+
+  .abs__body {
+    max-width: none;
   }
 
   .abs__cta {
-    width: 100%;
-    min-width: 0;
+    max-width: none;
     height: 44px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .abs__cta,
   .abs__cta-arrow {
     transition-duration: 0.01ms;

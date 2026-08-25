@@ -1,12 +1,25 @@
 /* ==========================================================================
    About Media & Text — a picture on one side, the copy that belongs to it on
    the other
+   ==========================================================================
+   The type is the store's own: `.section-heading` for the label — at the
+   product page's 15/700/7, not a section header's 19/700/7 — `.section-title`
+   for the sentence at the size this page settles on, and `.section-text` for
+   the paragraph.
    ========================================================================== */
 
 .amt {
-  padding-top: var(--amt-pad-top, 80px);
-  padding-bottom: var(--amt-pad-bottom, 80px);
+  padding-top: var(--amt-pad-top, 60px);
+  padding-bottom: var(--amt-pad-bottom, 60px);
   background-color: var(--amt-bg, #fff);
+}
+
+/* The product hero's mechanism: the site header is fixed and transparent
+   until the page scrolls, so a section leading a page holds its own content
+   clear of it. `--header-height` is published on the root by the header
+   script; the fallback only covers the moment before that runs. */
+.amt--under-header {
+  padding-top: calc(var(--header-height, var(--amt-header-fallback, 100px)) + var(--amt-pad-top, 60px));
 }
 
 .amt__row {
@@ -47,33 +60,65 @@
 
 /* --------------------------------------------------------------------------
    Type
+   --------------------------------------------------------------------------
+   The label is the product page's overline, not the home page's. The store
+   sets its small tracked label at two sizes: `.section-heading` at 19/700/7
+   when it opens a whole section, and `.pdt__overline` / `.mar__overline` at
+   15/700/7 when it sits with copy instead. Everything on this page is the
+   second kind, so the size, tracking and 14px drop are restated here rather
+   than inherited.
+
+   They have to be restated. `base.css` steps the shared label down to 14/6
+   under 750px and `.mar__overline` has no such step — it holds 15/7 at every
+   width — so these declarations are written to outrank that narrow-screen
+   rule on specificity and keep the label where the product page puts it.
+
+   Line height is deliberately absent. `.mar__overline` declares none either,
+   so it inherits the body's `calc(1 + 0.8 / var(--font-body-scale))` — and
+   pinning a number here would part the two the moment that scale is touched.
+
+   The tint stays the section's own, which is what `.mar__overline` does too:
+   it takes `--mar-text` from the panel it happens to sit in.
    -------------------------------------------------------------------------- */
 
-.amt__eyebrow {
-  margin: 0 0 var(--amt-eyebrow-gap, 18px);
-  font-size: var(--amt-eyebrow-size, 12px);
-  font-weight: 500;
-  letter-spacing: var(--amt-eyebrow-tracking, 3px);
-  line-height: 1.2;
+.amt .section-heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 7px;
+  text-align: left;
   text-transform: uppercase;
-  color: var(--amt-eyebrow-color, #1a1a1a);
+  color: var(--amt-ink, #0a0a0b);
 }
 
-.amt__heading {
-  margin: 0 0 var(--amt-heading-gap, 20px);
-  font-size: var(--amt-heading-size, 34px);
-  font-weight: var(--amt-heading-weight, 400);
-  line-height: var(--amt-heading-leading, 1.25);
-  letter-spacing: -0.01em;
-  color: var(--amt-heading-color, #0a0a0b);
+/* One statement size across the whole About page, taken from the band that
+   opens it: 34/50 as drawn, floored at 26px so it never outgrows the half
+   column it shares. The leading is a flat 50px rather than a ratio because
+   that is how it is specified — which is also why the narrow-screen rule
+   below hands it back as a proportion, since 50px against 24px type would be
+   double-spaced. Change it in one of these four and change it in all four. */
+.amt .section-title {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  line-height: 50px;
+  color: var(--amt-ink, #0a0a0b);
 }
 
 .amt__body {
-  color: var(--amt-body-color, #3d3d3d);
+  margin-top: var(--amt-body-gap, 20px);
+  max-width: var(--amt-body-max, 52ch);
+  line-height: 28px;
+  color: var(--amt-body-color, #1a1a1a);
 }
 
-.amt__body > * + * {
-  margin-top: var(--amt-body-gap, 16px);
+.amt__body em {
+  font-weight: 400;
+}
+
+.amt__body>*+* {
+  margin-top: 12px;
 }
 
 /* --------------------------------------------------------------------------
@@ -81,23 +126,21 @@
    -------------------------------------------------------------------------- */
 
 .amt__cta {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
+  gap: 20px;
   box-sizing: border-box;
-  min-width: var(--amt-cta-min-w, 300px);
-  max-width: 100%;
+  width: 100%;
+  max-width: var(--amt-cta-max, 400px);
   height: var(--amt-cta-h, 48px);
-  padding: 0 24px;
-  margin-top: var(--amt-cta-gap, 32px);
+  margin-top: var(--amt-cta-gap, 30px);
   border-radius: var(--amt-cta-radius, 0px);
   background-color: var(--amt-cta-bg, #000);
   color: var(--amt-cta-fg, #fff);
-  font-size: var(--amt-cta-size, 14px);
+  font-size: var(--amt-cta-size, 16px);
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.02em;
   text-decoration: none;
   transition: filter 0.3s ease;
 }
@@ -114,7 +157,7 @@
 }
 
 .amt__cta:hover .amt__cta-arrow {
-  transform: translateX(5px);
+  transform: translateX(6px);
 }
 
 /* --------------------------------------------------------------------------
@@ -127,8 +170,12 @@
 
 @media screen and (max-width: 749px) {
   .amt {
-    padding-top: calc(var(--amt-pad-top, 80px) * 0.6);
-    padding-bottom: calc(var(--amt-pad-bottom, 80px) * 0.6);
+    padding-top: calc(var(--amt-pad-top, 60px) * 0.6);
+    padding-bottom: calc(var(--amt-pad-bottom, 60px) * 0.6);
+  }
+
+  .amt--under-header {
+    padding-top: calc(var(--header-height, var(--amt-header-fallback-mobile, 76px)) + var(--amt-pad-top, 60px) * 0.6);
   }
 
   .amt__row,
@@ -145,18 +192,23 @@
     aspect-ratio: var(--amt-media-ratio-mobile, var(--amt-media-ratio, 1.15));
   }
 
-  .amt__heading {
-    font-size: clamp(2.2rem, 6.5vw, var(--amt-heading-size, 34px));
+  .amt .section-title {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+
+  .amt__body {
+    max-width: none;
   }
 
   .amt__cta {
-    width: 100%;
-    min-width: 0;
+    max-width: none;
     height: 44px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .amt__cta,
   .amt__cta-arrow {
     transition-duration: 0.01ms;

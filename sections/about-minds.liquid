@@ -11,43 +11,50 @@
   the reader can scroll, not to a row they cannot reach the end of.
 {%- endcomment -%}
 
+{%- liquid
+  comment
+    The mark is the brand's own, drawn rather than typed: the quotation glyph
+    a font supplies is a different shape in every face, and this one is the
+    shape the brand uses. Picked in the editor for the usual case, by URL for
+    artwork that lives elsewhere — resolved to one src here so the markup below
+    only has to ask about it once.
+  endcomment
+  assign quote_image = section.settings.quote_image
+  assign quote_src = section.settings.quote_image_url
+  if quote_image != blank
+    assign quote_src = quote_image | image_url: width: 600
+  endif
+-%}
+
 <div
   class="mnd"
-  data-mnd
   style="
     --mnd-pad-top: {{ section.settings.padding_top }}px;
     --mnd-pad-bottom: {{ section.settings.padding_bottom }}px;
     --mnd-bg: {{ section.settings.background }};
     --mnd-head-gap: {{ section.settings.head_gap }}px;
-    --mnd-heading-size: {{ section.settings.heading_size }}px;
-    --mnd-heading-weight: {{ section.settings.heading_weight }};
-    --mnd-heading-color: {{ section.settings.heading_color }};
+    --mnd-ink: {{ section.settings.ink }};
     --mnd-body-color: {{ section.settings.body_color }};
     --mnd-body-w: {{ section.settings.body_width }}px;
-    --mnd-quote-size: {{ section.settings.quote_size }}px;
-    --mnd-quote-color: {{ section.settings.quote_color }};
+    --mnd-quote-w: {{ section.settings.quote_width }}px;
     --mnd-columns: {{ section.settings.columns_desktop }};
     --mnd-columns-mobile: {{ section.settings.columns_mobile }};
     --mnd-card-gap: {{ section.settings.card_gap }}px;
-    --mnd-card-ratio: {{ section.settings.media_ratio }};
     --mnd-card-radius: {{ section.settings.card_radius }}px;
     --mnd-card-bg: {{ section.settings.card_background }};
     --mnd-card-inset: {{ section.settings.card_inset }}px;
-    --mnd-scrim: {{ section.settings.scrim_color }};
-    --mnd-scrim-opacity: {{ section.settings.scrim_opacity | divided_by: 100.0 }};
+    --mnd-caption-bg: {{ section.settings.caption_background }};
+    --mnd-caption-opacity: {{ section.settings.caption_opacity | divided_by: 100.0 }};
     --mnd-name-size: {{ section.settings.name_size }}px;
     --mnd-role-size: {{ section.settings.role_size }}px;
     --mnd-card-text: {{ section.settings.card_text_color }};
-    --mnd-arrow-size: {{ section.settings.arrow_size }}px;
-    --mnd-arrow-offset: {{ section.settings.arrow_offset }}px;
-    --mnd-arrow-color: {{ section.settings.arrow_color }};
   "
   {{ section.shopify_attributes }}
 >
   <div class="page-width mnd__head">
     <div class="mnd__head-copy">
       {%- if section.settings.heading != blank -%}
-        <h2 class="mnd__heading">{{ section.settings.heading }}</h2>
+        <h2 class="section-title">{{ section.settings.heading }}</h2>
       {%- endif -%}
 
       {%- if section.settings.body != blank -%}
@@ -57,30 +64,42 @@
 
     {%- comment -%}
       Decoration rather than a quotation — there is nothing being quoted — so
-      it is kept away from assistive technology entirely.
+      it carries an empty alt and is kept away from assistive technology
+      entirely.
+
+      A picked image brings its own width and height, which reserve its space
+      before it loads. The URL path cannot know them, so it takes a class that
+      hands it the default mark's proportions instead — applied only there, so
+      a differently shaped image chosen in the editor is never letterboxed
+      into the wrong ratio.
     {%- endcomment -%}
-    {%- if section.settings.show_quote_mark -%}
-      <span class="mnd__quote" aria-hidden="true">&rdquo;</span>
+    {%- if section.settings.show_quote_mark and quote_src != blank -%}
+      <img
+        class="mnd__quote{% if quote_image == blank %} mnd__quote--url{% endif %}"
+        src="{{ quote_src }}"
+        {%- if quote_image != blank %}
+          width="{{ quote_image.width }}"
+          height="{{ quote_image.height }}"
+        {%- endif %}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      >
     {%- endif -%}
   </div>
 
+  {%- comment -%}
+    No arrows: the row holds three people and three cards fit the column
+    exactly, so on a desktop there is nothing to step through. Narrower than
+    that the rail is still a scroll box, which a thumb already swipes — so
+    what was a carousel is now just a row that happens to scroll when it has
+    to, and needs no script at all.
+  {%- endcomment -%}
   <div class="page-width mnd__frame">
-    {%- if section.settings.show_arrows -%}
-      <button
-        class="mnd__arrow mnd__arrow--prev"
-        type="button"
-        data-mnd-arrow="prev"
-        aria-controls="mnd-rail-{{ section.id }}"
-        aria-label="{{ 'general.slider.previous_slide' | t }}"
-      >
-        <span class="mnd__arrow-glyph" aria-hidden="true">&lsaquo;</span>
-      </button>
-    {%- endif -%}
-
     <div
       class="mnd__rail"
       id="mnd-rail-{{ section.id }}"
-      data-mnd-rail
       tabindex="0"
       role="group"
       aria-label="{{ section.settings.heading | default: 'The people behind the brand' | escape }}"
@@ -95,7 +114,7 @@
           assign role = block.settings.role | escape | newline_to_br
         -%}
 
-        <article class="mnd__card" data-mnd-card {{ block.shopify_attributes }}>
+        <article class="mnd__card" {{ block.shopify_attributes }}>
           {%- comment -%}
             The whole card is the link when one is set, laid over the portrait
             rather than wrapped around it — a link around a figure with text
@@ -108,7 +127,13 @@
             </a>
           {%- endif -%}
 
-          <div class="mnd__media">
+          {%- comment -%}
+            The portrait is shown at its own full height rather than cropped
+            to a fixed card shape, so there is nothing to give an empty card
+            its height before a picture is chosen — the empty state carries
+            the drawn proportion itself.
+          {%- endcomment -%}
+          <div class="mnd__media{% if image_src == blank %} mnd__media--empty{% endif %}">
             {%- if image_src != blank -%}
               <img
                 class="mnd__img"
@@ -130,8 +155,6 @@
             {%- endif -%}
           </div>
 
-          <div class="mnd__scrim" aria-hidden="true"></div>
-
           <div class="mnd__caption">
             {%- if block.settings.name != blank -%}
               <h3 class="mnd__name">{{ block.settings.name }}</h3>
@@ -143,22 +166,8 @@
         </article>
       {%- endfor -%}
     </div>
-
-    {%- if section.settings.show_arrows -%}
-      <button
-        class="mnd__arrow mnd__arrow--next"
-        type="button"
-        data-mnd-arrow="next"
-        aria-controls="mnd-rail-{{ section.id }}"
-        aria-label="{{ 'general.slider.next_slide' | t }}"
-      >
-        <span class="mnd__arrow-glyph" aria-hidden="true">&rsaquo;</span>
-      </button>
-    {%- endif -%}
   </div>
 </div>
-
-<script src="{{ 'about-minds.js' | asset_url }}" defer="defer"></script>
 
 {% schema %}
 {
@@ -174,34 +183,12 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
+      "info": "Set in the theme's shared section statement.",
       "default": "Minds Behind Beyond Beyond"
     },
     {
-      "type": "range",
-      "id": "heading_size",
-      "min": 18,
-      "max": 48,
-      "step": 1,
-      "unit": "px",
-      "label": "Heading size",
-      "default": 28
-    },
-    {
-      "type": "select",
-      "id": "heading_weight",
-      "label": "Heading weight",
-      "options": [
-        { "value": "300", "label": "Light" },
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semi bold" },
-        { "value": "700", "label": "Bold" }
-      ],
-      "default": "500"
-    },
-    {
       "type": "color",
-      "id": "heading_color",
+      "id": "ink",
       "label": "Heading colour",
       "default": "#0A0A0B"
     },
@@ -244,20 +231,27 @@
       "default": true
     },
     {
-      "type": "range",
-      "id": "quote_size",
-      "min": 20,
-      "max": 140,
-      "step": 2,
-      "unit": "px",
-      "label": "Quote mark size",
-      "default": 56
+      "type": "image_picker",
+      "id": "quote_image",
+      "label": "Quote mark"
     },
     {
-      "type": "color",
-      "id": "quote_color",
-      "label": "Quote mark colour",
-      "default": "#1A1A1A"
+      "type": "text",
+      "id": "quote_image_url",
+      "label": "Quote mark URL",
+      "info": "Used when no quote mark is picked above. Defaults to the brand's own mark.",
+      "default": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_890.png?v=1787640838"
+    },
+    {
+      "type": "range",
+      "id": "quote_width",
+      "min": 20,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Quote mark width",
+      "info": "The height follows the artwork's own proportions.",
+      "default": 48
     },
     {
       "type": "header",
@@ -295,18 +289,6 @@
       "default": 8
     },
     {
-      "type": "select",
-      "id": "media_ratio",
-      "label": "Card shape",
-      "options": [
-        { "value": "1", "label": "Square" },
-        { "value": "0.9", "label": "Slight portrait" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "0.75", "label": "Tall portrait" }
-      ],
-      "default": "1"
-    },
-    {
       "type": "range",
       "id": "card_radius",
       "min": 0,
@@ -331,24 +313,23 @@
       "step": 2,
       "unit": "px",
       "label": "Caption inset",
-      "default": 18
+      "default": 28
     },
     {
       "type": "color",
-      "id": "scrim_color",
-      "label": "Caption scrim",
-      "info": "Fades up from the foot of the portrait so the name stays legible over any photograph.",
-      "default": "#000000"
+      "id": "caption_background",
+      "label": "Caption background",
+      "default": "#5C5C5C"
     },
     {
       "type": "range",
-      "id": "scrim_opacity",
+      "id": "caption_opacity",
       "min": 0,
       "max": 100,
       "step": 5,
       "unit": "%",
-      "label": "Scrim strength",
-      "default": 70
+      "label": "Caption strength",
+      "default": 90
     },
     {
       "type": "range",
@@ -358,7 +339,7 @@
       "step": 1,
       "unit": "px",
       "label": "Name size",
-      "default": 18
+      "default": 24
     },
     {
       "type": "range",
@@ -368,49 +349,13 @@
       "step": 1,
       "unit": "px",
       "label": "Role size",
-      "default": 12
+      "default": 15
     },
     {
       "type": "color",
       "id": "card_text_color",
       "label": "Caption colour",
       "default": "#FFFFFF"
-    },
-    {
-      "type": "header",
-      "content": "Arrows"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_arrows",
-      "label": "Show arrows",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "arrow_size",
-      "min": 10,
-      "max": 32,
-      "step": 1,
-      "unit": "px",
-      "label": "Arrow size",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "arrow_offset",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "label": "Arrow distance from the cards",
-      "default": 16
-    },
-    {
-      "type": "color",
-      "id": "arrow_color",
-      "label": "Arrow colour",
-      "default": "#1A1A1A"
     },
     {
       "type": "header",
