@@ -19,6 +19,9 @@
     --nsu-bg: {{ section.settings.background }};
     --nsu-ink: {{ section.settings.ink }};
     --nsu-body-color: {{ section.settings.body_color }};
+    --nsu-body-size: {{ section.settings.body_size }}px;
+    --nsu-rule-color: {{ section.settings.rule_color }};
+    --nsu-rule-gap: {{ section.settings.rule_gap }}px;
     --nsu-body-w: {{ section.settings.body_width }}px;
     --nsu-head-gap: {{ section.settings.head_gap }}px;
     --nsu-columns: {{ section.settings.columns_desktop }};
@@ -36,6 +39,16 @@
   <div class="page-width">
     {%- if section.settings.heading != blank -%}
       <h2 class="section-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- comment -%}
+      A real `<hr>`: what separates the name of the section from the
+      explanation under it is a thematic break, and that is the element that
+      says so. Its own border is cleared in the stylesheet, since browsers
+      draw one of their own.
+    {%- endcomment -%}
+    {%- if section.settings.show_rule -%}
+      <hr class="nsu__rule">
     {%- endif -%}
 
     {%- if section.settings.body != blank -%}
@@ -120,10 +133,42 @@
       "default": "<p>NAD+ can be replenished through topical formulations, supplements, or NAD+ precursors such as <strong>Nicotinamide Riboside (NR)</strong> and <strong>Nicotinamide Mononucleotide (NMN)</strong>. In skincare, stabilized forms of NAD+ or its precursors help:</p>"
     },
     {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Rule under the heading",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rule colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "rule_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below the rule",
+      "default": 28
+    },
+    {
       "type": "color",
       "id": "body_color",
       "label": "Intro colour",
       "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Intro size",
+      "default": 20
     },
     {
       "type": "range",
@@ -143,7 +188,7 @@
       "step": 2,
       "unit": "px",
       "label": "Space below the intro",
-      "default": 44
+      "default": 58
     },
     {
       "type": "header",
@@ -166,7 +211,7 @@
       "step": 4,
       "unit": "px",
       "label": "Space between columns",
-      "default": 64
+      "default": 72
     },
     {
       "type": "range",
@@ -176,17 +221,18 @@
       "step": 2,
       "unit": "px",
       "label": "Space between rows",
-      "default": 40
+      "default": 36
     },
     {
       "type": "range",
       "id": "icon_size",
       "min": 24,
-      "max": 120,
+      "max": 220,
       "step": 2,
       "unit": "px",
       "label": "Icon size",
-      "default": 64
+      "info": "The drawings are 160px artwork with their own margin, so 160 shows them at full size.",
+      "default": 160
     },
     {
       "type": "range",
@@ -196,7 +242,7 @@
       "step": 2,
       "unit": "px",
       "label": "Space between icon and copy",
-      "default": 20
+      "default": 24
     },
     {
       "type": "range",
@@ -206,7 +252,7 @@
       "step": 1,
       "unit": "px",
       "label": "Title size",
-      "default": 16
+      "default": 20
     },
     {
       "type": "color",
@@ -218,17 +264,17 @@
       "type": "range",
       "id": "text_size",
       "min": 9,
-      "max": 20,
+      "max": 24,
       "step": 1,
       "unit": "px",
       "label": "Description size",
-      "default": 13
+      "default": 16
     },
     {
       "type": "color",
       "id": "text_color",
       "label": "Description colour",
-      "default": "#4A4A4A"
+      "default": "#3D3D3D"
     },
     {
       "type": "header",

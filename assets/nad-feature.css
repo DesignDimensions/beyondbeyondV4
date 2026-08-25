@@ -4,7 +4,6 @@
    ========================================================================== */
 
 .nft {
-  padding-top: var(--nft-pad-top, 80px);
   padding-bottom: var(--nft-pad-bottom, 80px);
   background-color: var(--nft-bg, #fff);
 }
@@ -60,13 +59,13 @@
    -------------------------------------------------------------------------- */
 
 .nft .section-heading {
-  margin: 0 0 14px;
-  font-size: 15px;
+  margin: 0;
+  font-size: 36px;
   font-weight: 700;
-  letter-spacing: 7px;
+  letter-spacing: 2px;
   text-align: left;
   text-transform: uppercase;
-  color: var(--nft-ink, #0a0a0b);
+  color: #000;
 }
 
 .nft .section-title {
@@ -89,16 +88,17 @@
 
 /* Without a rule the paragraph still has to clear the heading, so the gap the
    rule would have carried is handed to the body instead. */
-.nft__rule + .nft__body {
+.nft__rule+.nft__body {
   margin-top: 0;
 }
 
 .nft__body {
   margin-top: var(--nft-rule-gap, 18px);
   color: var(--nft-body-color, #1a1a1a);
+  font-weight: 400;
 }
 
-.nft__body > * + * {
+.nft__body>*+* {
   margin-top: var(--nft-body-gap, 14px);
 }
 
@@ -113,9 +113,7 @@
   }
 
   .nft--under-header {
-    padding-top: calc(
-      var(--header-height, var(--nft-header-fallback-mobile, 76px)) + var(--nft-pad-top, 80px) * 0.6
-    );
+    padding-top: calc(var(--header-height, var(--nft-header-fallback-mobile, 76px)) + var(--nft-pad-top, 80px) * 0.6);
   }
 
   .nft__row,

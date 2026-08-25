@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
@@ -20,9 +29,9 @@
         "band_height": 850,
         "media_ratio_mobile": "1 / 1",
         "media_background": "#dedede",
+        "offset_header": true,
         "media_position": "right",
-        "media_width": 50,
-        "offset_header": true
+        "media_width": 50
       }
     },
     "what_is": {
@@ -45,9 +54,9 @@
         "band_height": 850,
         "media_ratio_mobile": "1 / 1",
         "media_background": "#dedede",
+        "offset_header": false,
         "media_position": "left",
-        "media_width": 50,
-        "offset_header": false
+        "media_width": 50
       }
     },
     "science": {
@@ -70,9 +79,9 @@
         "band_height": 850,
         "media_ratio_mobile": "1 / 1",
         "media_background": "#dedede",
+        "offset_header": false,
         "media_position": "right",
-        "media_width": 50,
-        "offset_header": false
+        "media_width": 50
       }
     },
     "supports": {
@@ -131,22 +140,26 @@
         "heading": "How NAD+ Supports Your Skin",
         "ink": "#0a0a0b",
         "body": "<p>NAD+ can be replenished through topical formulations, supplements, or NAD+ precursors such as <strong>Nicotinamide Riboside (NR)</strong> and <strong>Nicotinamide Mononucleotide (NMN)</strong>. In skincare, stabilized forms of NAD+ or its precursors help:</p>",
+        "show_rule": true,
+        "rule_color": "#1a1a1a",
+        "rule_gap": 28,
         "body_color": "#1a1a1a",
+        "body_size": 20,
         "body_width": 1180,
-        "head_gap": 44,
+        "head_gap": 58,
         "columns_desktop": 2,
-        "column_gap": 64,
-        "row_gap": 40,
-        "icon_size": 64,
-        "icon_gap": 20,
-        "title_size": 16,
+        "column_gap": 72,
+        "row_gap": 36,
+        "icon_size": 160,
+        "icon_gap": 24,
+        "title_size": 20,
         "title_color": "#0a0a0b",
-        "text_size": 13,
-        "text_color": "#4a4a4a",
+        "text_size": 16,
+        "text_color": "#3d3d3d",
         "background": "#f2f2f2",
+        "offset_header": false,
         "padding_top": 72,
-        "padding_bottom": 72,
-        "offset_header": false
+        "padding_bottom": 72
       }
     },
     "paradigm": {
@@ -154,8 +167,8 @@
       "settings": {
         "eyebrow": "",
         "heading": "Pro-Ageing Vs. Anti-Ageing:\nA Paradigm Shift",
-        "show_rule": false,
-        "body": "<p>Traditional skincare has largely focused on anti-ageing, attempting to reverse or slow down visible signs of ageing. However, the concept of pro-ageing shifts the narrative towards embracing ageing gracefully&mdash;not by erasing time but by enhancing cellular health to ensure skin ages optimally. NAD+ epitomizes this philosophy by working at the molecular level to revitalize, rather than simply conceal the effects of ageing.</p><p>Ageing is not about resisting time&mdash;it&rsquo;s about optimising how we age. With NAD+ at the forefront, Beyond Beyond offers a science-backed pathway to pro-ageing skincare.</p>",
+        "show_rule": true,
+        "body": "<p>Traditional skincare has largely focused on anti-ageing, attempting to reverse or slow down visible signs of ageing. However, the concept of pro-ageing shifts the narrative towards embracing ageing gracefully—not by erasing time but by enhancing cellular health to ensure skin ages optimally. NAD+ epitomizes this philosophy by working at the molecular level to revitalize, rather than simply conceal the effects of ageing.</p><p>Ageing is not about resisting time—it’s about optimising how we age. With NAD+ at the forefront, Beyond Beyond offers a science-backed pathway to pro-ageing skincare.</p>",
         "body_gap": 14,
         "ink": "#0a0a0b",
         "body_color": "#1a1a1a",
@@ -166,14 +179,14 @@
         "media_ratio": "0.8",
         "media_ratio_mobile": "",
         "media_background": "#dedede",
+        "offset_header": false,
         "media_position": "left",
         "media_width": 45,
         "column_gap": 56,
         "vertical_alignment": "center",
         "background": "#ffffff",
         "padding_top": 80,
-        "padding_bottom": 80,
-        "offset_header": false
+        "padding_bottom": 80
       }
     },
     "future": {
@@ -193,14 +206,14 @@
         "media_ratio": "0.76",
         "media_ratio_mobile": "",
         "media_background": "#dedede",
+        "offset_header": false,
         "media_position": "right",
         "media_width": 45,
         "column_gap": 56,
         "vertical_alignment": "center",
         "background": "#ffffff",
         "padding_top": 80,
-        "padding_bottom": 80,
-        "offset_header": false
+        "padding_bottom": 80
       }
     }
   },
