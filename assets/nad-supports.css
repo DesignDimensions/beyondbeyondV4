@@ -6,7 +6,6 @@
 .nsu {
   padding-top: var(--nsu-pad-top, 72px);
   padding-bottom: var(--nsu-pad-bottom, 72px);
-  margin-bottom: var(--nsu-pad-bottom, 72px);
   background-color: var(--nsu-bg, #f2f2f2);
 }
 
@@ -74,6 +73,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  row-gap: 30px;
 }
 
 .nsu__item {
@@ -88,8 +88,8 @@
    that is not square from being stretched into one. */
 .nsu__icon {
   flex: 0 0 auto;
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
   display: block;
 }
