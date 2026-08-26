@@ -4,7 +4,7 @@ class CartRemoveButton extends HTMLElement {
 
     this.addEventListener('click', (event) => {
       event.preventDefault();
-      const cartItems = this.closest('cart-items') || this.closest('cart-drawer-items');
+      const cartItems = this.closest('cart-items');
       cartItems.updateQuantity(this.dataset.index, 0, event);
     });
   }
@@ -109,36 +109,19 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
     this.validateQuantity(event);
   }
 
+  // The drawer branch this used to carry is gone with Dawn's <cart-drawer-items>; the drawer
+  // is re-rendered by whoever mutated the cart (see mini-cart-items.js).
   onCartUpdate() {
-    if (this.tagName === 'CART-DRAWER-ITEMS') {
-      return fetch(`${routes.cart_url}?section_id=cart-drawer`)
-        .then((response) => response.text())
-        .then((responseText) => {
-          const html = new DOMParser().parseFromString(responseText, 'text/html');
-          const selectors = ['cart-drawer-items', '.cart-drawer__footer'];
-          for (const selector of selectors) {
-            const targetElement = document.querySelector(selector);
-            const sourceElement = html.querySelector(selector);
-            if (targetElement && sourceElement) {
-              targetElement.replaceWith(sourceElement);
-            }
-          }
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    } else {
-      return fetch(`${routes.cart_url}?section_id=main-cart-items`)
-        .then((response) => response.text())
-        .then((responseText) => {
-          const html = new DOMParser().parseFromString(responseText, 'text/html');
-          const sourceQty = html.querySelector('cart-items');
-          this.innerHTML = sourceQty.innerHTML;
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    }
+    return fetch(`${routes.cart_url}?section_id=main-cart-items`)
+      .then((response) => response.text())
+      .then((responseText) => {
+        const html = new DOMParser().parseFromString(responseText, 'text/html');
+        const sourceQty = html.querySelector('cart-items');
+        this.innerHTML = sourceQty.innerHTML;
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }
 
   getSectionsToRender() {
@@ -162,6 +145,13 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         id: 'main-cart-footer',
         section: document.getElementById('main-cart-footer').dataset.id,
         selector: '.js-contents',
+      },
+      {
+        // The cart drawer is rendered on this page too. Only in the DOM when the cart type
+        // is 'drawer'; otherwise the lookup drops out on the null check downstream.
+        id: 'mini-cart',
+        section: document.getElementById('mini-cart')?.id,
+        selector: '.shopify-section',
       },
     ];
   }

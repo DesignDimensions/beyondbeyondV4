@@ -43,6 +43,8 @@
      never starts its own scroll/zoom gesture before JS decides the swipe is
      ours — vertical touch scroll still passes through untouched. */
   touch-action: pan-y;
+  width: 85%;
+  margin: 0 auto;
 }
 
 /* Centred is the resting state — a rail with room to spare sits in the middle
@@ -61,7 +63,7 @@
 }
 
 .bbc__concern {
-  flex: 0 0 var(--bbc-thumb-w);
+  flex: 0 0 calc((100% - (5 - 1) * 2.5%) / 5);
   width: var(--bbc-thumb-w);
   display: flex;
   flex-direction: column;

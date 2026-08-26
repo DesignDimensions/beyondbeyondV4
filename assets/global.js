@@ -217,6 +217,12 @@ function onKeyUpEscape(event) {
 class QuantityInput extends HTMLElement {
   constructor() {
     super();
+    this.init();
+  }
+
+  // Split out of the constructor so a subclass can extend setup -- the cart drawer's
+  // <gift-quantity> reconciles the wrap line against the cart on top of this.
+  init() {
     this.input = this.querySelector('input');
     this.changeEvent = new Event('change', { bubbles: true });
     this.input.addEventListener('change', this.onInputChange.bind(this));
@@ -267,12 +273,12 @@ class QuantityInput extends HTMLElement {
     const value = parseInt(this.input.value);
     if (this.input.min) {
       const buttonMinus = this.querySelector(".quantity__button[name='minus']");
-      buttonMinus.classList.toggle('disabled', parseInt(value) <= parseInt(this.input.min));
+      buttonMinus?.classList.toggle('disabled', parseInt(value) <= parseInt(this.input.min));
     }
     if (this.input.max) {
       const max = parseInt(this.input.max);
       const buttonPlus = this.querySelector(".quantity__button[name='plus']");
-      buttonPlus.classList.toggle('disabled', value >= max);
+      buttonPlus?.classList.toggle('disabled', value >= max);
     }
   }
 }

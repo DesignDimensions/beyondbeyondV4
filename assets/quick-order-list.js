@@ -168,9 +168,9 @@ if (!customElements.get('quick-order-list')) {
             selector: '.shopify-section',
           },
           {
-            id: 'CartDrawer',
-            selector: '.drawer__inner',
-            section: 'cart-drawer',
+            id: 'mini-cart',
+            selector: '.shopify-section',
+            section: 'mini-cart',
           },
         ];
       }
@@ -241,9 +241,9 @@ if (!customElements.get('quick-order-list')) {
 
               this.initVariantEventListeners();
             }
-          } else if (section === 'cart-drawer') {
+          } else if (section === 'mini-cart') {
             sectionElement.closest('cart-drawer')?.classList.toggle('is-empty', items.length === 0);
-            sectionElement.querySelector(selector).innerHTML = newSection.innerHTML;
+            sectionElement.innerHTML = newSection.innerHTML;
           } else {
             sectionElement.innerHTML = newSection.innerHTML;
           }

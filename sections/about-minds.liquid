@@ -41,6 +41,7 @@
     --mnd-columns-mobile: {{ section.settings.columns_mobile }};
     --mnd-card-gap: {{ section.settings.card_gap }}px;
     --mnd-card-radius: {{ section.settings.card_radius }}px;
+    --mnd-card-height: {{ section.settings.card_height }};
     --mnd-card-bg: {{ section.settings.card_background }};
     --mnd-card-inset: {{ section.settings.card_inset }}px;
     --mnd-caption-bg: {{ section.settings.caption_background }};
@@ -126,10 +127,9 @@
           {%- endif -%}
 
           {%- comment -%}
-            The portrait is shown at its own full height rather than cropped
-            to a fixed card shape, so there is nothing to give an empty card
-            its height before a picture is chosen — the empty state carries
-            the drawn proportion itself.
+            The card shape sets the height and the portrait is cropped to fill
+            it, so every card in the row lines up whatever proportions the
+            pictures arrive at. An empty card holds the same shape.
           {%- endcomment -%}
           <div class="mnd__media{% if image_src == blank %} mnd__media--empty{% endif %}">
             {%- if image_src != blank -%}
@@ -297,6 +297,17 @@
       "unit": "px",
       "label": "Space between cards",
       "default": 8
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "default": 145,
+      "label": "Card height",
+      "info": "As a percentage of the card's width. Portraits are cropped to this shape so every card in the row is the same height."
     },
     {
       "type": "range",

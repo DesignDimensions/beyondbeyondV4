@@ -85,10 +85,9 @@
 
 .mnd__rail {
   display: flex;
-  /* Each card is exactly as tall as its own portrait. Left to stretch, a card
-     with a shorter picture would be padded out to match the tallest and its
-     caption would come away from the foot of the image it belongs to. */
-  align-items: flex-start;
+  /* Every card is the same height: the portraits are cropped to one shape
+     rather than each card taking the height its own picture happens to have. */
+  align-items: stretch;
   gap: var(--mnd-card-gap, 8px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -110,6 +109,8 @@
 
 .mnd__card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 0 0 calc((100% - (var(--mnd-columns, 3) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns, 3));
   overflow: hidden;
   border-radius: var(--mnd-card-radius, 0px);
@@ -123,26 +124,28 @@
   z-index: 3;
 }
 
-/* The portrait is shown whole: full width of the card, and whatever height
-   its own proportions give it. Nothing is cropped, which is also why there is
-   no hover zoom here — scaling the picture up inside a clipped card would
-   crop it back on hover, which is the one thing this must not do. */
+/* The card shape, not the picture's, sets the height. The media box holds the
+   ratio so a row of portraits at different proportions still lines up, and it
+   grows with the card so a taller neighbour is absorbed by the crop rather
+   than by a strip of card background under the image. */
 .mnd__media {
   display: block;
+  flex: 1 1 auto;
   width: 100%;
+  aspect-ratio: 100 / var(--mnd-card-height, 145);
 }
 
 .mnd__img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 
-/* Before a portrait is chosen there is no picture to give the card a height,
-   so the empty state carries the drawn proportion itself and the section
-   still holds its shape in the editor. */
+/* Before a portrait is chosen the media box still carries the ratio above, so
+   the card holds its shape in the editor; this only paints the empty plate. */
 .mnd__media--empty {
-  aspect-ratio: 0.69;
   background-color: var(--mnd-card-bg, #c9ccd6);
 }
 

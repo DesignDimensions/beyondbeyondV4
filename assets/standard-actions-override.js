@@ -16,7 +16,7 @@
 
 // Cart custom elements that advertise sections via getSectionsToRender().
 // If Dawn adds a new cart custom element, add its tag here.
-const DAWN_CART_TAGS = ['cart-drawer', 'cart-items', 'cart-drawer-items', 'cart-notification'];
+const DAWN_CART_TAGS = ['cart-drawer', 'mini-cart', 'mini-cart-items', 'cart-items', 'cart-notification'];
 
 // Sections that Dawn's own pubsub subscribers refresh (cart.js's
 // CartItems#onCartUpdate fetches and replaces these directly when
@@ -24,11 +24,9 @@ const DAWN_CART_TAGS = ['cart-drawer', 'cart-items', 'cart-drawer-items', 'cart-
 // drawer body). We skip them here to avoid double-rendering.
 // Format is '<element-tag>:<getSectionsToRender entry id>'.
 // If you change which sections those subscribers refresh, update this set.
-const DAWN_PUBSUB_REFRESHED_SECTIONS = new Set([
-  'cart-drawer:cart-drawer',
-  'cart-drawer-items:CartDrawer',
-  'cart-items:main-cart-items',
-]);
+// The cart drawer has no cart-update subscriber of its own -- its body is only re-rendered
+// by whoever mutated the cart -- so `mini-cart` is deliberately not skipped here.
+const DAWN_PUBSUB_REFRESHED_SECTIONS = new Set(['cart-items:main-cart-items']);
 
 // Walk every mounted Dawn cart custom element, collect the sections it
 // wants rendered, and dedupe. Returns a Map keyed by section id, each

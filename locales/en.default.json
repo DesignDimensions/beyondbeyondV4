@@ -42,7 +42,49 @@
     "cart": {
       "view": "View cart ({{ count }})",
       "view_empty_cart": "View cart",
-      "item_added": "Item added to your cart"
+      "item_added": "Item added to your cart",
+      "discount": {
+        "applied_count": {
+          "one": "{{ count }} discount applied",
+          "other": "{{ count }} discounts applied"
+        },
+        "button": "Apply",
+        "caption": "Add a discount code",
+        "percent_off": " {{ percent }}% ",
+        "placeholder": "Enter Coupon Code",
+        "remove": "Remove discount {{ code }}",
+        "view_applied": "View discounts",
+        "applying": "Applying…",
+        "applied": "{{ code }} applied",
+        "invalid": "{{ code }} isn’t valid for this cart",
+        "removing": "Removing…",
+        "error": "Couldn’t apply that code. Please try again."
+      },
+      "free_shipping": {
+        "congratulations_html": "You are eligible for free shipping.",
+        "remaining_html": "Spend {{ remaining_amount }} more to reach free shipping"
+      },
+      "gift_note": {
+        "title": "Message",
+        "caption": "Add a personalized message to your order",
+        "button": "Apply"
+      },
+      "note": {
+        "title": "Note",
+        "caption": "Order special instructions",
+        "button": "Apply"
+      },
+      "shipping_calculator": {
+        "title": "Shipping",
+        "caption": "Estimate shipping rates",
+        "tooltip": "Shipping & taxes will be calculated at checkout",
+        "button": "Calculate"
+      },
+      "terms": {
+        "label_html": "I agree to the {{ terms_link }} & {{ privacy_link }}",
+        "terms_of_service": "T&C",
+        "privacy_policy": "Privacy Notice"
+      }
     },
     "share": {
       "close": "Close share",
@@ -274,7 +316,6 @@
       "announcement": "Announcement",
       "announcement_bar": "Announcement bar"
     },
-
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",
@@ -315,7 +356,10 @@
       "login": {
         "title": "Have an account?",
         "paragraph_html": "<a href=\"{{ link }}\" class=\"link underlined-link\">Log in</a> to check out faster."
-      }
+      },
+      "title_drawer": "Your Cart",
+      "gift_free": "Free gift",
+      "gift_wrapping_html": "For {{ price }} please wrap the products in this order."
     },
     "footer": {
       "payment": "Payment methods"

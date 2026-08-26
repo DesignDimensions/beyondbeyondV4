@@ -1,0 +1,92 @@
+{% comment %}
+  Renders an inline SVG icon by name.
+
+  This theme normally reaches for `{{ 'icon-x.svg' | inline_asset_content }}`. The cart
+  drawer was ported from a theme built around a named-icon snippet, and its markup calls
+  this on nearly every row -- keeping the snippet means the drawer's Liquid stays a
+  line-for-line match with the theme it came from, so the two can still be diffed.
+
+  Only the icons the cart drawer asks for are defined. Anything else falls through to
+  nothing rather than erroring.
+
+  Accepts:
+  - icon: {String} icon name
+  - class: {String} extra classes for the <svg> (optional)
+
+  Usage:
+  {% render 'icon', icon: 'close' %}
+{% endcomment %}
+
+{%- case icon -%}
+  {%- when 'caret' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-caret {{ class }}" fill="none" viewBox="0 0 24 15">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 15c-.3 0-.6-.1-.8-.4l-11-13C-.2 1.2-.1.5.3.2c.4-.4 1.1-.3 1.4.1L12 12.5 22.2.4c.4-.4 1-.5 1.4-.1.4.4.5 1 .1 1.4l-11 13c-.1.2-.4.3-.7.3z" fill="currentColor"/>
+    </svg>
+  {%- when 'checkmark' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-checkmark {{ class }}" fill="none" viewBox="0 0 20 20">
+      <path d="M18.5 1.5H1.5L1.5 18.5H18.5V1.5ZM1.5 0.5C0.947715 0.5 0.5 0.947715 0.5 1.5V18.5C0.5 19.0523 0.947715 19.5 1.5 19.5H18.5C19.0523 19.5 19.5 19.0523 19.5 18.5V1.5C19.5 0.947715 19.0523 0.5 18.5 0.5H1.5Z" fill-rule="evenodd" fill="currentColor"/>
+      <path d="M14.9975 6.09084C15.201 6.27746 15.2147 6.59375 15.0281 6.79728L8.91631 13.4627C8.82231 13.5652 8.68987 13.6239 8.55079 13.6247C8.41172 13.6256 8.27857 13.5684 8.18335 13.4671L4.99513 10.0731C4.80606 9.87179 4.81596 9.55536 5.01723 9.3663C5.21849 9.17723 5.53492 9.18713 5.72399 9.3884L8.54335 12.3897L14.291 6.12145C14.4776 5.91791 14.7939 5.90421 14.9975 6.09084Z" fill="currentColor"/>
+    </svg>
+  {%- when 'chevron' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-chevron {{ class }}" fill="none" viewBox="0 0 32 32">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12.943 24.943l8-8c0.521-0.521 0.521-1.365 0-1.885l-8-8c-0.521-0.521-1.365-0.521-1.885 0s-0.521 1.365 0 1.885l7.057 7.057-7.057 7.057c-0.521 0.521-0.521 1.365 0 1.885s1.365 0.521 1.885 0z" fill="currentColor"/>
+    </svg>
+  {%- when 'close' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-close {{ class }}" fill="none" viewBox="0 0 18 17">
+      <path d="M.865 15.978a.5.5 0 00.707.707l7.433-7.431 7.579 7.282a.501.501 0 00.846-.37.5.5 0 00-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 10-.707-.708L8.991 7.853 1.413.573a.5.5 0 10-.693.72l7.563 7.268-7.418 7.417z" fill="currentColor"/>
+    </svg>
+  {%- when 'discount' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-discount {{ class }}" fill="none" viewBox="0 0 24 24">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z" fill="currentColor"/>
+    </svg>
+  {%- when 'discount-percent' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-discount-percent {{ class }}" fill="none" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm3.53 5.116a.9.9 0 0 0-1.273 0l-7.14 7.141a.9.9 0 1 0 1.272 1.273l7.141-7.14a.9.9 0 0 0 0-1.274zM7.4 5.6a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6zm5.2 5.2a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6z" fill="currentColor"/>
+    </svg>
+  {%- when 'error' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-error {{ class }}" fill="none" viewBox="0 0 24 24">
+      <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z" fill="currentColor"/>
+    </svg>
+  {%- when 'gift' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-gift {{ class }}" fill="none" viewBox="0 0 512 512">
+      <path d="M448 128h-.4043c11.83-15.64 18.37-35.48 15.88-57.12c-2.67-23.17-17.02-43.45-36.28-56.6C357.5-33.31 291.3 48.56 256 106C220.7 48.56 154.5-33.31 84.81 14.28c-19.26 13.15-33.61 33.43-36.28 56.6C46.03 92.52 52.57 112.4 64.4 128H64C28.65 128 0 156.7 0 192v64c0 17.67 14.33 32 32 32L32 448c0 35.35 28.65 64 64 64h320c35.35 0 64-28.65 64-64l.0001-160C497.7 288 512 273.7 512 256V192C512 156.7 483.3 128 448 128zM384 32c26.47 0 48 21.53 48 48S410.5 128 384 128h-103.9C315.3 69.01 354.8 32 384 32zM128 32c29.22 0 68.67 37.01 103.9 96H128C101.5 128 80 106.5 80 80S101.5 32 128 32zM32 255.1L32 192c0-17.64 14.36-32 32.4-32H240v95.87L32 255.1zM96 480c-17.67 0-32-14.33-32-32V288h176v192H96zM448 448c0 17.67-14.33 32-32 32h-144V288H448V448zM480 255.1L272 255.9V160H448c17.64 0 32 14.36 32 32L480 255.1z" fill="currentColor"/>
+    </svg>
+  {%- when 'info' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-info {{ class }}" fill="none" viewBox="0 0 512 512">
+      <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 480c-123.5 0-224-100.5-224-224s100.5-224 224-224s224 100.5 224 224S379.5 480 256 480zM256 184c13.25 0 24-10.74 24-24c0-13.25-10.75-24-24-24S232 146.7 232 160C232 173.3 242.7 184 256 184zM304 352h-32V240C272 231.2 264.8 224 256 224H224C215.2 224 208 231.2 208 240S215.2 256 224 256h16v96h-32C199.2 352 192 359.2 192 368C192 376.8 199.2 384 208 384h96c8.836 0 16-7.164 16-16C320 359.2 312.8 352 304 352z" fill="currentColor"/>
+    </svg>
+  {%- when 'minus' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-minus {{ class }}" fill="none" viewBox="0 0 10 2">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z" fill="currentColor"/>
+    </svg>
+  {%- when 'pen' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-pen {{ class }}" fill="none" viewBox="0 0 512 512">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M493.25 56.26l-37.51-37.51C443.25 6.25 426.87 0 410.49 0s-32.76 6.25-45.26 18.74L12.85 371.12.15 485.34C-1.45 499.72 9.88 512 23.95 512c.89 0 1.78-.05 2.69-.15l114.14-12.61 352.48-352.48c24.99-24.99 24.99-65.51-.01-90.5zM126.09 468.68l-93.03 10.31 10.36-93.17 263.89-263.89 82.77 82.77-263.99 263.98zm344.54-344.54l-57.93 57.93-82.77-82.77 57.93-57.93c6.04-6.04 14.08-9.37 22.63-9.37 8.55 0 16.58 3.33 22.63 9.37l37.51 37.51c12.47 12.48 12.47 32.78 0 45.26z" fill="currentColor"/>
+    </svg>
+  {%- when 'plus' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-plus {{ class }}" fill="none" viewBox="0 0 10 10">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z" fill="currentColor"/>
+    </svg>
+  {%- when 'question' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-question {{ class }}" fill="none" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M11 11H9v-.148c0-.876.306-1.499 1-1.852.385-.195 1-.568 1-1a1.001 1.001 0 00-2 0H7c0-1.654 1.346-3 3-3s3 1 3 3-2 2.165-2 3zm-2 4h2v-2H9v2zm1-13a8 8 0 100 16 8 8 0 000-16z" fill="currentColor"/>
+    </svg>
+  {%- when 'receipt' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-receipt {{ class }}" fill="none" viewBox="0 0 20 20">
+      <path d="M4.5 1.5a.5.5 0 0 0-.5.5v16a.5.5 0 0 0 .77.42L7 16.85l2.23 1.57a.5.5 0 0 0 .58 0L12 16.85l2.23 1.57A.5.5 0 0 0 15 18V2a.5.5 0 0 0-.5-.5h-10Zm.5 1h9v14.53l-1.73-1.22a.5.5 0 0 0-.58 0l-2.19 1.55-2.19-1.55a.5.5 0 0 0-.58 0L5 17.03V2.5Z" fill="currentColor"/>
+      <path d="M6.75 5.5h5.5a.5.5 0 0 1 0 1h-5.5a.5.5 0 0 1 0-1ZM6.75 8.5h5.5a.5.5 0 0 1 0 1h-5.5a.5.5 0 0 1 0-1ZM6.75 11.5h3.5a.5.5 0 0 1 0 1h-3.5a.5.5 0 0 1 0-1Z" fill="currentColor"/>
+    </svg>
+  {%- when 'remove' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-remove {{ class }}" fill="none" viewBox="0 0 16 16">
+      <path d="M14 3h-3.53a3.07 3.07 0 00-.6-1.65C9.44.82 8.8.5 8 .5s-1.44.32-1.87.85A3.06 3.06 0 005.53 3H2a.5.5 0 000 1h1.25v10c0 .28.22.5.5.5h8.5a.5.5 0 00.5-.5V4H14a.5.5 0 000-1zM6.91 1.98c.23-.29.58-.48 1.09-.48s.85.19 1.09.48c.2.24.3.6.36 1.02h-2.9c.05-.42.17-.78.36-1.02zm4.84 11.52h-7.5V4h7.5v9.5z" fill="currentColor"/>
+      <path d="M6.55 5.25a.5.5 0 00-.5.5v6a.5.5 0 001 0v-6a.5.5 0 00-.5-.5zM9.45 5.25a.5.5 0 00-.5.5v6a.5.5 0 001 0v-6a.5.5 0 00-.5-.5z" fill="currentColor"/>
+    </svg>
+  {%- when 'spinner' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-spinner {{ class }}" fill="none" viewBox="0 0 66 66">
+      <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"/>
+    </svg>
+  {%- when 'truck' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon icon-truck {{ class }}" fill="none" viewBox="0 0 640 512">
+      <path d="M280 192c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H40c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240zm352 192h-24V275.9c0-16.8-6.8-33.3-18.8-45.2l-83.9-83.9c-11.8-12-28.3-18.8-45.2-18.8H416V78.6c0-25.7-22.2-46.6-49.4-46.6H113.4C86.2 32 64 52.9 64 78.6V96H8c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H96V78.6c0-8.1 7.8-14.6 17.4-14.6h253.2c9.6 0 17.4 6.5 17.4 14.6V384H207.6C193 364.7 170 352 144 352c-18.1 0-34.6 6.2-48 16.4V288H64v144c0 44.2 35.8 80 80 80s80-35.8 80-80c0-5.5-.6-10.8-1.6-16h195.2c-1.1 5.2-1.6 10.5-1.6 16 0 44.2 35.8 80 80 80s80-35.8 80-80c0-5.5-.6-10.8-1.6-16H632c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8zm-488 96c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm272-320h44.1c8.4 0 16.7 3.4 22.6 9.4l83.9 83.9c.8.8 1.1 1.9 1.8 2.8H416V160zm80 320c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm80-96h-16.4C545 364.7 522 352 496 352s-49 12.7-63.6 32H416v-96h160v96zM256 248v-16c0-4.4-3.6-8-8-8H8c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240c4.4 0 8-3.6 8-8z" fill="currentColor"/>
+    </svg>
+{%- endcase -%}

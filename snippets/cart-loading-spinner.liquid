@@ -1,0 +1,16 @@
+{% comment %}
+  Renders the cart drawer's per-line loading overlay.
+
+  Separate from this theme's own 'loading-spinner' snippet, which emits the button-sized
+  .loading__spinner. The drawer overlays a spinner on a card and its CSS keys off
+  .loading-overlay, so it gets its own markup.
+
+  Usage:
+  {% render 'cart-loading-spinner' %}
+{% endcomment %}
+
+<div class="loading-overlay hidden">
+  <div class="loading-overlay__spinner">
+    {% render 'icon', icon: 'spinner' %}
+  </div>
+</div>

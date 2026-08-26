@@ -1,0 +1,31 @@
+/* The cart drawer's per-line spinner. This theme's own spinner is .loading__spinner and is
+   sized for a button; the drawer overlays one on a card instead, so it keeps the overlay
+   geometry it was designed against. The rotator/dash keyframes and .path come from base.css. */
+.loading-overlay {
+  position: absolute;
+  z-index: 3;
+  width: 3rem;
+  line-height: 1;
+}
+
+@media screen and (max-width: 749px) {
+  .loading-overlay {
+    top: 0;
+    right: 0;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .loading-overlay {
+    left: 0;
+  }
+}
+
+.loading-overlay__spinner {
+  width: 3rem;
+  display: inline-block;
+}
+
+.icon-spinner {
+  animation: rotator 1.4s infinite linear;
+}

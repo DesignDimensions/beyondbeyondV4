@@ -1491,20 +1491,237 @@
         "default": false
       },
       {
+        "type": "color",
+        "id": "cart_accent_color",
+        "default": "#0107ef",
+        "label": "Drawer accent colour",
+        "info": "Used by the promo banner, unlocked gift tiers, discount actions and links inside the cart drawer."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_shipping_calculator",
+        "default": false,
+        "label": "Show shipping rates calculator"
+      },
+      {
+        "type": "text",
+        "id": "shipping_calculator_default_country",
+        "default": "India",
+        "label": "Default country to use",
+        "info": "If your customer is logged in, the country on their default shipping address is selected instead."
+      },
+      {
+        "type": "select",
+        "id": "giftwrap_rate_type",
+        "options": [
+          {
+            "value": "flat",
+            "label": "Flat rate"
+          },
+          {
+            "value": "product",
+            "label": "Per product"
+          }
+        ],
+        "default": "product",
+        "label": "Gift wrapping rate",
+        "info": "Whether the gift-wrapping product is charged once per order or once per item."
+      },
+      {
         "type": "header",
-        "content": "t:settings_schema.cart.settings.cart_drawer.header"
+        "content": "Free shipping message",
+        "info": "Make sure that you have properly configured your [shipping rates](/admin/settings/shipping)"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_free_shipping_message",
+        "default": false,
+        "label": "Show free shipping message"
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_minimum_amount",
+        "default": "100",
+        "label": "Free shipping minimum amount",
+        "info": "Enter amount using number only. If using multiple currencies, separate each currency code with its amount (e.g: USD:100, EUR:95, JPY:13000)"
+      },
+      {
+        "type": "header",
+        "content": "Cart recommendations",
+        "info": "Products in the cart are cross-sold from the merchandising sheet in the 'cart-recommendation-map' snippet. The collection below is the fallback used when the cart is empty or nothing in it appears in that sheet."
       },
       {
         "type": "collection",
-        "id": "cart_drawer_collection",
-        "label": "t:settings_schema.cart.settings.cart_drawer.collection.label",
-        "info": "t:settings_schema.cart.settings.cart_drawer.collection.info"
+        "id": "cart_recommendations_collection",
+        "label": "Recommendations collection",
+        "info": "Its products are shown in the cart drawer. Leave empty to hide the block."
       },
       {
-        "type": "color_scheme",
-        "id": "cart_color_scheme",
-        "label": "t:sections.all.colors.label",
-        "default": "scheme-1"
+        "type": "text",
+        "id": "cart_recommendations_heading",
+        "default": "You may also like",
+        "label": "Heading"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_recommendations_show_vendor",
+        "default": false,
+        "label": "Show vendor"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_recommendations_show_price",
+        "default": true,
+        "label": "Show price"
+      },
+      {
+        "type": "header",
+        "content": "Empty cart"
+      },
+      {
+        "type": "richtext",
+        "id": "empty_cart_message",
+        "label": "Text"
+      },
+      {
+        "type": "collection_list",
+        "id": "empty_cart_collections",
+        "label": "Collection list"
+      },
+      {
+        "type": "checkbox",
+        "id": "empty_cart_button_secondary",
+        "default": true,
+        "label": "Use outline button style"
+      },
+      {
+        "type": "header",
+        "content": "Promotional banner"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_promo_banner_enabled",
+        "default": false,
+        "label": "Show promotional banner"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "cart_promo_banner_text",
+        "default": "Get <strong>10% OFF</strong> sitewide",
+        "label": "Banner text"
+      },
+      {
+        "type": "url",
+        "id": "cart_promo_banner_link",
+        "label": "Banner link (optional)"
+      },
+      {
+        "type": "header",
+        "content": "Gift-with-purchase tiers",
+        "info": "Each tier needs a product picked below before it will show or take effect. The chosen product is added to the customer's cart automatically once their cart subtotal crosses the tier's minimum amount, and removed if it drops back below. IMPORTANT: adding the product does not make it free — theme code cannot change a line item's price. For each tier, also create a matching Automatic Discount in Shopify Admin (Discounts → Create discount → Amount off products) set to 100% off that specific product/variant, with a minimum purchase amount matching the tier below, so the gift actually rings up as free."
+      },
+      {
+        "type": "checkbox",
+        "id": "gift_tiers_enabled",
+        "default": false,
+        "label": "Enable gift-with-purchase tiers"
+      },
+      {
+        "type": "text",
+        "id": "gift_tiers_heading",
+        "default": "Unlock complimentary gifts as your cart value grows",
+        "label": "Heading"
+      },
+      {
+        "type": "product",
+        "id": "gift_tier_1_product",
+        "label": "Tier 1 gift product"
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_1_minimum_amount",
+        "default": "50",
+        "label": "Tier 1 minimum amount",
+        "info": "Enter amount using number only. If using multiple currencies, separate each currency code with its amount (e.g: USD:100, EUR:95, JPY:13000). Each tier's gift is kept once unlocked, as long as the tier below it still qualifies."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_1_label",
+        "label": "Tier 1 display label",
+        "info": "Defaults to the product's title."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_1_range_label",
+        "label": "Tier 1 range label",
+        "info": "Shown above the tier dot, e.g. \"3500-4500\". Defaults to the minimum amount."
+      },
+      {
+        "type": "product",
+        "id": "gift_tier_2_product",
+        "label": "Tier 2 gift product"
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_2_minimum_amount",
+        "default": "100",
+        "label": "Tier 2 minimum amount",
+        "info": "Enter amount using number only. If using multiple currencies, separate each currency code with its amount (e.g: USD:100, EUR:95, JPY:13000). Each tier's gift is kept once unlocked, as long as the tier below it still qualifies."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_2_label",
+        "label": "Tier 2 display label",
+        "info": "Defaults to the product's title."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_2_range_label",
+        "label": "Tier 2 range label",
+        "info": "Shown above the tier dot, e.g. \"3500-4500\". Defaults to the minimum amount."
+      },
+      {
+        "type": "product",
+        "id": "gift_tier_3_product",
+        "label": "Tier 3 gift product"
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_3_minimum_amount",
+        "default": "200",
+        "label": "Tier 3 minimum amount",
+        "info": "Enter amount using number only. If using multiple currencies, separate each currency code with its amount (e.g: USD:100, EUR:95, JPY:13000). Each tier's gift is kept once unlocked, as long as the tier below it still qualifies."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_3_label",
+        "label": "Tier 3 display label",
+        "info": "Defaults to the product's title."
+      },
+      {
+        "type": "text",
+        "id": "gift_tier_3_range_label",
+        "label": "Tier 3 range label",
+        "info": "Shown above the tier dot, e.g. \"3500-4500\". Defaults to the minimum amount."
+      },
+      {
+        "type": "header",
+        "content": "Footer"
+      },
+      {
+        "type": "image_picker",
+        "id": "cart_checkout_image",
+        "label": "Checkout button image"
+      },
+      {
+        "type": "text",
+        "id": "cart_powered_by_text",
+        "label": "\"Powered by\" text"
+      },
+      {
+        "type": "image_picker",
+        "id": "cart_powered_by_image",
+        "label": "\"Powered by\" logo"
       }
     ]
   },

@@ -201,6 +201,7 @@
       "type": "video-parallax",
       "name": "Video Parallax",
       "settings": {
+        "video": "shopify://files/videos/B1ANNNNEERRRRmp4 (1).mp4",
         "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
         "video_mobile_url": "",
         "video_alt": "",
@@ -250,63 +251,118 @@
     "browse_by_concern": {
       "type": "browse-by-concern",
       "blocks": {
-        "concern_1": {
-          "type": "concern",
-          "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": "5-discount-eligible"
-          }
-        },
-        "concern_2": {
-          "type": "concern",
-          "disabled": true,
-          "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": ""
-          }
-        },
-        "concern_3": {
-          "type": "concern",
-          "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": ""
-          }
-        },
-        "concern_4": {
-          "type": "concern",
-          "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": ""
-          }
-        },
-        "concern_5": {
-          "type": "concern",
-          "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": ""
-          }
-        },
         "concern_6": {
           "type": "concern",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318931.png?v=1786973172",
-            "label": "Acne & Blemishes",
-            "collection": ""
+            "image": "shopify://shop_images/Oil_Control.png",
+            "image_url": "",
+            "label": "Oil Control",
+            "collection": "oil-control"
+          }
+        },
+        "concern_Tbwjzj": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Enlarged_pores.png",
+            "image_url": "",
+            "label": "Enlarged pores",
+            "collection": "enlarged-pores"
+          }
+        },
+        "concern_qk4wL9": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Melasma.png",
+            "image_url": "",
+            "label": "Melasma",
+            "collection": "melasma"
+          }
+        },
+        "concern_ndktTM": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Oxidative_stress_cellular_repair.png",
+            "image_url": "",
+            "label": "Oxidative stress & cellular repair",
+            "collection": "oxidative-stress-cellular-repair"
+          }
+        },
+        "concern_HQBw9X": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Sun_Damage.png",
+            "image_url": "",
+            "label": "Sun Damage",
+            "collection": "sun-damage"
+          }
+        },
+        "concern_PQN9cD": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Age_spots_pigmentation.png",
+            "image_url": "",
+            "label": "Age spots & pigmentation",
+            "collection": "age-spots-pigmentation"
+          }
+        },
+        "concern_ki3dHR": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Dryness_Dullness.png",
+            "image_url": "",
+            "label": "Dryness & Dullness",
+            "collection": "dryness-dullness"
+          }
+        },
+        "concern_LjNjE4": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Redness_and_Irritation.png",
+            "image_url": "",
+            "label": "Redness and Irritation",
+            "collection": "redness-and-irritation"
+          }
+        },
+        "concern_cpXUBh": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Uneven_Skin_Tone.png",
+            "image_url": "",
+            "label": "Uneven Skin Tone",
+            "collection": "uneven-skin-tone"
+          }
+        },
+        "concern_qJ9JV6": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Acne_blemishes.png",
+            "image_url": "",
+            "label": "Acne & blemishes",
+            "collection": "acne-blemishes"
+          }
+        },
+        "concern_aQNEcn": {
+          "type": "concern",
+          "settings": {
+            "image": "shopify://shop_images/Clogged_Pores_Blackheads.png",
+            "image_url": "",
+            "label": "Clogged Pores & Blackheads",
+            "collection": "clogged-pores-blackheads"
           }
         }
       },
       "block_order": [
-        "concern_1",
-        "concern_2",
-        "concern_3",
-        "concern_4",
-        "concern_5",
-        "concern_6"
+        "concern_6",
+        "concern_Tbwjzj",
+        "concern_qk4wL9",
+        "concern_ndktTM",
+        "concern_HQBw9X",
+        "concern_PQN9cD",
+        "concern_ki3dHR",
+        "concern_LjNjE4",
+        "concern_cpXUBh",
+        "concern_qJ9JV6",
+        "concern_aQNEcn"
       ],
       "name": "Browse By Concern",
       "settings": {
@@ -425,72 +481,134 @@
     "testimonials": {
       "type": "testimonials",
       "blocks": {
-        "testimonial_1": {
+        "testimonial_pArdrH": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "video": "shopify://files/videos/LEILA ERFAN X BEYOND BEYOND REEL_compressed.mp4",
+            "video_url": "",
             "product": "the-ultimate-night-repair-super-cream-1"
           }
         },
-        "testimonial_2": {
+        "testimonial_j3GFm9": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
-            "product": "broad-spectrum-active-sunspray"
+            "video": "shopify://files/videos/Nalini Sunscreen Testimonial video_compressed.mp4",
+            "video_url": "",
+            "product": "oil-free-matte-sunscreen"
           }
         },
-        "testimonial_3": {
+        "testimonial_cTz6aL": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
-            "product": "ultra-hydrating-oligo-ha-mist"
-          }
-        },
-        "testimonial_4": {
-          "type": "testimonial",
-          "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "video": "shopify://files/videos/Sartthak Gandhi X Beyond beyond_compressed.mp4",
+            "video_url": "",
             "product": "the-ultimate-night-repair-super-cream-1"
           }
         },
-        "testimonial_5": {
+        "testimonial_R9dmKU": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
-            "product": "broad-spectrum-active-sunspray"
+            "video": "shopify://files/videos/BB REEL_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1"
           }
         },
-        "testimonial_6": {
+        "testimonial_JbTQhd": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
-            "product": "ultra-hydrating-oligo-ha-mist"
-          }
-        },
-        "testimonial_7": {
-          "type": "testimonial",
-          "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
+            "video": "shopify://files/videos/BB Nandani Singh 2nd Music Option_compressed.mp4",
+            "video_url": "",
             "product": "the-ultimate-night-repair-super-cream-1"
           }
         },
         "testimonial_8": {
           "type": "testimonial",
           "settings": {
-            "video_url": "https://cdn.shopify.com/videos/c/o/v/d492a347093f4c8da210a74aece1224b.mp4",
-            "product": "broad-spectrum-active-sunspray"
+            "video": "shopify://files/videos/MALVIKA MAM REEL MUSIC OPTION 1_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_zRAV7p": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Hydration Serum 7rth render_compressed.mp4",
+            "video_url": "",
+            "product": "advanced-cellular-hydration-serum"
+          }
+        },
+        "testimonial_tm7bGA": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/BB SUNSCREEN Testimonial Video 5th Render_compressed.mp4",
+            "video_url": "",
+            "product": "oil-free-matte-sunscreen"
+          }
+        },
+        "testimonial_GH7DVr": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Cleanser Jelly  Dr uktra video text_compressed.mp4",
+            "video_url": "",
+            "product": "dirt-makeup-cleanser-jelly"
+          }
+        },
+        "testimonial_HgcrEw": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Sanket Lambichhane Testimonial Video_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1"
+          }
+        },
+        "testimonial_EAMmb4": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Sunscreen Dr Uktra video_compressed.mp4",
+            "video_url": "",
+            "product": "oil-free-matte-sunscreen"
+          }
+        },
+        "testimonial_cXNbqV": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Complexion Corrector (Dr. Uktra)_compressed.mp4",
+            "video_url": "",
+            "product": "advanced-complexion-corrector-serum"
+          }
+        },
+        "testimonial_iMTxXX": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Dr. Uktra Defence Serum (Yellow)  Product Introduction Video_compressed.mp4",
+            "video_url": "",
+            "product": "advanced-antioxidant-defense-serum"
+          }
+        },
+        "testimonial_mtfErX": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/BB Chandni Singh Reel_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1"
           }
         }
       },
       "block_order": [
-        "testimonial_1",
-        "testimonial_2",
-        "testimonial_3",
-        "testimonial_4",
-        "testimonial_5",
-        "testimonial_6",
-        "testimonial_7",
-        "testimonial_8"
+        "testimonial_pArdrH",
+        "testimonial_j3GFm9",
+        "testimonial_cTz6aL",
+        "testimonial_R9dmKU",
+        "testimonial_JbTQhd",
+        "testimonial_8",
+        "testimonial_zRAV7p",
+        "testimonial_tm7bGA",
+        "testimonial_GH7DVr",
+        "testimonial_HgcrEw",
+        "testimonial_EAMmb4",
+        "testimonial_cXNbqV",
+        "testimonial_iMTxXX",
+        "testimonial_mtfErX"
       ],
       "name": "Testimonials",
       "settings": {
@@ -618,6 +736,7 @@
         "background": "#f2f3ff",
         "inset": 40,
         "column_gap": 20,
+        "image": "shopify://shop_images/WhatsApp_Image_2026-08-20_at_4.34.50_PM_1.jpg",
         "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321318963.png?v=1787051600",
         "image_alt": "The founders",
         "media_width": 43,

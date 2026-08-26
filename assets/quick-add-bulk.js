@@ -167,9 +167,9 @@ if (!customElements.get('quick-add-bulk')) {
             selector: '.shopify-section',
           },
           {
-            id: 'CartDrawer',
-            selector: '.drawer__inner',
-            section: 'cart-drawer',
+            id: 'mini-cart',
+            selector: '.shopify-section',
+            section: 'mini-cart',
           },
         ];
       }
@@ -179,8 +179,8 @@ if (!customElements.get('quick-add-bulk')) {
         if (intersection.length !== 0) return;
         this.getSectionsToRender().forEach((section) => {
           const sectionElement = document.getElementById(section.id);
-          if (section.section === 'cart-drawer') {
-            sectionElement.closest('cart-drawer')?.classList.toggle('is-empty', parsedState.items.length.length === 0);
+          if (section.section === 'mini-cart') {
+            sectionElement?.closest('cart-drawer')?.classList.toggle('is-empty', parsedState.items.length === 0);
           }
           const elementToReplace =
             sectionElement && sectionElement.querySelector(section.selector)

@@ -1,0 +1,350 @@
+{% comment %}theme-check-disable TemplateLength{% endcomment %}
+{%- liquid
+  if linklists.gift-wrapping.links != blank and linklists.gift-wrapping.links.first.type == 'product_link'
+    assign gift_wrapping = linklists.gift-wrapping.links.first
+
+    assign gift_wrap_id = gift_wrapping.object.variants.first.id
+    assign gift_wraps_in_cart = 0
+    for item in cart.items
+      if item.id == gift_wrap_id
+        assign gift_wraps_in_cart = item.quantity
+        break
+      endif
+    endfor
+    assign items_in_cart = cart.item_count | minus: gift_wraps_in_cart
+  endif
+
+  comment
+    The empty-cart rail has no cart lines to cross-sell against, so it stays on the collection
+    a merchant assigns. The rail inside the cart itself is per-product -- see
+    'cart-recommendations'.
+  endcomment
+  assign empty_cart_recommendations = settings.cart_recommendations_collection.products
+  assign show_empty_cart_recommendations = false
+  if settings.cart_recommendations_collection != blank and empty_cart_recommendations.size > 0
+    assign show_empty_cart_recommendations = true
+  endif
+
+  comment
+    The discounts actually on the cart, straight from Shopify. A code can land cart-wide or on
+    individual lines depending on how it was configured, so both are collected and deduped by
+    title -- Shopify names a code discount after the code itself.
+  endcomment
+  assign applied_discount_titles = ''
+  for discount in cart.cart_level_discount_applications
+    if discount.type == 'discount_code'
+      assign applied_discount_titles = applied_discount_titles | append: discount.title | append: '||'
+    endif
+  endfor
+  for item in cart.items
+    for allocation in item.line_level_discount_allocations
+      if allocation.discount_application.type == 'discount_code'
+        assign title_marker = allocation.discount_application.title | append: '||'
+        unless applied_discount_titles contains title_marker
+          assign applied_discount_titles = applied_discount_titles | append: title_marker
+        endunless
+      endif
+    endfor
+  endfor
+  assign applied_discount_codes = applied_discount_titles | split: '||'
+
+  assign show_cart_extras = false
+  if settings.show_cart_note or settings.show_shipping_calculator
+    assign show_cart_extras = true
+  endif
+  if gift_wrapping != nil and cart.attributes.gift-wrapping
+    assign show_cart_extras = true
+  endif
+-%}
+
+<form class="mini-cart{% if cart == empty %} is-empty{% endif %}" action="{{ routes.cart_url }}" method="post" id="MiniCartForm">
+  <div class="mini-cart__inner">
+    <div class="mini-cart__header" data-animate data-animate-delay-1>
+      <div class="mini-cart__header-row">
+        <p class="mini-cart__title">
+          {{ 'sections.cart.title_drawer' | t }}
+          {%- if cart.item_count > 0 %}
+            <span class="mini-cart__count">({{ 'sections.header.cart_count' | t: count: cart.item_count }})</span>
+          {%- endif -%}
+        </p>
+        <button
+          type="button"
+          class="mini-cart__close"
+          onclick="this.closest('cart-drawer').close()"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {% render 'icon', icon: 'close' %}
+        </button>
+      </div>
+
+      {% render 'cart-free-shipping-bar' %}
+    </div>
+
+    {%- if settings.cart_promo_banner_enabled and settings.cart_promo_banner_text != blank -%}
+      {%- if settings.cart_promo_banner_link != blank -%}
+        <a href="{{ settings.cart_promo_banner_link }}" class="mini-cart__promo-banner" data-animate data-animate-delay-2>
+          {{ settings.cart_promo_banner_text }}
+        </a>
+      {%- else -%}
+        <p class="mini-cart__promo-banner" data-animate data-animate-delay-2>
+          {{ settings.cart_promo_banner_text }}
+        </p>
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="mini-cart__empty center" data-animate data-animate-delay-2>
+      <p class="mini-cart__empty-text h3">{{ 'sections.cart.empty' | t }}</p>
+      <div class="mini-cart__empty-message rte">{{ settings.empty_cart_message }}</div>
+      {%- if settings.empty_cart_collections == blank -%}
+        <a href="{{ routes.all_products_collection_url }}" class="button{% if settings.empty_cart_button_secondary %} button--tertiary{% endif %}">
+          {{- 'general.continue_shopping' | t -}}
+        </a>
+      {%- else -%}
+        <ul class="mini-cart__empty-collections list-unstyled">
+          {%- for collection_card in settings.empty_cart_collections -%}
+            <li>
+              <a href="{{ collection_card.url }}" class="button{% if settings.empty_cart_button_secondary %} button--tertiary{% endif %} button--full-width">
+                {{- collection_card.title | escape -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if show_empty_cart_recommendations -%}
+        <cart-recommendations class="cart-card cart-recommendations">
+          <p class="cart-card__title">{{ settings.cart_recommendations_heading | escape }}</p>
+          <ul class="cart-recommendations__list list-unstyled">
+            {%- for recommendation in empty_cart_recommendations limit: 8 -%}
+              {% render 'cart-recommendation-card', recommendation: recommendation %}
+            {%- endfor -%}
+          </ul>
+        </cart-recommendations>
+      {%- endif -%}
+    </div>
+
+    <div class="mini-cart__main" id="MiniCartItems">
+      {% render 'cart-gift-tiers', animate_delay: 3 %}
+
+      <mini-cart-items class="mini-cart__items">
+        <ul class="cart-items__list list-unstyled" data-animate data-animate-delay-4>
+          {%- for item in cart.items -%}
+            {% render 'cart-drawer-item',
+              item: item,
+              gift_wrap_id: gift_wrap_id,
+              gift_wraps_in_cart: gift_wraps_in_cart,
+              items_in_cart: items_in_cart,
+              cart_items_size: cart.items.size
+            %}
+          {%- endfor -%}
+        </ul>
+      </mini-cart-items>
+
+      {%- if gift_wrapping != nil -%}
+        <gift-wrapping class="cart-card gift-wrapping"
+          data-gift-wrap-id="{{ gift_wrap_id }}"
+          data-gift-wrapping="{{ cart.attributes.gift-wrapping | escape }}"
+          cart-items-size="{{ cart.items.size }}"
+          gift-wraps-in-cart="{{ gift_wraps_in_cart }}"
+          items-in-cart="{{ items_in_cart }}"
+        >
+          <input
+            id="gift-wrapping"
+            type="checkbox"
+            name="attributes[gift-wrapping]"
+            value="yes"
+            {% if cart.attributes.gift-wrapping %}checked="checked"{% endif %}
+            class="visually-hidden"
+          />
+          <label for="gift-wrapping" class="gift-wrapping__label">
+            {%- capture gift_price -%}
+              <span class="price"><bdi>{{ gift_wrapping.object.price | money }}</bdi></span>
+            {%- endcapture -%}
+            <span class="gift-wrapping__text">{{ 'sections.cart.gift_wrapping_html' | t: price: gift_price }}</span>
+            <div class="loading-overlay hidden">
+              <div class="loading-overlay__spinner">
+                {% render 'icon', icon: 'spinner' %}
+              </div>
+            </div>
+            {% render 'icon', icon: 'checkmark', class: 'gift-wrapping__icon' %}
+          </label>
+        </gift-wrapping>
+      {%- endif -%}
+
+      {%- if show_cart_extras -%}
+        {% render 'cart-drawer-extras', gift_wrapping: gift_wrapping %}
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Held out of the scrolling canvas above: the discount field and the cross-sell rail keep
+      their place over the footer while the line items scroll past them.
+    {%- endcomment -%}
+    <div class="mini-cart__pinned">
+      {%- if cart != empty -%}
+        <discount-code class="cart-card cart-discount" data-animate data-animate-delay-5>
+          <div class="cart-discount__field">
+            {% render 'icon', icon: 'discount-percent', class: 'cart-discount__icon' %}
+            <label for="CartDiscountCode" class="visually-hidden">{{ 'general.cart.discount.caption' | t }}</label>
+            <input
+              type="text"
+              id="CartDiscountCode"
+              name="discount"
+              class="cart-discount__input"
+              placeholder="{{ 'general.cart.discount.placeholder' | t }}"
+              autocomplete="off"
+            />
+            <button type="button" class="cart-discount__apply">{{ 'general.cart.discount.button' | t }}</button>
+          </div>
+
+          <p class="cart-discount__message" role="status" aria-live="polite" hidden></p>
+
+          {%- if applied_discount_codes.size > 0 -%}
+            <details class="cart-discount__applied">
+              <summary class="cart-discount__summary">
+                <span class="cart-discount__available">
+                  {{- 'general.cart.discount.applied_count' | t: count: applied_discount_codes.size -}}
+                </span>
+                <span class="cart-discount__view">
+                  {{ 'general.cart.discount.view_applied' | t }}
+                  {% render 'icon', icon: 'chevron' %}
+                </span>
+              </summary>
+              <ul class="cart-discount__applied-list list-unstyled" role="list">
+                {%- for applied_code in applied_discount_codes -%}
+                  <li class="cart-discount__applied-item">
+                    {% render 'icon', icon: 'discount' %}
+                    <span class="cart-discount__applied-code">{{ applied_code }}</span>
+                    <button
+                      type="button"
+                      class="cart-discount__remove"
+                      data-remove-code="{{ applied_code | escape }}"
+                    >
+                      <span class="visually-hidden">
+                        {{- 'general.cart.discount.remove' | t: code: applied_code -}}
+                      </span>
+                      {% render 'icon', icon: 'close' %}
+                    </button>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- endif -%}
+        </discount-code>
+      {%- endif -%}
+
+      {%- if cart != empty -%}
+        {% render 'cart-recommendations', animate_delay: 6 %}
+      {%- endif -%}
+    </div>
+
+    <div class="mini-cart__footer" data-animate data-animate-delay-7>
+      {%- if cart.total_discount > 0 -%}
+        {%- assign cart_discount_percent = cart.total_discount | times: 100.0 | divided_by: cart.original_total_price | round -%}
+        <span class="mini-cart__savings">
+          <span class="mini-cart__savings-edge" aria-hidden="true"></span>
+          <span class="mini-cart__savings-body">
+            You're saving {{- 'general.cart.discount.percent_off' | t: percent: cart_discount_percent -}} on this cart!
+          </span>
+          <span class="mini-cart__savings-edge" aria-hidden="true"></span>
+        </span>
+      {%- endif -%}
+
+      <div class="cart-summary">
+        <div class="cart-summary__row">
+          <span class="cart-summary__label">
+            {% render 'icon', icon: 'receipt' %}
+            {{ 'sections.cart.estimated_total' | t }}
+          </span>
+          <span class="cart-summary__value" id="mini-cart-subtotal">
+            {%- if cart.total_discount > 0 -%}
+              <s class="cart-summary__compare-at">{{ cart.original_total_price | money }}</s>
+            {%- endif -%}
+            <span class="cart-summary__total">{{ cart.total_price | money }}</span>
+          </span>
+        </div>
+
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+            {%- for discount in cart.cart_level_discount_applications -%}
+              <li class="discounts__discount discounts__discount--end">
+                {% render 'icon', icon: 'discount' %}
+                {{ discount.title }}
+                (&#8211;{{ discount.total_allocated_amount | money }})
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        <small class="cart-summary__tax-note rte">{% render 'cart-tax-note' %}</small>
+      </div>
+
+      <cart-terms class="cart-terms">
+        <label class="cart-terms__label">
+          <input type="checkbox" id="CartTermsAgree" class="cart-terms__checkbox" checked />
+          {%- capture terms_link -%}
+            {%- if shop.terms_of_service.url != blank -%}
+              <a href="{{ shop.terms_of_service.url }}" target="_blank" rel="noopener">
+                {{- 'general.cart.terms.terms_of_service' | t -}}
+              </a>
+            {%- else -%}
+              {{- 'general.cart.terms.terms_of_service' | t -}}
+            {%- endif -%}
+          {%- endcapture -%}
+          {%- capture privacy_link -%}
+            {%- if shop.privacy_policy.url != blank -%}
+              <a href="{{ shop.privacy_policy.url }}" target="_blank" rel="noopener">
+                {{- 'general.cart.terms.privacy_policy' | t -}}
+              </a>
+            {%- else -%}
+              {{- 'general.cart.terms.privacy_policy' | t -}}
+            {%- endif -%}
+          {%- endcapture -%}
+          <span>{{ 'general.cart.terms.label_html' | t: terms_link: terms_link, privacy_link: privacy_link }}</span>
+        </label>
+      </cart-terms>
+
+      <div class="button-container">
+        <button class="button" name="checkout" type="submit">
+          <span class="button__label">{{ 'sections.cart.checkout' | t }}</span>
+          {%- if settings.cart_checkout_image != blank -%}
+            <img
+              class="button__image"
+              src="{{ settings.cart_checkout_image | image_url: height: 48 }}"
+              alt="{{ settings.cart_checkout_image.alt | escape }}"
+              width="{{ 24 | times: settings.cart_checkout_image.aspect_ratio | ceil }}"
+              height="24"
+              loading="lazy"
+            />
+          {%- endif -%}
+        </button>
+      </div>
+
+      {%- if settings.cart_powered_by_text != blank or settings.cart_powered_by_image != blank -%}
+        <p class="mini-cart__powered-by">
+          {%- if settings.cart_powered_by_text != blank -%}
+            <span>{{ settings.cart_powered_by_text | escape }}</span>
+          {%- endif -%}
+          {%- if settings.cart_powered_by_image != blank -%}
+            <img
+              src="{{ settings.cart_powered_by_image | image_url: height: 40 }}"
+              alt="{{ settings.cart_powered_by_image.alt | escape }}"
+              width="{{ 20 | times: settings.cart_powered_by_image.aspect_ratio | ceil }}"
+              height="20"
+              loading="lazy"
+            />
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Live regions for the drawer. The cart page has its own pair under different ids; the
+      drawer is rendered on that page too, so these cannot reuse them.
+    {%- endcomment -%}
+    <p class="visually-hidden" id="MiniCart-LiveRegionText" aria-live="polite" role="status"></p>
+    <p class="visually-hidden" id="MiniCart-LineItemStatus" aria-live="polite" aria-hidden="true" role="status">
+      {{ 'accessibility.loading' | t }}
+    </p>
+  </div>
+</form>

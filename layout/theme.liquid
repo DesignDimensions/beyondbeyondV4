@@ -365,12 +365,14 @@
         <link rel="preload" as="image" href="{{ settings.intro_accent_image | image_url: width: 600 }}">
       {%- endif -%}
     {%- endif -%}
-    <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
-
+    {%- comment -%}
+      component-cart-items.css belongs to the cart page and is loaded by main-cart-items.
+      It used to be preloaded here because Dawn's drawer shared its line-item markup; the
+      drawer no longer does, and the two stylesheets style the same .cart-item__* classes
+      differently, so loading it site-wide would fight the drawer on every page.
+    {%- endcomment -%}
     {%- if settings.cart_type == 'drawer' -%}
       {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
-      {{ 'component-cart.css' | asset_url | stylesheet_tag }}
-      {{ 'component-totals.css' | asset_url | stylesheet_tag }}
       {{ 'component-price.css' | asset_url | stylesheet_tag }}
       {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
@@ -452,6 +454,19 @@
       window.cartStrings = {
         error: `{{ 'sections.cart.cart_error' | t }}`,
         quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`,
+      };
+
+      window.discountStrings = {
+        applying: `{{ 'general.cart.discount.applying' | t }}`,
+        applied: `{{ 'general.cart.discount.applied' | t: code: '[code]' }}`,
+        invalid: `{{ 'general.cart.discount.invalid' | t: code: '[code]' }}`,
+        removing: `{{ 'general.cart.discount.removing' | t }}`,
+        error: `{{ 'general.cart.discount.error' | t }}`,
+      };
+
+      window.cartSettings = {
+        cartDrawer: {% if settings.cart_type == 'drawer' %}true{% else %}false{% endif %},
+        giftwrapRate: `{{ settings.giftwrap_rate_type | default: 'product' }}`,
       };
 
       window.variantStrings = {

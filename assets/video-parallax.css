@@ -25,8 +25,6 @@
   /* 0 while the shader is drawing, 1 once it has handed the picture back to
      the video element underneath. */
   --vpx-plain: 0;
-  filter: grayscale(1);
-
   position: relative;
   background: var(--vpx-bg);
 }
@@ -50,6 +48,7 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  scale: 1.05;
 }
 
 /* The canvas is opaque — its context is created without alpha — so while it is

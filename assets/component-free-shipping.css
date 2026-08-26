@@ -1,0 +1,66 @@
+/* Free-shipping progress bar. Ported alongside the cart drawer; the drawer restyles most of
+   this in component-cart-drawer.css, so what is left here is the standalone appearance. */
+.free-shipping {
+  margin-top: 1rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.free-shipping.is-last {
+  margin-bottom: 0;
+}
+
+@media (min-width: 750px) {
+  .free-shipping {
+    text-align: end;
+  }
+}
+
+.free-shipping .price {
+  display: initial;
+}
+
+.free-shipping__text .price bdi {
+  font-size: 1.6rem;
+}
+
+.free-shipping__text--success strong {
+  position: relative;
+}
+
+.free-shipping__text--success strong::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.6rem;
+  opacity: 0.2;
+  background-color: var(--color-success, #008060);
+}
+
+.free-shipping__progress {
+  display: block;
+  width: 100%;
+  position: relative;
+  height: 0.3rem;
+  line-height: 1;
+  margin-top: 1rem;
+  margin-bottom: 2.5rem;
+  background-color: rgba(var(--color-foreground), 0.12);
+  border-radius: min(var(--buttons-radius, 0.4rem), 0.4rem);
+}
+
+.free-shipping__progress::after {
+  content: '';
+  display: block;
+  background: var(--gradient-free-ship-progress, linear-gradient(325deg, #f9423a 0, #f1e04d 100%));
+  background-color: #f9423a;
+  height: 100%;
+  width: var(--progress);
+  border-radius: min(var(--buttons-radius, 0.4rem), 0.4rem);
+}
+
+.free-shipping__progress--success::after {
+  background: var(--gradient-free-ship-complete, linear-gradient(325deg, #049cff 0, #35ee7a 100%));
+}

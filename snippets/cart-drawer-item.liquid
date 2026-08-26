@@ -1,0 +1,320 @@
+{% comment %}
+  Renders one line item card in the cart drawer.
+
+  Accepts:
+  - item: {Object} Cart line item
+  - gift_wrap_id: {Number} Variant id of the gift-wrapping product, if one is configured
+  - gift_wraps_in_cart: {Number} Quantity of gift wraps currently in the cart
+  - items_in_cart: {Number} Cart item count excluding gift wraps
+  - cart_items_size: {Number} cart.items.size
+
+  Usage:
+  {% render 'cart-drawer-item', item: item, gift_wrap_id: gift_wrap_id %}
+{% endcomment %}
+
+{%- liquid
+  assign line = item.index | plus: 1
+
+  assign is_gift_wrap = false
+  if gift_wrap_id != nil and item.id == gift_wrap_id
+    assign is_gift_wrap = true
+  endif
+
+  assign is_gift_tier = false
+  if item.properties._gift_tier != blank
+    assign is_gift_tier = true
+  endif
+
+  comment
+    A gift-note wrap is bound to the product it was added with. Its quantity is
+    driven by that product, so the shopper gets a read-only count and no remove
+    button — removing the product removes the wrap.
+  endcomment
+  assign is_gift_note_wrap = false
+  if item.properties._gift_wrap_for != blank
+    assign is_gift_note_wrap = true
+  endif
+
+  assign has_qty_rules = false
+  if item.variant.quantity_rule.increment > 1 or item.variant.quantity_rule.min > 1 or item.variant.quantity_rule.max != null
+    assign has_qty_rules = true
+  endif
+
+  assign has_vol_pricing = false
+  if item.variant.quantity_price_breaks.size > 0
+    assign has_vol_pricing = true
+  endif
+
+  assign show_qty_info = false
+  if has_qty_rules or has_vol_pricing
+    assign show_qty_info = true
+  endif
+
+  comment
+    Line item properties are shown in the same pill as the variant title when a product has
+    no variants of its own, so a personalised item still reads as configurable at a glance.
+  endcomment
+  comment
+    The gift note gets its own multi-row block below, so keep it out of the
+    single-line pill where it would be truncated.
+  endcomment
+  assign gift_note_key = 'Gift Message'
+
+  assign custom_properties = ''
+  for property in item.properties
+    assign property_first_char = property.first | slice: 0
+    if property.last != blank and property_first_char != '_' and property.first != gift_note_key
+      assign custom_properties = custom_properties | append: property.first | append: ': ' | append: property.last | append: ' · '
+    endif
+  endfor
+  assign custom_properties = custom_properties | remove_last: ' · '
+
+  assign show_variant_picker = false
+  if item.product.has_only_default_variant == false and item.product.variants.size > 1 and is_gift_wrap == false and is_gift_tier == false
+    assign show_variant_picker = true
+  endif
+
+  comment
+    Strike through the highest "was" price we know about: the variant's compare at price when the
+    product is on sale, otherwise the pre-discount line price when a cart discount applies.
+  endcomment
+  assign compare_price = 0
+  if item.variant.compare_at_price > item.original_price
+    assign compare_price = item.variant.compare_at_price
+  elsif item.original_price > item.final_price
+    assign compare_price = item.original_price
+  endif
+
+  comment
+    Line discounts are surfaced as a ribbon on the card, but only on the line the offer gives
+    away. A "buy this, get that free" discount allocates against both lines, and naming the
+    offer on the one being paid for reads as if it were the freebie. Several titles are
+    collapsed onto the one line.
+  endcomment
+  assign has_discounts = false
+  assign discount_titles = ''
+  if item.line_level_discount_allocations.size > 0 and item.final_price == 0
+    assign has_discounts = true
+    for discount in item.line_level_discount_allocations
+      assign discount_titles = discount_titles | append: discount.discount_application.title | append: ' · '
+    endfor
+    assign discount_titles = discount_titles | remove_last: ' · '
+  endif
+
+  assign show_meta = false
+  if item.selling_plan_allocation != null or item.unit_price_measurement
+    assign show_meta = true
+  endif
+-%}
+
+{%- comment -%}
+  The card surface lives on .cart-item__body rather than the <li> so the discount tab can be a
+  sibling that the surface paints over, tucking its bottom edge out of sight.
+{%- endcomment -%}
+<li class="cart-item{% if is_gift_tier %} cart-item--gift{% endif %}{% if has_discounts %} cart-item--discounted{% endif %}"
+  id="MiniCart-Item-{{ line }}"
+  data-variant-id="{{ item.variant_id }}"
+  data-handle="{{ item.product.handle }}"
+  data-quantity="{{ item.quantity }}"
+  data-price="{{ item.original_price }}"
+>
+  {%- if has_discounts -%}
+    <span class="cart-item__discount-tab">
+      <span class="cart-item__discount-tab-edge" aria-hidden="true"></span>
+      <span class="cart-item__discount-tab-body">
+        <span class="visually-hidden">{{ 'customer.order.discount' | t }}:</span>
+        {%- render 'icon', icon: 'discount' -%}
+        <span class="cart-item__discount-tab-text">{{ discount_titles }}</span>
+      </span>
+      <span class="cart-item__discount-tab-edge" aria-hidden="true"></span>
+    </span>
+  {%- endif -%}
+
+  <div class="cart-card cart-item__body">
+    {%- if item.image -%}
+      <div class="cart-item__media">
+        <img
+          srcset="{{ item.image | image_url: width: 140 }} 1x, {{ item.image | image_url: width: 280 }} 2x"
+          src="{{ item.image | image_url: width: 140 }}"
+          alt="{{ item.image.alt | escape | split: '#' | first }}"
+          width="140"
+          height="{{ 140 | divided_by: item.image.aspect_ratio | ceil }}"
+          loading="lazy"
+        />
+      </div>
+    {%- endif -%}
+
+    <div class="cart-item__content">
+      <div class="cart-item__head">
+        <span class="cart-item__title">{{ item.product.title }}</span>
+        <span class="cart-item__price">
+          {%- if compare_price > 0 -%}
+            <s class="cart-item__price-compare">
+              <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+              <span><bdi>{{ compare_price | money }}</bdi></span>
+            </s>
+          {%- endif -%}
+          <span class="cart-item__price-final">
+            <span><bdi>{{ item.final_price | money }}</bdi></span>
+          </span>
+        </span>
+      </div>
+
+      {%- if show_meta -%}
+        <div class="cart-item__meta">
+          {%- if item.selling_plan_allocation != null -%}
+            <span class="cart-item__meta-line">{{ item.selling_plan_allocation.selling_plan.name }}</span>
+          {%- endif -%}
+
+          {%- if item.variant.available and item.unit_price_measurement -%}
+            <span class="cart-item__meta-line unit-price">
+              <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+              <span><bdi>{% if settings.currency_code_enabled %}{{ item.variant.unit_price | money_with_currency }}{% else %}{{ item.variant.unit_price | money }}{% endif %}</bdi></span>
+              <span aria-hidden="true">/</span>
+              <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+              {%- if item.variant.unit_price_measurement.reference_value != 1 -%}
+                {{- item.variant.unit_price_measurement.reference_value -}}
+              {%- endif -%}
+              {{ item.variant.unit_price_measurement.reference_unit }}
+            </span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="cart-item__controls">
+        {%- if show_variant_picker -%}
+          <cart-variant-picker
+            class="cart-item__variant"
+            data-line="{{ line }}"
+            data-key="{{ item.key }}"
+            data-variant-id="{{ item.variant_id }}"
+            data-quantity="{{ item.quantity }}"
+            data-selling-plan="{{ item.selling_plan_allocation.selling_plan.id }}"
+            data-properties="{{ item.properties | json | escape }}"
+          >
+            <label class="visually-hidden" for="CartVariant-{{ line }}">
+              {{- 'products.product.choose_options' | t -}}
+            </label>
+            <select class="cart-item__variant-select" id="CartVariant-{{ line }}">
+              {%- for variant in item.product.variants -%}
+                <option
+                  value="{{ variant.id }}"
+                  {% if variant.id == item.variant_id %}selected{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}
+                >
+                  {{- variant.title -}}
+                  {%- unless variant.available %} — {{ 'products.product.sold_out' | t }}{% endunless -%}
+                </option>
+              {%- endfor -%}
+            </select>
+            {% render 'icon', icon: 'caret' %}
+          </cart-variant-picker>
+        {%- elsif item.product.has_only_default_variant == false -%}
+          <span class="cart-item__variant cart-item__variant--static">{{ item.variant.title }}</span>
+        {%- elsif custom_properties != blank -%}
+          <span class="cart-item__variant cart-item__variant--static">{{ custom_properties }}</span>
+        {%- else -%}
+          <span class="cart-item__variant-spacer"></span>
+        {%- endif -%}
+
+        <div class="cart-item__actions">
+          {%- if is_gift_note_wrap -%}
+            <span class="cart-item__locked-qty" aria-label="{{ 'products.product.quantity.label' | t }}">
+              {{- 'products.product.quantity.label' | t }}: {{ item.quantity -}}
+            </span>
+            {%- render 'cart-loading-spinner' -%}
+          {%- elsif is_gift_tier -%}
+            <span class="cart-item__gift-badge">
+              {% render 'icon', icon: 'gift' %}
+              {{ 'sections.cart.gift_free' | t }}
+            </span>
+            {%- render 'cart-loading-spinner' -%}
+          {%- elsif is_gift_wrap -%}
+            <gift-quantity class="quantity"
+              cart-items-size="{{ cart_items_size }}"
+              gift-wraps-in-cart="{{ gift_wraps_in_cart }}"
+              items-in-cart="{{ items_in_cart }}"
+            >
+              <label for="MiniCart-Quantity-{{ line }}" class="visually-hidden">{{ 'products.product.quantity.label' | t }}:</label>
+              <button class="quantity__button no-js-hidden visually-hidden" name="minus" type="button" disabled="disabled">
+                <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}</span>
+                {% render 'icon', icon: 'minus' %}
+              </button>
+              <input class="quantity__input"
+                type="number"
+                name="updates[]"
+                value="{{ item.quantity }}"
+                min="0"
+                aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                id="MiniCart-Quantity-{{ line }}"
+                data-index="{{ line }}"
+                disabled="disabled"
+              />
+              <button class="quantity__button no-js-hidden visually-hidden" name="plus" type="button" disabled="disabled">
+                <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}</span>
+                {% render 'icon', icon: 'plus' %}
+              </button>
+            </gift-quantity>
+            {%- render 'cart-loading-spinner' -%}
+          {%- else -%}
+            <quantity-popover>
+              <div class="cart-item__quantity-wrapper quantity-popover-wrapper">
+                <div class="quantity-popover-container{% if show_qty_info %} quantity-popover-container--hover{% endif %}">
+                  <label for="MiniCart-Quantity-{{ line }}" class="visually-hidden">{{ 'products.product.quantity.label' | t }}</label>
+                  <quantity-input class="quantity">
+                    <button class="quantity__button no-js-hidden" name="minus" type="button">
+                      <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}</span>
+                      {% render 'icon', icon: 'minus' %}
+                    </button>
+                    <input class="quantity__input"
+                      type="number"
+                      data-quantity-variant-id="{{ item.variant.id }}"
+                      name="updates[]"
+                      value="{{ item.quantity }}"
+                      {% # theme-check-disable %}
+                      data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                      min="0"
+                      data-min="{{ item.variant.quantity_rule.min }}"
+                      {% if item.variant.quantity_rule.max != null %}
+                        max="{{ item.variant.quantity_rule.max }}"
+                      {% endif %}
+                      step="{{ item.variant.quantity_rule.increment }}"
+                      {% # theme-check-enable %}
+                      aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                      id="MiniCart-Quantity-{{ line }}"
+                      data-index="{{ line }}"
+                    />
+                    <button class="quantity__button no-js-hidden" name="plus" type="button">
+                      <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}</span>
+                      {% render 'icon', icon: 'plus' %}
+                    </button>
+                  </quantity-input>
+                </div>
+              </div>
+              {%- if show_qty_info -%}
+                {% render 'cart-quantity-rules', item: item, has_qty_rules: has_qty_rules, has_vol_pricing: has_vol_pricing %}
+              {%- endif -%}
+            </quantity-popover>
+            {%- render 'cart-loading-spinner' -%}
+            <mini-cart-remove-button class="cart-item__remove" id="MiniCart-Remove-{{ line }}" data-index="{{ line }}">
+              <a href="{{ item.url_to_remove }}" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}" data-no-instant>
+                {% render 'icon', icon: 'remove' %}
+              </a>
+            </mini-cart-remove-button>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <p class="cart-item__error form__message errors" id="MiniCart-LineItemError-{{ line }}">
+        <span class="cart-item__error-text"></span>
+      </p>
+
+      {%- comment -%}
+        Last child of .cart-item__content, which is a flex column, so the note gets its
+        own row at the full width of the details area. It must stay inside this column:
+        making .cart-item__body wrap instead pushes the image onto its own row.
+      {%- endcomment -%}
+      {% render 'cart-gift-note', item: item, line: line, note_property: gift_note_key %}
+    </div>
+  </div>
+</li>

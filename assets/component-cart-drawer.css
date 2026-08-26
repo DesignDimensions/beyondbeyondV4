@@ -1,389 +1,812 @@
-.drawer {
+/* ==========================================================================
+   Cart drawer
+   --------------------------------------------------------------------------
+   Layout: a fixed white header + promo banner, a scrolling canvas of cards,
+   and a pinned white footer. Cards sit on a tinted canvas, so the drawer
+   deliberately opts out of the theme's global surface tokens and defines its
+   own scale below.
+
+   Ported from the beyondbeyondskincare theme. Everything from "Shell" down is
+   that theme's stylesheet unchanged; only the block above it -- the fixed
+   shell, the backdrop and the slide transition -- was rewritten against this
+   theme's <cart-drawer> element, which owns open/close instead of a <details>.
+   ========================================================================== */
+
+/* Tokens the source theme publishes globally and this one does not. Scoped to
+   the drawer so no second set of colour names leaks into the rest of the page. */
+cart-drawer {
+  --color-overlay: 0, 0, 0;
+  --color-placeholder: 243, 243, 243;
+  --color-critical: #d72c0d;
+  --color-success: #008060;
+  --color-border: #d6d8de;
+  --font-price-family: var(--font-body-family);
+  --font-price-scale: 1;
+  --font-button-baseline: 0rem;
+  --button-radius: var(--buttons-radius, 0px);
+  --gradient-free-ship-progress: linear-gradient(325deg, #f9423a 0, #f1e04d 100%);
+  --gradient-free-ship-complete: linear-gradient(325deg, #049cff 0, #35ee7a 100%);
+}
+
+/* The page behind an open drawer must not scroll. <cart-drawer> adds
+   .overflow-hidden to the body for this, which base.css already defines; the
+   rule below is the iOS half of the lock. Safari ignores `overflow: hidden` on
+   the body, so a drag anywhere over the drawer keeps scrolling the page
+   underneath -- and that scroll is also what collapses Safari's toolbars, which
+   resizes the viewport out from under the open drawer. Pinning the body is the
+   only reliable lock there; cart-drawer.js applies this class and holds the
+   offset in `top` so the position can be restored on close. */
+body.cart-drawer--scroll-locked {
   position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  justify-content: flex-end;
-  background-color: rgba(var(--color-foreground), 0.5);
-  transition: visibility var(--duration-default) ease;
+  inset-inline: 0;
+  width: 100%;
 }
 
-.drawer.active {
-  visibility: visible;
+/* Height source for the drawer and its backdrop, declared on their shared
+   ancestor. `100%` on a fixed element resolves against the initial containing
+   block, which iOS Safari freezes at the toolbars-visible size: the moment the
+   bottom bar auto-hides, the drawer stops short and the page shows through
+   underneath. `dvh` follows the browser chrome as it collapses;
+   `--viewport-height` (tracked in global.js) covers Safari before 15.4.
+   `svh` is deliberately not used -- it is the toolbars-visible height, i.e. the
+   short one. */
+cart-drawer {
+  --cart-viewport-height: var(--viewport-height, 100vh);
 }
 
-.drawer__inner {
-  height: 100%;
-  width: 40rem;
-  max-width: calc(100vw - 3rem);
-  padding: 0 1.5rem;
-  border: 0.1rem solid rgba(var(--color-foreground), 0.2);
-  border-right: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transform: translateX(100%);
-  transition: transform var(--duration-default) ease;
-}
-
-.drawer__inner-empty {
-  height: 100%;
-  padding: 0 1.5rem;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.cart-drawer__warnings {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-}
-
-cart-drawer.is-empty .drawer__inner {
-  display: grid;
-  grid-template-rows: 1fr;
-  align-items: center;
-  padding: 0;
-}
-
-cart-drawer.is-empty .drawer__header {
-  display: none;
-}
-
-cart-drawer:not(.is-empty) .cart-drawer__warnings,
-cart-drawer:not(.is-empty) .cart-drawer__collection {
-  display: none;
-}
-
-.cart-drawer__warnings--has-collection .cart__login-title {
-  margin-top: 2.5rem;
-}
-
-.drawer.active .drawer__inner {
-  transform: translateX(0);
-}
-
-.drawer__header {
-  position: relative;
-  padding: 1.5rem 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.drawer__heading {
-  margin: 0 0 1rem;
-}
-
-.drawer__close {
-  display: inline-block;
-  padding: 0;
-  min-width: 4.4rem;
-  min-height: 4.4rem;
-  box-shadow: 0 0 0 0.2rem rgba(var(--color-button), 0);
-  position: absolute;
-  top: 10px;
-  right: -10px;
-  color: rgb(var(--color-foreground));
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.cart-drawer__warnings .drawer__close {
-  right: 5px;
-}
-
-.drawer__close .svg-wrapper {
-  height: 2rem;
-  width: 2rem;
-}
-
-.drawer__contents {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.drawer__footer {
-  border-top: 0.1rem solid rgba(var(--color-foreground), 0.2);
-  padding: 1.5rem 0;
-}
-
-cart-drawer-items.is-empty + .drawer__footer {
-  display: none;
-}
-
-.drawer__footer > details {
-  margin-top: -1.5rem;
-  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.2);
-}
-
-.drawer__footer > details[open] {
-  padding-bottom: 1.5rem;
-}
-
-.drawer__footer summary {
-  display: flex;
-  position: relative;
-  line-height: 1;
-  padding: 1.5rem 2.8rem 1.5rem 0;
-}
-
-.drawer__footer > details + .cart-drawer__footer {
-  padding-top: 1.5rem;
+@supports (height: 100dvh) {
+  cart-drawer {
+    --cart-viewport-height: 100dvh;
+  }
 }
 
 cart-drawer {
   position: fixed;
+  z-index: 100;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100%;
+  /* Not 100vw: that measurement includes the classic scrollbar gutter, which pushes the
+     panel's trailing edge underneath the scrollbar and eats its gutter. On a fixed element
+     `100%` resolves against the initial containing block, which excludes it. */
+  width: 100%;
+  height: var(--cart-viewport-height);
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility var(--duration-long) ease;
 }
 
-.cart-drawer__overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+cart-drawer.active {
+  visibility: visible;
+  pointer-events: auto;
 }
 
+/* base.css hides every empty element (`div:empty { display: none }`) and the backdrop is an
+   empty div by design, so it has to opt back in. */
 .cart-drawer__overlay:empty {
   display: block;
 }
 
-.cart-drawer__form {
-  flex-grow: 1;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.cart-drawer__collection {
-  margin: 0 2.5rem 1.5rem;
-}
-
-.cart-drawer .drawer__cart-items-wrapper {
-  flex-grow: 1;
-}
-
-.cart-drawer .cart-items,
-.cart-drawer tbody {
-  display: block;
+.cart-drawer__overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: var(--cart-viewport-height);
+  opacity: 0;
+  cursor: url(cross.svg), url(cross.png), zoom-out;
+  transition: opacity var(--duration-long) ease;
+  background-color: rgba(var(--color-overlay), 0.5);
 }
 
-.cart-drawer thead {
-  display: inline-table;
-  width: 100%;
+cart-drawer.active .cart-drawer__overlay {
+  opacity: 1;
 }
 
-cart-drawer-items {
-  overflow: auto;
-  flex: 1;
-}
-
-@media screen and (max-height: 650px) {
-  cart-drawer-items {
-    overflow: visible;
-  }
-
-  .drawer__inner {
-    overflow: scroll;
-  }
-}
-
-.cart-drawer .cart-item {
-  display: grid;
-  grid-template: repeat(2, auto) / repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 0;
-}
-
-.cart-drawer .cart-item:last-child {
-  margin-bottom: 1rem;
-}
-
-.cart-drawer .cart-item__media {
-  grid-row: 1 / 3;
-}
-
-.cart-drawer .cart-item__image {
-  max-width: 100%;
-}
-
-.cart-drawer .cart-item__nested-line .cart-item__image {
-  max-width: 60%;
-  float: right;
-}
-
-.cart-drawer .cart-items thead {
-  margin-bottom: 0.5rem;
-}
-
-.cart-drawer .cart-items thead th:first-child,
-.cart-drawer .cart-items thead th:last-child {
-  width: 0;
+/* The sliding panel itself. */
+.cart-drawer {
   padding: 0;
+  position: absolute;
+  transform: translateX(100%);
+  visibility: hidden;
+  z-index: 2;
+  right: 0;
+  top: 0;
+  width: calc(100% - 4rem);
+  height: var(--max-height);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: var(--cart-canvas);
+  transition-property: transform, visibility;
+  transition-duration: var(--duration-long);
+  transition-timing-function: ease;
+  --max-height: var(--cart-viewport-height, 100vh);
 }
 
-.cart-drawer .cart-items thead th:nth-child(2) {
-  width: 50%;
-  padding-left: 0;
-}
-
-.cart-drawer .cart-items thead tr {
-  display: table-row;
-  margin-bottom: 0;
-}
-
-.cart-drawer .cart-items th {
-  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.08);
-}
-
-.cart-drawer .cart-item:last-child {
-  margin-bottom: 1.5rem;
-}
-
-.cart-drawer .cart-item .loading__spinner {
-  right: 5px;
-  padding-top: 2.5rem;
-}
-
-.cart-drawer .cart-items td {
-  padding-top: 1.7rem;
-}
-
-.cart-drawer .cart-items .cart-item__nested-line td:not(.cart-item__quantity) {
-  padding-top: 1rem;
-}
-
-.cart-drawer .cart-item > td + td {
-  padding-left: 1rem;
-}
-
-.cart-drawer .cart-item__details {
-  width: auto;
-  grid-column: 2 / 4;
-}
-
-.cart-drawer .cart-item__totals {
-  pointer-events: none;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-}
-
-.cart-drawer.cart-drawer .cart-item__price-wrapper > *:only-child {
-  margin-top: 0;
-}
-
-.cart-drawer .cart-item__price-wrapper .cart-item__discounted-prices {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.cart-drawer .unit-price {
-  margin-top: 0.6rem;
-}
-
-.cart-drawer .cart-items .cart-item__quantity {
-  padding-top: 0;
-  grid-column: 2 / 5;
-}
-
-@media screen and (max-width: 749px) {
-  .cart-drawer .cart-item cart-remove-button {
-    margin-left: 0;
-  }
-}
-
-.cart-drawer__footer > * + * {
-  margin-top: 1rem;
-}
-
-.cart-drawer .totals {
-  justify-content: space-between;
-}
-
-.cart-drawer .price {
-  line-height: 1;
-}
-
-.cart-drawer .tax-note {
-  margin: 1.2rem 0 2rem auto;
-  text-align: left;
-}
-
-.cart-drawer .product-option dd {
-  word-break: break-word;
-}
-
-.cart-drawer details[open] > summary .icon-caret {
-  transform: rotate(180deg);
-}
-
-.cart-drawer .cart__checkout-button {
-  max-width: none;
-}
-
-.drawer__footer .cart__dynamic-checkout-buttons {
-  max-width: 100%;
-}
-
-.drawer__footer #dynamic-checkout-cart ul {
-  flex-wrap: wrap !important;
-  flex-direction: row !important;
-  margin: 0.5rem -0.5rem 0 0 !important;
-  gap: 0.5rem;
-}
-
-.drawer__footer [data-shopify-buttoncontainer] {
-  justify-content: flex-start;
-}
-
-.drawer__footer #dynamic-checkout-cart ul > li {
-  flex-basis: calc(50% - 0.5rem) !important;
-  margin: 0 !important;
-}
-
-.drawer__footer #dynamic-checkout-cart ul > li:only-child {
-  flex-basis: 100% !important;
-  margin-right: 0.5rem !important;
+cart-drawer.active .cart-drawer {
+  transform: translateX(0);
+  visibility: visible;
 }
 
 @media screen and (min-width: 750px) {
-  .drawer__footer #dynamic-checkout-cart ul > li {
-    flex-basis: calc(100% / 3 - 0.5rem) !important;
-    margin: 0 !important;
+  .cart-drawer {
+    width: 44rem;
   }
 
-  .drawer__footer #dynamic-checkout-cart ul > li:first-child:nth-last-child(2),
-  .drawer__footer #dynamic-checkout-cart ul > li:first-child:nth-last-child(2) ~ li,
-  .drawer__footer #dynamic-checkout-cart ul > li:first-child:nth-last-child(4),
-  .drawer__footer #dynamic-checkout-cart ul > li:first-child:nth-last-child(4) ~ li {
-    flex-basis: calc(50% - 0.5rem) !important;
+  .cart-drawer .mini-cart {
+    position: relative;
+    z-index: 2;
   }
 }
 
-cart-drawer-items::-webkit-scrollbar {
-  width: 3px;
+.cart-drawer > mini-cart-items {
+  display: block;
+  height: 100%;
 }
 
-cart-drawer-items::-webkit-scrollbar-thumb {
-  background-color: rgba(var(--color-foreground), 0.7);
-  border-radius: 100px;
+.cart-drawer > .loading-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-cart-drawer-items::-webkit-scrollbar-track-piece {
-  margin-top: 31px;
+/* The panel is `overflow: hidden` and the content is fetched into it, so the
+   spinner needs a box of its own before that content lands. */
+.cart-drawer__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.cart-drawer__loading .loading-overlay__spinner {
+  width: 2.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   Shell
+   -------------------------------------------------------------------------- */
+
+.mini-cart {
+  height: 100%;
+
+  --cart-canvas: #f4f5f7;
+  --cart-surface: #ffffff;
+  --cart-line: #e7e8ec;
+  --cart-line-strong: #d6d8de;
+  --cart-strong: #101114;
+  --cart-muted: #767a86;
+  --cart-chip: #f1f2f4;
+  --cart-success: #12894f;
+  --cart-radius: 1rem;
+  --cart-radius-sm: 0.7rem;
+  --cart-gutter: 1.2rem;
+}
+
+.mini-cart__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--cart-canvas);
+}
+
+.mini-cart__header {
+  flex: 0 0 auto;
+  padding: 1.4rem 1.6rem .4rem;
+  background-color: var(--cart-surface);
+  border-bottom: 0.1rem solid var(--cart-line);
+}
+
+.mini-cart__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1.5rem;
+}
+
+.mini-cart__title {
+  margin: 0;
+  font-family: var(--font-heading-family);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+.mini-cart__count {
+  /* font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--cart-muted); */
+}
+
+.mini-cart__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.8rem;
+  height: 2.8rem;
+  margin-inline-end: -0.4rem;
+  /* A <button> here, where the source theme had a custom element, so the user-agent's grey
+     face, bevel and padding all have to be cleared. */
+  padding: 0;
+  border: 0;
+  background: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--cart-strong);
+  transition: background-color var(--duration-default) ease;
+}
+
+.mini-cart__close .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@media screen and (hover: hover) {
+  .mini-cart__close:hover {
+    background-color: var(--cart-chip);
+  }
+}
+
+.mini-cart__promo-banner {
+  display: block;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 1.3rem 2rem;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #ffffff;
+  background-color: var(--cart-accent);
+  text-decoration: none;
+}
+
+.mini-cart__promo-banner strong,
+.mini-cart__promo-banner b {
+  font-weight: 700;
+}
+
+a.mini-cart__promo-banner:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Scrolling canvas + card shell
+   -------------------------------------------------------------------------- */
+
+.mini-cart__main {
+  flex: 1 1 auto;
+  /* The overflow below should already zero the automatic minimum size; pinning it makes sure
+     the pane shrinks into a scroller instead of growing and handing the drag to the page. */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--cart-gutter);
+  /* No bottom gutter of its own: the pinned block below owns the gap at the scroll boundary,
+     so the spacing reads the same whether the list is mid-scroll or has run out. */
+  padding: var(--cart-gutter) var(--cart-gutter) 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.mini-cart__main::-webkit-scrollbar {
+  appearance: none;
+  width: 0.3rem;
+  background-color: transparent;
+}
+
+.mini-cart__main::-webkit-scrollbar-thumb {
+  border-radius: 1.6rem;
+  background-color: var(--cart-line-strong);
+}
+
+.mini-cart__main.cart__items--disabled {
+  pointer-events: none;
+}
+
+.cart-card {
+  display: block;
+  padding: 1.2rem;
+  background-color: var(--cart-surface);
+  border: 0.1rem solid var(--cart-line);
+  border-radius: var(--cart-radius);
+}
+
+/* --------------------------------------------------------------------------
+   Pinned cards
+   -------------------------------------------------------------------------- */
+
+/* The discount field and the cross-sell rail sit outside the scrolling canvas so they hold
+   their place above the footer while the line items scroll -- same gutter, same tinted
+   canvas, so nothing about the cards themselves reads differently for having left it. */
+.mini-cart__pinned {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--cart-gutter);
+  padding: var(--cart-gutter);
+  background-color: var(--cart-canvas);
+}
+
+/* The rail renders nothing when there is nothing left to cross-sell, and neither card is
+   rendered on an empty cart -- no stray gutter above the footer in either case. */
+.mini-cart__pinned:not(:has(> *)) {
+  display: none;
+}
+
+/* enableLoading() reaches only the scrolling canvas. Both of these used to live inside it,
+   so they follow it into the disabled state rather than staying live mid-update. */
+.mini-cart__main.cart__items--disabled ~ .mini-cart__pinned {
+  pointer-events: none;
+}
+
+.cart-card__title {
+  margin: 0 0 1.2rem;
+  font-family: var(--font-heading-family);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+/* --------------------------------------------------------------------------
+   Gift tier progress
+   -------------------------------------------------------------------------- */
+
+.gift-tier-progress {
+  display: block;
+  padding: 0.8rem 0.4rem 0.4rem;
+}
+
+.gift-tier-progress__heading {
+  margin: 0 0 2rem;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+.gift-tier-progress__track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gift-tier-progress__tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  row-gap: 0.7rem;
+}
+
+.gift-tier-progress__range {
+  font-size: 1.2rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.gift-tier-progress__tier.is-unlocked .gift-tier-progress__range {
+  font-weight: 600;
+  color: var(--cart-accent);
+}
+
+/* The marker spans the tier's full column, so its ::before/::after become the
+   track segment that column owns. Each tier's dot sits at the segment's
+   midpoint, which is what lets the fill terminate exactly on a dot. */
+.gift-tier-progress__marker {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.gift-tier-progress__marker::before,
+.gift-tier-progress__marker::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
+  height: 0.3rem;
+  border-radius: 0.3rem;
+  transform: translateY(-50%);
+}
+
+.gift-tier-progress__marker::before {
+  width: 100%;
+  background-color: var(--cart-line-strong);
+}
+
+.gift-tier-progress__tier:last-child .gift-tier-progress__marker::before {
+  width: 50%;
+}
+
+.gift-tier-progress__marker::after {
+  width: var(--gift-tier-segment-fill, 0%);
+  background-color: var(--cart-accent);
+  transition: width var(--duration-long) ease;
+}
+
+.gift-tier-progress__dot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--cart-surface);
+  box-shadow: 0 0 0 0.1rem var(--cart-line-strong);
+  color: var(--cart-muted);
+  transition-property: color, box-shadow, background-color;
+  transition-duration: var(--duration-default);
+  transition-timing-function: ease;
+}
+
+.gift-tier-progress__dot .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.gift-tier-progress__tier.is-unlocked .gift-tier-progress__dot {
+  background-color: var(--cart-accent);
+  box-shadow: none;
+  color: #ffffff;
+}
+
+.gift-tier-progress__label {
+  padding: 0 0.4rem;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.gift-tier-progress__tier.is-unlocked .gift-tier-progress__label {
+  color: var(--cart-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Line items
+   -------------------------------------------------------------------------- */
+
+.mini-cart__items {
+  display: block;
+}
+
+.cart-items__list {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--cart-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Same `:empty` sweep as the backdrop above (`ul:empty`), and it would collapse the list
+   before the shimmer placeholder below ever gets a box to paint into. */
+.cart-items__list:empty {
+  display: flex;
+}
+
+.cart-items__list:empty::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 9.6rem;
+  border-radius: var(--cart-radius);
+  background-image: linear-gradient(100deg, rgba(var(--color-foreground), 0.05) 40%, rgba(var(--color-foreground), 0.09) 63%, rgba(var(--color-foreground), 0.05) 79%);
+  background-size: 400% 100%;
+  animation: placeholder-shimmer 1.3s linear infinite;
+}
+
+@keyframes placeholder-shimmer {
+  0% {
+    background-position: -150% 0;
+  }
+
+  to {
+    background-position: 150% 0;
+  }
+}
+
+.cart-item {
+  position: relative;
+}
+
+.cart-item__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  column-gap: 1.2rem;
+}
+
+.cart-item__media {
+  flex: 0 0 auto;
+  width: 7rem;
+  overflow: hidden;
+  border-radius: var(--cart-radius-sm);
+  background-color: rgb(var(--color-placeholder));
+}
+
+.cart-item__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform var(--duration-long) ease;
+}
+
+.cart-item__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.8rem;
+}
+
+.cart-item__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
+.cart-item__title {
+  font-family: var(--font-heading-family);
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-decoration: none;
+  color: var(--cart-strong);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.cart-item__price {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  column-gap: 0.6rem;
+  row-gap: 0.2rem;
+  text-align: end;
+  font-family: var(--font-price-family);
+}
+
+.cart-item__price bdi {
+  font-size: 1.4rem;
+}
+
+.cart-item__price-final {
+  font-weight: 600;
+  color: var(--cart-strong);
+}
+
+.cart-item__price-compare {
+  /* The strike is drawn from this element's own font metrics, so it has to carry the
+     same font-size as the text inside it or the line lands below the digits. */
+  font-size: 1.2rem;
+  color: var(--cart-muted);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.1rem;
+  text-decoration-skip-ink: none;
+}
+
+.cart-item__price-compare bdi {
+  font-size: inherit;
+}
+
+.cart-item__meta {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.3rem;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  color: var(--cart-muted);
+}
+
+/* Line discounts read as a ribbon growing out of the top edge of the card: a stadium-topped
+   body with a concave fillet on each side flaring outward into the card surface. */
+.cart-item--discounted {
+  margin-top: 1.2rem;
+
+  --discount-tab-height: 2.2rem;
+  --discount-tab-flare: 1.1rem;
+}
+
+/* Sits flush on the card's top edge, overlapping only the 0.1rem border so the ribbon's base
+   merges into the surface instead of leaving a hard horizontal edge across the card. */
+.cart-item__discount-tab {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, calc(-100% + 0.1rem));
+  max-width: calc(100% - 2.4rem);
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.cart-item__discount-tab-body {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  column-gap: 0.4rem;
+  height: var(--discount-tab-height);
+  padding: 0 1.1rem;
+  border-radius: 0 0 10px 10px;
+  font-family: var(--font-heading-family);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  height: 20px;
+  white-space: nowrap;
+  color: #ffffff;
+  background-color: var(--cart-accent);
+  margin-bottom: -10px;
+}
+
+/* Square blocks with a quarter-disc masked out of the corner facing the body, so the ribbon
+   curves outward into the card instead of stopping at a hard vertical edge. */
+.cart-item__discount-tab-edge {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 10px;
+  background-color: #00059b
+}
+
+.cart-item__discount-tab-edge:first-child {
+  -webkit-mask-image: radial-gradient(circle var(--discount-tab-flare) at 0 0, transparent 99%, #000 100%);
+  mask-image: radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%);
+  margin-right: -2px;
+}
+
+.cart-item__discount-tab-edge:last-child {
+  -webkit-mask-image: radial-gradient(circle var(--discount-tab-flare) at 100% 0, transparent 99%, #000 100%);
+  mask-image: radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%);
+  margin-left: -2px;
+}
+
+.cart-item__discount-tab .icon {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: currentColor;
+}
+
+.cart-item__discount-tab-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+  margin-top: 0.2rem;
+}
+
+.cart-item__variant-spacer {
+  flex: 1 1 auto;
+}
+
+/* Variant chip: a bare <select> painted as a pill, so the native picker (and
+   its mobile sheet) does the heavy lifting. */
+.cart-item__variant {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 60%;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--cart-radius-sm);
+  background-color: var(--cart-chip);
+  font-size: 1.15rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.cart-item__variant--static {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cart-item__variant-select {
+  appearance: none;
+  -webkit-appearance: none;
+  max-width: 100%;
+  padding: 0 1.4rem 0 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.cart-item__variant .icon-caret {
+  position: absolute;
+  inset-inline-end: 0.8rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  pointer-events: none;
+  color: var(--cart-muted);
+}
+
+.cart-item__variant.is-loading {
+  opacity: 0.5;
+}
+
+.cart-item__actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  column-gap: 0.6rem;
+  flex: 0 0 auto;
+}
+
+.cart-item__actions .loading-overlay {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 50%;
+  left: auto;
+  width: 1.6rem;
+  line-height: 0;
+  transform: translateY(-50%);
+}
+
+.cart-item__actions .loading-overlay__spinner,
+.cart-item__actions .icon-spinner {
+  width: 100%;
+}
+
+.cart-item__actions .loading-overlay:not(.hidden)~* {
+  visibility: hidden;
+}
+
+.cart-item__quantity-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .cart-drawer .quantity-popover-container {
@@ -395,20 +818,1129 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   top: 100%;
 }
 
-.cart-drawer .cart-item__error {
-  margin-top: 0.8rem;
+/* This theme's base .quantity is Dawn's input-sized stepper: a 4.5rem min-height plus a
+   ::before/::after pair painting the input's border, ring shadow and backdrop. The drawer's
+   stepper is 2.8rem and draws its own single border, so all three have to be undone --
+   `height` on its own loses to `min-height`, which is what was stretching the row and
+   double-drawing the box. */
+.mini-cart .quantity {
+  width: auto;
+  height: 2.8rem;
+  min-height: 0;
+  align-items: center;
+  border: 0.1rem solid var(--cart-line-strong);
+  border-radius: var(--cart-radius-sm);
+  overflow: hidden;
 }
 
-.cart-drawer .quantity-popover__info + .cart-item__error {
-  margin-top: 0.2rem;
+.mini-cart .quantity::before,
+.mini-cart .quantity::after {
+  content: none;
 }
 
-@media screen and (min-width: 750px) {
-  .cart-drawer .cart-item__quantity--info quantity-popover > * {
-    padding-left: 0;
+.mini-cart .quantity__button:first-child {
+  margin-left: 0;
+}
+
+.mini-cart .quantity__button:last-child {
+  margin-right: 0;
+}
+
+.mini-cart .quantity__button {
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.6rem;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.mini-cart .quantity__button::after {
+  content: none;
+}
+
+.mini-cart .quantity__button .icon {
+  flex: 0 0 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--cart-strong);
+}
+
+.mini-cart .quantity__button.disabled .icon {
+  opacity: 0.35;
+}
+
+.mini-cart .quantity__input {
+  width: 2.6rem;
+  min-width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+  opacity: 1;
+  color: var(--cart-strong);
+}
+
+.cart-item__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.8rem;
+  height: 2.8rem;
+  cursor: pointer;
+  color: var(--cart-muted);
+  transition: color var(--duration-default) ease;
+}
+
+.cart-item__remove a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.cart-item__remove .icon {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+@media screen and (hover: hover) {
+  .cart-item__remove:hover {
+    color: var(--color-critical);
+  }
+}
+
+.cart-item__gift-badge {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--cart-radius-sm);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--cart-accent);
+  background-color: color-mix(in srgb, var(--cart-accent) 8%, transparent);
+}
+
+.cart-item__gift-badge .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* This theme's base.css carries .form__message but no red .errors variant of it, which the
+   drawer's line errors and the shipping estimator both rely on. */
+.cart-drawer .form__message.errors {
+  color: var(--color-critical);
+}
+
+.cart-item__error {
+  display: flex;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.cart-item__error-text:empty {
+  display: none;
+}
+
+.cart-item__error:has(.cart-item__error-text:empty) {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Discount code + coupons
+   -------------------------------------------------------------------------- */
+
+.cart-discount {
+  padding: 1.2rem;
+}
+
+.cart-discount__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 4.4rem;
+  border: 0.1rem dashed var(--cart-line-strong);
+  border-radius: var(--cart-radius-sm);
+}
+
+.cart-discount__icon {
+  position: absolute;
+  inset-inline-start: 1.2rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--cart-accent);
+  pointer-events: none;
+}
+
+.cart-discount__input {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  padding: 0 8rem 0 3.6rem;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  font-family: inherit;
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+.cart-discount__input::placeholder {
+  color: var(--cart-muted);
+  opacity: 1;
+}
+
+.cart-discount__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.1rem var(--cart-accent);
+}
+
+.cart-discount__apply {
+  position: absolute;
+  inset-inline-end: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.6rem 1rem;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  color: var(--cart-accent);
+  cursor: pointer;
+  transition: opacity var(--duration-default) ease;
+}
+
+/* Nothing to apply until something is typed, and the mock shows the field bare
+   at rest -- so the button only surfaces once the input has content. */
+.cart-discount__input:placeholder-shown~.cart-discount__apply {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cart-discount--loading .cart-discount__field {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.cart-discount__message {
+  margin: 0.8rem 0 0;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  color: var(--cart-muted);
+}
+
+.cart-discount__message--success {
+  color: var(--cart-success);
+}
+
+.cart-discount__message--error {
+  color: var(--color-critical);
+}
+
+/* The applied discounts come straight from cart.cart_level_discount_applications and the
+   line-level allocations -- Shopify gives the storefront no way to list codes that have not
+   been applied, so there is nothing here to configure. */
+.cart-discount__applied {
+  margin-top: 1.2rem;
+}
+
+.cart-discount__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+  padding-top: 1.2rem;
+  border-top: 0.1rem dashed var(--cart-line-strong);
+  cursor: pointer;
+  list-style: none;
+}
+
+.cart-discount__summary::-webkit-details-marker {
+  display: none;
+}
+
+.cart-discount__available {
+  font-size: 1.25rem;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.cart-discount__view {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+.cart-discount__view .icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform var(--duration-default) ease;
+}
+
+.cart-discount__applied[open] .cart-discount__view .icon {
+  transform: rotate(90deg);
+}
+
+.cart-discount__applied-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.6rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-discount__applied-item {
+  display: flex;
+  align-items: center;
+  column-gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--cart-radius-sm);
+  background-color: color-mix(in srgb, var(--cart-accent) 8%, transparent);
+  color: var(--cart-accent);
+}
+
+.cart-discount__applied-item .icon {
+  flex: 0 0 auto;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.cart-discount__applied-code {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+.cart-discount__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cart-discount__remove .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media screen and (hover: hover) {
+  .cart-discount__remove:hover {
+    background-color: color-mix(in srgb, var(--cart-accent) 14%, transparent);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Recommendations rail
+   -------------------------------------------------------------------------- */
+
+.cart-recommendations {
+  display: block;
+  padding: 1.2rem 0 1.2rem 1.2rem;
+}
+
+/* The rail is populated asynchronously, and Shopify returns nothing when a product
+   has no recommendations -- so stay hidden until there is something to show rather
+   than leaving a card that is only a heading. */
+.cart-recommendations:not(:has(.cart-recommendations__item)) {
+  display: none;
+}
+
+.cart-recommendations__list {
+  display: flex;
+  column-gap: 1rem;
+  margin: 0;
+  padding: 0 1.2rem 0 0;
+  list-style: none;
+  overflow-x: auto;
+  /* Keeps a swipe that runs off the end of the rail from becoming Safari's back gesture. */
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.cart-recommendations__list::-webkit-scrollbar {
+  display: none;
+}
+
+/* The scrollbar is hidden and a mouse has no sideways gesture, so the rail advertises
+   itself as draggable instead. cart-recommendations.js does the scrolling. */
+.cart-recommendations__list {
+  cursor: grab;
+}
+
+.cart-recommendations__list.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* Snapping fights a gesture that is still in flight, pulling cards back under the cursor.
+   cart-recommendations.js suspends it mid-wheel and mid-drag, then lets it settle the rail
+   onto a card once the gesture stops. */
+.cart-recommendations__list.is-scrolling,
+.cart-recommendations__list.is-dragging {
+  scroll-snap-type: none;
+}
+
+.cart-recommendations__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 22rem;
+  max-width: 82%;
+  padding: 0.8rem;
+  border: 0.1rem solid var(--cart-line);
+  border-radius: var(--cart-radius-sm);
+  scroll-snap-align: start;
+}
+
+.cart-recommendations__link {
+  display: flex;
+  align-items: center;
+  column-gap: 1rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-decoration: none;
+}
+
+.cart-recommendations__media {
+  flex: 0 0 auto;
+  width: 5.4rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: rgb(var(--color-placeholder));
+}
+
+.cart-recommendations__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.cart-recommendations__info {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.4rem;
+  min-width: 0;
+}
+
+.cart-recommendations__vendor {
+  font-size: 1.1rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  color: var(--cart-muted);
+}
+
+.cart-recommendations__title {
+  font-family: var(--font-heading-family);
+  font-size: 1.3rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Only present when the cross-sell sheet pins the card to one variant, so the shopper can
+   tell which size the quick-add button will actually put in the cart. */
+.cart-recommendations__variant {
+  color: var(--cart-muted);
+}
+
+.cart-recommendations__variant::before {
+  content: ' — ';
+}
+
+.cart-recommendations__price {
+  font-family: var(--font-price-family);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--cart-strong);
+}
+
+.cart-recommendations__price s {
+  margin-inline-end: 0.5rem;
+  font-weight: 400;
+  color: var(--cart-muted);
+}
+
+.cart-recommendations__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-inline-start: 0.6rem;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: var(--cart-accent);
+  transition: opacity var(--duration-default) ease;
+}
+
+.cart-recommendations__add .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cart-recommendations__add.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Gift wrapping + disclosures
+   -------------------------------------------------------------------------- */
+
+.mini-cart .gift-wrapping {
+  padding: 1.2rem;
+}
+
+.mini-cart__actions {
+  display: flex;
+  padding: 0;
+}
+
+.mini-cart__actions details {
+  flex-grow: 1;
+}
+
+.mini-cart__actions details+details {
+  border-inline-start: 0.1rem solid var(--cart-line);
+}
+
+.mini-cart__action summary {
+  padding: 1.2rem 0.5rem;
+  cursor: pointer;
+}
+
+.mini-cart__action summary>span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.8rem;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15rem;
+  color: var(--cart-strong);
+}
+
+.mini-cart__action summary .icon {
+  height: 1.4rem;
+  position: relative;
+  top: -0.1rem;
+}
+
+.mini-cart__action[open]>summary::before {
+  max-width: 100%;
+  max-height: 100%;
+  background-color: rgba(var(--color-overlay), 0.85);
+  animation: fade-in var(--duration-long) ease;
+  cursor: url(cross.svg), url(cross.png), zoom-out;
+}
+
+.mini-cart__action[open]>summary+* {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 3rem;
+  background-color: var(--cart-surface);
+  animation: appear-up var(--duration-default) ease;
+}
+
+.mini-cart__action label {
+  display: flex;
+  margin-bottom: -1rem;
+  color: var(--cart-strong);
+}
+
+.mini-cart__action .field {
+  margin-top: 2rem;
+  --color-keyboard-focus: var(--color-border);
+}
+
+.mini-cart__action .button {
+  margin-top: 3rem;
+}
+
+.mini-cart__action .close {
+  border: none;
+  background: none;
+  padding: 0;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--cart-strong);
+}
+
+.mini-cart__action .close .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  transition: transform var(--duration-default) ease;
+}
+
+@media screen and (hover: hover) {
+  .mini-cart__action .close:hover .icon {
+    transform: scale(0.8) rotate(90deg);
+  }
+}
+
+.mini-cart__question {
+  position: relative;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  margin-inline-start: 0.5rem;
+  cursor: pointer;
+}
+
+.mini-cart__question .icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  position: relative;
+  top: 0.1rem;
+}
+
+.mini-cart__tooltip {
+  display: flex;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1;
+  position: absolute;
+  bottom: 100%;
+  pointer-events: none;
+  white-space: nowrap;
+  text-align: center;
+  padding: 0.8rem 1rem;
+  color: rgb(var(--color-background));
+  background-color: rgb(var(--color-foreground));
+  opacity: 0;
+  transform: translateY(-100%);
+  transition-property: opacity, transform;
+  transition-timing-function: ease;
+  transition-duration: var(--duration-default);
+}
+
+.mini-cart__tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -1.6rem;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 1rem;
+  border-color: transparent transparent transparent;
+  border-top-color: rgb(var(--color-foreground));
+}
+
+.mini-cart__question:hover .mini-cart__tooltip {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+#ShippingCalculatorSuccess {
+  display: block;
+}
+
+#ShippingCalculatorSuccess p {
+  margin: 0;
+}
+
+#ShippingCalculatorSuccess p+p {
+  margin-top: 1rem;
+}
+
+.mini-cart__note {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+
+.mini-cart__footer {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 1.4rem 1.6rem 1.6rem;
+  background-color: var(--cart-surface);
+  border-top: 0.1rem solid var(--cart-line);
+  box-shadow: 0 -0.4rem 1.6rem rgba(16, 17, 20, 0.05);
+}
+
+/* The cart-wide saving rides the top edge of the footer as a ribbon, mirroring the geometry of
+   the per-item .cart-item__discount-tab but in green. The footer's own z-index lifts it clear of
+   the scrolling canvas so the ribbon is not painted over as items scroll beneath. */
+.mini-cart__savings {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 50%;
+  /* No border compensation, unlike the item ribbon: the footer carries its own border-top, so
+     top:0 already resolves inside it and lands the ribbon's base on the same line. */
+  transform: translate(-50%, -100%);
+  max-width: calc(100% - 3.2rem);
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.mini-cart__savings-body {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 1.1rem;
+  border-radius: 0 0 10px 10px;
+  font-family: var(--font-heading-family);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: #ffffff;
+  background-color: var(--cart-success);
+  margin-bottom: -10px;
+}
+
+.mini-cart__savings-edge {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 10px;
+  background-color: var(--cart-success);
+}
+
+.mini-cart__savings-edge:first-child {
+  -webkit-mask-image: radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%);
+  mask-image: radial-gradient(circle 10px at 0 0, transparent 99%, #000 100%);
+  margin-right: -2px;
+}
+
+.mini-cart__savings-edge:last-child {
+  -webkit-mask-image: radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%);
+  mask-image: radial-gradient(circle 10px at 100% 0, transparent 99%, #000 100%);
+  margin-left: -2px;
+}
+
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.4rem;
+}
+
+.cart-summary__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
+.cart-summary__label {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.7rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+}
+
+.cart-summary__label .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  align-self: center;
+  color: var(--cart-strong);
+}
+
+.cart-summary__value {
+  display: inline-flex;
+  align-items: baseline;
+  column-gap: 0.8rem;
+  font-family: var(--font-price-family);
+}
+
+.cart-summary__compare-at {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--cart-muted);
+}
+
+.cart-summary__total {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--cart-strong);
+}
+
+.cart-summary .discounts {
+  margin: 0.4rem 0 0;
+  font-size: 1.2rem;
+}
+
+.cart-summary__tax-note {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.cart-summary__tax-note p {
+  margin: 0;
+}
+
+.cart-terms {
+  display: block;
+  margin-top: 1.2rem;
+}
+
+.cart-terms__label {
+  display: flex;
+  align-items: flex-start;
+  column-gap: 0.8rem;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--cart-strong);
+  cursor: pointer;
+}
+
+.cart-terms__checkbox {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0.1rem 0 0;
+  accent-color: var(--cart-strong);
+  cursor: pointer;
+}
+
+.cart-terms__label a {
+  color: var(--cart-accent);
+  text-decoration: underline;
+}
+
+.mini-cart__footer .button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  row-gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.mini-cart__footer .button-container .button {
+  width: 100%;
+  min-width: auto;
+  min-height: 5rem;
+  border-radius: var(--cart-radius-sm);
+  font-size: 1.5rem;
+  letter-spacing: 0.02rem;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.mini-cart__footer .button-container .button[name='checkout'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1.2rem;
+  padding-inline: 1.6rem;
+  text-align: start;
+  background-color: var(--cart-strong);
+  border-color: var(--cart-strong);
+  color: #ffffff;
+}
+
+.mini-cart__footer .button-container .button[name='checkout'] .button__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pushed to the trailing edge on its own so the label keeps the leading edge whether or not a
+   merchant has set an image. */
+.mini-cart__footer .button-container .button[name='checkout'] .button__image {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  max-height: 2.4rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.mini-cart__footer .button-container .button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mini-cart__footer .button-container .button--secondary {
+  min-height: 4.2rem;
+  background-color: transparent;
+  border: 0.1rem solid var(--cart-line-strong);
+  color: var(--cart-strong);
+  box-shadow: none;
+}
+
+.mini-cart__powered-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.6rem;
+  margin: 1.2rem 0 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.02rem;
+  color: var(--cart-muted);
+}
+
+.mini-cart__powered-by img {
+  display: block;
+  width: auto;
+  height: 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Free shipping bar
+   -------------------------------------------------------------------------- */
+
+.cart-drawer .free-shipping {
+  margin: 1.2rem 0 0;
+  text-align: start;
+}
+
+.cart-drawer .free-shipping__progress {
+  display: block;
+  margin: 0.8rem 0 0;
+  height: 0.3rem;
+  background-color: var(--cart-line-strong);
+  border-radius: 0.3rem;
+}
+
+.cart-drawer .free-shipping .price {
+  display: initial;
+}
+
+.cart-drawer .free-shipping__text {
+  font-size: 1.25rem;
+  letter-spacing: 0;
+  color: var(--cart-muted);
+}
+
+.cart-drawer .free-shipping__text .price bdi {
+  font-size: 1.3rem;
+  color: var(--cart-strong);
+}
+
+.mini-cart.is-empty .free-shipping {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Empty state
+   -------------------------------------------------------------------------- */
+
+.mini-cart__empty {
+  padding: 3rem 2rem;
+}
+
+.mini-cart__empty-text {
+  margin: 0 0 2rem;
+  font-size: calc(var(--font-heading-scale) * 2rem);
+  text-transform: none;
+}
+
+.mini-cart__empty-message {
+  margin-top: -1rem;
+  margin-bottom: 2.5rem;
+}
+
+.mini-cart__empty-message p {
+  margin: 0;
+}
+
+.mini-cart__empty-message p+p {
+  margin-top: 1rem;
+}
+
+.mini-cart__empty-collections {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.5rem;
+}
+
+.mini-cart__empty .button {
+  min-width: auto;
+  padding: 1rem 3rem;
+  padding-top: calc(1rem + var(--font-button-baseline));
+}
+
+.mini-cart__empty .cart-recommendations {
+  width: 100%;
+  margin-top: 3rem;
+  text-align: start;
+}
+
+.mini-cart__empty,
+.is-empty .mini-cart__main,
+.is-empty .mini-cart__pinned,
+.is-empty .mini-cart__footer {
+  display: none;
+}
+
+.is-empty .mini-cart__empty {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.is-empty .mini-cart__empty::-webkit-scrollbar {
+  appearance: none;
+  width: 0.3rem;
+  background-color: transparent;
+}
+
+.is-empty .mini-cart__empty::-webkit-scrollbar-thumb {
+  border-radius: 1.6rem;
+  background-color: var(--cart-line-strong);
+}
+
+/* --------------------------------------------------------------------------
+   Entrance animation
+   -------------------------------------------------------------------------- */
+
+.cart-drawer [data-animate] {
+  opacity: 0;
+  transform: translateX(4rem);
+  transition-property: transform, opacity;
+  transition-timing-function: ease;
+  transition-duration: var(--duration-long);
+}
+
+.cart-drawer [data-animate-delay-1] {
+  transition-delay: var(--duration-default);
+}
+
+.cart-drawer [data-animate-delay-2] {
+  transition-delay: calc(var(--duration-default) + 60ms);
+}
+
+.cart-drawer [data-animate-delay-3] {
+  transition-delay: calc(var(--duration-default) + 120ms);
+}
+
+.cart-drawer [data-animate-delay-4] {
+  transition-delay: calc(var(--duration-default) + 180ms);
+}
+
+.cart-drawer [data-animate-delay-5] {
+  transition-delay: calc(var(--duration-default) + 240ms);
+}
+
+.cart-drawer [data-animate-delay-6] {
+  transition-delay: calc(var(--duration-default) + 300ms);
+}
+
+.cart-drawer [data-animate-delay-7] {
+  transition-delay: calc(var(--duration-default) + 360ms);
+}
+
+cart-drawer.active .cart-drawer [data-animate] {
+  opacity: 1;
+  transform: none;
+}
+
+@media screen and (max-height: 480px) {
+  #mini-cart {
+    overflow-y: auto;
   }
 
-  .cart-drawer .cart-item__error {
-    margin-left: 0;
+  .cart-drawer .mini-cart {
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-drawer [data-animate] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+/* The drawer's live regions start life empty and are filled by script. `p:empty` in base.css
+   would take them out of the accessibility tree before they ever have anything to announce. */
+#MiniCart-LiveRegionText:empty,
+#MiniCart-LineItemStatus:empty {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Keyframes
+   --------------------------------------------------------------------------
+   Used by the drawer's bottom sheets (note, gift note, shipping estimator).
+   Defined here because this theme's base.css does not carry them.
+   -------------------------------------------------------------------------- */
+
+@keyframes appear-up {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }

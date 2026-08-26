@@ -11,6 +11,7 @@
   "sections": {
     "mindset": {
       "type": "about-statement",
+      "disabled": true,
       "settings": {
         "offset_header": true,
         "background": "#ffffff",
@@ -72,7 +73,7 @@
         "vertical_alignment": "flex-start",
         "background": "#ffffff",
         "ink": "#0a0a0b",
-        "image": "shopify://shop_images/Frame_1321319586.png",
+        "image": "shopify://shop_images/Frame_1321319586_1.png",
         "image_url": "",
         "image_alt": "",
         "media_ratio": "1.15",
@@ -99,40 +100,40 @@
     "minds": {
       "type": "about-minds",
       "blocks": {
-        "person_MrDJ6z": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/Frame_1321319596_1.png",
-            "image_url": "",
-            "name": "Ritu Malhotra",
-            "role": "Clinical Research\n& Formulation Lead",
-            "link": ""
-          }
-        },
         "person_zKeeDH": {
           "type": "person",
           "settings": {
-            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image": "shopify://shop_images/IMG_5532_JPG.jpg",
             "image_url": "",
-            "name": "Ritu Malhotra",
-            "role": "Clinical Research\n& Formulation Lead",
+            "name": "Sushma Puri",
+            "role": "Visionary Entrepreneur\n& Industry Trailblazer",
+            "link": ""
+          }
+        },
+        "person_MrDJ6z": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/IMG_0666_JPG.png",
+            "image_url": "",
+            "name": "Aparna Kakrania",
+            "role": "Brand Builder. Designer.\nStoryteller",
             "link": ""
           }
         },
         "person_YbiDb3": {
           "type": "person",
           "settings": {
-            "image": "shopify://shop_images/Frame_1321319596_1.png",
+            "image": "shopify://shop_images/WhatsApp_Image_2026-08-20_at_4.31.52_PM.jpg",
             "image_url": "",
-            "name": "Ritu Malhotra",
-            "role": "Clinical Research\n& Formulation Lead",
+            "name": "Shweta Jain",
+            "role": "Architect of Luxury &\nBrand Transformation",
             "link": ""
           }
         }
       },
       "block_order": [
-        "person_MrDJ6z",
         "person_zKeeDH",
+        "person_MrDJ6z",
         "person_YbiDb3"
       ],
       "name": "Minds Behind",
@@ -149,6 +150,7 @@
         "columns_desktop": 3,
         "columns_mobile": "1.2",
         "card_gap": 8,
+        "card_height": 145,
         "card_radius": 0,
         "card_background": "#c9ccd6",
         "card_inset": 28,
@@ -233,7 +235,7 @@
         "rule_color": "#1a1a1a",
         "rule_gap": 12,
         "item_gap": 40,
-        "image": "shopify://shop_images/Frame_1321319586.png",
+        "image": "shopify://shop_images/BB_web_collage_image_1.png",
         "image_url": "",
         "image_alt": "",
         "media_ratio": "1",
