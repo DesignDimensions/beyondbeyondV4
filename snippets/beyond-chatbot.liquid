@@ -20,11 +20,34 @@
   assign chat_logo = settings.chat_logo | default: shop.brand.logo
   assign chat_logo_height = settings.chat_logo_height | default: 34
   assign chat_logo_height_2x = chat_logo_height | times: 2
+
+  comment
+    The handoff only exists if there is somewhere to hand off to. Each channel is
+    independent, so a merchant with only WhatsApp gets a one-row sheet rather than an
+    empty shell with a heading.
+  endcomment
+  assign whatsapp = settings.chat_whatsapp | strip | remove: ' ' | remove: '+' | remove: '-'
+  assign phone = settings.chat_phone | strip
+  assign booking = settings.chat_booking_url
+  assign chat_email = settings.chat_email | strip
+
+  assign has_human = false
+  if settings.chat_human_enabled
+    if whatsapp != blank or phone != blank or booking != blank or chat_email != blank
+      assign has_human = true
+    endif
+  endif
 -%}
 
 {{ 'beyond-chatbot.css' | asset_url | stylesheet_tag }}
 
-<div class="bb-chat" data-bb-root>
+<div
+  class="bb-chat"
+  data-bb-root
+  data-bb-hours-days="{{ settings.chat_human_days | default: 'mon-sat' }}"
+  data-bb-hours-open="{{ settings.chat_human_open | default: 10 }}"
+  data-bb-hours-close="{{ settings.chat_human_close | default: 19 }}"
+>
   {%- comment -%}
     Sits behind the panel and blurs everything behind it -- the rest of the
     page, not the widget itself, since the panel and launcher are stacked
@@ -85,6 +108,29 @@
       </div>
 
       <div class="bb-header__actions">
+        {%- if has_human -%}
+          {%- comment -%}
+            An icon rather than a labelled pill: at this panel width a text button would
+            have to push the brand lockup out to fit, and the whole point of the handoff is
+            that it waits quietly until it is wanted. The transcript surfaces a labelled
+            prompt at the moment someone actually needs a person -- see bb-nudge.
+          {%- endcomment -%}
+          <button
+            id="bb-human"
+            class="bb-iconbtn bb-iconbtn--human"
+            type="button"
+            aria-label="Talk to a human"
+            title="Talk to a human"
+            aria-haspopup="dialog"
+          >
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M4 13h1.6a1.4 1.4 0 0 1 1.4 1.4v3.2A1.4 1.4 0 0 1 5.6 19H5a1 1 0 0 1-1-1v-5ZM20 13h-1.6a1.4 1.4 0 0 0-1.4 1.4v3.2a1.4 1.4 0 0 0 1.4 1.4h.6a1 1 0 0 0 1-1v-5Z" fill="currentColor"/>
+            </svg>
+            <span class="bb-iconbtn__dot" data-bb-live-dot aria-hidden="true"></span>
+          </button>
+        {%- endif -%}
+
         <button id="bb-reset" class="bb-iconbtn" type="button" aria-label="Start a new conversation">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M4 12a8 8 0 1 1 2.4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -145,7 +191,44 @@
     <div class="bb-composer">
       <div id="bb-suggest" class="bb-suggest" role="listbox" aria-label="Suggested questions" hidden></div>
 
+      {%- comment -%}
+        The attached photo, shown as a chip above the row rather than inside the field --
+        the field's ghost-completion layer mirrors the input's box exactly, and anything
+        placed inside it would have to be mirrored there too.
+      {%- endcomment -%}
+      {%- if settings.chat_photo_enabled -%}
+        <div class="bb-attach" data-bb-attach hidden>
+          <img class="bb-attach__thumb" data-bb-attach-thumb alt="" width="40" height="40">
+          <span class="bb-attach__meta">
+            <span class="bb-attach__title">Photo attached</span>
+            <span class="bb-attach__note" data-bb-attach-note>Analysed once. Never stored.</span>
+          </span>
+          <button class="bb-attach__remove" type="button" data-bb-attach-remove aria-label="Remove photo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+
       <div class="bb-composer__row">
+        {%- if settings.chat_photo_enabled -%}
+          <button id="bb-photo" class="bb-photo" type="button" aria-label="Add a photo of your skin">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M4 8.5h2.6l1.2-2h8.4l1.2 2H20a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <circle cx="12" cy="13.2" r="3.1" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </button>
+          <input
+            id="bb-photo-input"
+            class="bb-visually-hidden"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            tabindex="-1"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+
         <div class="bb-field">
           {%- comment -%}
             Ghost layer sits behind the input and mirrors its metrics exactly, so the greyed
@@ -181,6 +264,165 @@
         Press <kbd>Tab</kbd> to complete
       </p>
     </div>
+
+    {%- comment -%}
+      Sheets. Both slide up inside the panel over a scrim rather than opening a dialog of
+      their own -- the visitor never loses the conversation they were having, and coming
+      back is a dismiss rather than a navigation.
+    {%- endcomment -%}
+    {%- if has_human -%}
+      <div class="bb-scrim" data-bb-scrim hidden></div>
+
+      <div
+        id="bb-human-sheet"
+        class="bb-sheet"
+        role="dialog"
+        aria-label="Talk to a human"
+        aria-modal="true"
+        hidden
+      >
+        <button class="bb-sheet__close" type="button" data-bb-sheet-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <p class="bb-sheet__title">Talk to a human</p>
+        <p class="bb-sheet__status" data-bb-status>
+          <span class="bb-sheet__dot" data-bb-live-dot aria-hidden="true"></span>
+          <span data-bb-status-text>{{ settings.chat_human_hours }}</span>
+        </p>
+
+        <div class="bb-channels">
+          {%- if whatsapp != blank -%}
+            <a class="bb-channel" href="https://wa.me/{{ whatsapp }}" target="_blank" rel="noopener">
+              <span class="bb-channel__icon bb-channel__icon--whatsapp" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 3a9 9 0 0 0-7.7 13.7L3 21l4.4-1.2A9 9 0 1 0 12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                  <path d="M9.2 8.2c.3-.1.6 0 .8.3l.7 1.2c.1.3.1.6-.1.8l-.4.5c-.1.2-.2.4 0 .6.5.8 1.1 1.4 1.9 1.9.2.1.4.1.6-.1l.5-.4c.2-.2.5-.2.8-.1l1.2.7c.3.2.4.5.3.8-.2.7-.9 1.2-1.7 1.2-2.4 0-5.4-3-5.4-5.4 0-.8.5-1.5 1.2-1.7l-.4-.3Z" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="bb-channel__text">
+                <span class="bb-channel__label">WhatsApp</span>
+                <span class="bb-channel__note">Usually replies in minutes</span>
+              </span>
+              <svg class="bb-channel__go" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {%- endif -%}
+
+          {%- if booking != blank -%}
+            <a class="bb-channel" href="{{ booking }}" target="_blank" rel="noopener">
+              <span class="bb-channel__icon bb-channel__icon--book" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3.5" y="5.5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M3.5 10h17M8.5 3.5v4M15.5 3.5v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="bb-channel__text">
+                <span class="bb-channel__label">Book a consultation</span>
+                <span class="bb-channel__note">
+                  {{- settings.chat_booking_note | default: 'Pick a time that suits you' -}}
+                </span>
+              </span>
+              <svg class="bb-channel__go" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {%- endif -%}
+
+          {%- if phone != blank -%}
+            <a class="bb-channel" href="tel:{{ phone | remove: ' ' }}">
+              <span class="bb-channel__icon bb-channel__icon--call" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.6 4h2.5l1.4 3.5-1.8 1.3a10.5 10.5 0 0 0 4.5 4.5l1.3-1.8L18 12.9v2.5c0 1-.8 1.8-1.8 1.7A13.4 13.4 0 0 1 4.9 5.8 1.7 1.7 0 0 1 6.6 4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="bb-channel__text">
+                <span class="bb-channel__label">Call us</span>
+                <span class="bb-channel__note">{{ phone }}</span>
+              </span>
+              <svg class="bb-channel__go" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {%- endif -%}
+
+          {%- if chat_email != blank -%}
+            <a class="bb-channel" href="mailto:{{ chat_email }}">
+              <span class="bb-channel__icon bb-channel__icon--mail" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="M4.5 7.5l7.5 5.5 7.5-5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="bb-channel__text">
+                <span class="bb-channel__label">Email</span>
+                <span class="bb-channel__note">{{ chat_email }}</span>
+              </span>
+              <svg class="bb-channel__go" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          {%- endif -%}
+        </div>
+
+        <p class="bb-sheet__foot">Or keep chatting here — I'll be right where you left off.</p>
+      </div>
+    {%- endif -%}
+
+    {%- if settings.chat_photo_enabled -%}
+      {%- unless has_human -%}
+        <div class="bb-scrim" data-bb-scrim hidden></div>
+      {%- endunless -%}
+
+      {%- comment -%}
+        Shown once, before the first photo is ever chosen. A face is not an ordinary
+        attachment, so what happens to it is said plainly before the picker opens rather
+        than in fine print underneath it afterwards.
+      {%- endcomment -%}
+      <div
+        id="bb-photo-sheet"
+        class="bb-sheet"
+        role="dialog"
+        aria-label="Add a photo of your skin"
+        aria-modal="true"
+        hidden
+      >
+        <button class="bb-sheet__close" type="button" data-bb-sheet-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <p class="bb-sheet__title">Show me your skin</p>
+        <p class="bb-sheet__lead">
+          A clear, well-lit photo of your bare face lets me tailor the routine to what I can
+          actually see — texture, tone, shine, dryness.
+        </p>
+
+        <ul class="bb-facts">
+          <li class="bb-fact">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M12 3.5l7 3v5.2c0 4.1-2.9 7.4-7 8.8-4.1-1.4-7-4.7-7-8.8V6.5l7-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M9 12l2.2 2.2L15.5 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Analysed once, then discarded. It is never stored or shown to anyone.</span>
+          </li>
+          <li class="bb-fact">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M12 11v5.5M12 7.8v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span>Cosmetic guidance, not a medical diagnosis. See a dermatologist for that.</span>
+          </li>
+        </ul>
+
+        <button class="bb-sheet__cta" type="button" data-bb-photo-continue>Choose a photo</button>
+        <button class="bb-sheet__ghost" type="button" data-bb-sheet-close>Not now</button>
+      </div>
+    {%- endif -%}
   </section>
 </div>
 

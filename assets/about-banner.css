@@ -7,6 +7,22 @@
   padding-bottom: var(--abb-pad-bottom, 0px);
 }
 
+/* The site header is `position: fixed` and transparent, so whatever comes first on a page
+   starts at the top of the viewport with the nav floating over it. That is the intended
+   effect over a hero; over this banner it lands the nav on top of the lockup. So when the
+   banner is the page's opening section it clears the header instead.
+
+   Scoped to :first-child rather than made a setting: the overlap only exists in that one
+   position, and anywhere further down the page the same offset would read as a stray gap.
+   Move the banner to the top and it takes the clearance with it.
+
+   --header-height is measured and published by the sticky-header element; the static value
+   behind it is rendered from the header's own settings so the first paint already has the
+   right number and nothing shifts once the script runs. */
+#MainContent > .shopify-section:first-child .abb {
+  padding-top: calc(var(--abb-pad-top, 0px) + var(--header-height, var(--header-height-static, 96px)));
+}
+
 .abb--contained .abb__frame {
   max-width: var(--page-width);
   margin-inline: auto;

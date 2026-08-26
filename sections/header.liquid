@@ -76,7 +76,38 @@
   }
 </style>
 
+{%- liquid
+  comment
+    A server-rendered stand-in for --header-height, which the sticky-header element only
+    publishes once its script has run. Sections that reserve room for the fixed header
+    need a number on the very first paint or the page visibly drops as JS catches up, so
+    this reconstructs the height from the same settings the padding below is built out of:
+    the two paddings plus whatever is tallest in the bar. It is a fallback, not a
+    replacement -- the measured value takes over the moment it exists.
+  endcomment
+  assign header_logo_height = 44
+  if settings.logo != blank and settings.logo.aspect_ratio > 0
+    assign header_logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio | at_least: 44
+  endif
+
+  assign header_height_desktop = section.settings.padding_top | plus: section.settings.padding_bottom | plus: header_logo_height
+
+  assign header_pad_mobile_top = section.settings.padding_top | times: 0.5 | round: 0
+  assign header_pad_mobile_bottom = section.settings.padding_bottom | times: 0.5 | round: 0
+  assign header_height_mobile = header_pad_mobile_top | plus: header_pad_mobile_bottom | plus: header_logo_height
+-%}
+
 {%- style -%}
+          :root {
+            --header-height-static: {{ header_height_mobile | round }}px;
+          }
+
+          @media screen and (min-width: 990px) {
+            :root {
+              --header-height-static: {{ header_height_desktop | round }}px;
+            }
+          }
+
           .header {
             padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
           }

@@ -16,6 +16,22 @@
 
   var CHAT_API_URL = "https://designdimensions.in/bb_chat_assisstant/chat.php";
   var STORAGE_KEY = "bb_chat_history_v1";
+  var PHOTO_CONSENT_KEY = "bb_photo_consent_v1";
+
+  /* Photo budget. A vision call is priced by the pixels it is handed, and skin texture,
+     tone and shine all read fine at this size -- a 640px long edge costs roughly 600
+     image tokens against roughly 1,400 for the 1,024px the phone would otherwise send,
+     and a 4,000px original would be resized by the API anyway after being uploaded in
+     full. Resizing in the browser also keeps the request small on a phone connection. */
+  var PHOTO_MAX_EDGE = 640;
+  var PHOTO_QUALITY = 0.72;
+  var PHOTO_MAX_SOURCE_BYTES = 12 * 1024 * 1024;
+  var PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+  /* What the assistant has no way to answer: none of this is in the catalogue, so a model
+     turn spent on it is a turn wasted. Matching here routes it to a person for free. */
+  var HUMAN_SIGNALS =
+    /\b(refund|return|exchange|replace|cancel|complain|damaged|broken|missing|wrong\s+(item|product|order)|order\s*(id|number|status)?|tracking|track\s+my|deliver\w*|shipp?\w*|invoice|gst|payment\s+failed|not\s+received|speak\s+to|talk\s+to|human|agent|executive|someone|call\s+me)\b/i;
 
   var STARTERS = [
     "Help me build a routine",
@@ -382,6 +398,19 @@
     var ghostTyped = panel.querySelector("[data-bb-ghost-typed]");
     var ghostRest = panel.querySelector("[data-bb-ghost-rest]");
 
+    var humanBtn = document.getElementById("bb-human");
+    var humanSheet = document.getElementById("bb-human-sheet");
+    var photoSheet = document.getElementById("bb-photo-sheet");
+    var scrim = panel.querySelector("[data-bb-scrim]");
+    var statusText = panel.querySelector("[data-bb-status-text]");
+
+    var photoBtn = document.getElementById("bb-photo");
+    var photoInput = document.getElementById("bb-photo-input");
+    var attach = panel.querySelector("[data-bb-attach]");
+    var attachThumb = panel.querySelector("[data-bb-attach-thumb]");
+    var attachNote = panel.querySelector("[data-bb-attach-note]");
+    var attachRemove = panel.querySelector("[data-bb-attach-remove]");
+
     var motion = createMotion();
     if (motion.enabled) root.classList.add("bb-anim");
 
@@ -391,6 +420,13 @@
     var trayOpen = false;
     var cart = null;
     var selfSync = false;
+    var openSheet = null;
+    var nudged = false;
+    var botTurns = 0;
+    /* Held only until the next send. It is never written to history and never leaves this
+       variable, so it cannot be resent on later turns -- one photo, one vision call. */
+    var pendingPhoto = null;
+    var placeholderDefault = input.getAttribute("placeholder");
 
     // ------------------------------------------------------------- routine tray
 
@@ -661,6 +697,274 @@
         });
     }
 
+    // ------------------------------------------------------- sheets + handoff
+
+    /* Both sheets share the scrim and only one is ever up, so opening is a swap. */
+    function showSheet(sheet) {
+      if (!sheet || openSheet === sheet) return;
+      if (openSheet) hideSheet();
+
+      openSheet = sheet;
+      if (scrim) scrim.hidden = false;
+      sheet.hidden = false;
+      // Two frames: the element has to be laid out at its off-screen transform before the
+      // class that animates it away from there can take effect.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (scrim) scrim.classList.add("bb-in");
+          sheet.classList.add("bb-in");
+        });
+      });
+
+      var focusable = sheet.querySelector("a, button:not([data-bb-sheet-close])");
+      if (focusable && window.matchMedia("(pointer: fine)").matches) focusable.focus();
+    }
+
+    function hideSheet() {
+      var sheet = openSheet;
+      if (!sheet) return;
+      openSheet = null;
+
+      sheet.classList.remove("bb-in");
+      if (scrim) scrim.classList.remove("bb-in");
+
+      window.setTimeout(function () {
+        // Guard against a second sheet having opened inside the transition.
+        if (openSheet !== sheet) sheet.hidden = true;
+        if (!openSheet && scrim) scrim.hidden = true;
+      }, 300);
+    }
+
+    /* Opening hours, evaluated in the store's timezone rather than the visitor's -- a
+       visitor in London still wants to know whether the Mumbai desk is staffed. */
+    function isWithinHours() {
+      var open = parseInt(root.getAttribute("data-bb-hours-open"), 10);
+      var close = parseInt(root.getAttribute("data-bb-hours-close"), 10);
+      var days = root.getAttribute("data-bb-hours-days") || "mon-sat";
+      if (!isFinite(open) || !isFinite(close)) return false;
+
+      var now;
+      try {
+        var parts = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Kolkata",
+          weekday: "short",
+          hour: "numeric",
+          hour12: false,
+        }).formatToParts(new Date());
+        now = {};
+        parts.forEach(function (part) {
+          now[part.type] = part.value;
+        });
+      } catch (err) {
+        return false;
+      }
+
+      var day = String(now.weekday || "").slice(0, 3).toLowerCase();
+      var hour = parseInt(now.hour, 10);
+      if (!isFinite(hour)) return false;
+
+      if (days === "mon-fri" && (day === "sat" || day === "sun")) return false;
+      if (days === "mon-sat" && day === "sun") return false;
+
+      return hour >= open && hour < close;
+    }
+
+    function refreshPresence() {
+      if (!humanBtn) return;
+      var live = isWithinHours();
+      root.classList.toggle("bb-live", live);
+      if (statusText) {
+        var hours = statusText.getAttribute("data-bb-hours") || statusText.textContent.trim();
+        statusText.setAttribute("data-bb-hours", hours);
+        statusText.textContent = (live ? "Online now · " : "Away · ") + hours;
+      }
+      humanBtn.setAttribute("aria-label", live ? "Talk to a human — online now" : "Talk to a human");
+    }
+
+    /* The labelled way in. Shown once per conversation, either when a message reads like
+       something only a person can settle or after a few turns, whichever comes first. */
+    function maybeNudge(lastUserText) {
+      if (nudged || !humanBtn) return;
+      if (!HUMAN_SIGNALS.test(lastUserText || "") && botTurns < 3) return;
+
+      nudged = true;
+      var button = el("button", "bb-nudge");
+      button.type = "button";
+      button.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+        '<path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+        '<path d="M4 13h1.6a1.4 1.4 0 0 1 1.4 1.4v3.2A1.4 1.4 0 0 1 5.6 19H5a1 1 0 0 1-1-1v-5ZM20 13h-1.6a1.4 1.4 0 0 0-1.4 1.4v3.2a1.4 1.4 0 0 0 1.4 1.4h.6a1 1 0 0 0 1-1v-5Z" fill="currentColor"/>' +
+        "</svg>";
+      button.appendChild(el("span", null, "Rather speak to a person?"));
+      button.appendChild(el("span", "bb-nudge__go", "Talk to us"));
+      button.addEventListener("click", function () {
+        showSheet(humanSheet);
+      });
+      body.appendChild(button);
+      motion.enter(button);
+    }
+
+    if (humanBtn) {
+      humanBtn.addEventListener("click", function () {
+        refreshPresence();
+        showSheet(humanSheet);
+      });
+      refreshPresence();
+      // Cheap enough to keep honest across a long session, and it means the dot is right
+      // when someone opens the widget an hour after loading the page.
+      window.setInterval(refreshPresence, 60000);
+    }
+
+    if (scrim) scrim.addEventListener("click", hideSheet);
+
+    panel.querySelectorAll("[data-bb-sheet-close]").forEach(function (button) {
+      button.addEventListener("click", hideSheet);
+    });
+
+    // ------------------------------------------------------------------ photo
+
+    function consentGiven() {
+      try {
+        return window.localStorage.getItem(PHOTO_CONSENT_KEY) === "1";
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function rememberConsent() {
+      try {
+        window.localStorage.setItem(PHOTO_CONSENT_KEY, "1");
+      } catch (err) {
+        /* private mode -- the sheet simply shows again next visit */
+      }
+    }
+
+    /* Draws the picture down to PHOTO_MAX_EDGE and re-encodes it as JPEG. Resolves to a
+       data URL; rejects only if the file could not be decoded at all. */
+    function shrinkPhoto(file) {
+      function draw(source, width, height) {
+        var scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(width, height));
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+        var ctx = canvas.getContext("2d");
+        // A JPEG has no alpha, so anything transparent in a PNG would encode as black.
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL("image/jpeg", PHOTO_QUALITY);
+      }
+
+      // createImageBitmap applies the EXIF orientation phones write into portrait shots;
+      // decoding through an <img> does not, everywhere, and a sideways face is useless.
+      if (window.createImageBitmap) {
+        return window
+          .createImageBitmap(file, { imageOrientation: "from-image" })
+          .then(function (bitmap) {
+            var url = draw(bitmap, bitmap.width, bitmap.height);
+            bitmap.close();
+            return url;
+          });
+      }
+
+      return new Promise(function (resolve, reject) {
+        var url = URL.createObjectURL(file);
+        var image = new Image();
+        image.onload = function () {
+          try {
+            resolve(draw(image, image.naturalWidth, image.naturalHeight));
+          } catch (err) {
+            reject(err);
+          }
+          URL.revokeObjectURL(url);
+        };
+        image.onerror = function () {
+          URL.revokeObjectURL(url);
+          reject(new Error("decode failed"));
+        };
+        image.src = url;
+      });
+    }
+
+    function clearPhoto() {
+      pendingPhoto = null;
+      if (attach) attach.hidden = true;
+      if (attachThumb) attachThumb.removeAttribute("src");
+      if (photoBtn) {
+        photoBtn.classList.remove("is-attached");
+        photoBtn.disabled = false;
+      }
+      input.setAttribute("placeholder", placeholderDefault);
+    }
+
+    function attachPhoto(file) {
+      if (!file) return;
+
+      if (PHOTO_TYPES.indexOf(file.type) === -1) {
+        addBubble("bot", "That file type isn't supported — a JPG, PNG or WEBP photo works.");
+        scrollToEnd();
+        return;
+      }
+      if (file.size > PHOTO_MAX_SOURCE_BYTES) {
+        addBubble("bot", "That photo is a little too large to send. Try one under 12MB.");
+        scrollToEnd();
+        return;
+      }
+
+      photoBtn.disabled = true;
+      if (attachNote) attachNote.textContent = "Preparing…";
+      if (attach) attach.hidden = false;
+
+      shrinkPhoto(file)
+        .then(function (dataUrl) {
+          var comma = dataUrl.indexOf(",");
+          pendingPhoto = { dataUrl: dataUrl, base64: dataUrl.slice(comma + 1) };
+
+          if (attachThumb) attachThumb.src = dataUrl;
+          if (attachNote) attachNote.textContent = "Analysed once. Never stored.";
+          photoBtn.classList.add("is-attached");
+          photoBtn.disabled = false;
+          input.setAttribute("placeholder", "Add a note, or just send…");
+          if (window.matchMedia("(pointer: fine)").matches) input.focus();
+        })
+        .catch(function () {
+          clearPhoto();
+          addBubble("bot", "I couldn't read that image — could you try another one?");
+          scrollToEnd();
+        });
+    }
+
+    if (photoBtn && photoInput) {
+      photoBtn.addEventListener("click", function () {
+        if (pendingPhoto) {
+          clearPhoto();
+          return;
+        }
+        if (!consentGiven() && photoSheet) {
+          showSheet(photoSheet);
+          return;
+        }
+        photoInput.click();
+      });
+
+      photoInput.addEventListener("change", function () {
+        attachPhoto(photoInput.files && photoInput.files[0]);
+        // Reset so picking the same file twice in a row still fires a change.
+        photoInput.value = "";
+      });
+
+      if (attachRemove) attachRemove.addEventListener("click", clearPhoto);
+
+      var photoContinue = panel.querySelector("[data-bb-photo-continue]");
+      if (photoContinue) {
+        photoContinue.addEventListener("click", function () {
+          rememberConsent();
+          hideSheet();
+          photoInput.click();
+        });
+      }
+    }
+
     // ---------------------------------------------------------------- messaging
 
     function scrollToEnd() {
@@ -716,7 +1020,18 @@
 
     function send(text) {
       text = (text || input.value).trim();
-      if (!text || sending) return;
+
+      /* Taken off the pending slot at the moment of sending: whatever happens next, this
+         photo is attached to exactly one request. It is deliberately never pushed into
+         `history`, which is resent whole on every later turn. */
+      var photo = pendingPhoto;
+      if (!text && !photo) return;
+      if (sending) return;
+      if (photo) clearPhoto();
+
+      // A photo on its own is a complete request; give the model the question the visitor
+      // plainly means rather than an empty turn.
+      if (!text) text = "Here's my skin — what would you recommend?";
 
       closeSuggest();
       clearGhost();
@@ -726,16 +1041,31 @@
       sending = true;
       sendBtn.disabled = true;
 
+      if (photo) {
+        var frame = el("div", "bb-msg-photo");
+        var thumb = new Image();
+        thumb.src = photo.dataUrl;
+        thumb.alt = "The photo you shared";
+        frame.appendChild(thumb);
+        body.appendChild(frame);
+        motion.enter(frame);
+      }
+
       addBubble("user", text);
-      history.push({ role: "user", content: text });
+      // The marker keeps the transcript coherent on later turns without carrying the
+      // image itself into history, sessionStorage, or every subsequent request.
+      history.push({ role: "user", content: photo ? text + "\n\n[Photo of my skin attached]" : text });
       saveHistory(history);
       scrollToEnd();
       showTyping();
 
+      var payload = { messages: history };
+      if (photo) payload.image = { media_type: "image/jpeg", data: photo.base64 };
+
       fetch(CHAT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history }),
+        body: JSON.stringify(payload),
       })
         .then(function (res) {
           return res.json();
@@ -760,6 +1090,8 @@
           }
 
           renderChips(data.suggested_questions);
+          botTurns += 1;
+          maybeNudge(text);
           scrollToEnd();
         })
         .catch(function () {
@@ -792,6 +1124,10 @@
     function resetConversation() {
       history = [];
       saveHistory(history);
+      nudged = false;
+      botTurns = 0;
+      clearPhoto();
+      hideSheet();
       body.replaceChildren();
       if (welcome) {
         welcome.hidden = false;
@@ -1021,6 +1357,7 @@
     function closePanel() {
       if (!isOpen) return;
       isOpen = false;
+      hideSheet();
       launcher.setAttribute("aria-expanded", "false");
       clearGhost();
       closeSuggest();
@@ -1045,7 +1382,13 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && isOpen) closePanel();
+      if (event.key !== "Escape" || !isOpen) return;
+      // Innermost layer first, so Escape backs out one step at a time.
+      if (openSheet) {
+        hideSheet();
+        return;
+      }
+      closePanel();
     });
 
     // Another surface changed the cart -- keep the tray honest, but ignore our own echo.

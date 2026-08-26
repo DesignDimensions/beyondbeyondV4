@@ -39,7 +39,7 @@
     "banner": {
       "type": "about-banner",
       "settings": {
-        "image": "shopify://shop_images/Frame_1321319581.png",
+        "image": "shopify://shop_images/Frame_1321319582.png",
         "image_url": "",
         "image_alt": "Beyond Beyond skincare applied",
         "full_width": true,
@@ -235,7 +235,7 @@
         "rule_color": "#1a1a1a",
         "rule_gap": 12,
         "item_gap": 40,
-        "image": "shopify://shop_images/BB_web_collage_image_1.png",
+        "image": "shopify://shop_images/collage_image_2_1.png",
         "image_url": "",
         "image_alt": "",
         "media_ratio": "1",
@@ -255,7 +255,7 @@
       "type": "about-statement",
       "settings": {
         "offset_header": false,
-        "background": "#d3ccb0",
+        "background": "#E5E0D0",
         "ink": "#0a0a0b",
         "lead_width": 52,
         "column_gap": 80,

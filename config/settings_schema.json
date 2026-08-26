@@ -1744,6 +1744,105 @@
         "label": "Logo height",
         "info": "Square or stacked logos need more height than a wide wordmark to stay legible.",
         "default": 34
+      },
+      {
+        "type": "header",
+        "content": "Talk to a human",
+        "info": "A quiet button in the chat header opens a sheet with these channels. Only the ones you fill in are shown; leave them all blank and the button never appears."
+      },
+      {
+        "type": "checkbox",
+        "id": "chat_human_enabled",
+        "default": true,
+        "label": "Offer a human handoff"
+      },
+      {
+        "type": "text",
+        "id": "chat_whatsapp",
+        "label": "WhatsApp number",
+        "info": "Country code first, digits only — e.g. 919958838802."
+      },
+      {
+        "type": "url",
+        "id": "chat_booking_url",
+        "label": "Consultation booking link",
+        "info": "Calendly, Google Calendar appointments, or any booking page."
+      },
+      {
+        "type": "text",
+        "id": "chat_booking_note",
+        "default": "Free 15-min video call",
+        "label": "Booking sub-label"
+      },
+      {
+        "type": "text",
+        "id": "chat_phone",
+        "default": "+91 99588 38802",
+        "label": "Phone number"
+      },
+      {
+        "type": "text",
+        "id": "chat_email",
+        "default": "care@beyondbeyond.co.in",
+        "label": "Email address"
+      },
+      {
+        "type": "text",
+        "id": "chat_human_hours",
+        "default": "Mon–Sat, 10am–7pm IST",
+        "label": "Hours shown in the sheet"
+      },
+      {
+        "type": "select",
+        "id": "chat_human_days",
+        "options": [
+          {
+            "value": "everyday",
+            "label": "Every day"
+          },
+          {
+            "value": "mon-sat",
+            "label": "Monday to Saturday"
+          },
+          {
+            "value": "mon-fri",
+            "label": "Monday to Friday"
+          }
+        ],
+        "default": "mon-sat",
+        "label": "Days open"
+      },
+      {
+        "type": "range",
+        "id": "chat_human_open",
+        "min": 0,
+        "max": 23,
+        "step": 1,
+        "unit": "h",
+        "default": 10,
+        "label": "Opens at (IST)"
+      },
+      {
+        "type": "range",
+        "id": "chat_human_close",
+        "min": 1,
+        "max": 24,
+        "step": 1,
+        "unit": "h",
+        "default": 19,
+        "label": "Closes at (IST)",
+        "info": "Drives the live dot next to the handoff button — lit inside these hours, dimmed outside them."
+      },
+      {
+        "type": "header",
+        "content": "Photo consultation",
+        "info": "Adds a camera button to the composer so a visitor can attach a selfie for tailored advice. Photos are resized in the browser before they are sent and are never stored."
+      },
+      {
+        "type": "checkbox",
+        "id": "chat_photo_enabled",
+        "default": true,
+        "label": "Allow photo uploads"
       }
     ]
   }
