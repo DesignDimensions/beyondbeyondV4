@@ -42,7 +42,6 @@
     --exn-align: {{ section.settings.vertical_alignment }};
     --exn-media-w: {{ section.settings.media_width }}%;
     --exn-media-ratio: {{ section.settings.media_ratio }};
-    --exn-heading-size: {{ section.settings.heading_size }}px;
     --exn-heading-weight: {{ section.settings.heading_weight }};
     --exn-heading-color: {{ section.settings.heading_color }};
     --exn-heading-gap: {{ section.settings.heading_gap }}px;
@@ -155,8 +154,14 @@
       "id": "image_position",
       "label": "Image side",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ],
       "default": "left"
     },
@@ -175,10 +180,22 @@
       "id": "media_ratio",
       "label": "Image shape",
       "options": [
-        { "value": "1", "label": "Square" },
-        { "value": "0.8", "label": "Portrait (4:5)" },
-        { "value": "0.75", "label": "Portrait (3:4)" },
-        { "value": "1.333", "label": "Landscape (4:3)" }
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "0.75",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "1.333",
+          "label": "Landscape (4:3)"
+        }
       ],
       "default": "1"
     },
@@ -202,8 +219,14 @@
       "label": "Text alignment",
       "info": "Where the text sits against the image.",
       "options": [
-        { "value": "flex-start", "label": "Top" },
-        { "value": "center", "label": "Middle" }
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        }
       ],
       "default": "flex-start"
     },
@@ -212,24 +235,26 @@
       "content": "Type"
     },
     {
-      "type": "range",
-      "id": "heading_size",
-      "min": 18,
-      "max": 56,
-      "step": 1,
-      "unit": "px",
-      "label": "Name size",
-      "default": 30
-    },
-    {
       "type": "select",
       "id": "heading_weight",
       "label": "Name weight",
       "options": [
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semibold" },
-        { "value": "700", "label": "Bold" }
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
       ],
       "default": "500"
     },

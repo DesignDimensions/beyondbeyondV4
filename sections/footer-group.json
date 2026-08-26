@@ -307,6 +307,7 @@
         "link-23",
         "link-24"
       ],
+      "disabled": true,
       "settings": {
         "logo": "shopify://shop_images/Group_1.png",
         "logo_width": 220,

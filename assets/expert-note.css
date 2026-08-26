@@ -57,7 +57,7 @@
 .exn__heading {
   margin: 0 0 var(--exn-heading-gap, 16px);
   font-family: var(--font-heading-family);
-  font-size: 42px;
+  font-size: 40px;
   font-weight: var(--exn-heading-weight, 500);
   line-height: 1.25;
   letter-spacing: 1px;
@@ -70,7 +70,7 @@
 .exn__body {
   color: var(--exn-body-color, #3d3d3d);
   font-weight: 400;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .exn__body>*+* {

@@ -70,7 +70,7 @@
    clamp rather than a flat 13px because this one has a circle to fit inside,
    and the circle is a share of a column that changes width. */
 .mar__badge-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.8;
 }
@@ -105,7 +105,7 @@
   font-family: inherit;
   /* `.ph__atc`, the add-to-cart at the top of this page. It is the same button
      doing the same job, so it is set the same way. */
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -133,7 +133,7 @@
   padding: 8px 10px;
   background: #fff;
   color: #b3093c;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* --------------------------------------------------------------------------
@@ -151,11 +151,11 @@
    panel. This is the second of those, so it takes the second of those. */
 .mar__overline {
   margin: 0 0 14px;
-  font-size: var(--mar-overline-size, 15px);
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: var(--mar-overline-tracking, 7px);
   text-transform: uppercase;
-  color: var(--mar-text, #1a1a1a);
+  color: #000;
 }
 
 .mar__reviews {
@@ -165,29 +165,32 @@
   margin-bottom: 14px;
 }
 
-/* The stars come from component-rating.css, which every product card in the
-   store already draws. That sheet sizes the glyph off two variables it only
-   sets under `.product` and `.card-wrapper`, so a row of stars anywhere else
-   has to bring its own — without them the row's font-size resolves to nothing
-   and the stars do not draw at all. */
+/* `.ph__stars` at the top of this page, to the pixel: one box with a
+   hard-stopped gradient painted across it — filled up to the rating, empty
+   after — and the star repeated over it as a mask. The mask itself comes from
+   `product-card.css`, so no row of stars in the store can drift from another.
+   Not component-rating.css's Times glyphs, which are a different star. */
 .mar__stars {
-  line-height: 1;
-}
-
-.mar__stars .rating-star {
-  /* The gap between the stars is this, not a margin: the row is one string of
-     five glyphs, so what separates them is the letter-spacing of the text. The
-     sheet's own contexts set it at 0.7 and 0.8 of a rem, which is wide for a
-     row this size — the five stars read as five marks rather than one rating. */
-  --letter-spacing: 0.2;
-  --font-size: 1.5;
-  --color-rating-star: var(--mar-text, #1a1a1a);
+  --mar-star-w: calc(var(--mar-star-size, 14px) * 15 / 14);
+  display: inline-block;
+  width: calc(var(--mar-star-w) * 5 + var(--mar-star-gap, 2px) * 4);
+  height: var(--mar-star-size, 14px);
+  background-image: linear-gradient(to right,
+      var(--mar-star, #000) var(--percent, 100%),
+      var(--mar-star-empty, #d5d5d5) var(--percent, 100%));
+  -webkit-mask-image: var(--pcard-star-icon);
+  mask-image: var(--pcard-star-icon);
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+  -webkit-mask-repeat: space no-repeat;
+  mask-repeat: space no-repeat;
+  font-size: 0;
 }
 
 /* `.ph__reviews` — the same line under the title at the top of this page. */
 .mar__reviews-count {
   color: var(--mar-text, #1a1a1a);
-  font-size: 13px;
+  font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -199,7 +202,7 @@
 .mar__title {
   margin: 0 0 14px;
   font-family: var(--font-body-family);
-  font-size: var(--mar-title-size, 34px);
+  font-size: 30px;
   font-weight: var(--mar-title-weight, 500);
   line-height: 1.12;
   letter-spacing: -0.01em;
@@ -210,7 +213,7 @@
    only the tint is this section's. The margin reset comes with it. */
 .mar__description {
   color: #000;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -260,7 +263,7 @@
   content: counter(mar-item, decimal-leading-zero);
   grid-column: 1;
   grid-row: 1;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.3;
   color: #000;
@@ -270,7 +273,7 @@
 .mar__item-name {
   grid-column: 2;
   grid-row: 1;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.3;
   color: var(--mar-text, #1a1a1a);
@@ -284,7 +287,6 @@
 .mar__item-sizes {
   grid-column: 2;
   grid-row: 2;
-  margin-top: 5px;
   font-size: 12px;
   font-weight: 300;
   letter-spacing: 1px;
@@ -317,7 +319,7 @@
   /* The hero drops its 40px title to 30 on mobile. This one takes the same
      step so the two stay in proportion down the page. */
   .mar__title {
-    font-size: var(--mar-title-size-mobile, 26px);
+    font-size: 26px;
   }
 
   .mar__badge-text {

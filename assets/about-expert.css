@@ -64,9 +64,9 @@
   margin: 0;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  font-size: 30px;
   line-height: 50px;
-  color: var(--aex-ink, #0a0a0b);
+  color: #000;
 }
 
 /* Browsers draw an inset border on `hr` of their own, which is why the border
@@ -81,11 +81,11 @@
 .aex__lead {
   margin: 0 0 var(--aex-lead-gap, 6px);
   font-style: italic;
-  color: var(--aex-lead-color, #1a1a1a);
+  color: #000;
 }
 
 .aex__body {
-  color: var(--aex-body-color, #1a1a1a);
+  color: #000;
 }
 
 .aex__body > * + * {

@@ -45,10 +45,7 @@
     --phc-item-gap: {{ section.settings.item_gap }}px;
     --phc-rule-gap: {{ section.settings.rule_gap }}px;
     --phc-rule-color: {{ section.settings.rule_color }};
-    --phc-title-size: {{ section.settings.title_size }}px;
-    --phc-number-size: {{ section.settings.number_size }}px;
     --phc-number-color: {{ section.settings.number_color }};
-    --phc-text-size: {{ section.settings.text_size }}px;
     --phc-text-color: {{ section.settings.text_color }};
   "
   {{ section.shopify_attributes }}
@@ -190,40 +187,10 @@
       "default": true
     },
     {
-      "type": "range",
-      "id": "title_size",
-      "min": 12,
-      "max": 28,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "number_size",
-      "min": 9,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Number size",
-      "default": 13
-    },
-    {
       "type": "color",
       "id": "number_color",
       "label": "Number colour",
       "default": "#0A0A0B"
-    },
-    {
-      "type": "range",
-      "id": "text_size",
-      "min": 9,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Description size",
-      "default": 13
     },
     {
       "type": "color",
@@ -289,11 +256,26 @@
       "id": "media_ratio",
       "label": "Image shape (desktop)",
       "options": [
-        { "value": "1", "label": "Square" },
-        { "value": "0.9", "label": "Slight portrait" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "1.15", "label": "Wide" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.9",
+          "label": "Slight portrait"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "1.15",
+          "label": "Wide"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": "1"
     },
@@ -302,11 +284,26 @@
       "id": "media_ratio_mobile",
       "label": "Image shape (mobile)",
       "options": [
-        { "value": "", "label": "Same as desktop" },
-        { "value": "1", "label": "Square" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "1.15", "label": "Wide" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "1.15",
+          "label": "Wide"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": ""
     },
@@ -336,8 +333,14 @@
       "id": "media_position",
       "label": "Image position",
       "options": [
-        { "value": "right", "label": "Right" },
-        { "value": "left", "label": "Left" }
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
       ],
       "default": "right"
     },
@@ -367,9 +370,18 @@
       "id": "vertical_alignment",
       "label": "Image alignment",
       "options": [
-        { "value": "flex-start", "label": "Top" },
-        { "value": "center", "label": "Middle" },
-        { "value": "stretch", "label": "Fill the column" }
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "stretch",
+          "label": "Fill the column"
+        }
       ],
       "default": "flex-start"
     },
@@ -434,9 +446,15 @@
     {
       "name": "Philosophy",
       "blocks": [
-        { "type": "card" },
-        { "type": "card" },
-        { "type": "card" }
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        }
       ]
     }
   ]

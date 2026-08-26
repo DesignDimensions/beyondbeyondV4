@@ -3,7 +3,6 @@
    ========================================================================== */
 
 .fnd {
-  padding-top: var(--fnd-pad-top, 60px);
   padding-bottom: var(--fnd-pad-bottom, 60px);
 }
 
@@ -40,7 +39,7 @@
 
 .fnd__heading {
   margin: 0 0 var(--fnd-heading-gap, 32px);
-  font-size: var(--fnd-heading-size, 32px);
+  font-size: 30px;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0;
@@ -75,7 +74,7 @@
   border-radius: var(--fnd-cta-radius, 0px);
   background-color: var(--fnd-cta-bg, #0107ef);
   color: var(--fnd-cta-fg, #fff);
-  font-size: var(--fnd-cta-size, 16px);
+  font-size: 16px;
   font-weight: 500;
   line-height: 1;
   text-decoration: none;

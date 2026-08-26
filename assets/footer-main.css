@@ -38,13 +38,13 @@
 .ftm__logo-text {
   font-family: var(--font-heading-family);
   font-style: italic;
-  font-size: 3rem;
+  font-size: 30px;
   line-height: 1.1;
 }
 
 .ftm__newsletter-heading {
   margin: 0 0 16px;
-  font-size: 2.3rem;
+  font-size: 22px;
   font-weight: 600;
   line-height: 1.35;
 }
@@ -67,7 +67,7 @@
   background: none;
   color: inherit;
   /* 16px minimum — anything smaller makes iOS Safari zoom the page in on focus. */
-  font-size: 1.6rem;
+  font-size: 16px;
   outline: none;
 }
 
@@ -103,7 +103,7 @@
 
 .ftm__newsletter-message {
   margin: 10px 0 0;
-  font-size: 1.2rem;
+  font-size: 12px;
 }
 
 .ftm__follow {
@@ -115,7 +115,7 @@
 
 .ftm__follow-label {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -166,7 +166,7 @@
 
 .ftm__menu-heading {
   margin: 0 0 35px;
-  font-size: 1.8rem;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -179,7 +179,7 @@
 }
 
 .ftm__menu-link {
-  font-size: 1.4rem;
+  font-size: 16px;
   color: #202020;
   text-decoration: none;
   opacity: 0.8;

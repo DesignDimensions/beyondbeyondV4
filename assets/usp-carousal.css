@@ -49,7 +49,7 @@
   align-items: center;
   width: max-content;
   gap: var(--usp-gap, 8rem);
-  padding: 2.2rem 0;
+  padding: 1.8rem 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -116,7 +116,7 @@
 
 .usp-carousal__title {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 16px;
   line-height: 1.3;
   letter-spacing: 0.02em;
   white-space: nowrap;

@@ -30,7 +30,6 @@
     --fr-tabs-bg: {{ section.settings.tabs_background | color_modify: 'alpha', fr_tabs_alpha }};
     --fr-tabs-border: {{ section.settings.tabs_border | color_modify: 'alpha', 0.85 }};
     --fr-tabs-radius: {{ section.settings.tabs_radius }}px;
-    --fr-tab-size: {{ section.settings.tab_size }}px;
     --fr-tab-color: {{ section.settings.tab_color }};
     --fr-tab-pad: {{ section.settings.tab_padding }}px;
     --fr-pill-bg: {{ section.settings.pill_color }};
@@ -252,8 +251,14 @@
       "id": "tabs_width",
       "label": "Switcher width",
       "options": [
-        { "value": "fit", "label": "As wide as the names" },
-        { "value": "full", "label": "Full content width" }
+        {
+          "value": "fit",
+          "label": "As wide as the names"
+        },
+        {
+          "value": "full",
+          "label": "Full content width"
+        }
       ],
       "default": "fit"
     },
@@ -311,16 +316,6 @@
       "default": 14
     },
     {
-      "type": "range",
-      "id": "tab_size",
-      "min": 12,
-      "max": 28,
-      "step": 1,
-      "unit": "px",
-      "label": "Routine name size",
-      "default": 16
-    },
-    {
       "type": "color",
       "id": "tab_color",
       "label": "Routine name color",
@@ -375,9 +370,18 @@
       "id": "columns_mobile",
       "label": "Cards visible on mobile",
       "options": [
-        { "value": "1", "label": "1" },
-        { "value": "1.2", "label": "1 and a peek" },
-        { "value": "2", "label": "2" }
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.2",
+          "label": "1 and a peek"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
       ],
       "default": "2"
     },
@@ -444,8 +448,14 @@
       "id": "cart_behavior",
       "label": "Button action",
       "options": [
-        { "value": "add", "label": "Add the selected variant" },
-        { "value": "link", "label": "Go to the product page" }
+        {
+          "value": "add",
+          "label": "Add the selected variant"
+        },
+        {
+          "value": "link",
+          "label": "Go to the product page"
+        }
       ],
       "default": "add"
     },
@@ -527,8 +537,18 @@
     {
       "name": "Founder's Routine",
       "blocks": [
-        { "type": "routine", "settings": { "label": "Morning Routine" } },
-        { "type": "routine", "settings": { "label": "Night Routine" } }
+        {
+          "type": "routine",
+          "settings": {
+            "label": "Morning Routine"
+          }
+        },
+        {
+          "type": "routine",
+          "settings": {
+            "label": "Night Routine"
+          }
+        }
       ]
     }
   ]

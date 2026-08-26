@@ -19,7 +19,6 @@
     --nsu-bg: {{ section.settings.background }};
     --nsu-ink: {{ section.settings.ink }};
     --nsu-body-color: {{ section.settings.body_color }};
-    --nsu-body-size: {{ section.settings.body_size }}px;
     --nsu-rule-color: {{ section.settings.rule_color }};
     --nsu-rule-gap: {{ section.settings.rule_gap }}px;
     --nsu-body-w: {{ section.settings.body_width }}px;
@@ -29,9 +28,7 @@
     --nsu-row-gap: {{ section.settings.row_gap }}px;
     --nsu-icon-size: {{ section.settings.icon_size }}px;
     --nsu-icon-gap: {{ section.settings.icon_gap }}px;
-    --nsu-title-size: {{ section.settings.title_size }}px;
     --nsu-title-color: {{ section.settings.title_color }};
-    --nsu-text-size: {{ section.settings.text_size }}px;
     --nsu-text-color: {{ section.settings.text_color }};
   "
   {{ section.shopify_attributes }}
@@ -162,16 +159,6 @@
     },
     {
       "type": "range",
-      "id": "body_size",
-      "min": 12,
-      "max": 28,
-      "step": 1,
-      "unit": "px",
-      "label": "Intro size",
-      "default": 20
-    },
-    {
-      "type": "range",
       "id": "body_width",
       "min": 400,
       "max": 1400,
@@ -245,30 +232,10 @@
       "default": 24
     },
     {
-      "type": "range",
-      "id": "title_size",
-      "min": 12,
-      "max": 26,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size",
-      "default": 20
-    },
-    {
       "type": "color",
       "id": "title_color",
       "label": "Title colour",
       "default": "#0A0A0B"
-    },
-    {
-      "type": "range",
-      "id": "text_size",
-      "min": 9,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Description size",
-      "default": 16
     },
     {
       "type": "color",
@@ -353,11 +320,21 @@
     {
       "name": "NAD Supports",
       "blocks": [
-        { "type": "benefit" },
-        { "type": "benefit" },
-        { "type": "benefit" },
-        { "type": "benefit" },
-        { "type": "benefit" }
+        {
+          "type": "benefit"
+        },
+        {
+          "type": "benefit"
+        },
+        {
+          "type": "benefit"
+        },
+        {
+          "type": "benefit"
+        },
+        {
+          "type": "benefit"
+        }
       ]
     }
   ]

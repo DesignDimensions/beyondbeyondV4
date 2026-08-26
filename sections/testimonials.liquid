@@ -38,8 +38,6 @@
     --tst-scrim: {{ section.settings.scrim_opacity }};
     --tst-inset: {{ section.settings.card_inset }}px;
     --tst-thumb: {{ section.settings.thumb_size }}px;
-    --tst-title-size: {{ section.settings.title_size }}px;
-    --tst-price-size: {{ section.settings.price_size }}px;
     --tst-card-text: {{ section.settings.card_text_color }};
     --tst-mute-size: {{ section.settings.mute_size }}px;
     --tst-mute-bg: {{ section.settings.mute_background }};
@@ -257,9 +255,18 @@
       "id": "columns_mobile",
       "label": "Cards visible on mobile",
       "options": [
-        { "value": "1", "label": "1" },
-        { "value": "1.2", "label": "1 and a peek" },
-        { "value": "2", "label": "2" }
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "1.2",
+          "label": "1 and a peek"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
       ],
       "default": "1.2"
     },
@@ -278,9 +285,18 @@
       "id": "video_ratio",
       "label": "Video shape",
       "options": [
-        { "value": "0.5625", "label": "Vertical (9:16)" },
-        { "value": "0.75", "label": "Portrait (3:4)" },
-        { "value": "1", "label": "Square" }
+        {
+          "value": "0.5625",
+          "label": "Vertical (9:16)"
+        },
+        {
+          "value": "0.75",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        }
       ],
       "default": "0.5625"
     },
@@ -333,26 +349,6 @@
       "unit": "px",
       "label": "Product image size",
       "default": 42
-    },
-    {
-      "type": "range",
-      "id": "title_size",
-      "min": 10,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "label": "Product title size",
-      "default": 13
-    },
-    {
-      "type": "range",
-      "id": "price_size",
-      "min": 10,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "label": "Price size",
-      "default": 13
     },
     {
       "type": "color",
@@ -521,12 +517,24 @@
     {
       "name": "Testimonials",
       "blocks": [
-        { "type": "testimonial" },
-        { "type": "testimonial" },
-        { "type": "testimonial" },
-        { "type": "testimonial" },
-        { "type": "testimonial" },
-        { "type": "testimonial" }
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
       ]
     }
   ]

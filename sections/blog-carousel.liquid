@@ -35,7 +35,6 @@
     --bc-card-bg: {{ section.settings.card_background }};
     --bc-card-pad: {{ section.settings.card_padding }}px;
     --bc-media-ratio: {{ section.settings.media_ratio }};
-    --bc-title-size: {{ section.settings.title_size }}px;
     --bc-title-color: {{ section.settings.title_color }};
     --bc-dot-color: {{ section.settings.dot_color }};
   "
@@ -260,10 +259,22 @@
       "id": "media_ratio",
       "label": "Image shape",
       "options": [
-        { "value": "1", "label": "Square" },
-        { "value": "4 / 5", "label": "Portrait" },
-        { "value": "3 / 4", "label": "Tall portrait" },
-        { "value": "3 / 2", "label": "Landscape" }
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Tall portrait"
+        },
+        {
+          "value": "3 / 2",
+          "label": "Landscape"
+        }
       ],
       "default": "1"
     },
@@ -297,16 +308,6 @@
       "step": 2,
       "unit": "px",
       "label": "Space around the title",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "title_size",
-      "min": 12,
-      "max": 26,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size",
       "default": 16
     },
     {

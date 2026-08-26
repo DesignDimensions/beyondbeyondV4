@@ -71,12 +71,12 @@
 
 .abs .section-heading {
   margin: 0 0 14px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 7px;
   text-align: left;
   text-transform: uppercase;
-  color: var(--abs-ink, #0a0a0b);
+  color: #000;
 }
 
 /* One statement size across the whole About page, taken from the band that
@@ -89,14 +89,14 @@
   margin: 0;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
-  color: var(--abs-ink, #0a0a0b);
+  font-size: 30px;
+  color: #000;
   line-height: 50px;
 }
 
 .abs__body {
   margin-top: 0;
-  color: var(--abs-body-color, #1a1a1a);
+  color: #000;
   line-height: 28px;
   width: 100%;
 }
@@ -123,9 +123,9 @@
   height: var(--abs-cta-h, 48px);
   margin-top: var(--abs-cta-gap, 30px);
   border-radius: var(--abs-cta-radius, 0px);
-  background-color: var(--abs-cta-bg, #000);
+  background-color: #000;
   color: var(--abs-cta-fg, #fff);
-  font-size: var(--abs-cta-size, 16px);
+  font-size: 16px;
   font-weight: 500;
   line-height: 1;
   text-decoration: none;

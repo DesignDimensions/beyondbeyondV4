@@ -2,7 +2,7 @@
 
 {%- liquid
   comment
-    Both rows print the same logos twice. One copy is what you see; the second
+    The row prints the same logos twice. One copy is what you see; the second
     is what slides into its place, and the loop is nothing more than the track
     travelling exactly one copy's width and starting over — so there is never
     a gap to hide or a jump to smooth over. The script clones further copies
@@ -27,7 +27,6 @@
     --asi-logo-h: {{ section.settings.logo_height }}px;
     --asi-logo-h-mobile: {{ section.settings.logo_height | times: 0.7 | round }}px;
     --asi-gap: {{ section.settings.logo_gap }}px;
-    --asi-row-gap: {{ section.settings.row_gap }}px;
     --asi-sep-h: {{ section.settings.separator_height }}px;
     --asi-dim: {{ section.settings.dim_opacity }};
   "
@@ -44,85 +43,74 @@
   {%- endif -%}
 
   <div class="asi__rows">
-    {%- comment -%}
-      Two rows travelling the same way. The second is the same list rotated by
-      one, so the two never line up into a grid and read as a single block
-      sliding — the offset is what keeps them legible as two rows.
-    {%- endcomment -%}
-    {%- for row in (1..2) -%}
-      <div
-        class="asi__row asi__row--{{ row }}"
-        data-asi-row
-        data-direction="{{ section.settings.direction }}"
-      >
-        <div class="asi__track" data-asi-track>
-          {%- for copy in (1..2) -%}
-            <div
-              class="asi__seq"
-              data-asi-seq
-              {% unless forloop.first %}
-                aria-hidden="true"
-              {% endunless %}
-            >
-              {%- for block in section.blocks -%}
-                {%- liquid
-                  assign index = forloop.index0
-                  if row == 2
-                    assign index = forloop.index0 | plus: 1 | modulo: section.blocks.size
-                  endif
-                  assign logo = section.blocks[index]
-                  assign image = logo.settings.image
-                  assign label = logo.settings.name
-                -%}
-                <div class="asi__cell">
-                  {%- capture logo_media -%}
-                    {%- if image != blank -%}
-                      <img
-                        class="asi__logo-img"
-                        src="{{ image | image_url: width: 480 }}"
-                        srcset="{{ image | image_url: width: 240 }} 240w, {{ image | image_url: width: 480 }} 480w"
-                        sizes="{{ section.settings.logo_height | times: 4 }}px"
-                        width="{{ image.width }}"
-                        height="{{ image.height }}"
-                        alt="{{ label | escape }}"
-                        loading="lazy"
-                        decoding="async"
-                      >
-                    {%- elsif logo.settings.image_url != blank -%}
-                      <img
-                        class="asi__logo-img"
-                        src="{{ logo.settings.image_url }}"
-                        alt="{{ label | escape }}"
-                        loading="lazy"
-                        decoding="async"
-                      >
-                    {%- else -%}
-                      {{ 'image' | placeholder_svg_tag: 'asi__logo-img asi__logo-img--placeholder' }}
-                    {%- endif -%}
-                  {%- endcapture -%}
-
-                  {%- if logo.settings.link != blank -%}
-                    <a class="asi__logo" href="{{ logo.settings.link }}" data-asi-logo {{ logo.shopify_attributes }}>
-                      {{ logo_media }}
-                    </a>
+    <div
+      class="asi__row"
+      data-asi-row
+      data-direction="{{ section.settings.direction }}"
+    >
+      <div class="asi__track" data-asi-track>
+        {%- for copy in (1..2) -%}
+          <div
+            class="asi__seq"
+            data-asi-seq
+            {% unless forloop.first %}
+              aria-hidden="true"
+            {% endunless %}
+          >
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign logo = block
+                assign image = logo.settings.image
+                assign label = logo.settings.name
+              -%}
+              <div class="asi__cell">
+                {%- capture logo_media -%}
+                  {%- if image != blank -%}
+                    <img
+                      class="asi__logo-img"
+                      src="{{ image | image_url: width: 480 }}"
+                      srcset="{{ image | image_url: width: 240 }} 240w, {{ image | image_url: width: 480 }} 480w"
+                      sizes="{{ section.settings.logo_height | times: 4 }}px"
+                      width="{{ image.width }}"
+                      height="{{ image.height }}"
+                      alt="{{ label | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  {%- elsif logo.settings.image_url != blank -%}
+                    <img
+                      class="asi__logo-img"
+                      src="{{ logo.settings.image_url }}"
+                      alt="{{ label | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                    >
                   {%- else -%}
-                    <span class="asi__logo" data-asi-logo {{ logo.shopify_attributes }}>
-                      {{ logo_media }}
-                    </span>
+                    {{ 'image' | placeholder_svg_tag: 'asi__logo-img asi__logo-img--placeholder' }}
                   {%- endif -%}
+                {%- endcapture -%}
 
-                  <span class="asi__sep" aria-hidden="true">
-                    {%- if separator != blank -%}
-                      <img class="asi__sep-img" src="{{ separator }}" alt="" loading="lazy" decoding="async">
-                    {%- endif -%}
+                {%- if logo.settings.link != blank -%}
+                  <a class="asi__logo" href="{{ logo.settings.link }}" data-asi-logo {{ logo.shopify_attributes }}>
+                    {{ logo_media }}
+                  </a>
+                {%- else -%}
+                  <span class="asi__logo" data-asi-logo {{ logo.shopify_attributes }}>
+                    {{ logo_media }}
                   </span>
-                </div>
-              {%- endfor -%}
-            </div>
-          {%- endfor -%}
-        </div>
+                {%- endif -%}
+
+                <span class="asi__sep" aria-hidden="true">
+                  {%- if separator != blank -%}
+                    <img class="asi__sep-img" src="{{ separator }}" alt="" loading="lazy" decoding="async">
+                  {%- endif -%}
+                </span>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
       </div>
-    {%- endfor -%}
+    </div>
   </div>
 </div>
 
@@ -175,16 +163,6 @@
       "default": 56
     },
     {
-      "type": "range",
-      "id": "row_gap",
-      "min": 0,
-      "max": 80,
-      "step": 2,
-      "unit": "px",
-      "label": "Space between rows",
-      "default": 40
-    },
-    {
       "type": "header",
       "content": "Separator"
     },
@@ -230,8 +208,14 @@
       "id": "direction",
       "label": "Direction",
       "options": [
-        { "value": "1", "label": "Right" },
-        { "value": "-1", "label": "Left" }
+        {
+          "value": "1",
+          "label": "Right"
+        },
+        {
+          "value": "-1",
+          "label": "Left"
+        }
       ],
       "default": "1"
     },

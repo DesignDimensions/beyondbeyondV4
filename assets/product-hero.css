@@ -325,7 +325,7 @@
 
 .ph__reviews {
   color: var(--ph-text, #0a0a0b);
-  font-size: var(--ph-reviews-size, 13px);
+  font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -347,12 +347,12 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  color: #202020;
+  color: #000;
 }
 
 .ph__desc {
   margin: 16px 0 0;
-  font-size: 15px;
+  font-size: 16px;
   color: #000;
   line-height: 25px;
   font-weight: 400;
@@ -396,7 +396,7 @@
   align-items: center;
   gap: 8px;
   margin: 16px 0 0;
-  font-size: var(--ph-variant-size, 15px);
+  font-size: 16px;
   color: var(--ph-muted, #6b6b6b);
 }
 
@@ -416,12 +416,12 @@
 }
 
 .ph__variant:hover {
-  color: var(--ph-text, #0a0a0b);
+  color: #000;
   text-decoration: underline;
 }
 
 .ph__variant.is-selected {
-  color: var(--ph-text, #0a0a0b);
+  color: #000;
   font-weight: 700;
   text-decoration: underline;
 }
@@ -442,7 +442,7 @@
 
 .ph__mrp {
   margin: 16px 0 0;
-  font-size: var(--ph-mrp-size, 15px);
+  font-size: 16px;
   color: var(--ph-muted, #6b6b6b);
 }
 
@@ -461,14 +461,14 @@
 }
 
 .ph__price {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 500;
   letter-spacing: 0;
   color: #000;
 }
 
 .ph__tax {
-  font-size: 11px;
+  font-size: 12px;
   color: #000;
 }
 
@@ -537,7 +537,7 @@
   background: none;
   color: var(--ph-text, #000);
   font-family: inherit;
-  font-size: var(--ph-qty-size, 15px);
+  font-size: 16px;
   text-align: center;
   -moz-appearance: textfield;
   appearance: textfield;
@@ -570,7 +570,7 @@
   background: var(--ph-atc-bg, #000);
   color: var(--ph-atc-fg, #fff);
   font-family: inherit;
-  font-size: var(--ph-atc-size, 14px);
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -614,7 +614,7 @@
 
 .ph .product-form__error-message-wrapper {
   margin: 12px 0 0;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* Policy links */
@@ -625,7 +625,7 @@
   align-items: center;
   gap: 8px;
   margin: var(--ph-gap-links, 20px) 0 0;
-  font-size: var(--ph-links-size, 12px);
+  font-size: 12px;
   font-weight: 700;
   justify-content: space-between;
 }
@@ -680,11 +680,11 @@
   }
 
   .ph__title {
-    font-size: var(--ph-title-size-mobile, 30px);
+    font-size: 30px;
   }
 
   .ph__price {
-    font-size: var(--ph-price-size-mobile, 24px);
+    font-size: 24px;
   }
 }
 

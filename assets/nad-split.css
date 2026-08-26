@@ -122,7 +122,7 @@
 
 .nsp .section-heading {
   margin: 0 0 14px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 7px;
   text-align: left;
@@ -134,7 +134,7 @@
   margin: 0;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  font-size: 30px;
   line-height: 50px;
   color: var(--nsp-ink, #fff);
 }

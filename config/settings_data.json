@@ -9,7 +9,9 @@
  */
 {
   "current": {
+    "intro_once_per_session": true,
     "intro_accent_image": "shopify://shop_images/2.gif",
+    "intro_pill_url": "shopify://pages/nad",
     "logo": "shopify://shop_images/Frame_511_e28b1aaa-75eb-4d8a-bbbc-82b7b553db87.svg",
     "logo_width": 110,
     "favicon": "shopify://shop_images/download_14.jpg",

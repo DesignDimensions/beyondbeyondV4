@@ -95,7 +95,7 @@
 
 .abb__overlay-heading {
   margin: 0;
-  font-size: var(--abb-heading-size, 18px);
+  font-size: 22px;
   font-weight: 400;
   line-height: 1.35;
   color: currentColor;
@@ -119,6 +119,6 @@
   }
 
   .abb__overlay-heading {
-    font-size: calc(var(--abb-heading-size, 18px) * 0.85);
+    font-size: 15px;
   }
 }

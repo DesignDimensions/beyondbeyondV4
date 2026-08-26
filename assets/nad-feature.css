@@ -60,7 +60,7 @@
 
 .nft .section-heading {
   margin: 0;
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 700;
   letter-spacing: 2px;
   text-align: left;
@@ -72,7 +72,7 @@
   margin: 0;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  font-size: 30px;
   line-height: 50px;
   color: var(--nft-ink, #0a0a0b);
 }

@@ -320,7 +320,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0 0 1.1rem;
-  font-size: 1.4rem;
+  font-size: 16px;
   line-height: 1.4;
   font-weight: 600;
   color: #16181d;
@@ -339,7 +339,7 @@
 .uis__card-price {
   grid-column: 1;
   grid-row: 2;
-  font-size: 1.8rem;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.2;
   color: #16181d;
@@ -348,7 +348,7 @@
 .uis__card-discount {
   grid-column: 1;
   grid-row: 3;
-  font-size: 1.15rem;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
   color: var(--uis-accent, #16a34a);
@@ -375,7 +375,7 @@
   background-color: #ffffff;
   color: var(--uis-accent, #16a34a);
   font-family: inherit;
-  font-size: 1.3rem;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;

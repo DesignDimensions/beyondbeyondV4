@@ -74,13 +74,10 @@
       --pdt-glass-blur: {{ tabs_blur }}px;
       --pdt-tabs-radius: {{ section.settings.tabs_radius }}px;
       --pdt-tabs-inset: {{ section.settings.tabs_inset }}px;
-      --pdt-tab-size: {{ section.settings.tab_size }}px;
       --pdt-tab-pad-y: {{ section.settings.tab_height }}px;
       --pdt-tab-active-bg: {{ section.settings.tab_active_background }};
       --pdt-tab-active-fg: {{ section.settings.tab_active_text }};
-      --pdt-overline-size: {{ section.settings.overline_size }}px;
       --pdt-overline-tracking: {{ section.settings.overline_tracking }}px;
-      --pdt-body-size: {{ section.settings.body_size }}px;
       --pdt-columns: {{ section.settings.columns }};
       --pdt-col-gap: {{ section.settings.column_gap }}px;
       --pdt-row-gap: {{ section.settings.row_gap }}px;
@@ -252,7 +249,9 @@
   "tag": "section",
   "class": "section-product-detail-tabs",
   "enabled_on": {
-    "templates": ["product"]
+    "templates": [
+      "product"
+    ]
   },
   "settings": [
     {
@@ -277,9 +276,18 @@
       "type": "select",
       "id": "background_position",
       "options": [
-        { "value": "center", "label": "Centre" },
-        { "value": "right center", "label": "Right" },
-        { "value": "left center", "label": "Left" }
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        }
       ],
       "label": "Image position",
       "default": "center"
@@ -427,16 +435,6 @@
       "default": 14
     },
     {
-      "type": "range",
-      "id": "tab_size",
-      "min": 12,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Tab text size",
-      "default": 17
-    },
-    {
       "type": "color",
       "id": "tab_active_background",
       "label": "Chosen tab",
@@ -454,16 +452,6 @@
     },
     {
       "type": "range",
-      "id": "overline_size",
-      "min": 10,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "label": "Overline size",
-      "default": 14
-    },
-    {
-      "type": "range",
       "id": "overline_tracking",
       "min": 0,
       "max": 10,
@@ -471,16 +459,6 @@
       "unit": "px",
       "label": "Overline letter spacing",
       "default": 4
-    },
-    {
-      "type": "range",
-      "id": "body_size",
-      "min": 12,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Body size",
-      "default": 15
     },
     {
       "type": "color",
@@ -536,9 +514,27 @@
     {
       "name": "Product Detail Tabs",
       "blocks": [
-        { "type": "tab", "settings": { "label": "What It Does", "metafield_key": "custom.pdp_what_it_does" } },
-        { "type": "tab", "settings": { "label": "Ingredients", "metafield_key": "custom.pdp_ingredients" } },
-        { "type": "tab", "settings": { "label": "How To Use", "metafield_key": "custom.pdp_how_to_use" } }
+        {
+          "type": "tab",
+          "settings": {
+            "label": "What It Does",
+            "metafield_key": "custom.pdp_what_it_does"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "label": "Ingredients",
+            "metafield_key": "custom.pdp_ingredients"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "label": "How To Use",
+            "metafield_key": "custom.pdp_how_to_use"
+          }
+        }
       ]
     }
   ]

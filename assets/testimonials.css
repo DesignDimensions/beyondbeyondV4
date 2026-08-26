@@ -176,7 +176,7 @@
 }
 
 .tst__product-title {
-  font-size: var(--tst-title-size, 13px);
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.35;
 }
@@ -187,7 +187,7 @@
 }
 
 .tst__product-price {
-  font-size: var(--tst-price-size, 13px);
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -274,7 +274,7 @@
   padding: 8px 15px;
   background: var(--tst-tag-bg, #000);
   color: var(--tst-tag-fg, #fff);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;

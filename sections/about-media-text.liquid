@@ -50,7 +50,6 @@
     --amt-cta-gap: {{ section.settings.cta_gap }}px;
     --amt-cta-max: {{ section.settings.cta_width }}px;
     --amt-cta-h: {{ section.settings.cta_height }}px;
-    --amt-cta-size: {{ section.settings.cta_size }}px;
     --amt-cta-radius: {{ section.settings.cta_radius }}px;
     --amt-cta-bg: {{ section.settings.cta_background }};
     --amt-cta-fg: {{ section.settings.cta_color }};
@@ -150,8 +149,14 @@
       "id": "media_position",
       "label": "Image position",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ],
       "default": "left"
     },
@@ -181,9 +186,18 @@
       "id": "vertical_alignment",
       "label": "Copy alignment",
       "options": [
-        { "value": "flex-start", "label": "Top" },
-        { "value": "center", "label": "Middle" },
-        { "value": "flex-end", "label": "Bottom" }
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
       ],
       "default": "flex-start"
     },
@@ -232,11 +246,26 @@
       "id": "media_ratio",
       "label": "Image shape (desktop)",
       "options": [
-        { "value": "1.15", "label": "Wide" },
-        { "value": "1.33", "label": "Landscape" },
-        { "value": "1", "label": "Square" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "1.15",
+          "label": "Wide"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": "1.15"
     },
@@ -245,11 +274,26 @@
       "id": "media_ratio_mobile",
       "label": "Image shape (mobile)",
       "options": [
-        { "value": "", "label": "Same as desktop" },
-        { "value": "1.33", "label": "Landscape" },
-        { "value": "1", "label": "Square" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": ""
     },
@@ -355,16 +399,6 @@
       "unit": "px",
       "label": "Button height",
       "default": 48
-    },
-    {
-      "type": "range",
-      "id": "cta_size",
-      "min": 11,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "label": "Button text size",
-      "default": 16
     },
     {
       "type": "range",

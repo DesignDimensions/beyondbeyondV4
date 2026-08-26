@@ -20,9 +20,9 @@
       {
         "type": "checkbox",
         "id": "intro_once_per_session",
-        "default": false,
+        "default": true,
         "label": "Play once per session",
-        "info": "Off means it replays on every page load."
+        "info": "On means it plays once and then stays out of the way until the browser tab is closed. Off means it replays on every page load. Add ?intro to any URL to replay it either way."
       },
       {
         "type": "text",

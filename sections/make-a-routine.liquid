@@ -53,14 +53,6 @@
       assign rating_max = rating.scale_max
       assign rating_value = rating.rating
       assign rating_percent = rating_value | times: 100.0 | divided_by: rating_max
-      assign rating_floor = rating_value | floor
-      assign rating_decimal = 0
-      assign decimal = rating_value | modulo: 1
-      if decimal >= 0.3 and decimal <= 0.7
-        assign rating_decimal = 0.5
-      elsif decimal > 0.7
-        assign rating_decimal = 1
-      endif
     endif
 
     assign form_id = 'mar-form-' | append: section.id | append: '-' | append: routine.id
@@ -76,12 +68,8 @@
       --mar-media-w: {{ section.settings.media_width }}%;
       --mar-media-ratio: {{ section.settings.media_ratio }};
       --mar-gap: {{ section.settings.column_gap }}px;
-      --mar-overline-size: {{ section.settings.overline_size }}px;
       --mar-overline-tracking: {{ section.settings.overline_tracking }}px;
-      --mar-title-size: {{ section.settings.title_size }}px;
       --mar-title-weight: {{ section.settings.title_weight }};
-      --mar-number-size: {{ section.settings.number_size }}px;
-      --mar-item-size: {{ section.settings.item_size }}px;
       --mar-text: {{ section.settings.text_color }};
       --mar-muted: {{ section.settings.muted_color }};
       --mar-rule: {{ section.settings.rule_color }};
@@ -176,21 +164,16 @@
         {%- if section.settings.show_rating and rating != blank and rating_value != 0 -%}
           <div class="mar__reviews">
             {%- comment -%}
-              The same one masked row the product cards draw, painted to a
-              percentage rather than counted out in filled glyphs, so a half
-              star falls out of the number itself.
+              `.ph__stars` at the top of this page, exactly: one box with a
+              hard-stopped gradient painted across it and the star repeated
+              over it as a mask, so a half star falls out of the number itself.
             {%- endcomment -%}
-            <div
-              class="rating mar__stars"
+            <span
+              class="mar__stars"
+              style="--percent: {{ rating_percent }}%;"
               role="img"
               aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating_value, rating_max: rating_max }}"
-            >
-              <span
-                aria-hidden="true"
-                class="rating-star"
-                style="--rating: {{ rating_floor }}; --rating-max: {{ rating_max }}; --rating-decimal: {{ rating_decimal }}; --percent: {{ rating_percent }}%;"
-              ></span>
-            </div>
+            ></span>
 
             {%- if rating_count != blank and rating_count != 0 -%}
               <a class="mar__reviews-count" href="{{ routine.url }}">
@@ -352,9 +335,18 @@
       "id": "media_ratio",
       "label": "Image shape",
       "options": [
-        { "value": "0.7", "label": "Portrait (7:10)" },
-        { "value": "0.8", "label": "Portrait (4:5)" },
-        { "value": "1", "label": "Square" }
+        {
+          "value": "0.7",
+          "label": "Portrait (7:10)"
+        },
+        {
+          "value": "0.8",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        }
       ],
       "default": "0.7"
     },
@@ -374,17 +366,6 @@
     },
     {
       "type": "range",
-      "id": "overline_size",
-      "min": 9,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Overline size",
-      "info": "15px is the detail tabs' overline.",
-      "default": 15
-    },
-    {
-      "type": "range",
       "id": "overline_tracking",
       "min": 0,
       "max": 10,
@@ -394,47 +375,29 @@
       "default": 7
     },
     {
-      "type": "range",
-      "id": "title_size",
-      "min": 20,
-      "max": 64,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size",
-      "default": 34
-    },
-    {
       "type": "select",
       "id": "title_weight",
       "label": "Title weight",
       "info": "The product title at the top of the page is Medium.",
       "options": [
-        { "value": "400", "label": "Regular" },
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semibold" },
-        { "value": "700", "label": "Bold" }
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
       ],
       "default": "500"
-    },
-    {
-      "type": "range",
-      "id": "item_size",
-      "min": 12,
-      "max": 28,
-      "step": 1,
-      "unit": "px",
-      "label": "Product name size",
-      "default": 15
-    },
-    {
-      "type": "range",
-      "id": "number_size",
-      "min": 10,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Number size",
-      "default": 15
     },
     {
       "type": "header",

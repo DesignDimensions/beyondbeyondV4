@@ -54,7 +54,6 @@
     --abb-overlay-color: {{ section.settings.overlay_color }};
     --abb-quote-size: {{ section.settings.quote_size }}px;
     --abb-lockup-gap: {{ section.settings.lockup_gap }}px;
-    --abb-heading-size: {{ section.settings.overlay_heading_size }}px;
   "
   {{ section.shopify_attributes }}
 >
@@ -261,16 +260,6 @@
       "info": "Optional. Press Enter to break it onto a new line."
     },
     {
-      "type": "range",
-      "id": "overlay_heading_size",
-      "min": 12,
-      "max": 48,
-      "step": 1,
-      "unit": "px",
-      "label": "Text size",
-      "default": 18
-    },
-    {
       "type": "color",
       "id": "overlay_color",
       "label": "Lockup colour",
@@ -282,9 +271,18 @@
       "id": "overlay_align",
       "label": "Lockup alignment",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Centre" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ],
       "default": "left"
     },

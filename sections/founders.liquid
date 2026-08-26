@@ -47,14 +47,12 @@
     {%- if section.settings.media_ratio_mobile != blank %}
       --fnd-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
     {%- endif %}
-    --fnd-heading-size: {{ section.settings.heading_size }}px;
     --fnd-heading-color: {{ section.settings.heading_color }};
     --fnd-heading-gap: {{ section.settings.heading_gap }}px;
     --fnd-body-color: {{ section.settings.body_color }};
     --fnd-body-gap: {{ section.settings.body_gap }}px;
     --fnd-cta-gap: {{ section.settings.cta_gap }}px;
     --fnd-cta-h: {{ section.settings.cta_height }}px;
-    --fnd-cta-size: {{ section.settings.cta_size }}px;
     --fnd-cta-bg: {{ section.settings.cta_background }};
     --fnd-cta-fg: {{ section.settings.cta_color }};
     --fnd-cta-radius: {{ section.settings.cta_radius }}px;
@@ -206,10 +204,22 @@
       "id": "media_ratio",
       "label": "Image shape (desktop)",
       "options": [
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "0.75", "label": "Tall portrait" },
-        { "value": "1", "label": "Square" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "0.75",
+          "label": "Tall portrait"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": "0.815"
     },
@@ -218,12 +228,30 @@
       "id": "media_ratio_mobile",
       "label": "Image shape (mobile)",
       "options": [
-        { "value": "", "label": "Same as desktop" },
-        { "value": "0.815", "label": "Portrait" },
-        { "value": "0.75", "label": "Tall portrait" },
-        { "value": "1", "label": "Square" },
-        { "value": "1.33", "label": "Landscape" },
-        { "value": "auto", "label": "Original" }
+        {
+          "value": "",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "0.75",
+          "label": "Tall portrait"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
       ],
       "default": ""
     },
@@ -236,16 +264,6 @@
       "id": "heading",
       "label": "Heading",
       "default": "From Our Founders"
-    },
-    {
-      "type": "range",
-      "id": "heading_size",
-      "min": 20,
-      "max": 56,
-      "step": 1,
-      "unit": "px",
-      "label": "Heading size",
-      "default": 32
     },
     {
       "type": "color",
@@ -320,16 +338,6 @@
       "unit": "px",
       "label": "Button height",
       "default": 48
-    },
-    {
-      "type": "range",
-      "id": "cta_size",
-      "min": 12,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Button text size",
-      "default": 16
     },
     {
       "type": "range",

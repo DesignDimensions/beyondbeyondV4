@@ -38,7 +38,7 @@
   margin: 0 0 10px;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  font-size: 30px;
   line-height: 50px;
   color: var(--mnd-ink, #0a0a0b);
 }
@@ -178,7 +178,7 @@
   position: relative;
   margin: 0 0 12px;
   padding-bottom: 12px;
-  font-size: var(--mnd-name-size, 24px);
+  font-size: 22px;
   font-weight: 500;
   line-height: 1.2;
   color: currentColor;
@@ -200,7 +200,7 @@
 
 .mnd__role {
   margin: 0;
-  font-size: var(--mnd-role-size, 15px);
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   opacity: 0.9;

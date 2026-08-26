@@ -144,13 +144,13 @@
 }
 
 .hp-bubble__label-small {
-  font-size: calc(var(--hp-bubble-size) * 0.098);
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
 
 .hp-bubble__label-large {
-  font-size: calc(var(--hp-bubble-size) * 0.17);
+  font-size: 50px;
   font-weight: 700;
   letter-spacing: 0.01em;
   margin-top: calc(var(--hp-bubble-size) * 0.03);
@@ -214,7 +214,7 @@
 .hp-callout__title {
   margin: 0 0 0.9rem;
   font-family: var(--font-body-family);
-  font-size: clamp(1.9rem, 2.1vw, 2.6rem);
+  font-size: 22px;
   font-weight: var(--font-body-weight);
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -340,6 +340,16 @@
   .hp-callout[data-index='2'] {
     left: 41% !important;
     top: 78% !important;
+  }
+
+  /* Desktop pins these to the 30/50 type scale; on mobile the bubble shrinks to
+     190px, so keep them proportional here as they were. */
+  .hp-bubble__label-small {
+    font-size: calc(var(--hp-bubble-size) * 0.098);
+  }
+
+  .hp-bubble__label-large {
+    font-size: calc(var(--hp-bubble-size) * 0.17);
   }
 
   .hp-callout__title {

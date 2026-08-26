@@ -17,7 +17,6 @@
     --anb-pad-bottom: {{ section.settings.padding_bottom }}px;
     --anb-bg: {{ section.settings.background }};
     --anb-color: {{ section.settings.text_color }};
-    --anb-size: {{ section.settings.text_size }}px;
     --anb-leading: {{ section.settings.line_height }};
     --anb-align: {{ section.settings.alignment }};
     {%- if section.settings.text_width > 0 %}
@@ -45,16 +44,6 @@
       "label": "Text",
       "info": "Bold the phrase you want to carry the emphasis.",
       "default": "<p>No fillers, no shortcuts, just skincare that is <strong>honest, effective, and thoughtfully crafted</strong> for skin that thrives.</p>"
-    },
-    {
-      "type": "range",
-      "id": "text_size",
-      "min": 14,
-      "max": 40,
-      "step": 1,
-      "unit": "px",
-      "label": "Text size",
-      "default": 22
     },
     {
       "type": "range",
@@ -87,8 +76,14 @@
       "id": "alignment",
       "label": "Alignment",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Centre" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        }
       ],
       "default": "left"
     },

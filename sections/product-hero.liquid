@@ -90,14 +90,8 @@
     --ph-arrow-bg: {{ section.settings.arrow_background }};
     --ph-star: {{ section.settings.star_color }};
     --ph-star-size: {{ section.settings.star_size }}px;
-    --ph-title-size: {{ section.settings.title_size }}px;
-    --ph-title-size-mobile: {{ section.settings.title_size_mobile }}px;
     --ph-title-weight: {{ section.settings.title_weight }};
-    --ph-lede-size: {{ section.settings.lede_size }}px;
-    --ph-body-size: {{ section.settings.body_size }}px;
-    --ph-variant-size: {{ section.settings.variant_size }}px;
     --ph-desc-lines: {{ section.settings.description_lines }};
-    --ph-price-size: {{ section.settings.price_size }}px;
     --ph-badge-bg: {{ section.settings.badge_background }};
     --ph-badge-fg: {{ section.settings.badge_text_color }};
     --ph-cta-h: {{ section.settings.cta_height }}px;
@@ -419,7 +413,9 @@
   "tag": "section",
   "class": "section-product-hero",
   "enabled_on": {
-    "templates": ["product"]
+    "templates": [
+      "product"
+    ]
   },
   "settings": [
     {
@@ -699,32 +695,21 @@
       "content": "Copy"
     },
     {
-      "type": "range",
-      "id": "title_size",
-      "min": 24,
-      "max": 64,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size",
-      "default": 36
-    },
-    {
-      "type": "range",
-      "id": "title_size_mobile",
-      "min": 20,
-      "max": 48,
-      "step": 1,
-      "unit": "px",
-      "label": "Title size — mobile",
-      "default": 30
-    },
-    {
       "type": "select",
       "id": "title_weight",
       "options": [
-        { "value": "500", "label": "Medium" },
-        { "value": "600", "label": "Semibold" },
-        { "value": "700", "label": "Bold" }
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
       ],
       "label": "Title weight",
       "default": "700"
@@ -738,26 +723,6 @@
     },
     {
       "type": "range",
-      "id": "lede_size",
-      "min": 11,
-      "max": 22,
-      "step": 1,
-      "unit": "px",
-      "label": "Subtitle size",
-      "default": 15
-    },
-    {
-      "type": "range",
-      "id": "body_size",
-      "min": 12,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Body size",
-      "default": 15
-    },
-    {
-      "type": "range",
       "id": "description_lines",
       "min": 0,
       "max": 14,
@@ -765,16 +730,6 @@
       "label": "Description lines shown",
       "info": "0 shows the whole description. Any other number trims it so the cart bar stays in the fold.",
       "default": 0
-    },
-    {
-      "type": "range",
-      "id": "variant_size",
-      "min": 11,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "label": "Size chip text",
-      "default": 15
     },
     {
       "type": "header",
@@ -791,16 +746,6 @@
       "id": "tax_note",
       "label": "Note beside the price",
       "default": "(MRP inclusive of all taxes.)"
-    },
-    {
-      "type": "range",
-      "id": "price_size",
-      "min": 18,
-      "max": 44,
-      "step": 1,
-      "unit": "px",
-      "label": "Price size",
-      "default": 26
     },
     {
       "type": "color",

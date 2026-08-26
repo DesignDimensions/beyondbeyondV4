@@ -61,16 +61,16 @@
   margin: 0 0 var(--phc-head-gap, 48px);
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.4rem);
+  font-size: 30px;
   line-height: 50px;
-  color: var(--phc-ink, #0a0a0b);
+  color: #000;
 }
 
 /* With an intro present it, not the heading, is what the list sits under —
    so the heading closes up and hands the gap over. */
 .phc__intro {
   margin: calc(var(--phc-head-gap, 48px) * -0.6) 0 var(--phc-head-gap, 48px);
-  color: var(--phc-text-color, #1a1a1a);
+  color: #000;
 }
 
 .phc__intro>*+* {
@@ -106,10 +106,10 @@
 .phc__title {
   margin: 0;
   min-width: 0;
-  font-size: var(--phc-title-size, 16px);
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
-  color: var(--phc-ink, #0a0a0b);
+  color: #000;
 }
 
 .phc__title-link {
@@ -124,7 +124,7 @@
 
 .phc__number {
   flex: 0 0 auto;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -137,11 +137,11 @@
   height: 0;
   margin: var(--phc-rule-gap, 12px) 0;
   border: 0;
-  border-top: 1px solid var(--phc-rule-color, #1a1a1a);
+  border-top: 1px solid #000;
 }
 
 .phc__text {
-  font-size: var(--phc-text-size, 13px);
+  font-size: 16px;
   line-height: 1.75;
   color: #000;
   width: 73%;

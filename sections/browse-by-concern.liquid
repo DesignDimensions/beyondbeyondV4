@@ -41,8 +41,6 @@
   endcomment
   assign thumb_lift_cq = section.settings.active_lift | divided_by: 12.0
   assign thumb_lift_min = section.settings.active_lift | times: 0.62 | round: 1
-  assign label_cq = section.settings.label_size | divided_by: 12.0
-  assign label_min = section.settings.label_size | times: 0.85 | round: 1
 
   comment
     'Go to the product page' leaves the card with no add-to-cart on it — the
@@ -70,7 +68,6 @@
     --bbc-thumb-gap: {{ section.settings.thumb_gap }}%;
     --bbc-thumb-lift: clamp({{ thumb_lift_min }}px, {{ thumb_lift_cq }}cqw, {{ section.settings.active_lift }}px);
     --bbc-thumb-radius: {{ section.settings.thumb_radius }}px;
-    --bbc-label-size: clamp({{ label_min }}px, {{ label_cq }}cqw, {{ section.settings.label_size }}px);
     --bbc-label-spacing: {{ section.settings.label_letter_spacing }}px;
     --bbc-label-color: {{ section.settings.label_color }};
     --bbc-label-active-color: {{ section.settings.label_active_color }};
@@ -94,7 +91,6 @@
     --pcard-media-blend: {% if section.settings.card_media_blend %}multiply{% else %}normal{% endif %};
     --pcard-media-pad: {{ section.settings.card_media_padding }}px;
     --pcard-inset: {{ section.settings.card_inset }}px;
-    --pcard-title: {{ section.settings.card_title_size }}px;
     --pcard-text: {{ section.settings.card_text_color }};
     --pcard-muted: {{ section.settings.card_muted_color }};
     --pcard-star: {{ section.settings.star_color }};
@@ -383,16 +379,6 @@
     },
     {
       "type": "range",
-      "id": "label_size",
-      "min": 8,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "label": "Label size",
-      "default": 11
-    },
-    {
-      "type": "range",
       "id": "label_letter_spacing",
       "min": 0,
       "max": 6,
@@ -522,8 +508,14 @@
       "id": "columns_mobile",
       "label": "Columns on mobile",
       "options": [
-        { "value": "1", "label": "1" },
-        { "value": "2", "label": "2" }
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
       ],
       "default": "2"
     },
@@ -548,10 +540,22 @@
       "id": "card_media_ratio",
       "label": "Image shape",
       "options": [
-        { "value": "default", "label": "Card default" },
-        { "value": "1", "label": "Square" },
-        { "value": "1.15", "label": "Landscape" },
-        { "value": "0.85", "label": "Portrait" }
+        {
+          "value": "default",
+          "label": "Card default"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "1.15",
+          "label": "Landscape"
+        },
+        {
+          "value": "0.85",
+          "label": "Portrait"
+        }
       ],
       "default": "default"
     },
@@ -561,8 +565,14 @@
       "label": "Image fit",
       "info": "Fill suits photos that already carry their own background. Fit shows the whole image and lets the background colour above show around it.",
       "options": [
-        { "value": "contain", "label": "Fit inside the tile" },
-        { "value": "cover", "label": "Fill the tile" }
+        {
+          "value": "contain",
+          "label": "Fit inside the tile"
+        },
+        {
+          "value": "cover",
+          "label": "Fill the tile"
+        }
       ],
       "default": "cover"
     },
@@ -592,16 +602,6 @@
       "unit": "px",
       "label": "Card inset",
       "info": "How far the copy and the add-to-cart button sit in from the image's edges.",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "card_title_size",
-      "min": 10,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "label": "Product title size",
       "default": 16
     },
     {
@@ -670,8 +670,14 @@
       "id": "cart_behavior",
       "label": "Button action",
       "options": [
-        { "value": "add", "label": "Add first available variant" },
-        { "value": "link", "label": "Go to the product page" }
+        {
+          "value": "add",
+          "label": "Add first available variant"
+        },
+        {
+          "value": "link",
+          "label": "Go to the product page"
+        }
       ],
       "default": "add"
     },
@@ -773,10 +779,18 @@
     {
       "name": "Browse By Concern",
       "blocks": [
-        { "type": "concern" },
-        { "type": "concern" },
-        { "type": "concern" },
-        { "type": "concern" }
+        {
+          "type": "concern"
+        },
+        {
+          "type": "concern"
+        },
+        {
+          "type": "concern"
+        },
+        {
+          "type": "concern"
+        }
       ]
     }
   ]

@@ -29,7 +29,7 @@
   margin: 0;
   max-width: none;
   text-align: left;
-  font-size: clamp(2.6rem, 2.6vw, 3.6rem);
+  font-size: 40px;
 }
 
 .bc__body {
@@ -53,7 +53,7 @@
   margin-top: var(--bc-cta-gap, 30px);
   background-color: var(--bc-cta-bg, #000);
   color: var(--bc-cta-fg, #fff);
-  font-size: var(--bc-cta-size, 13px);
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: var(--bc-cta-spacing, 1.6px);
   line-height: 1;
@@ -205,7 +205,7 @@
 
 .bc__card-title {
   margin: 0;
-  font-size: var(--bc-title-size, 16px);
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: -0.01em;
