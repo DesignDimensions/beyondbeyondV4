@@ -32,7 +32,7 @@
 .vpx__band {
   position: relative;
   width: 100%;
-  aspect-ratio: var(--vpx-ratio-mobile);
+  aspect-ratio: 1440/665;
   overflow: hidden;
 }
 
