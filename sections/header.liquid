@@ -538,7 +538,6 @@
       this.headerIsAlwaysSticky =
         this.getAttribute('data-sticky-type') === 'always' ||
         this.getAttribute('data-sticky-type') === 'reduce-logo-size';
-      this.headerBounds = {};
 
       this.setHeaderHeight();
 
@@ -558,11 +557,36 @@
       this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
       window.addEventListener('scroll', this.onScrollHandler, false);
 
-      this.createObserver();
+      /* A reload or a back-navigation can restore a scroll offset before a single
+         scroll event fires, so paint the state the page is already in. */
+      this.setScrolledState(window.pageYOffset || document.documentElement.scrollTop);
     }
 
     setHeaderHeight() {
-      document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+      const height = this.header.offsetHeight;
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+
+      /* The bar is fixed to the top, so in viewport terms its bounds are simply
+         0..height -- no measurement needed. Re-deriving them on every height change
+         keeps the hide/reveal thresholds in step, where the observer this replaces
+         read the rect once at load and then disconnected. */
+      this.headerBounds = { top: 0, bottom: height };
+    }
+
+    /* The filled, blurred state is a function of scroll offset alone. The header is
+       fixed, so any offset off the top means page content is travelling underneath
+       it and the bar needs a background of its own. Deriving that here rather than
+       inside the scroll-direction branches below closes the window between 0 and the
+       header's own height, where none of those branches ran: the bar was left
+       transparent over moving content and its text collided with whatever scrolled
+       past. The two thresholds differ so rubber-band overscroll or a pixel of jitter
+       at the very top cannot flip the fill on and off. */
+    setScrolledState(scrollTop) {
+      const isScrolled = this.header.classList.contains('scrolled-past-header')
+        ? scrollTop > 2
+        : scrollTop > 8;
+
+      this.header.classList.toggle('scrolled-past-header', isScrolled);
     }
 
     disconnectedCallback() {
@@ -570,26 +594,17 @@
       window.removeEventListener('scroll', this.onScrollHandler);
     }
 
-    createObserver() {
-      let observer = new IntersectionObserver((entries, observer) => {
-        this.headerBounds = entries[0].intersectionRect;
-        observer.disconnect();
-      });
-
-      observer.observe(this.header);
-    }
-
     onScroll() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
       if (this.predictiveSearch && this.predictiveSearch.isOpen) return;
 
+      this.setScrolledState(scrollTop);
+
       if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
-        this.header.classList.add('scrolled-past-header');
         if (this.preventHide) return;
         requestAnimationFrame(this.hide.bind(this));
       } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
-        this.header.classList.add('scrolled-past-header');
         if (!this.preventReveal) {
           requestAnimationFrame(this.reveal.bind(this));
         } else {
@@ -602,7 +617,6 @@
           requestAnimationFrame(this.hide.bind(this));
         }
       } else if (scrollTop <= this.headerBounds.top) {
-        this.header.classList.remove('scrolled-past-header');
         requestAnimationFrame(this.reset.bind(this));
       }
 
