@@ -1,0 +1,89 @@
+{
+  "sections": {
+    "browse": {
+      "type": "all-collections",
+      "blocks": {
+        "all": {
+          "type": "collection",
+          "settings": {
+            "collection": "shop",
+            "label": "All"
+          }
+        },
+        "cleansers": {
+          "type": "collection",
+          "settings": {
+            "collection": "cleanser",
+            "label": "Cleansers"
+          }
+        },
+        "serums": {
+          "type": "collection",
+          "settings": {
+            "collection": "serums",
+            "label": "Serums"
+          }
+        },
+        "moisturiser": {
+          "type": "collection",
+          "settings": {
+            "collection": "moisturiser",
+            "label": "Moisturiser"
+          }
+        },
+        "sun_protection": {
+          "type": "collection",
+          "settings": {
+            "collection": "sun-protection",
+            "label": "Sun Protection"
+          }
+        },
+        "sets": {
+          "type": "collection",
+          "settings": {
+            "collection": "combos",
+            "label": "Sets and Offer"
+          }
+        },
+        "concerns": {
+          "type": "collection",
+          "settings": {
+            "collection": "concern",
+            "label": "Concerns"
+          }
+        }
+      },
+      "block_order": [
+        "all",
+        "cleansers",
+        "serums",
+        "moisturiser",
+        "sun_protection",
+        "sets",
+        "concerns"
+      ],
+      "name": "Browse collections",
+      "settings": {
+        "offset_header": true,
+        "list_position": "left",
+        "list_width": 200,
+        "column_gap": 56,
+        "background": "#ffffff",
+        "list_label": "Collections",
+        "sticky_list": true,
+        "sticky_gap": 16,
+        "show_count": true,
+        "item_gap": 14,
+        "list_color": "#4a4a4a",
+        "list_active_color": "#0a0a0b",
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "padding_top": 48,
+        "padding_bottom": 72
+      }
+    }
+  },
+  "order": [
+    "browse"
+  ]
+}

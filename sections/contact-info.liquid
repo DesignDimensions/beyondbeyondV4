@@ -1,0 +1,571 @@
+{{ 'contact-info.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The half of the contact page that answers "who are you and where": a
+  heading, the sentence under it, then the company's particulars as rows —
+  and the picture that belongs beside them.
+
+  Every particular is a block rather than a setting, because a contact page
+  is exactly the page that grows one: a second address, a phone line, a GST
+  number. A block takes a label and its value, and chooses between the two
+  shapes the page uses — the value beside the label on one line, or under it.
+
+  The copy leads in the markup and the picture follows, which is the reading
+  order either way; "image on the left" is a flex direction, not a
+  reordering, so the heading is still the first thing announced.
+
+  No type size is set in the schema. The heading is the theme's own
+  `.section-title` and the sentence its `.section-text`; the rows take the
+  16px and 12px of the store's scale from the stylesheet. Only the tints and
+  the spacing belong to the section.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1600
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
+  assign heading = section.settings.heading | escape | newline_to_br
+  assign heading_tag = section.settings.heading_tag | default: 'h2'
+-%}
+
+<div
+  class="cin{% if section.settings.media_position == 'left' %} cin--reversed{% endif %}{% if section.settings.offset_header %} cin--under-header{% endif %}"
+  style="
+    --cin-pad-top: {{ section.settings.padding_top }}px;
+    --cin-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --cin-bg: {{ section.settings.background }};
+    --cin-ink: {{ section.settings.ink }};
+    --cin-gap: {{ section.settings.column_gap }}px;
+    --cin-align: {{ section.settings.vertical_alignment }};
+    --cin-media-w: {{ section.settings.media_width }}%;
+    --cin-media-ratio: {{ section.settings.media_ratio }};
+    {%- if section.settings.media_ratio_mobile != blank %}
+      --cin-media-ratio-mobile: {{ section.settings.media_ratio_mobile }};
+    {%- endif %}
+    --cin-media-bg: {{ section.settings.media_background }};
+    --cin-media-radius: {{ section.settings.media_radius }}px;
+    --cin-body-color: {{ section.settings.body_color }};
+    --cin-body-gap: {{ section.settings.body_gap }}px;
+    --cin-label-color: {{ section.settings.label_color }};
+    --cin-value-color: {{ section.settings.value_color }};
+    --cin-rule-color: {{ section.settings.rule_color }};
+    --cin-rows-gap: {{ section.settings.rows_gap }}px;
+    --cin-row-pad: {{ section.settings.row_padding }}px;
+    --cin-value-gap: {{ section.settings.value_gap }}px;
+    --cin-details-gap: {{ section.settings.details_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width cin__row">
+    <div class="cin__copy">
+      {%- if heading != blank -%}
+        <{{ heading_tag }} class="section-title cin__heading">{{ heading }}</{{ heading_tag }}>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="cin__intro section-text">{{ section.settings.body }}</div>
+      {%- endif -%}
+
+      {%- comment -%}
+        A description list, because that is what these rows are: a term and
+        the value that answers it. The wrapper around each pair is what
+        carries the rule and the block's editor handle — `dl` allows a `div`
+        around a `dt`/`dd` group precisely for this.
+      {%- endcomment -%}
+      {%- if section.blocks.size > 0 -%}
+        <dl class="cin__details">
+          {%- for block in section.blocks -%}
+            <div
+              class="cin__item cin__item--{{ block.settings.layout }}{% if block.settings.rule == 'above' or block.settings.rule == 'both' %} cin__item--rule-above{% endif %}{% if block.settings.rule == 'below' or block.settings.rule == 'both' %} cin__item--rule-below{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.label != blank -%}
+                <dt class="cin__label">{{ block.settings.label }}</dt>
+              {%- endif -%}
+
+              {%- if block.settings.value != blank -%}
+                <dd class="cin__value">{{ block.settings.value }}</dd>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </dl>
+      {%- endif -%}
+    </div>
+
+    <div class="cin__media">
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 600 }} 600w,
+                {{ image_mobile | image_url: width: 900 }} 900w,
+                {{ image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="92vw"
+            >
+          {%- endif -%}
+          <img
+            class="cin__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 600 }} 600w,
+                {{ image | image_url: width: 900 }} 900w,
+                {{ image | image_url: width: 1400 }} 1400w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 92vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact Info",
+  "tag": "section",
+  "class": "section-contact-info",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the content column. The details take what is left.",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between details and image",
+      "default": 72
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Column alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading level",
+      "info": "Use Heading 1 when this section opens the page, so the page has a title of its own. Use Heading 2 anywhere else.",
+      "options": [
+        {
+          "value": "h1",
+          "label": "Heading 1"
+        },
+        {
+          "value": "h2",
+          "label": "Heading 2"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
+      "default": "We are here to help"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>If you couldn't find what you need from us in the FAQs, you can write to us at Care@beyondbeyond.in</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Text colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above the text",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Details"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "color",
+      "id": "value_color",
+      "label": "Value colour",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Line colour",
+      "info": "Each row chooses whether it draws one.",
+      "default": "#C9C9C9"
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rows",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "row_padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Space inside a lined row",
+      "info": "Holds the row off the line above or below it.",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "value_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Space between a label and its value",
+      "info": "Only applies to rows set to stack.",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "details_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above the details",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape (desktop)",
+      "options": [
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        },
+        {
+          "value": "1.15",
+          "label": "Wide"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "options": [
+        {
+          "value": "",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "1.33",
+          "label": "Landscape"
+        },
+        {
+          "value": "1",
+          "label": "Square"
+        },
+        {
+          "value": "0.815",
+          "label": "Portrait"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Image background",
+      "info": "Shows while the image loads, and in place of it before one is chosen.",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Image corner radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Detail",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Address"
+        },
+        {
+          "type": "richtext",
+          "id": "value",
+          "label": "Value",
+          "info": "Links written here stay links — use it for an email address or a phone number.",
+          "default": "<p>M-283, Greater Kailash Part-2, New Delhi-110048</p>"
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "Shape",
+          "options": [
+            {
+              "value": "stacked",
+              "label": "Value under the label"
+            },
+            {
+              "value": "inline",
+              "label": "Value beside the label"
+            }
+          ],
+          "default": "stacked"
+        },
+        {
+          "type": "select",
+          "id": "rule",
+          "label": "Line",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "above",
+              "label": "Above"
+            },
+            {
+              "value": "below",
+              "label": "Below"
+            },
+            {
+              "value": "both",
+              "label": "Above and below"
+            }
+          ],
+          "default": "none"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Info",
+      "blocks": [
+        {
+          "type": "detail",
+          "settings": {
+            "label": "Company Information",
+            "value": "<p>Fyremist Pvt. Ltd.</p>",
+            "layout": "inline",
+            "rule": "both"
+          }
+        },
+        {
+          "type": "detail",
+          "settings": {
+            "label": "Address",
+            "value": "<p>M-283, Greater Kailash Part-2, New Delhi-110048</p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        },
+        {
+          "type": "detail",
+          "settings": {
+            "label": "Email ID",
+            "value": "<p><a href=\"mailto:Care@beyondbeyond.co.in\">Care@beyondbeyond.co.in</a></p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        },
+        {
+          "type": "detail",
+          "settings": {
+            "label": "Note:",
+            "value": "<p>We work only on weekdays from Monday - Friday. Our Operational hours are 10:00 AM - 04:00 PM</p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

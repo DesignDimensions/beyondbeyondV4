@@ -1,0 +1,30 @@
+{%- comment -%}
+  The fetch endpoint behind the All Collections section's tabs, and nothing
+  else. It has no presets, so it never appears in the editor's section list.
+
+  A tab is a link to a real collection, and the script asks that link's URL
+  for this section:
+
+      /collections/cleansers?section_id=all-collections-grid
+
+  Shopify renders it in that URL's context, which is the whole trick — the
+  section does not have to be told which collection to draw, because
+  `collection` already is one. It also does not have to exist on that
+  collection's template: `?section_id=` resolves against the section file.
+
+  The wrapper below is what the script reads. The `<div>` Shopify puts around
+  every rendered section would do, but naming the element the script wants
+  means a change to that wrapper cannot quietly break the swap.
+{%- endcomment -%}
+
+<div data-acl-items>
+  {%- if collection != blank -%}
+    {% render 'all-collections-grid', grid_collection: collection, section_id: section.id %}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "All Collections grid"
+}
+{% endschema %}

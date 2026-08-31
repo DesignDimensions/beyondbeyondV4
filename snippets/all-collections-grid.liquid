@@ -1,0 +1,87 @@
+{%- comment -%}
+  The product cards for one collection, as bare `<li>`s.
+
+  This is rendered from two places and has to produce the same markup from
+  both: the All Collections section draws it for the tab that is open when the
+  page is built, and the `all-collections-grid` section draws it again for
+  whichever collection the visitor asks for after that.
+
+  That second caller is the reason the card's appearance is fixed here rather
+  than passed in. The Section Rendering API resolves `?section_id=` against a
+  section *file*, so a section fetched for a collection it was never placed on
+  is rendered with its schema defaults and no template settings at all. Any
+  card setting offered in the editor would therefore apply to the first tab
+  and silently revert on every tab after it. One set of values, written once,
+  is the only arrangement that cannot drift.
+
+  What is safe to configure lives on the `<ul>` instead — the column counts —
+  because that element belongs to the section and is never swapped out.
+
+  Only the list items are produced here. The list itself is the section's.
+
+  Accepts:
+  - grid_collection: {Object} the collection to draw
+  - section_id: {String} the id of the section the cards are being drawn into
+
+  Usage:
+  {% render 'all-collections-grid', grid_collection: collection, section_id: section.id %}
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    Without a `paginate` tag Shopify hands over the first 50 products of a
+    collection and stops. That is the ceiling here, and it is why the link out
+    to the collection's own page appears when a collection has more — a
+    paginated grid cannot survive being swapped in by fetch without carrying
+    its page links along with it, and a link to the real collection page is
+    the honest answer rather than a half-built one.
+  endcomment
+  assign shown = grid_collection.products.size
+  assign total = grid_collection.all_products_count
+-%}
+
+{%- if shown == 0 -%}
+  <li class="acl__span acl__empty">
+    {{ 'sections.collection_template.empty' | t }}
+  </li>
+{%- else -%}
+  {%- for product in grid_collection.products -%}
+    {%- liquid
+      assign lazy_load = true
+      if forloop.index <= 3
+        assign lazy_load = false
+      endif
+    -%}
+    <li class="grid__item">
+      {% render 'card-product',
+        card_product: product,
+        media_aspect_ratio: 'square',
+        show_secondary_image: false,
+        show_vendor: false,
+        show_rating: true,
+        quick_add: 'standard',
+        lazy_load: lazy_load,
+        skip_styles: true,
+        section_id: section_id,
+        product_view_context: 'collection'
+      %}
+    </li>
+  {%- endfor -%}
+
+  {%- if total > shown -%}
+    <li class="acl__span acl__more">
+      <a class="acl__more-link" href="{{ grid_collection.url }}">
+        {{- grid_collection.title }} &mdash; all {{ total }} products
+        <svg class="acl__more-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
+          <path
+            d="M0 5h31.5M27.5 1 32 5l-4.5 4"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+    </li>
+  {%- endif -%}
+{%- endif -%}

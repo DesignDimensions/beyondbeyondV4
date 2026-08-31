@@ -1,0 +1,152 @@
+{
+  "sections": {
+    "info": {
+      "type": "contact-info",
+      "blocks": {
+        "company": {
+          "type": "detail",
+          "settings": {
+            "label": "Company Information",
+            "value": "<p>Fyremist Pvt. Ltd.</p>",
+            "layout": "inline",
+            "rule": "both"
+          }
+        },
+        "address": {
+          "type": "detail",
+          "settings": {
+            "label": "Address",
+            "value": "<p>M-283, Greater Kailash Part-2, New Delhi-110048</p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        },
+        "email": {
+          "type": "detail",
+          "settings": {
+            "label": "Email ID",
+            "value": "<p><a href=\"mailto:Care@beyondbeyond.co.in\">Care@beyondbeyond.co.in</a></p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        },
+        "note": {
+          "type": "detail",
+          "settings": {
+            "label": "Note:",
+            "value": "<p>We work only on weekdays from Monday - Friday. Our Operational hours are 10:00 AM - 04:00 PM</p>",
+            "layout": "stacked",
+            "rule": "none"
+          }
+        }
+      },
+      "block_order": [
+        "company",
+        "address",
+        "email",
+        "note"
+      ],
+      "name": "We are here to help",
+      "settings": {
+        "offset_header": true,
+        "media_position": "right",
+        "media_width": 45,
+        "column_gap": 72,
+        "vertical_alignment": "flex-start",
+        "background": "#ffffff",
+        "heading_tag": "h1",
+        "heading": "We are here to help",
+        "ink": "#0a0a0b",
+        "body": "<p>If you couldn't find what you need from us in the FAQs, you can write to us at <a href=\"mailto:Care@beyondbeyond.co.in\">Care@beyondbeyond.co.in</a></p>",
+        "body_color": "#1a1a1a",
+        "body_gap": 18,
+        "label_color": "#0a0a0b",
+        "value_color": "#1a1a1a",
+        "rule_color": "#c9c9c9",
+        "rows_gap": 20,
+        "row_padding": 12,
+        "value_gap": 6,
+        "details_gap": 32,
+        "image": "shopify://shop_images/BEYOND_BEYOND_BOX_1.png",
+        "image_url": "",
+        "image_alt": "Beyond Beyond Supercream in its box",
+        "media_ratio": "1",
+        "media_ratio_mobile": "",
+        "media_background": "#ffffff",
+        "media_radius": 0,
+        "padding_top": 60,
+        "padding_bottom": 72
+      }
+    },
+    "faq": {
+      "type": "contact-faq",
+      "blocks": {
+        "shipping": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Standard shipping takes 3-7 business days depending on your location. You will receive tracking updates via email/SMS once your order is dispatched.</p>"
+          }
+        },
+        "skin_types": {
+          "type": "question",
+          "settings": {
+            "question": "Is this suitable for all skin types?",
+            "answer": "<p>Yes! The formulation is designed to be gentle yet effective for:</p><ul><li>Dry & dehydrated skin — boosts hydration and strengthens the barrier.</li><li>Aging & mature skin — restores elasticity and reduces wrinkles.</li><li>Oily & combination skin — lightweight, non-greasy texture.</li><li>Sensitive skin — free from irritants, making it safe for reactive skin.</li></ul>"
+          }
+        },
+        "returns": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>Returns are eligible within 48 hours of delivery for all orders placed on beyondbeyond.co.in. To ensure a smooth return process, please follow these steps:</p><ol><li>All items must be unused and returned with the original invoice.</li><li>Items should be in their original packaging, including price tags, labels, boxes, and any accompanying accessories.</li></ol><p>Note: All returned products will undergo a quality assessment before approval.</p>"
+          }
+        },
+        "international": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Currently, we ship within India. We are working on expanding our availability to international markets soon!</p>"
+          }
+        }
+      },
+      "block_order": [
+        "shipping",
+        "skin_types",
+        "returns",
+        "international"
+      ],
+      "name": "Frequently Asked Questions",
+      "settings": {
+        "offset_header": false,
+        "media_position": "left",
+        "media_width": 50,
+        "band_height": 620,
+        "background": "#f2f2f2",
+        "heading": "Frequently Asked Questions",
+        "ink": "#0a0a0b",
+        "head_gap": 28,
+        "single_open": true,
+        "open_first": true,
+        "question_color": "#0a0a0b",
+        "answer_color": "#4a4a4a",
+        "rule_color": "#c9c9c9",
+        "row_padding": 18,
+        "answer_gap": 10,
+        "marker_size": 14,
+        "panel_alignment": "center",
+        "panel_pad_inner": 60,
+        "panel_pad_y": 64,
+        "image": "shopify://shop_images/oily-shoulder-woman-model-2_1.png",
+        "image_url": "",
+        "image_alt": "",
+        "media_ratio_mobile": "1 / 1",
+        "media_background": "#dedede"
+      }
+    }
+  },
+  "order": [
+    "info",
+    "faq"
+  ]
+}

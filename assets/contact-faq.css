@@ -1,0 +1,304 @@
+/* ==========================================================================
+   Contact FAQ — a picture running to one edge of the screen, the questions
+   held against it on the store's content grid
+   ==========================================================================
+   The band is full-bleed for the reason the NAD+ bands are: a content column
+   would open a seam of background between the picture and the edge of the
+   screen. The questions are not full-bleed — their outer edge is worked back
+   onto `.page-width`'s grid, so an answer ends on the same vertical as the
+   text in any ordinary section above or below.
+
+   Type is the store's own: `.section-title` for the heading at the 30/50 the
+   site settles on, 16px for a question, `.section-text` for an answer.
+   ========================================================================== */
+
+.cfq {
+  background-color: var(--cfq-bg, #f2f2f2);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its content clear of it.
+   `--header-height` is published on the root by the header script; the
+   fallback only covers the moment before that runs. */
+.cfq--under-header {
+  padding-top: var(--header-height, var(--cfq-header-fallback, 100px));
+}
+
+.cfq__row {
+  display: flex;
+  align-items: stretch;
+}
+
+/* The side the picture takes is a direction, not an order: it stays first in
+   the markup either way. */
+.cfq--reversed .cfq__row {
+  flex-direction: row-reverse;
+}
+
+/* The half carries no height of its own, so it stretches to whatever the row
+   settles on — which is what guarantees the picture reaches the bottom of the
+   band even when enough answers are open to make the questions taller. */
+.cfq__media {
+  position: relative;
+  flex: 0 0 var(--cfq-media-w, 50%);
+  max-width: var(--cfq-media-w, 50%);
+  overflow: hidden;
+  background-color: var(--cfq-media-bg, #dedede);
+}
+
+/* An empty element carries the height instead of the picture's own shape,
+   which is what makes the band the same at every screen width rather than a
+   different one per viewport. It is a floor: open enough answers and the row
+   grows past it, and the picture grows with it. */
+.cfq__sizer {
+  height: var(--cfq-h, 620px);
+}
+
+.cfq__media picture {
+  display: block;
+}
+
+.cfq__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The questions sit on the theme's own content grid rather than on a padding
+   of their own. `.page-width` is a centred box of `--page-width` with a 5rem
+   inner gutter, so the distance from the screen edge to where its text begins
+   is `(row - page-width) / 2 + 5rem`. That is exactly what the panel's outer
+   padding is set to, which is what "clipped to the page width" means here.
+
+   The percentage resolves against `.cfq__row`, which is the real content
+   width. `100vw` would have been the obvious way to write it and would have
+   been wrong — it counts the scrollbar, and every line in here would sit a
+   few pixels off the grid on any desktop that shows one.
+
+   `max()` covers the narrow end: below `--page-width` the grid is the full
+   screen less its gutter, so the gutter alone is the right answer and the
+   subtraction would otherwise go negative. */
+.cfq__panel {
+  --cfq-grid-edge: max(var(--cfq-grid-pad, 5rem),
+      calc(50% - var(--page-width, 130rem) / 2 + var(--cfq-grid-pad, 5rem)));
+
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: var(--cfq-align, center);
+  padding-block: var(--cfq-pad-y, 64px);
+  /* Outer side to the grid, inner side to the join with the picture. */
+  padding-inline: var(--cfq-pad-inner, 60px) var(--cfq-grid-edge);
+  background-color: var(--cfq-bg, #f2f2f2);
+}
+
+/* Reversed, the panel is on the left, so the two sides swap: the grid edge is
+   now the one facing the screen. */
+.cfq--reversed .cfq__panel {
+  padding-inline: var(--cfq-grid-edge) var(--cfq-pad-inner, 60px);
+}
+
+.cfq__copy {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------
+   30/50, the same declaration the About and NAD+ bands carry. Change it in
+   one and change it in all.
+   -------------------------------------------------------------------------- */
+
+.cfq .cfq__heading {
+  margin: 0 0 var(--cfq-head-gap, 28px);
+  max-width: none;
+  text-align: left;
+  font-size: 30px;
+  line-height: 50px;
+  color: var(--cfq-ink, #0a0a0b);
+}
+
+/* --------------------------------------------------------------------------
+   The questions
+   --------------------------------------------------------------------------
+   Native `<details>`, so a question is keyboard-operable and its answer is
+   found by the browser's own find-in-page whether or not it is open.
+   -------------------------------------------------------------------------- */
+
+.cfq__item {
+  border-bottom: 1px solid var(--cfq-rule-color, #c9c9c9);
+}
+
+/* A `<summary>` is a button in every way that matters, so it is given a
+   button's cursor — and the browser's own disclosure triangle is dropped,
+   since the mark on the right is doing that job. */
+.cfq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: var(--cfq-row-pad, 18px);
+  cursor: pointer;
+  list-style: none;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--cfq-q-color, #0a0a0b);
+}
+
+.cfq__q::-webkit-details-marker {
+  display: none;
+}
+
+/* Only for keyboard use: a click on a question should not leave a ring behind
+   on the way to the answer. */
+.cfq__q:focus-visible {
+  outline: 2px solid var(--cfq-q-color, #0a0a0b);
+  outline-offset: 4px;
+}
+
+.cfq__q-text {
+  min-width: 0;
+}
+
+/* Two bars, crossed. The upright one folds away as the question opens, so
+   the `+` becomes a `−` rather than being swapped for one. Sized in its own
+   variable because this is a glyph, not type. */
+.cfq__marker {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--cfq-marker, 14px);
+  height: var(--cfq-marker, 14px);
+}
+
+.cfq__marker::before,
+.cfq__marker::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1.5px;
+  background-color: currentColor;
+  transform: translateY(-50%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cfq__marker::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.cfq__item[open] .cfq__marker::after {
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.cfq__a {
+  padding-bottom: var(--cfq-row-pad, 18px);
+  margin-top: var(--cfq-answer-gap, 10px);
+  max-width: 58ch;
+  line-height: 1.7;
+  color: var(--cfq-a-color, #4a4a4a);
+}
+
+.cfq__a>*+* {
+  margin-top: 12px;
+}
+
+.cfq__a a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cfq__a ol,
+.cfq__a ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+/* Opening a question is a height change from nothing to whatever the answer
+   needs, which is only animatable where `::details-content` is a box of its
+   own and `auto` is an interpolable size. Both are recent; where either is
+   missing the whole block is skipped and the question snaps open, which is
+   the native behaviour and perfectly fine. */
+@supports selector(::details-content) {
+  .cfq__list {
+    interpolate-size: allow-keywords;
+  }
+
+  .cfq__item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      content-visibility 0.35s allow-discrete;
+  }
+
+  .cfq__item[open]::details-content {
+    block-size: auto;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Stacked, and the picture above the questions whichever side it takes on a
+   wide screen: reversing a column would open the band with an image and leave
+   the heading that names it underneath.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .cfq--under-header {
+    padding-top: var(--header-height, var(--cfq-header-fallback-mobile, 76px));
+  }
+
+  .cfq__row,
+  .cfq--reversed .cfq__row {
+    flex-direction: column;
+  }
+
+  .cfq__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Stacked, the picture is the full width of a phone, where the band's fixed
+     height would crop it to a letterbox. It goes back to a shape here. */
+  .cfq__sizer {
+    height: auto;
+    aspect-ratio: var(--cfq-ratio-mobile, 1 / 1);
+  }
+
+  /* Stacked, there is no join to hold the questions off and no half-grid to
+     align to, so the panel takes `.page-width`'s own narrow-screen gutter. */
+  .cfq__panel,
+  .cfq--reversed .cfq__panel {
+    padding-block: 32px 40px;
+    padding-inline: 1.5rem;
+  }
+
+  .cfq .cfq__heading {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+
+  .cfq__a {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cfq__marker::before,
+  .cfq__marker::after {
+    transition-duration: 0.01ms;
+  }
+
+  @supports selector(::details-content) {
+    .cfq__item::details-content {
+      transition-duration: 0.01ms;
+    }
+  }
+}

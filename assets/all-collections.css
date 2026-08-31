@@ -1,0 +1,252 @@
+/* ==========================================================================
+   All Collections — a list of collections down the side, one collection's
+   products beside it
+   ==========================================================================
+   The grid is the theme's own: `.grid` / `.grid__item` and the column classes
+   from `base.css`, so a card here is the same card as on any collection page.
+   What belongs to this section is the rail, the two full-width items the grid
+   can carry (the empty note and the link out), and the wait between tabs.
+
+   Type is the store's six sizes: 22px for the open collection, 16px for the
+   rest, 12px for the count and the empty note.
+   ========================================================================== */
+
+.acl {
+  padding-top: var(--acl-pad-top, 48px);
+  padding-bottom: var(--acl-pad-bottom, 72px);
+  background-color: var(--acl-bg, #fff);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its content clear of it. */
+.acl--under-header {
+  padding-top: calc(var(--header-height, var(--acl-header-fallback, 100px)) + var(--acl-pad-top, 48px));
+}
+
+.acl__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--acl-gap, 56px);
+}
+
+/* The side the rail takes is a direction, not an order: it stays first in the
+   markup either way, so the list of collections is still read before the
+   products it chooses between. */
+.acl--reversed .acl__row {
+  flex-direction: row-reverse;
+}
+
+/* --------------------------------------------------------------------------
+   The rail
+   -------------------------------------------------------------------------- */
+
+.acl__list {
+  flex: 0 0 var(--acl-list-w, 200px);
+  max-width: var(--acl-list-w, 200px);
+}
+
+/* Held in view while the grid scrolls past it.
+
+   Not at a fixed distance from the top, though. The site header is fixed and
+   hides itself as you scroll down — it animates its own `top` up to minus its
+   height and drops back the moment you scroll up — so any single number here
+   is wrong half the time: far enough down to clear a revealed header leaves a
+   band of nothing once it has gone, and tight enough to look right once it
+   has gone puts the list underneath it the moment it comes back.
+
+   So the number is not fixed. The script measures where the bottom edge of
+   the header actually is on each frame and publishes it as
+   `--acl-sticky-top`, which means the list rides up as the header leaves and
+   is pushed back down as it returns, always by the gap and never through it.
+
+   This fallback is what stands before that script runs, and if it never runs
+   at all: clear of a header at its full height. `--header-height` is the
+   measured value the header publishes on the root; `--header-height-static`
+   is the header's own server-rendered estimate for the first paint. */
+.acl__list--sticky {
+  position: sticky;
+  top: var(--acl-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--acl-sticky-gap, 16px)));
+}
+
+.acl__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--acl-item-gap, 14px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.acl__link {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+  color: var(--acl-list-color, #4a4a4a);
+  transition: color 0.2s ease;
+}
+
+.acl__link:hover {
+  color: var(--acl-list-active, #0a0a0b);
+}
+
+/* The open collection is the one thing on the page that says which grid is
+   being shown, so it is given the step up in the scale rather than a weight
+   that would barely read at this size. */
+.acl__link.is-active {
+  font-size: 22px;
+  color: var(--acl-list-active, #0a0a0b);
+}
+
+/* Every tab carries its count and only the open one shows it, which is what
+   keeps the number with the selection without the rail being re-rendered. */
+.acl__count {
+  display: none;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.acl__link.is-active .acl__count {
+  display: inline;
+}
+
+/* --------------------------------------------------------------------------
+   The grid
+   -------------------------------------------------------------------------- */
+
+.acl__panel {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.acl__grid {
+  margin-bottom: 0;
+}
+
+/* The wait between tabs. Enough to say something is happening and not enough
+   to be a flash on a fast connection — the cards are still there and still
+   readable, they are simply on their way out. */
+.acl.is-loading .acl__grid {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Two things the grid can hold that are not cards: the note when a collection
+   is empty, and the way out to a collection too big to draw in full. Neither
+   takes `.grid__item`, so the column widths never apply to them — they are
+   given the whole row instead. */
+.acl__span {
+  width: 100%;
+  max-width: 100%;
+}
+
+.acl__empty {
+  padding: 40px 0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--acl-list-color, #4a4a4a);
+}
+
+.acl__more {
+  padding-top: 8px;
+}
+
+.acl__more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 16px;
+  text-decoration: none;
+  color: var(--acl-list-active, #0a0a0b);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 4px;
+}
+
+.acl__more-arrow {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 9px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.acl__more-link:hover .acl__more-arrow {
+  transform: translateX(5px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   The rail cannot stay a rail on a phone: at the width left over the products
+   would be two thin columns beside a list of words. It becomes a row above
+   them instead, scrolling sideways, which is the shape a list of filters
+   takes everywhere else on the site.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 989px) {
+  .acl {
+    padding-top: calc(var(--acl-pad-top, 48px) * 0.6);
+    padding-bottom: calc(var(--acl-pad-bottom, 72px) * 0.6);
+  }
+
+  .acl--under-header {
+    padding-top: calc(var(--header-height, var(--acl-header-fallback-mobile, 76px)) + var(--acl-pad-top, 48px) * 0.6);
+  }
+
+  .acl__row,
+  .acl--reversed .acl__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .acl__list,
+  .acl--reversed .acl__list {
+    flex: 0 0 auto;
+    max-width: none;
+    position: static;
+    /* Full-bleed out of the content gutter, so the row of collections runs to
+       both edges of the screen the way a scrolling row should — a scroller
+       that starts and stops inside a margin looks like it has been cut off. */
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .acl__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .acl__items {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 20px;
+    width: max-content;
+  }
+
+  /* One line, whatever the name. Wrapping a row of tabs is what makes a
+     horizontal scroller feel broken. */
+  .acl__link {
+    white-space: nowrap;
+  }
+
+  .acl__link.is-active {
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .acl__link,
+  .acl__more-arrow,
+  .acl.is-loading .acl__grid {
+    transition-duration: 0.01ms;
+  }
+}

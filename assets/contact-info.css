@@ -1,0 +1,227 @@
+/* ==========================================================================
+   Contact Info — the company's particulars on one side, the picture that
+   belongs beside them on the other
+   ==========================================================================
+   Built on the About page's media-and-text band, so the two read as the same
+   store: the same column split, the same mirroring by flex direction, the
+   same 30/50 statement. What is new is the list under the sentence — label
+   and value pairs that either share a line or stack, each drawing its own
+   rules.
+
+   Type is the store's six sizes and nothing else: 30px for the heading, 16px
+   for the sentence, the labels and an inline value, 12px for a stacked one.
+   ========================================================================== */
+
+.cin {
+  padding-top: var(--cin-pad-top, 60px);
+  padding-bottom: var(--cin-pad-bottom, 72px);
+  background-color: var(--cin-bg, #fff);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its own content clear of it.
+   `--header-height` is the theme's own measurement, published on the root by
+   the header script; the fallback only stands in for the moment before that
+   runs. */
+.cin--under-header {
+  padding-top: calc(var(--header-height, var(--cin-header-fallback, 100px)) + var(--cin-pad-top, 60px));
+}
+
+.cin__row {
+  display: flex;
+  align-items: var(--cin-align, flex-start);
+  gap: var(--cin-gap, 72px);
+}
+
+/* The copy leads in the markup whichever side the picture takes, so the
+   heading is always the first thing read. Moving the picture left is a
+   direction, not a reordering. */
+.cin--reversed .cin__row {
+  flex-direction: row-reverse;
+}
+
+.cin__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cin__media {
+  flex: 0 0 var(--cin-media-w, 45%);
+  max-width: var(--cin-media-w, 45%);
+  aspect-ratio: var(--cin-media-ratio, 1);
+  overflow: hidden;
+  border-radius: var(--cin-media-radius, 0px);
+  /* Standing in for the picture before one is chosen, this is what makes the
+     section hold its drawn shape in the editor rather than collapsing. */
+  background-color: var(--cin-media-bg, #d9d9d9);
+}
+
+.cin__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------
+   The statement is the size the rest of the site settles on — 30/50, the same
+   declaration the About bands carry. Change it in one and change it in all.
+   -------------------------------------------------------------------------- */
+
+.cin .cin__heading {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: 30px;
+  line-height: 50px;
+  color: var(--cin-ink, #0a0a0b);
+}
+
+.cin__intro {
+  margin-top: var(--cin-body-gap, 18px);
+  max-width: 46ch;
+  line-height: 28px;
+  color: var(--cin-body-color, #1a1a1a);
+}
+
+.cin__intro>*+* {
+  margin-top: 12px;
+}
+
+/* A bare `<a>` in here would take the browser's own blue: the theme only
+   tints links it has marked as `.rte` or `.underlined-link`, and a richtext
+   setting produces neither. The address stays in the running text and is
+   marked as a link by its underline alone — the same treatment the detail
+   rows below give theirs. */
+.cin__intro a,
+.cin__value a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Details
+   --------------------------------------------------------------------------
+   A description list. The rules belong to the row rather than to the gaps
+   between rows, so a merchant can line one row and leave the rest bare —
+   which is what the drawn page does with the company name.
+   -------------------------------------------------------------------------- */
+
+.cin__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cin-rows-gap, 20px);
+  margin: var(--cin-details-gap, 32px) 0 0;
+  max-width: 46ch;
+}
+
+.cin__item {
+  margin: 0;
+}
+
+/* Padding only where there is a line to be held off. A row with no rules sits
+   on the list's own gap and nothing more, so turning a line on does not shift
+   the rows that have none. */
+.cin__item--rule-above {
+  border-top: 1px solid var(--cin-rule-color, #c9c9c9);
+  padding-top: var(--cin-row-pad, 12px);
+}
+
+.cin__item--rule-below {
+  border-bottom: 1px solid var(--cin-rule-color, #c9c9c9);
+  padding-bottom: var(--cin-row-pad, 12px);
+}
+
+/* Two rows sharing a line would draw it twice, a pixel apart. The second one
+   gives its top edge up. */
+.cin__item--rule-below+.cin__item--rule-above {
+  border-top: 0;
+}
+
+.cin__label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--cin-label-color, #0a0a0b);
+}
+
+.cin__value {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--cin-value-color, #1a1a1a);
+}
+
+.cin__value>* {
+  margin: 0;
+}
+
+.cin__value>*+* {
+  margin-top: 8px;
+}
+
+/* Stacked: the value sits under its label at the smaller of the two sizes. */
+.cin__item--stacked .cin__value {
+  margin-top: var(--cin-value-gap, 6px);
+}
+
+/* Side by side: the value is the label's peer rather than its detail, so it
+   takes the label's size and holds the far edge of the column. */
+.cin__item--inline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cin__item--inline .cin__value {
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   Stacked, and the copy first whichever side the picture takes on a wide
+   screen — the same rule the About bands follow, for the same reason.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .cin {
+    padding-top: calc(var(--cin-pad-top, 60px) * 0.6);
+    padding-bottom: calc(var(--cin-pad-bottom, 72px) * 0.6);
+  }
+
+  .cin--under-header {
+    padding-top: calc(var(--header-height, var(--cin-header-fallback-mobile, 76px)) + var(--cin-pad-top, 60px) * 0.6);
+  }
+
+  .cin__row,
+  .cin--reversed .cin__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 28px;
+  }
+
+  .cin__media {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: var(--cin-media-ratio-mobile, var(--cin-media-ratio, 1));
+  }
+
+  .cin .cin__heading {
+    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    line-height: 1.45;
+  }
+
+  .cin__intro,
+  .cin__details {
+    max-width: none;
+  }
+}

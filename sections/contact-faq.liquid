@@ -1,0 +1,483 @@
+{{ 'contact-faq.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'contact-faq.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  A full-bleed half-and-half band: a picture running to one edge of the
+  screen, and the questions people actually write in about held against it on
+  the store's own content grid.
+
+  The band itself ignores the grid on purpose — a content column here would
+  open a seam of background between the picture and the edge of the screen.
+  The questions do not: the panel's outer padding is worked out from
+  `--page-width` so the far edge of an answer lands exactly where the text in
+  any ordinary section above or below it does. That is the "clipped to the
+  page width" part, and it is why the panel cannot simply take a padding of
+  its own. See `.cfq__panel` in the stylesheet for the arithmetic.
+
+  Every question is a block. They are `<details>` because that is what they
+  are — a native disclosure, keyboard-operable and findable by the browser's
+  own find-in-page, with no script standing between a visitor and an answer.
+  The only script here opens one when its block is selected in the editor.
+
+  No type size is set in the schema. The heading is the theme's
+  `.section-title` at the size the site settles on and an answer is
+  `.section-text`; only the tints and the spacing belong to the section.
+{%- endcomment -%}
+
+{%- liquid
+  assign image = section.settings.image
+  assign image_src = section.settings.image_url
+  if image != blank
+    assign image_src = image | image_url: width: 1600
+  endif
+
+  assign image_mobile = section.settings.image_mobile
+  if image_mobile == blank
+    assign image_mobile = image
+  endif
+
+  assign heading = section.settings.heading | escape | newline_to_br
+
+  comment
+    On a wide screen the band is given a height outright, so there is no ratio
+    to resolve. Stacked, a fixed height would be absurd on a phone, so the
+    picture goes back to a shape there and this is the only ratio left.
+  endcomment
+  assign ratio_mobile = section.settings.media_ratio_mobile | default: '1 / 1'
+
+  comment
+    An exclusive accordion is what a shared `name` buys: opening one question
+    closes the last. Left off, every question opens on its own.
+  endcomment
+  assign group_name = ''
+  if section.settings.single_open
+    assign group_name = 'cfq-' | append: section.id
+  endif
+-%}
+
+<div
+  class="cfq{% if section.settings.media_position == 'right' %} cfq--reversed{% endif %}{% if section.settings.offset_header %} cfq--under-header{% endif %}"
+  style="
+    --cfq-bg: {{ section.settings.background }};
+    --cfq-ink: {{ section.settings.ink }};
+    --cfq-media-w: {{ section.settings.media_width }}%;
+    --cfq-h: {{ section.settings.band_height }}px;
+    --cfq-ratio-mobile: {{ ratio_mobile }};
+    --cfq-media-bg: {{ section.settings.media_background }};
+    --cfq-pad-inner: {{ section.settings.panel_pad_inner }}px;
+    --cfq-pad-y: {{ section.settings.panel_pad_y }}px;
+    --cfq-align: {{ section.settings.panel_alignment }};
+    --cfq-head-gap: {{ section.settings.head_gap }}px;
+    --cfq-q-color: {{ section.settings.question_color }};
+    --cfq-a-color: {{ section.settings.answer_color }};
+    --cfq-rule-color: {{ section.settings.rule_color }};
+    --cfq-row-pad: {{ section.settings.row_padding }}px;
+    --cfq-answer-gap: {{ section.settings.answer_gap }}px;
+    --cfq-marker: {{ section.settings.marker_size }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="cfq__row">
+    {%- comment -%}
+      The picture comes first in the markup, so it sits on the left until the
+      row is reversed — which is why "right" is what adds `--reversed`, not
+      "left".
+    {%- endcomment -%}
+    <div class="cfq__media">
+      {%- comment -%}
+        An empty element carries the shape. It, not the picture, is what tells
+        the row how tall this half wants to be, which leaves the half free to
+        stretch to whatever the row settles on — so the picture still reaches
+        the bottom of the band when enough answers are open to make the
+        questions the taller half.
+      {%- endcomment -%}
+      <div class="cfq__sizer" aria-hidden="true"></div>
+
+      {%- if image_src != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ image_mobile | image_url: width: 750 }} 750w,
+                {{ image_mobile | image_url: width: 1100 }} 1100w
+              "
+              sizes="100vw"
+            >
+          {%- endif -%}
+          <img
+            class="cfq__img"
+            src="{{ image_src }}"
+            {%- if image != blank %}
+              srcset="
+                {{ image | image_url: width: 700 }} 700w,
+                {{ image | image_url: width: 1100 }} 1100w,
+                {{ image | image_url: width: 1600 }} 1600w
+              "
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            {%- endif %}
+            sizes="(min-width: 750px) {{ section.settings.media_width }}vw, 100vw"
+            alt="{{ section.settings.image_alt | escape }}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      {%- endif -%}
+    </div>
+
+    <div class="cfq__panel">
+      <div class="cfq__copy">
+        {%- if heading != blank -%}
+          <h2 class="section-title cfq__heading">{{ heading }}</h2>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="cfq__list">
+            {%- for block in section.blocks -%}
+              <details
+                class="cfq__item"
+                id="cfq-{{ section.id }}-{{ block.id }}"
+                {% if group_name != blank %}
+                  name="{{ group_name }}"
+                {% endif %}
+                {% if forloop.first and section.settings.open_first %}
+                  open
+                {% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <summary class="cfq__q">
+                  <span class="cfq__q-text">{{ block.settings.question }}</span>
+                  {%- comment -%}
+                    Two bars drawn in CSS rather than a `+` and a `−` set in
+                    type: the upright one folds away as the question opens,
+                    which a pair of glyphs cannot do. It is decoration — the
+                    `<summary>` already announces its own open state.
+                  {%- endcomment -%}
+                  <span class="cfq__marker" aria-hidden="true"></span>
+                </summary>
+
+                {%- if block.settings.answer != blank -%}
+                  <div class="cfq__a section-text">{{ block.settings.answer }}</div>
+                {%- endif -%}
+              </details>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact FAQ",
+  "tag": "section",
+  "class": "section-contact-faq",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image side",
+      "info": "The image runs to that edge of the screen. The questions stay on the store's content grid.",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 30,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "label": "Image width",
+      "info": "As a share of the screen. The questions take what is left.",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "band_height",
+      "min": 320,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "label": "Band height",
+      "info": "A floor, not a ceiling — the band grows if the open questions need more room.",
+      "default": 620
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Panel background",
+      "default": "#F2F2F2"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Set in the theme's shared section statement. Press Enter to break it onto a new line.",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "color",
+      "id": "ink",
+      "label": "Heading colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "range",
+      "id": "head_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space below the heading",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "single_open",
+      "label": "Only one answer open at a time",
+      "info": "Opening a question closes the last one.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open the first question",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Question colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Answer colour",
+      "default": "#4A4A4A"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Line colour",
+      "info": "Drawn under each question.",
+      "default": "#C9C9C9"
+    },
+    {
+      "type": "range",
+      "id": "row_padding",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Space around a question",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "answer_gap",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Space above an answer",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "marker_size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Open and close mark",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Panel padding"
+    },
+    {
+      "type": "select",
+      "id": "panel_alignment",
+      "label": "Questions alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "panel_pad_inner",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space from the image",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "panel_pad_y",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding above and below",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image (mobile)",
+      "info": "Optional — a separate crop for small screens. Falls back to the desktop image above."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Image URL",
+      "info": "Used when no image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image description",
+      "info": "Read out in place of the image."
+    },
+    {
+      "type": "select",
+      "id": "media_ratio_mobile",
+      "label": "Image shape (mobile)",
+      "info": "The band's height only applies on a wide screen. Stacked, the image takes this shape instead.",
+      "options": [
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 3",
+          "label": "Landscape"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait"
+        }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Image background",
+      "info": "Shows while the image loads, and in place of it before one is chosen.",
+      "default": "#DEDEDE"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "How long does shipping take?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Standard shipping takes 3-7 business days depending on your location. You will receive tracking updates via email/SMS once your order is dispatched.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact FAQ",
+      "blocks": [
+        {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Standard shipping takes 3-7 business days depending on your location. You will receive tracking updates via email/SMS once your order is dispatched.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Is this suitable for all skin types?",
+            "answer": "<p>Yes! The formulation is designed to be gentle yet effective for dry and dehydrated skin, aging and mature skin, oily and combination skin, and sensitive skin — it is free from irritants, making it safe for reactive skin.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>Returns are eligible within 48 hours of delivery. All items must be unused and returned with the original invoice, in their original packaging, including price tags, labels, boxes and any accompanying accessories. All returned products undergo a quality assessment before approval.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Currently, we ship within India. We are working on expanding our availability to international markets soon!</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,377 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+{{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+{{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+{{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+{{ 'all-collections.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'all-collections.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  One collection at a time, chosen from a list down the side.
+
+  The list is the section's blocks: a block is a collection and, if the
+  merchant wants the tab to read differently from the collection's own title,
+  a label to call it by. The grid beside it is that collection's products.
+
+  Each tab is a real link to a real collection page, which is what makes the
+  section work with the script switched off — and what the script uses when it
+  is on, since the link's own URL is what it asks Shopify to re-render the
+  grid from. Nothing here has to name a collection twice.
+
+  The `<ul>` the cards sit in belongs to this section and is never replaced;
+  only its items are. That is deliberate. The column counts are written onto
+  it as the theme's own grid classes, and a fetched grid cannot carry section
+  settings with it — see `snippets/all-collections-grid.liquid` for why. Keep
+  anything configurable on this element and out of the swap.
+
+  Every card's stylesheet is loaded above rather than by the first card, so
+  the markup that arrives by fetch is cards and nothing else.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    The tab to open with. If the collection this page is actually on is one of
+    the tabs — which is the arrangement the template is built for, the "All"
+    tab being the collection the template is assigned to — then that is the
+    one, and the page opens on the thing its URL says it is. Otherwise the
+    first block leads, which is the only other answer that is stable between
+    two visits.
+  endcomment
+  assign active_index = -1
+  for block in section.blocks
+    if block.settings.collection != blank and block.settings.collection.id == collection.id
+      assign active_index = forloop.index0
+      break
+    endif
+  endfor
+
+  comment
+    Failing that, the first block that actually names a collection — not
+    simply the first block, which on a section just added to a page is an
+    empty one and would open the page on nothing.
+  endcomment
+  if active_index == -1
+    for block in section.blocks
+      if block.settings.collection != blank
+        assign active_index = forloop.index0
+        break
+      endif
+    endfor
+  endif
+
+  assign active_collection = blank
+  if active_index >= 0
+    assign active_collection = section.blocks[active_index].settings.collection
+  endif
+-%}
+
+<div
+  class="acl{% if section.settings.list_position == 'right' %} acl--reversed{% endif %}{% if section.settings.offset_header %} acl--under-header{% endif %}"
+  data-acl
+  data-acl-endpoint="all-collections-grid"
+  style="
+    --acl-pad-top: {{ section.settings.padding_top }}px;
+    --acl-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --acl-bg: {{ section.settings.background }};
+    --acl-gap: {{ section.settings.column_gap }}px;
+    --acl-list-w: {{ section.settings.list_width }}px;
+    --acl-item-gap: {{ section.settings.item_gap }}px;
+    --acl-list-color: {{ section.settings.list_color }};
+    --acl-list-active: {{ section.settings.list_active_color }};
+    --acl-sticky-gap: {{ section.settings.sticky_gap }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width acl__row">
+    {%- if section.blocks.size > 0 -%}
+      {%- comment -%}
+        A list of links to collections, which is what a `<nav>` is for. Not a
+        tablist: these are addresses, they work as addresses without the
+        script, and calling them tabs would promise a keyboard behaviour —
+        arrow keys moving between them — that real links do not have.
+      {%- endcomment -%}
+      <nav
+        class="acl__list{% if section.settings.sticky_list %} acl__list--sticky{% endif %}"
+        aria-label="{{ section.settings.list_label | escape }}"
+      >
+        <ul class="acl__items" role="list">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign block_collection = block.settings.collection
+              assign label = block.settings.label
+              if label == blank
+                assign label = block_collection.title
+              endif
+              assign is_active = false
+              if forloop.index0 == active_index
+                assign is_active = true
+              endif
+            -%}
+            {%- if block_collection != blank -%}
+              <li class="acl__item" {{ block.shopify_attributes }}>
+                <a
+                  class="acl__link{% if is_active %} is-active{% endif %}"
+                  href="{{ block_collection.url }}"
+                  data-acl-link
+                  data-acl-handle="{{ block_collection.handle }}"
+                  {% if is_active %}
+                    aria-current="true"
+                  {% endif %}
+                >
+                  <span class="acl__label">{{ label }}</span>
+                  {%- if section.settings.show_count -%}
+                    {%- comment -%}
+                      Every tab carries its count, but only the open one shows
+                      it — the stylesheet decides that, not the script. So the
+                      number follows the selection on its own, and the list
+                      never has to be re-rendered to keep up with the grid.
+
+                      Padded to two figures below ten, which is how it is
+                      drawn: a lone digit floating beside a word reads as a
+                      typo rather than a total.
+                    {%- endcomment -%}
+                    {%- assign count = block_collection.all_products_count -%}
+                    <sup class="acl__count">
+                      {%- if count < 10 -%}0{%- endif -%}{{ count }}
+                    </sup>
+                  {%- endif -%}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- comment -%}
+      `aria-live` on the grid rather than on anything around it: the swap is
+      the only thing on the page that changes without the page moving, so this
+      is what has to announce itself. `aria-busy` covers the wait in between.
+    {%- endcomment -%}
+    <div class="acl__panel" data-acl-panel>
+      <ul
+        class="acl__grid grid product-grid grid--{{ section.settings.columns_mobile }}-col-tablet-down grid--{{ section.settings.columns_desktop }}-col-desktop"
+        id="acl-grid-{{ section.id }}"
+        data-acl-grid
+        aria-live="polite"
+        aria-busy="false"
+      >
+        {%- if active_collection != blank -%}
+          {% render 'all-collections-grid', grid_collection: active_collection, section_id: section.id %}
+        {%- endif -%}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "All Collections",
+  "tag": "section",
+  "class": "section-all-collections",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "list_position",
+      "label": "List position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "list_width",
+      "min": 120,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "label": "List width",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between list and products",
+      "default": 56
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Collection list"
+    },
+    {
+      "type": "text",
+      "id": "list_label",
+      "label": "List description",
+      "info": "Read out in place of the list by a screen reader. Not shown on the page.",
+      "default": "Collections"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_list",
+      "label": "Keep the list in view while the products scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "sticky_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap the held list keeps",
+      "info": "How far the list stays clear of the site header, and of the top of the screen once the header has scrolled away.",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show the product count",
+      "info": "Shown beside the open collection only.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Space between collections",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "list_color",
+      "label": "Collection name colour",
+      "default": "#4A4A4A"
+    },
+    {
+      "type": "color",
+      "id": "list_active_color",
+      "label": "Open collection colour",
+      "default": "#0A0A0B"
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns on desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Name",
+          "info": "Optional — what to call it in the list. Falls back to the collection's own title."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "All Collections",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
