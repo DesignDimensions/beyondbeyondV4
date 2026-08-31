@@ -1,19 +1,25 @@
 {
   "sections": {
-    "main": {
-      "type": "main-blog",
+    "hero": {
+      "type": "blog-hero-carousel",
       "settings": {
-        "layout": "collage",
-        "show_image": true,
-        "image_height": "medium",
-        "show_date": true,
-        "show_author": false,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "blog": "blog",
+        "heading": "Let's Talk Skincare!",
+        "subheading": "Our top pick for you.",
+        "posts_limit": 6
+      }
+    },
+    "grid": {
+      "type": "blog-post-grid",
+      "settings": {
+        "blog": "blog",
+        "heading": "Latest Journals",
+        "posts_limit": 9
       }
     }
   },
   "order": [
-    "main"
+    "hero",
+    "grid"
   ]
 }

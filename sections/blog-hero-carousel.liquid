@@ -12,6 +12,7 @@
 -%}
 
 <div class="bhc">
+  <div class="bhc__band">
   <div class="page-width bhc__header">
     {%- if section.settings.heading != blank -%}
       <h1 class="bhc__heading">{{ section.settings.heading | escape }}</h1>
@@ -51,9 +52,8 @@
           <h2 class="bhc__title">{{ post.title | escape }}</h2>
         </div>
       </a>
-    {%- else -%}
-      <p class="bhc__subheading">{{ 'blogs.article.no_posts' | t }}</p>
     {%- endfor -%}
+  </div>
   </div>
 </div>
 

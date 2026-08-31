@@ -1,0 +1,104 @@
+{{ 'blog-post-grid.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    Like the carousel above it, the blog is chosen in the settings rather than
+    taken from the page, so one listing can show two different blogs.
+  endcomment
+  assign bpg_blog = blogs[section.settings.blog]
+  if bpg_blog == blank or bpg_blog.articles_count == 0
+    assign bpg_blog = blog
+  endif
+-%}
+
+<div class="bpg">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bpg__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    <div class="bpg__grid">
+      {%- for post in bpg_blog.articles limit: section.settings.posts_limit -%}
+        {%- liquid
+          assign card_image = post.metafields.journal.hero_image.value
+          if card_image == blank
+            assign card_image = post.image
+          endif
+
+          comment
+            The design sets the title's opening clause heavier than the rest.
+            A colon is the break the titles themselves offer, so the lead-in is
+            everything up to the first one; a title without a colon has no such
+            break and is set entirely in the heavier weight.
+          endcomment
+          assign title_parts = post.title | split: ':'
+          assign lead = title_parts | first | append: ':'
+          assign tail = post.title | remove_first: lead
+        -%}
+        <a class="bpg__card" href="{{ post.url }}">
+          <div class="bpg__media">
+            {%- if card_image != blank -%}
+              <img
+                src="{{ card_image | image_url: width: 700 }}"
+                srcset="
+                  {{ card_image | image_url: width: 350 }} 350w,
+                  {{ card_image | image_url: width: 700 }} 700w,
+                  {{ card_image | image_url: width: 1050 }} 1050w
+                "
+                sizes="(min-width: 990px) 29vw, (min-width: 600px) 46vw, 92vw"
+                width="{{ card_image.width }}"
+                height="{{ card_image.height }}"
+                alt="{{ card_image.alt | default: post.title | escape }}"
+                loading="lazy"
+              >
+            {%- endif -%}
+          </div>
+          <div class="bpg__text">
+            <h3 class="bpg__title">
+              {%- if title_parts.size > 1 -%}
+                <b>{{ lead | escape }}</b>{{ tail | escape }}
+              {%- else -%}
+                <b>{{ post.title | escape }}</b>
+              {%- endif -%}
+            </h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog post grid",
+  "tag": "section",
+  "class": "section-blog-post-grid",
+  "settings": [
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Latest Journals"
+    },
+    {
+      "type": "range",
+      "id": "posts_limit",
+      "min": 3,
+      "max": 24,
+      "step": 1,
+      "label": "Posts shown",
+      "default": 9
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog post grid"
+    }
+  ]
+}
+{% endschema %}

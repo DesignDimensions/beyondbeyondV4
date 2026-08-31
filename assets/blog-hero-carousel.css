@@ -9,9 +9,26 @@
    below is what brings its first card back onto the content column's edge.
    ========================================================================== */
 
+/* White behind the padding the fixed header sits over, exactly as the design
+   has it; the grey band begins where the header ends. */
 .bhc {
-  background-color: #e6e6e6;
+  /* What `.page-width` pads its own max-width by, at each of the theme's two
+     breakpoints. Holding it here lets the full-bleed rail below line its first
+     card up with the heading, which is in a `.page-width` container. */
+  --bhc-pad: 1.5rem;
+
+  background-color: #fff;
   padding-top: var(--header-height, var(--header-height-static, 96px));
+}
+
+@media screen and (min-width: 750px) {
+  .bhc {
+    --bhc-pad: 5rem;
+  }
+}
+
+.bhc__band {
+  background-color: #e6e6e6;
   padding-bottom: 120px;
 }
 
@@ -47,10 +64,10 @@
   display: flex;
   gap: 3.3333%;
   margin-top: 45px;
-  padding-inline: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + 1.5rem);
+  padding-inline: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + var(--bhc-pad));
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline-start: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + 1.5rem);
+  scroll-padding-inline-start: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + var(--bhc-pad));
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior-x: contain;
