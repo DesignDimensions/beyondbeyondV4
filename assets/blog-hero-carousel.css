@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Blog hero carousel — the "top pick" rail at the head of a blog listing.
+
+   Drawn on the same 1200 content column as the rest of the site, so the two
+   card measures are ratios of it rather than the design's literal pixels: a
+   card is two thirds of the column (800 of 1200) and the gap between two cards
+   is a thirtieth (40 of 1200). The rail itself runs the full width of the
+   viewport so the second card can carry on past the right edge — the padding
+   below is what brings its first card back onto the content column's edge.
+   ========================================================================== */
+
+.bhc {
+  background-color: #e6e6e6;
+  padding-top: var(--header-height, var(--header-height-static, 96px));
+  padding-bottom: 120px;
+}
+
+.bhc__header {
+  padding-top: 66px;
+}
+
+.bhc__heading {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+.bhc__subheading {
+  margin: 22px 0 0;
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #202020;
+}
+
+/* The gutter is written here rather than carried in a custom property: a
+   percentage inside a variable resolves against whatever element ends up using
+   it, and this one has to resolve against the full-width band. The 1.5rem
+   matches the padding `.page-width` puts inside its own max-width, so the
+   first card starts on the same line as the heading above it. */
+.bhc__rail {
+  display: flex;
+  gap: 3.3333%;
+  margin-top: 45px;
+  padding-inline: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + 1.5rem);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline-start: calc(max(0px, (100% - var(--page-width, 130rem)) / 2) + 1.5rem);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.bhc__rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* Two thirds of the rail's content box, which the padding above has already
+   reduced to the content column — so this is two thirds of that column. */
+.bhc__card {
+  flex: 0 0 66.6667%;
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: inherit;
+}
+
+.bhc__media {
+  aspect-ratio: 800 / 346;
+  background-color: #d9d9d9;
+  overflow: hidden;
+}
+
+.bhc__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bhc__card:hover .bhc__media img {
+  transform: scale(1.03);
+}
+
+.bhc__text {
+  display: flex;
+  align-items: flex-start;
+  min-height: 168px;
+  padding: 32px 16px;
+  background-color: #fff;
+}
+
+.bhc__title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #202020;
+}
+
+.bhc__card:hover .bhc__title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media screen and (max-width: 989px) {
+  .bhc {
+    padding-bottom: 64px;
+  }
+
+  .bhc__header {
+    padding-top: 40px;
+  }
+
+  .bhc__heading {
+    font-size: 34px;
+  }
+
+  .bhc__rail {
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  /* One card at a time, with the next one just showing. */
+  .bhc__card {
+    flex: 0 0 86%;
+  }
+
+  .bhc__text {
+    min-height: 120px;
+    padding: 24px 16px;
+  }
+}

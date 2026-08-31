@@ -1,0 +1,145 @@
+{{ 'article-related.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    The rail is drawn from the article's own blog, skipping the post being read.
+    One extra is fetched beyond the limit so removing the current post still
+    leaves a full row.
+  endcomment
+  assign want = section.settings.posts_limit
+  assign fetch = want | plus: 1
+  assign shown = 0
+-%}
+
+<article-related class="ajr" data-scrollable="true">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="ajr__heading">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+
+  <div class="ajr__rail" data-ajr-rail>
+    {%- for post in blog.articles limit: fetch -%}
+      {%- if post.id == article.id -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- if shown >= want -%}
+        {%- break -%}
+      {%- endif -%}
+      {%- assign shown = shown | plus: 1 -%}
+
+      {%- liquid
+        assign card_image = post.metafields.journal.hero_image.value
+        if card_image == blank
+          assign card_image = post.image
+        endif
+      -%}
+
+      <a class="ajr__card" href="{{ post.url }}">
+        <div class="ajr__media">
+          {%- if card_image != blank -%}
+            <img
+              src="{{ card_image | image_url: width: 700 }}"
+              srcset="
+                {{ card_image | image_url: width: 350 }} 350w,
+                {{ card_image | image_url: width: 700 }} 700w
+              "
+              sizes="(min-width: 990px) 346px, 260px"
+              width="{{ card_image.width }}"
+              height="{{ card_image.height }}"
+              alt="{{ card_image.alt | default: post.title | escape }}"
+              loading="lazy"
+            >
+          {%- endif -%}
+        </div>
+        <div class="ajr__text">
+          <h3 class="ajr__title">{{ post.title | escape }}</h3>
+        </div>
+      </a>
+    {%- endfor -%}
+  </div>
+
+  <div class="ajr__progress" aria-hidden="true">
+    {%- for i in (1..shown) -%}
+      <span class="ajr__seg{% if forloop.first %} is-active{% endif %}"></span>
+    {%- endfor -%}
+  </div>
+</article-related>
+
+{% javascript %}
+  /* The rail is a plain overflow-scroll element — the browser does the
+     scrolling, dragging and snapping. All this adds is the progress bar, since
+     the native scrollbar is hidden: the thumb's width is the share of the rail
+     that is on screen, and its offset is how far through that view has moved. */
+  class ArticleRelated extends HTMLElement {
+    connectedCallback() {
+      this.rail = this.querySelector('[data-ajr-rail]');
+      this.segments = [...this.querySelectorAll('.ajr__seg')];
+      if (!this.rail || !this.segments.length) return;
+
+      this.update = this.update.bind(this);
+      this.rail.addEventListener('scroll', this.update, { passive: true });
+
+      /* A rail's overflow depends on the width of images that may not have
+         loaded yet, so remeasure when the box changes rather than only once. */
+      this.observer = new ResizeObserver(this.update);
+      this.observer.observe(this.rail);
+
+      this.update();
+    }
+
+    disconnectedCallback() {
+      this.rail?.removeEventListener('scroll', this.update);
+      this.observer?.disconnect();
+    }
+
+    update() {
+      const { scrollWidth, clientWidth, scrollLeft } = this.rail;
+      const overflow = scrollWidth - clientWidth;
+
+      this.dataset.scrollable = overflow > 1 ? 'true' : 'false';
+      if (overflow <= 1) return;
+
+      /* Which card the rail has reached: its scroll offset over the pitch of one
+         card. Measured from the first two cards rather than assumed, so the
+         gap and the responsive card width are both accounted for. */
+      const [first, second] = this.rail.children;
+      const pitch = second ? second.offsetLeft - first.offsetLeft : first.offsetWidth;
+      const index = Math.min(Math.round(scrollLeft / pitch), this.segments.length - 1);
+
+      this.segments.forEach((seg, i) => seg.classList.toggle('is-active', i === index));
+    }
+  }
+
+  if (!customElements.get('article-related')) {
+    customElements.define('article-related', ArticleRelated);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Article related posts",
+  "tag": "section",
+  "class": "section-article-related",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Topics You Might Also Like!"
+    },
+    {
+      "type": "range",
+      "id": "posts_limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Posts shown",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Article related posts"
+    }
+  ]
+}
+{% endschema %}

@@ -18,6 +18,8 @@
     --fu-tile-width: {{ section.settings.tile_width }}px;
     --fu-gap: {{ section.settings.gap }}px;
     --fu-radius: {{ section.settings.radius }}px;
+    {% if section.settings.background != blank %}--fu-bg: {{ section.settings.background }};{% endif %}
+    {% if section.settings.text_color != blank %}--fu-fg: {{ section.settings.text_color }};{% endif %}
   "
   {{ section.shopify_attributes }}
 >
@@ -143,9 +145,18 @@
       "id": "heading_size",
       "label": "Heading size",
       "options": [
-        { "value": "h2", "label": "Small" },
-        { "value": "h1", "label": "Medium" },
-        { "value": "h0", "label": "Large" }
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
       ],
       "default": "h1"
     },
@@ -172,6 +183,18 @@
       "id": "color_scheme",
       "label": "Color scheme",
       "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "info": "Overrides the section's default background when set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading and handle colour",
+      "info": "Use a light colour on a dark background."
     },
     {
       "type": "header",
@@ -344,9 +367,15 @@
     {
       "name": "Follow Us",
       "blocks": [
-        { "type": "image" },
-        { "type": "image" },
-        { "type": "image" }
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
       ]
     }
   ]

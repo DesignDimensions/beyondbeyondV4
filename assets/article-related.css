@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Topics You Might Also Like — a rail of post cards under a journal article.
+
+   The rail is deliberately inset less than the article above it (64px against
+   the article's 120) and the last card is allowed to run past the right edge,
+   so the row reads as something that continues rather than a closed grid of
+   four. The segmented bar under it is the only affordance saying so on a
+   trackpad, where no scrollbar is drawn.
+   ========================================================================== */
+
+/* A custom element is inline until told otherwise, and this one carries the
+   section's band and padding. */
+.ajr {
+  display: block;
+
+  --ajr-inset: 64px;
+  --ajr-card: 346px;
+  --ajr-gap: 24px;
+
+  padding-top: 97px;
+  padding-bottom: 80px;
+  background-color: #f1f1f1;
+}
+
+.ajr__heading {
+  margin: 0 0 73px;
+  padding-inline: var(--ajr-inset);
+  font-family: var(--font-body-family);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+/* The rail scrolls the full width of the viewport but starts at the inset, so
+   the first card lines up with the heading and the overflow runs off the right
+   edge rather than inside a boxed container. */
+.ajr__rail {
+  display: flex;
+  gap: var(--ajr-gap);
+  padding-inline: var(--ajr-inset);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* Without this the snap port starts at the padding box, so mandatory snapping
+     pulls the first card flush to the edge and the inset is never seen. */
+  scroll-padding-inline-start: var(--ajr-inset);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.ajr__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.ajr__card {
+  flex: 0 0 var(--ajr-card);
+  width: var(--ajr-card);
+  scroll-snap-align: start;
+  background-color: #fff;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ajr__media {
+  aspect-ratio: 1 / 1;
+  background-color: #e6e6e6;
+  overflow: hidden;
+}
+
+.ajr__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ajr__card:hover .ajr__media img {
+  transform: scale(1.03);
+}
+
+/* A fixed text box under every card, so a two-line title and a four-line one
+   still leave the row of cards ending on one line. */
+.ajr__text {
+  display: flex;
+  align-items: flex-start;
+  min-height: 176px;
+  padding: 32px 20px;
+}
+
+.ajr__title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.625;
+  color: #000;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ajr__card:hover .ajr__title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Progress indicator — one segment per card, the current one thicker
+
+   The design draws this as a 220px bar centred under the rail, divided into as
+   many equal segments as there are cards, all 2px except the current card's,
+   which is 4px and grows upward (the segments are bottom-aligned).
+   -------------------------------------------------------------------------- */
+
+.ajr__progress {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  width: 220px;
+  height: 4px;
+  margin: 80px auto 0;
+}
+
+.ajr__seg {
+  flex: 1 1 0;
+  height: 2px;
+  background-color: #000;
+  transition: height 0.25s ease;
+}
+
+.ajr__seg.is-active {
+  height: 4px;
+}
+
+/* A rail with nothing to scroll has nothing to report. The attribute starts at
+   `true` in the markup so the bar is present until the script says otherwise,
+   rather than depending on the script to reveal it. */
+.ajr[data-scrollable='false'] .ajr__progress {
+  display: none;
+}
+
+@media screen and (max-width: 989px) {
+  .ajr {
+    --ajr-inset: 24px;
+    --ajr-card: 260px;
+    --ajr-gap: 16px;
+
+    padding-top: 64px;
+    padding-bottom: 56px;
+  }
+
+  .ajr__heading {
+    margin-bottom: 32px;
+    font-size: 24px;
+  }
+
+  .ajr__text {
+    min-height: 140px;
+    padding: 24px 16px;
+  }
+
+  .ajr__progress {
+    margin-top: 32px;
+  }
+}

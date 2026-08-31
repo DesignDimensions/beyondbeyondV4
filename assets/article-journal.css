@@ -1,0 +1,438 @@
+/* ==========================================================================
+   Journal article — the long-form blog post layout.
+
+   The design is drawn on a 1440 frame with a 1200 content column inside it, so
+   every horizontal measure here is a ratio of that column — `--aj-frame` — and
+   not one of the design's literal pixel values. The one rule that shapes the
+   whole page is the split: body copy occupies the right 60% of the column and
+   nothing occupies the left 40%, which is what gives the page its wide, quiet
+   left margin and lets the meta and share controls sit out there.
+   ========================================================================== */
+
+.aj {
+  /* The article shares the theme's content column so its left edge lines up
+     with the header logo and every other section on the site. The design drew
+     it at 1200 on a 1440 frame; the ratios below are held against whatever
+     `--page-width` is set to instead of that literal number. */
+  --aj-frame: var(--page-width, 130rem);
+  --aj-split: 40%;
+  --aj-block-gap: 128px;
+  --aj-rule: #000;
+
+  background-color: #fff;
+}
+
+/* The page's spine: an empty left column and the copy on the right. The empty
+   column is not decorative — the meta list and the share controls are placed
+   into it, and the section headings hang off its right edge. */
+.aj-grid {
+  display: grid;
+  grid-template-columns: var(--aj-split) 1fr;
+  align-items: start;
+}
+
+.aj-body {
+  grid-column: 2;
+  max-width: 720px;
+}
+
+/* Grid items carry a min-content floor by default, and a child sized with a
+   percentage can push that floor past the track — which sends the whole page
+   sideways on narrow screens. Nothing here needs that floor. */
+.aj-hero>*,
+.aj-grid>* {
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Hero — copy on the left half, image bleeding off the right
+   -------------------------------------------------------------------------- */
+
+/* The site header is fixed and paints nothing until the page scrolls, so the
+   hero has to hold its own content clear of it. `--header-height` is the
+   header script's measurement; the static value covers the first paint. */
+/* White behind the padding so the strip the header sits over stays white all
+   the way across; the two halves below it carry their own grounds. */
+.aj-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  background-color: #fff;
+  padding-top: var(--header-height, var(--header-height-static, 96px));
+}
+
+.aj-hero__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  background-color: #F5F5F5;
+  padding: 64px 0;
+}
+
+/* Half the content column, hugging the right of the half-width cell, so its
+   left edge lands on the same line `.page-width` puts every other section on —
+   the frame's edge plus that container's own 1.5rem of padding. */
+.aj-hero__inner {
+  width: min(100% - 3rem, calc(var(--aj-frame) / 2 - 1.5rem));
+  padding-inline-end: 48px;
+}
+
+.aj-hero__readtime {
+  margin: 0 0 20px;
+  font-family: var(--font-body-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #202020;
+}
+
+.aj-hero__title {
+  margin: 0;
+  max-width: 480px;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: #000;
+}
+
+/* The design rules off the title before the byline — 480 of the frame's 1440,
+   so it stops short of the column edge rather than running its full width. */
+.aj-hero__rule {
+  width: min(100%, 480px);
+  height: 0;
+  margin: 14px 0 16px;
+  border: 0;
+  border-top: 1px solid var(--aj-rule);
+}
+
+.aj-hero__byline {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #202020;
+}
+
+/* 720 x 700 in the frame — the image keeps that ratio and crops rather than
+   letterboxing, so the split edge stays exactly on the half. */
+.aj-hero__media {
+  aspect-ratio: 720 / 700;
+  min-height: 100%;
+  background-color: #f1f1f1;
+}
+
+.aj-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aj-hero__media--mobile {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Meta column + opening statement
+   -------------------------------------------------------------------------- */
+
+.aj-intro {
+  padding-top: 128px;
+  padding-bottom: 128px;
+}
+
+.aj-meta {
+  grid-column: 1;
+  max-width: 333px;
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000;
+}
+
+.aj-meta__row {
+  padding-top: 16px;
+}
+
+.aj-meta__row:first-child {
+  padding-top: 0;
+}
+
+/* Only the date is ruled off. The author and the share control below it run on
+   without one, which is what the design does — so this is a rule on one row,
+   not a divider between every row. */
+.aj-meta__row--ruled {
+  padding-bottom: 54px;
+  border-bottom: 1px solid var(--aj-rule);
+}
+
+/* The share row sits well clear of the author line above it. */
+.aj-meta__row--share {
+  padding-top: 37px;
+}
+
+.aj-meta__label {
+  font-weight: 700;
+}
+
+.aj-intro__lead {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+.aj-rule {
+  height: 0;
+  margin: 32px 0;
+  border: 0;
+  border-top: 1px solid var(--aj-rule);
+}
+
+/* --------------------------------------------------------------------------
+   Body copy
+   -------------------------------------------------------------------------- */
+
+.aj-block {
+  padding-top: var(--aj-block-gap);
+  padding-bottom: var(--aj-block-gap);
+}
+
+/* An image always follows a block of copy, and the copy above it already
+   carries a full block of space — so the block sheds its bottom padding when a
+   figure comes next, rather than the two stacking into a gap twice the size. */
+.aj-block:has(+ .aj-figure) {
+  padding-bottom: 0;
+}
+
+.aj-heading {
+  margin: 0 0 32px;
+  font-family: var(--font-body-family);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+.aj-copy {
+  font-family: var(--font-body-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #202020;
+}
+
+/* `metafield_tag` wraps rich text in a div of its own, so the first and last
+   paragraph sit a level deeper than they would in hand-written markup. Both
+   depths are trimmed so the block's own padding is the only space around it. */
+.aj-copy> :first-child,
+.aj-copy>*> :first-child {
+  margin-top: 0;
+}
+
+.aj-copy> :last-child,
+.aj-copy>*> :last-child {
+  margin-bottom: 0;
+}
+
+.aj-copy p {
+  margin: 0 0 28px;
+}
+
+.aj-copy strong,
+.aj-copy b {
+  font-weight: 700;
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Images
+   -------------------------------------------------------------------------- */
+
+.aj-figure {
+  margin: var(--aj-block-gap) 0 0;
+}
+
+.aj-figure__media {
+  aspect-ratio: 1200 / 640;
+  background-color: #f1f1f1;
+}
+
+.aj-banner {
+  margin: var(--aj-block-gap) 0 0;
+  aspect-ratio: 1440 / 640;
+  background-color: #f1f1f1;
+}
+
+.aj-figure__media img,
+.aj-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --------------------------------------------------------------------------
+   Share control — the icon and its label, sitting out in the left column
+   -------------------------------------------------------------------------- */
+
+.aj-share {
+  display: block;
+}
+
+.aj-share .share-button__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12.6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-body-family);
+    font-weight: 700;
+    color: #202020;
+    text-decoration: underline;
+}
+
+.aj-share details>summary {
+  list-style: none;
+}
+
+.aj-share details>summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The glyph is centred in a 64 x 65 box in the design, which is why it sits a
+   little in from the column edge that the text rows start on. The box doubles
+   as the control's hit area. */
+.aj-share .svg-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 65px;
+}
+
+.aj-share .svg-wrapper svg {
+  width: 39px;
+  height: 25.4px;
+}
+
+.aj-share .share-button__fallback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.aj-share .field__input {
+  font-size: 12px;
+}
+
+/* The closing block puts its share control in the left column beside the
+   heading, so it lines up with the first line of type rather than the top of
+   the column box. */
+.aj-share--closing {
+  grid-column: 1;
+  padding-top: 0;
+  padding-left: 64px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — the split collapses; everything runs full width in one column
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 989px) {
+  .aj {
+    --aj-block-gap: 64px;
+  }
+
+  .aj-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .aj-body,
+  .aj-meta,
+  .aj-share--closing {
+    grid-column: 1;
+    max-width: none;
+  }
+
+  .aj-share--closing {
+    padding-left: 0;
+  }
+
+  .aj-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .aj-hero__text {
+    align-items: stretch;
+    padding: 48px 0 40px;
+  }
+
+  /* Padding rather than a percentage width, so the cell has no intrinsic
+     width to inherit from this. */
+  .aj-hero__inner {
+    width: auto;
+    max-width: var(--aj-frame);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .aj-hero__title {
+    font-size: 34px;
+    max-width: none;
+  }
+
+  .aj-hero__byline {
+    margin-top: 24px;
+  }
+
+  /* Portrait screens get the portrait crop; the desktop file is a wide one and
+     would be cut to a letterbox here. */
+  .aj-hero__media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .aj-hero__media--mobile {
+    display: block;
+  }
+
+  .aj-hero__media--mobile+.aj-hero__media {
+    display: none;
+  }
+
+  .aj-intro {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .aj-intro__lead {
+    font-size: 26px;
+  }
+
+  .aj-heading {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .aj-banner,
+  .aj-figure__media {
+    aspect-ratio: 3 / 2;
+  }
+
+  .aj-meta__row {
+    padding: 20px 0;
+  }
+}

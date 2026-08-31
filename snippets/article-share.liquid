@@ -1,0 +1,52 @@
+{% comment %}
+  Renders the journal share control — the theme's share-button element, carrying
+  the brand quote mark the design uses in place of a share glyph, and with
+  ids keyed to an instance name so the same control can appear twice on a page
+  (once in the meta column, once beside the closing heading) without the two
+  details elements colliding on a shared id.
+
+  Accepts:
+  - instance: {String} unique suffix for this occurrence, e.g. 'meta'
+  - share_link: {String} url the reader copies
+  - label: {String} visible label beside the icon
+
+  Usage:
+  {% render 'article-share', instance: 'meta', share_link: url, label: 'Share' %}
+{% endcomment %}
+
+<script src="{{ 'share.js' | asset_url }}" defer="defer"></script>
+
+<share-button id="Share-{{ section.id }}-{{ instance }}" class="share-button aj-share">
+  <button class="share-button__button hidden">
+    <span class="svg-wrapper">{{ 'icon-quote-mark.svg' | inline_asset_content }}</span>
+    {{ label | escape }}
+  </button>
+  <details id="Details-{{ section.id }}-{{ instance }}">
+    <summary class="share-button__button">
+      <span class="svg-wrapper">{{ 'icon-quote-mark.svg' | inline_asset_content }}</span>
+      {{ label | escape }}
+    </summary>
+    <div class="share-button__fallback motion-reduce">
+      <div class="field">
+        <span id="ShareMessage-{{ section.id }}-{{ instance }}" class="share-button__message hidden" role="status">
+        </span>
+        <input
+          type="text"
+          class="field__input"
+          id="ShareUrl-{{ section.id }}-{{ instance }}"
+          value="{{ share_link }}"
+          placeholder="{{ 'general.share.share_url' | t }}"
+          onclick="this.select();"
+          readonly
+        >
+        <label class="field__label" for="ShareUrl-{{ section.id }}-{{ instance }}">
+          {{- 'general.share.share_url' | t -}}
+        </label>
+      </div>
+      <button class="share-button__close hidden">
+        <span class="svg-wrapper">{{ 'icon-close.svg' | inline_asset_content }}</span>
+        <span class="visually-hidden">{{ 'general.share.close' | t }}</span>
+      </button>
+    </div>
+  </details>
+</share-button>

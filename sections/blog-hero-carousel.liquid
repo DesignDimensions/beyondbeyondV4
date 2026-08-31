@@ -1,0 +1,99 @@
+{{ 'blog-hero-carousel.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    The blog is picked in the section settings rather than taken from the page,
+    so the rail can feature a different blog from the grid below it.
+  endcomment
+  assign bhc_blog = blogs[section.settings.blog]
+  if bhc_blog == blank or bhc_blog.articles_count == 0
+    assign bhc_blog = blog
+  endif
+-%}
+
+<div class="bhc">
+  <div class="page-width bhc__header">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="bhc__heading">{{ section.settings.heading | escape }}</h1>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="bhc__subheading">{{ section.settings.subheading | escape }}</p>
+    {%- endif -%}
+  </div>
+
+  <div class="bhc__rail">
+    {%- for post in bhc_blog.articles limit: section.settings.posts_limit -%}
+      {%- liquid
+        assign card_image = post.metafields.journal.hero_image.value
+        if card_image == blank
+          assign card_image = post.image
+        endif
+      -%}
+      <a class="bhc__card" href="{{ post.url }}">
+        <div class="bhc__media">
+          {%- if card_image != blank -%}
+            <img
+              src="{{ card_image | image_url: width: 1000 }}"
+              srcset="
+                {{ card_image | image_url: width: 500 }} 500w,
+                {{ card_image | image_url: width: 1000 }} 1000w,
+                {{ card_image | image_url: width: 1600 }} 1600w
+              "
+              sizes="(min-width: 990px) 67vw, 86vw"
+              width="{{ card_image.width }}"
+              height="{{ card_image.height }}"
+              alt="{{ card_image.alt | default: post.title | escape }}"
+              loading="lazy"
+            >
+          {%- endif -%}
+        </div>
+        <div class="bhc__text">
+          <h2 class="bhc__title">{{ post.title | escape }}</h2>
+        </div>
+      </a>
+    {%- else -%}
+      <p class="bhc__subheading">{{ 'blogs.article.no_posts' | t }}</p>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog hero carousel",
+  "tag": "section",
+  "class": "section-blog-hero-carousel",
+  "settings": [
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Let's Talk Skincare!"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Our top pick for you."
+    },
+    {
+      "type": "range",
+      "id": "posts_limit",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Posts shown",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog hero carousel"
+    }
+  ]
+}
+{% endschema %}

@@ -6,7 +6,8 @@
 .fu {
   padding-top: var(--fu-pad-top, 60px);
   padding-bottom: var(--fu-pad-bottom, 60px);
-  background-color: #E6E6E6;
+  background-color: var(--fu-bg, #E6E6E6);
+  color: var(--fu-fg, inherit);
 }
 
 .fu__header {
@@ -31,7 +32,7 @@
 
 .fu__handle {
   font-size: 16px;
-  color: #000;
+  color: var(--fu-fg, #000);
   text-decoration: none;
   opacity: 0.75;
   width: fit-content;
