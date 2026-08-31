@@ -83,6 +83,8 @@
     --acl-list-color: {{ section.settings.list_color }};
     --acl-list-active: {{ section.settings.list_active_color }};
     --acl-sticky-gap: {{ section.settings.sticky_gap }}px;
+    --acl-grid-gap-x: {{ section.settings.grid_gap_horizontal }}px;
+    --acl-grid-gap-y: {{ section.settings.grid_gap_vertical }}px;
   "
   {{ section.shopify_attributes }}
 >
@@ -296,6 +298,27 @@
       "step": 1,
       "label": "Columns on desktop",
       "default": 3
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_horizontal",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between columns",
+      "info": "This grid only. The rest of the store keeps the spacing set in Theme settings.",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_vertical",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rows",
+      "default": 36
     },
     {
       "type": "select",

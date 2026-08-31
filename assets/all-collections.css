@@ -123,7 +123,24 @@
   min-width: 0;
 }
 
+/* The theme's grid takes its gutters from two custom properties set globally
+   in theme settings, and every grid on the store shares them. They are
+   redefined here, on this grid alone, so widening the gaps between these
+   cards does not widen them on every collection page as well.
+
+   Setting them on the `.grid` element itself is what makes the columns come
+   out right: `.grid--3-col-desktop .grid__item` sizes itself with
+   `calc(33.33% - var(--grid-desktop-horizontal-spacing) * 2 / 3)`, and the
+   items inherit these values from the list they are in — so the gutter and
+   the width it is subtracted from can never disagree.
+
+   Mobile takes half, which is the ratio the theme's own settings use. */
 .acl__grid {
+  --grid-mobile-horizontal-spacing: calc(var(--acl-grid-gap-x, 16px) / 2);
+  --grid-mobile-vertical-spacing: calc(var(--acl-grid-gap-y, 36px) / 2);
+  --grid-desktop-horizontal-spacing: var(--acl-grid-gap-x, 16px);
+  --grid-desktop-vertical-spacing: var(--acl-grid-gap-y, 36px);
+
   margin-bottom: 0;
 }
 
