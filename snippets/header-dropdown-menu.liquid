@@ -1,11 +1,62 @@
 {% comment %}
   Renders a standard dropdown style menu for the header.
 
+  A top-level link with children opens a band the width of the screen: the
+  links themselves down the left on the store's own content grid, and a card
+  for whichever one the pointer is over on the right. The first product in the
+  list is the one shown until something else is pointed at.
+
+  Only the panel is full-bleed. Its contents sit in `.page-width`, so the
+  first link lines up with everything else on the page below it. The panel is
+  positioned exactly as the theme's mega menu positions its own — absolute,
+  pinned to both edges, `top: 100%` — which resolves against `.header-wrapper`
+  and so spans the screen and sits directly under the header without either
+  measurement being written down here.
+
+  The card is a preview, not a control surface for the menu: every link is a
+  real link and works whether or not a pointer ever rests on it, and the cards
+  are all drawn up front so hovering swaps between them rather than fetching.
+
   Usage:
   {% render 'header-dropdown-menu' %}
 {% endcomment %}
 
-{%- assign nad_title = settings.intro_highlight | default: 'NAD+' | downcase -%}
+{%- liquid
+  assign nad_title = settings.intro_highlight | default: 'NAD+' | downcase
+
+  comment
+    The card's stylesheets and the quick-add scripts are only worth the weight
+    of putting on every page of the store if a menu actually has a product in
+    it, so the whole menu is looked over once before any of it is asked for.
+  endcomment
+  assign menu_has_product = false
+  for link in section.settings.menu.links
+    for childlink in link.links
+      if childlink.type == 'product_link' and childlink.object != blank
+        assign menu_has_product = true
+        break
+      endif
+    endfor
+    if menu_has_product
+      break
+    endif
+  endfor
+-%}
+
+{{ 'header-dropdown.css' | asset_url | stylesheet_tag }}
+
+{%- if menu_has_product -%}
+  {{ 'component-card.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+  {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+  {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+  {{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
+  {{ 'quick-add.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+<script src="{{ 'header-dropdown.js' | asset_url }}" defer="defer"></script>
 
 <nav class="header__inline-menu">
   <ul class="list-menu list-menu--inline" role="list">
@@ -18,8 +69,24 @@
       {%- endif -%}
       <li>
         {%- if link.links != blank -%}
+          {%- liquid
+            comment
+              Which of the children can be shown as a card, and which of those
+              is the one to open on. Worked out before anything is written so
+              the link and the card can be marked active in the same pass —
+              the alternative is a second loop that has to agree with the
+              first about what "first" meant.
+            endcomment
+            assign first_product_index = -1
+            for childlink in link.links
+              if childlink.type == 'product_link' and childlink.object != blank
+                assign first_product_index = forloop.index0
+                break
+              endif
+            endfor
+          -%}
           <header-menu>
-            <details id="Details-HeaderMenu-{{ forloop.index }}">
+            <details id="Details-HeaderMenu-{{ forloop.index }}" class="hdm">
               <summary
                 id="HeaderMenu-{{ link.handle }}"
                 class="header__menu-item list-menu__item link focus-inset"
@@ -33,58 +100,106 @@
                 </span>
                 {{- 'icon-caret.svg' | inline_asset_content -}}
               </summary>
-              <ul
+
+              <div
                 id="HeaderMenu-MenuList-{{ forloop.index }}"
-                class="header__submenu list-menu list-menu--disclosure color-{{ section.settings.menu_color_scheme }} gradient caption-large motion-reduce global-settings-popup"
-                role="list"
+                class="hdm__panel color-{{ section.settings.menu_color_scheme }} gradient motion-reduce"
+                data-hdm
+                data-hdm-default="{{ first_product_index }}"
                 tabindex="-1"
               >
-                {%- for childlink in link.links -%}
-                  <li>
-                    {%- if childlink.links == blank -%}
-                      <a
-                        id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
-                        href="{{ childlink.url }}"
-                        class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"
-                        {% if childlink.current %}
-                          aria-current="page"
-                        {% endif %}
-                      >
-                        {{ childlink.title | escape }}
-                      </a>
-                    {%- else -%}
-                      <details id="Details-HeaderSubMenu-{{ link.handle }}-{{ childlink.handle }}">
-                        <summary
+                <div class="page-width hdm__inner">
+                  <ul class="hdm__list list-menu" role="list">
+                    {%- for childlink in link.links -%}
+                      {%- liquid
+                        assign child_product = blank
+                        if childlink.type == 'product_link'
+                          assign child_product = childlink.object
+                        endif
+                        assign is_default = false
+                        if forloop.index0 == first_product_index
+                          assign is_default = true
+                        endif
+                      -%}
+                      <li class="hdm__item">
+                        <a
                           id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
-                          class="header__menu-item link link--text list-menu__item focus-inset caption-large"
+                          href="{{ childlink.url }}"
+                          class="hdm__link{% if is_default %} is-active{% endif %}{% if childlink.current %} hdm__link--current{% endif %}"
+                          {% if child_product != blank %}
+                            data-hdm-link="{{ forloop.index0 }}"
+                          {% endif %}
+                          {% if childlink.current %}
+                            aria-current="page"
+                          {% endif %}
                         >
-                          <span>{{ childlink.title | escape }}</span>
-                          {{- 'icon-caret.svg' | inline_asset_content -}}
-                        </summary>
-                        <ul
-                          id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
-                          class="header__submenu list-menu motion-reduce"
-                        >
-                          {%- for grandchildlink in childlink.links -%}
-                            <li>
-                              <a
-                                id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
-                                href="{{ grandchildlink.url }}"
-                                class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"
-                                {% if grandchildlink.current %}
-                                  aria-current="page"
-                                {% endif %}
-                              >
-                                {{ grandchildlink.title | escape }}
-                              </a>
-                            </li>
-                          {%- endfor -%}
-                        </ul>
-                      </details>
-                    {%- endif -%}
-                  </li>
-                {%- endfor -%}
-              </ul>
+                          {{ childlink.title | escape }}
+                        </a>
+
+                        {%- comment -%}
+                          A child with children of its own keeps them, listed
+                          under it. The design has no third level, but a menu
+                          that grows one should not lose it silently.
+                        {%- endcomment -%}
+                        {%- if childlink.links != blank -%}
+                          <ul class="hdm__sublist" role="list">
+                            {%- for grandchildlink in childlink.links -%}
+                              <li>
+                                <a
+                                  id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                                  href="{{ grandchildlink.url }}"
+                                  class="hdm__sublink{% if grandchildlink.current %} hdm__link--current{% endif %}"
+                                  {% if grandchildlink.current %}
+                                    aria-current="page"
+                                  {% endif %}
+                                >
+                                  {{ grandchildlink.title | escape }}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+
+                  {%- if first_product_index >= 0 -%}
+                    {%- comment -%}
+                      Every card is drawn and one is shown. `aria-hidden` on
+                      the rest keeps the ones that are not being shown out of
+                      a screen reader's way — the links on the left are what
+                      that reader is navigating, and hearing four products
+                      read out between them would bury the menu.
+                    {%- endcomment -%}
+                    <div class="hdm__preview" data-hdm-preview>
+                      {%- for childlink in link.links -%}
+                        {%- if childlink.type == 'product_link' and childlink.object != blank -%}
+                          <div
+                            class="hdm__card{% if forloop.index0 == first_product_index %} is-active{% endif %}"
+                            data-hdm-card="{{ forloop.index0 }}"
+                            {% if forloop.index0 != first_product_index %}
+                              aria-hidden="true"
+                            {% endif %}
+                          >
+                            {% render 'card-product',
+                              card_product: childlink.object,
+                              media_aspect_ratio: 'square',
+                              show_secondary_image: false,
+                              show_vendor: false,
+                              show_rating: false,
+                              quick_add: 'standard',
+                              lazy_load: true,
+                              skip_styles: true,
+                              section_id: section.id,
+                              product_view_context: 'header'
+                            %}
+                          </div>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+                </div>
+              </div>
             </details>
           </header-menu>
         {%- else -%}
