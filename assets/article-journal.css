@@ -307,9 +307,9 @@
   background: none;
   cursor: pointer;
   font-family: var(--font-body-family);
-    font-weight: 700;
-    color: #202020;
-    text-decoration: underline;
+  font-weight: 700;
+  color: #202020;
+  text-decoration: underline;
 }
 
 .aj-share details>summary {
@@ -443,5 +443,106 @@
 
   .aj-meta__row {
     padding: 20px 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   One statement size carries the whole page at this width — hero title,
+   opening lead and every body heading are the same 28/40/500/0.56 the rest
+   of the site settles its phone headings on, not the individually-tuned
+   34/26/24px the tablet rule above gives them. Body copy and the meta
+   column both want a 28px line rather than the desktop 1.5 (=24px) they'd
+   otherwise inherit, and every content photo (hero, figure, banner) shares
+   one 394/277 crop instead of three different ones. The 750–989px rule
+   above is untouched — this is the phone width only. */
+
+@media screen and (max-width: 749px) {
+
+  /* The tinted panel is a desktop-only device — Figma's phone hero keeps the
+     text on plain white, same as the rest of the page. */
+  .aj-hero__text {
+    background-color: #fff;
+    padding-bottom: 48px;
+  }
+
+  .aj-hero__rule {
+    margin: 8px 0;
+  }
+
+  .aj-grid {
+    gap: 24px;
+  }
+
+  .aj-intro {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  /* Figma's phone meta column drops to one line — the date and the share
+     control side by side, no rule under the date and no separate author
+     row. (The author is already named in the hero byline above; nothing
+     here loses that information, it's just not repeated.) */
+  .aj-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .aj-meta__row {
+    padding: 0;
+  }
+
+  .aj-meta__row--ruled {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .aj-meta__row:not(.aj-meta__row--ruled):not(.aj-meta__row--share) {
+    display: none;
+  }
+
+  .aj-rule {
+    margin: 16px 0;
+  }
+
+  .aj-hero__readtime {
+    letter-spacing: 4.8px;
+    margin-bottom: 5px;
+  }
+
+  .aj-hero__title,
+  .aj-intro__lead,
+  .aj-heading {
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .aj-hero__byline,
+  .aj-meta,
+  .aj-copy {
+    line-height: 28px;
+    letter-spacing: 0.32px;
+    margin-top: 5px;
+  }
+
+  .aj-hero__media,
+  .aj-figure__media,
+  .aj-banner {
+    aspect-ratio: 394 / 277;
+  }
+
+  .aj-share .svg-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  .aj-share .svg-wrapper svg {
+    width: 20px;
+    height: 13px;
   }
 }
