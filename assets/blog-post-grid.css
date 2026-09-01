@@ -35,6 +35,10 @@
   color: inherit;
 }
 
+.bpg__nav {
+  display: none;
+}
+
 .bpg__media {
   aspect-ratio: 1 / 1;
   background-color: #e6e6e6;
@@ -110,5 +114,100 @@
   .bpg__grid {
     grid-template-columns: 1fr;
     row-gap: 32px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   Figma trades the reflowing grid for a horizontal rail — one card and a
+   sliver of the next, with a pair of arrows and a segmented scroll indicator
+   underneath rather than the grid's row of dots-by-scrolling. The 599px rule
+   above (single column) never fires here since this query wins on order.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .bpg__grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 24px;
+    row-gap: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline-start: 1.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+  }
+
+  .bpg__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bpg__card {
+    flex: 0 0 264px;
+    scroll-snap-align: start;
+  }
+
+  .bpg__title {
+    letter-spacing: 0.32px;
+  }
+
+  .bpg__nav {
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .bpg__arrow {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bpg__arrow[disabled] {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .bpg__arrow img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* A short track between the arrows, not the full gap — centred on its own
+     rather than stretched to touch them. The thumb is positioned in JS as a
+     fraction of the track it's free to move in (track width minus its own),
+     so it reaches the far end exactly as the rail finishes scrolling rather
+     than running out of track early. */
+  .bpg__progress {
+    position: relative;
+    flex: 0 1 120px;
+    margin: 0 auto;
+    height: 2px;
+    background-color: #000;
+    border-radius: 2px;
+  }
+
+  .bpg__thumb {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 22px;
+    height: 4px;
+    background-color: #000;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    transition: left 0.15s ease-out;
   }
 }

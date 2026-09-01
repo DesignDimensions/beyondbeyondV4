@@ -29,7 +29,7 @@
 
 .bhc__band {
   background-color: #e6e6e6;
-  padding-bottom: 120px;
+  padding-bottom: 60px;
 }
 
 .bhc__header {
@@ -128,7 +128,7 @@
 
 @media screen and (max-width: 989px) {
   .bhc {
-    padding-bottom: 64px;
+    padding-bottom: 0;
   }
 
   .bhc__header {
@@ -152,5 +152,62 @@
   .bhc__text {
     min-height: 120px;
     padding: 24px 16px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   Figma's phone frame drops the peek-carousel for a plain stack: one
+   full-width card after another, each a square photo over its title rather
+   than the wide 800/346 crop the rail carries everywhere wider. The tablet
+   rule above (750–989px) is left as it is — this is the phone width only.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .bhc__header {
+    padding-top: 48px;
+  }
+
+  .bhc__heading {
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .bhc__subheading {
+    margin-top: 4px;
+    font-size: 20px;
+    line-height: 32px;
+    letter-spacing: 0.4px;
+  }
+
+  .bhc__rail {
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 24px;
+    padding-inline: 1.5rem;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
+  .bhc__card {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .bhc__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  .bhc__text {
+    height: 132px;
+    min-height: 0;
+    padding: 24px 16px;
+  }
+
+  .bhc__title {
+    font-weight: 700;
+    letter-spacing: 0.32px;
   }
 }
