@@ -158,6 +158,20 @@
             border-bottom: none;
           }
 
+          /* An open dropdown hangs its panel straight off the bottom of the bar,
+             and the two read as one white surface — so while a menu is open the
+             bar gives up its transparency (and the blur that goes with it) and
+             takes the panel's own ground. It fades on the same transition the
+             scrolled state uses, so opening a menu near the top of the page is
+             not a hard switch. `!important` only because the two rules it is
+             answering are written that way. */
+          .section-header:has(.hdm[open]) .header-wrapper,
+          .section-header:has(.hdm[open]) .header-wrapper.gradient {
+            background-color: rgb(255, 255, 255) !important;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+          }
+
           .shopify-section-header-sticky {
             position: fixed;
             top: 0;
