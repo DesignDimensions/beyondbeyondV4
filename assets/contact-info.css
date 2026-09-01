@@ -198,30 +198,57 @@
   }
 
   .cin--under-header {
-    padding-top: calc(var(--header-height, var(--cin-header-fallback-mobile, 76px)) + var(--cin-pad-top, 60px) * 0.6);
+    padding-top: calc(var(--abb-pad-top, 0px) + var(--header-height, var(--header-height-static, 96px)));
   }
 
   .cin__row,
   .cin--reversed .cin__row {
     flex-direction: column;
     align-items: stretch;
-    gap: 28px;
+    gap: 48px;
   }
 
+  /* The picture leads on mobile even though the copy leads in the markup
+     (so a screen reader still meets the heading first) — Figma draws the
+     photo immediately under the header with the particulars beneath it. */
   .cin__media {
+    order: -1;
     flex: 0 0 auto;
-    width: 100%;
-    max-width: 100%;
+    /* Bleeds to the viewport edges: `.cin__row` sits inside `.page-width`,
+       which is what's holding the picture in from the sides. Pulling back
+       out by half a viewport on each edge is what breaks it free of that
+       gutter without touching the row's own (still gutter-respecting) copy. */
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     aspect-ratio: var(--cin-media-ratio-mobile, var(--cin-media-ratio, 1));
   }
 
   .cin .cin__heading {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
   }
 
   .cin__intro,
   .cin__details {
     max-width: none;
+  }
+
+  .cin__details {
+    gap: 16px;
+  }
+
+  /* A label and its value share a line only where there's room for both —
+     stacked, the "inline" rows read the same as the "stacked" ones, just at
+     their own (larger) value size. */
+  .cin__item--inline {
+    display: block;
+  }
+
+  .cin__item--inline .cin__value {
+    display: block;
+    margin-top: var(--cin-value-gap, 6px);
+    text-align: left;
   }
 }

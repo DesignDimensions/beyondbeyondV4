@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "info": {
@@ -138,6 +147,7 @@
         "panel_pad_inner": 60,
         "panel_pad_y": 64,
         "image": "shopify://shop_images/oily-shoulder-woman-model-2_1.png",
+        "image_mobile": "shopify://shop_images/Frame_882.png",
         "image_url": "",
         "image_alt": "",
         "media_ratio_mobile": "1 / 1",

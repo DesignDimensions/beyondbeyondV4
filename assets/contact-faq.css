@@ -258,14 +258,18 @@
     flex-direction: column;
   }
 
+  /* Stacked, the picture is the full width of a phone, where the band's fixed
+     height would crop it to a letterbox. It goes back to a shape here — set
+     directly on the half rather than on the (otherwise unsized) sizer div,
+     since a column-direction flex item needs an explicit main-axis size of
+     its own. */
   .cfq__media {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
+    aspect-ratio: var(--cfq-ratio-mobile, 1 / 1);
   }
 
-  /* Stacked, the picture is the full width of a phone, where the band's fixed
-     height would crop it to a letterbox. It goes back to a shape here. */
   .cfq__sizer {
     height: auto;
     aspect-ratio: var(--cfq-ratio-mobile, 1 / 1);
@@ -275,13 +279,13 @@
      align to, so the panel takes `.page-width`'s own narrow-screen gutter. */
   .cfq__panel,
   .cfq--reversed .cfq__panel {
-    padding-block: 32px 40px;
+    padding-block: 40px;
     padding-inline: 1.5rem;
   }
 
   .cfq .cfq__heading {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
   }
 
   .cfq__a {
