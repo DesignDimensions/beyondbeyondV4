@@ -216,8 +216,8 @@
 
 @media screen and (max-width: 749px) {
   .mnd {
-    padding-top: calc(var(--mnd-pad-top, 72px) * 0.6);
-    padding-bottom: calc(var(--mnd-pad-bottom, 72px) * 0.6);
+    padding-top: calc(var(--mnd-pad-top, 72px) * 0.333);
+    padding-bottom: calc(var(--mnd-pad-bottom, 72px) * 0.333);
   }
 
   .mnd__head {
@@ -225,18 +225,31 @@
   }
 
   .mnd .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
   }
 
   .mnd__quote {
     width: calc(var(--mnd-quote-w, 48px) * 0.7);
   }
 
+  /* One full-width portrait per row rather than a horizontal-scroll rail —
+     there's no room beside a card to hint at the next one at this width. */
+  .mnd__rail {
+    flex-direction: column;
+    gap: 24px;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
   .mnd__card {
     flex: 0 0 calc(
-      (100% - (var(--mnd-columns-mobile, 1.2) - 1) * var(--mnd-card-gap, 8px)) / var(--mnd-columns-mobile, 1.2)
+      (100% - (var(--mnd-columns-mobile, 1) - 1) * 24px) / var(--mnd-columns-mobile, 1)
     );
+  }
+
+  .mnd__media {
+    aspect-ratio: 100 / 158;
   }
 }
 

@@ -165,18 +165,22 @@
 
 @media screen and (max-width: 749px) {
   .phc {
-    padding-top: calc(var(--phc-pad-top, 72px) * 0.6);
-    padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.6);
+    padding-top: calc(var(--phc-pad-top, 72px) * 0.333);
+    padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.333);
   }
 
   .phc__row,
   .phc--reversed .phc__row {
     flex-direction: column;
     align-items: stretch;
-    gap: 32px;
+    gap: 24px;
   }
 
+  /* The picture leads on mobile regardless of `media_position`, since the
+     list stays first in the DOM (so its heading is still read before the
+     picture that decorates it) even where the row is visually reversed. */
   .phc__media {
+    order: -1;
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
@@ -184,7 +188,12 @@
   }
 
   .phc .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    margin-bottom: 24px;
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .phc__text {
+    width: 100%;
   }
 }

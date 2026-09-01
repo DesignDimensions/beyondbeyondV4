@@ -168,8 +168,8 @@
 
 @media screen and (max-width: 749px) {
   .amt {
-    padding-top: calc(var(--amt-pad-top, 60px) * 0.6);
-    padding-bottom: calc(var(--amt-pad-bottom, 60px) * 0.6);
+    padding-top: calc(var(--amt-pad-top, 60px) * 0.3);
+    padding-bottom: calc(var(--amt-pad-bottom, 60px) * 0.3);
   }
 
   .amt--under-header {
@@ -190,9 +190,13 @@
     aspect-ratio: var(--amt-media-ratio-mobile, var(--amt-media-ratio, 1.15));
   }
 
+  .amt__copy {
+    width: 100%;
+  }
+
   .amt .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
   }
 
   .amt__body {

@@ -180,16 +180,20 @@
   .nsp__row,
   .nsp--reversed .nsp__row {
     flex-direction: column;
+    height: auto;
   }
 
+  /* Stacked, the picture is the full width of a phone, where a fixed height
+     would crop it to a letterbox. It goes back to a shape here — set directly
+     on the half rather than on the (otherwise unsized) sizer div, since a
+     column-direction flex item needs an explicit main-axis size of its own. */
   .nsp__media {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
+    aspect-ratio: var(--nsp-ratio-mobile, 1 / 1);
   }
 
-  /* Stacked, the picture is the full width of a phone, where a fixed height
-     would crop it to a letterbox. It goes back to a shape here. */
   .nsp__sizer {
     height: auto;
     aspect-ratio: var(--nsp-ratio-mobile, 1 / 1);
@@ -199,12 +203,21 @@
      to, so the panel simply takes `.page-width`'s own narrow-screen gutter. */
   .nsp__panel,
   .nsp--reversed .nsp__panel {
-    padding-block: 32px 40px;
+    padding-block: 48px 40px;
     padding-inline: 1.5rem;
   }
 
   .nsp .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .nsp__rule {
+    margin: 16px 0;
+  }
+
+  .nsp__rule + .nsp__body,
+  .nsp__body {
+    margin-top: 16px;
   }
 }

@@ -132,26 +132,38 @@
 
 @media screen and (max-width: 749px) {
   .nsu {
-    padding-top: calc(var(--nsu-pad-top, 72px) * 0.6);
-    padding-bottom: calc(var(--nsu-pad-bottom, 72px) * 0.6);
+    padding-top: calc(var(--nsu-pad-top, 72px) * 0.667);
+    padding-bottom: calc(var(--nsu-pad-bottom, 72px) * 0.667);
   }
 
   .nsu--under-header {
-    padding-top: calc(var(--header-height, var(--nsu-header-fallback-mobile, 76px)) + var(--nsu-pad-top, 72px) * 0.6);
+    padding-top: calc(var(--header-height, var(--nsu-header-fallback-mobile, 76px)) + var(--nsu-pad-top, 72px) * 0.667);
   }
 
   .nsu .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .nsu__rule {
+    margin-bottom: 16px;
   }
 
   .nsu__intro {
     max-width: none;
+    margin-bottom: 24px;
+    font-size: clamp(1.5rem, 4.4vw, 20px);
   }
 
+  /* One point per row — a phone has no room for the desktop's two-up grid,
+     and `.nsu__item` otherwise keeps its `calc(50% - 30px)` desktop width. */
   .nsu__grid {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 28px;
+    row-gap: 20px;
+  }
+
+  .nsu__item {
+    width: 100%;
+    gap: 12px;
   }
 
   /* At full size the drawing would take most of a phone's width and leave the
@@ -159,9 +171,5 @@
   .nsu__icon {
     width: min(var(--nsu-icon-size, 160px), 92px);
     height: min(var(--nsu-icon-size, 160px), 92px);
-  }
-
-  .nsu__intro {
-    font-size: clamp(1.5rem, 4.4vw, 20px);
   }
 }

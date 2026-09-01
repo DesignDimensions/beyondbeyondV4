@@ -178,8 +178,8 @@
   }
 
   .abs .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
-    line-height: 1.45;
+    font-size: 30px;
+    line-height: 40px;
   }
 
   .abs__body {

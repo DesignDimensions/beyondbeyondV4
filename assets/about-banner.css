@@ -59,12 +59,15 @@
    expects, and what keeps it steady as the banner re-crops.
    -------------------------------------------------------------------------- */
 
+/* The lockup is drawn only for the mobile banner photo — the desktop crop
+   was finished without it, and turning it on here rather than in the
+   (shared) section settings keeps that finished layout untouched. */
 .abb__overlay {
+  display: none;
   position: absolute;
   left: var(--abb-overlay-x, 6%);
   top: var(--abb-overlay-y, 50%);
   z-index: 1;
-  display: flex;
   flex-direction: column;
   gap: 16px;
   max-width: 80%;
@@ -124,6 +127,10 @@
 @media screen and (max-width: 749px) {
   .abb__frame {
     aspect-ratio: var(--abb-ratio-mobile, var(--abb-ratio, 1440 / 637));
+  }
+
+  .abb__overlay {
+    display: flex;
   }
 
   .abb__quote {
