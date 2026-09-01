@@ -581,6 +581,46 @@
 }
 
 /* ==========================================================================
+   Phone, two to a row
+   ==========================================================================
+   The rules above are drawn for a card the width of the content column — one
+   to a screen. Halved into a `grid--2-col-tablet-down` (collection grids,
+   search, anywhere a phone shows two up), the same numbers no longer fit:
+   Figma draws this card at 171px with its own, smaller scale throughout —
+   title, type line, stars and the add-to-cart bar all step down together.
+   The 8px rhythm and the price stay exactly as drawn above; only what has to
+   shrink to survive a narrower tile is restated here.
+   ========================================================================== */
+
+@media screen and (max-width: 749px) {
+  .grid--2-col-tablet-down .card-wrapper {
+    --pcard-star-size: 11px;
+  }
+
+  .grid--2-col-tablet-down .card-wrapper .card__heading {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0;
+  }
+
+  .grid--2-col-tablet-down .card-wrapper .card__meta {
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.24px;
+  }
+
+  .grid--2-col-tablet-down .card-wrapper .quick-add__submit.button {
+    height: 28px;
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+}
+
+/* ==========================================================================
    Mobile photo gallery
    ==========================================================================
    A tap-through carousel of the product's own photos, mobile only. Desktop
