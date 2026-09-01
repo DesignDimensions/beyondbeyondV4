@@ -291,6 +291,34 @@
     });
   }
 
+  /* ----------------------------------------------------------------------
+     Rating → reviews
+     ----------------------------------------------------------------------
+     The stars are a `role="img"` span, not a link — only the count beside
+     them is — so a tap anywhere on the row bar the words themselves used to
+     do nothing. The row now carries the jump, smoothly, past the fixed
+     header rather than under it, and stops the count's own `<a>` from also
+     firing an instant native jump underneath it. */
+  function setupRatingLink(root) {
+    var rating = root.querySelector('.ph__rating');
+    if (!rating || rating.phRatingBound) return;
+    rating.phRatingBound = true;
+
+    rating.addEventListener('click', function (event) {
+      var target = document.querySelector('.prv__head');
+      if (!target) return;
+
+      event.preventDefault();
+
+      var rootStyle = getComputedStyle(document.documentElement);
+      var header = parseFloat(rootStyle.getPropertyValue('--header-height'))
+        || parseFloat(rootStyle.getPropertyValue('--header-height-static'))
+        || 0;
+      var y = target.getBoundingClientRect().top + window.scrollY - header - 24;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  }
+
   function setup(root) {
     if (root.phBound) return;
     root.phBound = true;
@@ -298,6 +326,7 @@
     setupVariants(root, setupGallery(root));
     setupQuantity(root);
     setupBadgeStrip(root);
+    setupRatingLink(root);
   }
 
   function setupAll(scope) {

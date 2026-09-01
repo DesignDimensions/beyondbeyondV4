@@ -429,7 +429,7 @@ blockquote {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 7px;
-  color: #000;
+  color: #171717;
   text-transform: uppercase;
 }
 
@@ -1883,7 +1883,7 @@ details[open]>.share-button__fallback {
 .field__input:-webkit-autofill~.field__button,
 .field__input:-webkit-autofill~.field__label,
 .customer .field input:-webkit-autofill~label {
-  color: rgb(0, 0, 0);
+  color: #171717;
 }
 
 /* Text area */
@@ -2888,7 +2888,7 @@ details[open]>.header__submenu {
 .header__menu-item {
   padding: 1.2rem 1.8rem;
   text-decoration: none;
-  color: #000;
+  color: #171717;
   font-weight: 500;
   font-size: 16px;
 }

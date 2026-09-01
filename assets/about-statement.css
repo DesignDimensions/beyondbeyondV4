@@ -76,7 +76,7 @@
   letter-spacing: 7px;
   text-align: left;
   text-transform: uppercase;
-  color: #000;
+  color: #171717;
 }
 
 /* One statement size across the whole About page, taken from the band that
@@ -90,13 +90,13 @@
   max-width: none;
   text-align: left;
   font-size: 30px;
-  color: #000;
+  color: #171717;
   line-height: 50px;
 }
 
 .abs__body {
   margin-top: 0;
-  color: #000;
+  color: #171717;
   line-height: 28px;
   width: 100%;
 }

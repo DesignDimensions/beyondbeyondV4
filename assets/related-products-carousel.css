@@ -101,7 +101,7 @@
 .rp__arrow-glyph {
   font-size: calc(var(--rp-arrow-size, 18px) * 1.6);
   line-height: 1;
-  color: #000;
+  color: #171717;
 }
 
 .rp__arrow--prev:hover {

@@ -35,7 +35,7 @@
 .ftm__logo {
   display: block;
   width: var(--ftm-logo-width, 137px);
-  color: #000;
+  color: #171717;
   text-decoration: none;
 }
 
@@ -61,7 +61,7 @@
   font-weight: 500;
   line-height: 40px;
   letter-spacing: 0.56px;
-  color: #000;
+  color: #171717;
 }
 
 .ftm__form {
@@ -109,7 +109,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: #000;
+  color: #171717;
   cursor: pointer;
 }
 
@@ -155,7 +155,7 @@
 
 /* Drawn 26px in the design, a touch smaller than the other two. */
 .ftm__social-link--li {
-  color: #000;
+  color: #171717;
 }
 
 .ftm__social-link--li svg {

@@ -30,7 +30,7 @@
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: #000;
+  color: #171717;
 }
 
 /* The rail scrolls the full width of the viewport but starts at the inset, so
@@ -96,7 +96,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.625;
-  color: #000;
+  color: #171717;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;

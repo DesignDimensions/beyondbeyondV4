@@ -105,7 +105,7 @@
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0;
-  color: #000;
+  color: #171717;
 }
 
 /* The design rules off the title before the byline — 480 of the frame's 1440,
@@ -161,7 +161,7 @@
   font-family: var(--font-body-family);
   font-size: 16px;
   line-height: 1.5;
-  color: #000;
+  color: #171717;
 }
 
 .aj-meta__row {
@@ -196,7 +196,7 @@
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.01em;
-  color: #000;
+  color: #171717;
 }
 
 .aj-rule {
@@ -229,7 +229,7 @@
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: -0.01em;
-  color: #000;
+  color: #171717;
 }
 
 .aj-copy {
@@ -260,7 +260,7 @@
 .aj-copy strong,
 .aj-copy b {
   font-weight: 700;
-  color: #000;
+  color: #171717;
 }
 
 /* --------------------------------------------------------------------------

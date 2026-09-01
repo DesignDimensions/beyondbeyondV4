@@ -30,7 +30,7 @@
   border: 1px dashed #000;
   text-align: center;
   text-decoration: none;
-  color: #000;
+  color: #171717;
   background-color: #fff;
 }
 
@@ -139,14 +139,14 @@
 .hb-card__caption {
   font-weight: 600;
   font-size: 13px;
-  color: #000;
+  color: #171717;
   margin: var(--hb-copy-top) 0 10px;
   letter-spacing: 1px;
 }
 
 .hb-card__title {
   font-size: 28px;
-  color: #000;
+  color: #171717;
   font-weight: 600;
   margin: 0 0 10px;
   line-height: 1.4;
@@ -156,7 +156,7 @@
   margin: 0;
   font-weight: 600;
   font-size: 15px;
-  color: #000;
+  color: #171717;
   letter-spacing: 0.5px;
 }
 
@@ -171,7 +171,7 @@
   left: 0;
   right: 0;
   text-decoration: none;
-  color: #000;
+  color: #171717;
   font-weight: 500;
   font-size: 15px;
   letter-spacing: 0.5px;

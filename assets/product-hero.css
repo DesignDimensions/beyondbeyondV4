@@ -24,11 +24,16 @@
      where the header ends, with nothing between them. That is also what puts
      the header's frosted band over this colour rather than beside it.
 
-     `--header-height` is the theme's own measurement, published on the root
-     by the sticky header. The fallback is only what stands in for the moment
-     before that script runs, and `--ph-top` is the merchant's nudge on top —
-     zero by default, since the ask is no gap at all. */
-  padding-top: calc(var(--header-height, var(--ph-header-fallback, 100px)) + var(--ph-top, 0px));
+     `--header-height` is the sticky-header script's live measurement, and
+     only exists once that script has run a frame after first paint.
+     `--header-height-static` is the header section's own server-rendered
+     stand-in for the moment before it — reconstructed from the same padding
+     and logo-height settings the real bar is built from, so it already
+     matches instead of guessing. `--ph-header-fallback` is the true last
+     resort, for a page this section somehow renders on without the header
+     section at all. `--ph-top` is the merchant's nudge on top — zero by
+     default, since the ask is no gap at all. */
+  padding-top: calc(var(--header-height, var(--header-height-static, var(--ph-header-fallback, 100px))) + var(--ph-top, 0px));
   background: var(--ph-bg, #E9EEF4);
   color: var(--ph-text, #0a0a0b);
   font-family: var(--font-body-family);
@@ -262,7 +267,7 @@
 .ph__arrow-glyph {
   font-size: calc(var(--ph-arrow-size, 16px) * 1.6);
   line-height: 1;
-  color: #000;
+  color: #171717;
 }
 
 .ph__arrow--prev:hover img,
@@ -304,6 +309,7 @@
   align-items: center;
   gap: var(--ph-rating-gap, 10px);
   margin: 0;
+  cursor: pointer;
 }
 
 /* The home page's star, exactly: one box with a hard-stopped gradient painted
@@ -343,7 +349,7 @@
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.01em;
-  color: #000000;
+  color: #171717;
 }
 
 .ph__lede {
@@ -351,13 +357,13 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  color: #000;
+  color: #171717;
 }
 
 .ph__desc {
   margin: 16px 0 0;
   font-size: 16px;
-  color: #000;
+  color: #171717;
   line-height: 25px;
   font-weight: 400;
 }
@@ -420,12 +426,12 @@
 }
 
 .ph__variant:hover {
-  color: #000;
+  color: #171717;
   text-decoration: underline;
 }
 
 .ph__variant.is-selected {
-  color: #000;
+  color: #171717;
   font-weight: 700;
   text-decoration: underline;
 }
@@ -468,12 +474,12 @@
   font-size: 22px;
   font-weight: 500;
   letter-spacing: 0;
-  color: #000;
+  color: #171717;
 }
 
 .ph__tax {
   font-size: 12px;
-  color: #000;
+  color: #171717;
 }
 
 .ph__badge {
@@ -647,7 +653,7 @@
 
 .ph__link-sep {
   font-weight: 400;
-  color: #000;
+  color: #171717;
 }
 
 /* --------------------------------------------------------------------------
@@ -660,7 +666,7 @@
 
 @media screen and (max-width: 989px) {
   .ph {
-    padding-top: calc(var(--header-height, var(--ph-header-fallback-mobile, 76px)) + var(--ph-top-mobile, 0px));
+    padding-top: calc(var(--header-height, var(--header-height-static, var(--ph-header-fallback-mobile, 76px))) + var(--ph-top-mobile, 0px));
   }
 
   .ph__grid {

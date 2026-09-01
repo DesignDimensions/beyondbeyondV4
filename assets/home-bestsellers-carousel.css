@@ -45,7 +45,7 @@
   text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 3px;
-  color: #000;
+  color: #171717;
 }
 
 /* --------------------------------------------------------------------------
@@ -133,7 +133,7 @@
 .hbc__arrow-glyph {
   font-size: calc(var(--hbc-arrow-size, 18px) * 1.6);
   line-height: 1;
-  color: #000;
+  color: #171717;
 }
 
 .hbc__arrow--prev:hover {

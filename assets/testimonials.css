@@ -229,7 +229,7 @@
 .tst__arrow-glyph {
   font-size: calc(var(--tst-arrow-size, 16px) * 1.6);
   line-height: 1;
-  color: #000;
+  color: #171717;
 }
 
 .tst__arrow--prev:hover {

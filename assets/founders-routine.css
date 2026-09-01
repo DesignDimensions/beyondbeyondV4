@@ -297,7 +297,7 @@
 .fr__arrow-glyph {
   font-size: calc(var(--fr-arrow-size, 16px) * 1.6);
   line-height: 1;
-  color: #000;
+  color: #171717;
 }
 
 .fr__arrow--prev:hover {
@@ -412,7 +412,7 @@
     backdrop-filter: none;
     --fr-pill-inset: 0px;
     --fr-tab-pad: 24px;
-    --fr-tab-color: #000;
+    --fr-tab-color: #171717;
   }
 
   .fr__tabs::before {
