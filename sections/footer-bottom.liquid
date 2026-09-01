@@ -17,51 +17,55 @@
   "
   {{ section.shopify_attributes }}
 >
-  <div class="page-width ftb__row">
-    <p class="ftb__copyright">
-      {%- if section.settings.copyright_text != blank -%}
-        {{ section.settings.copyright_text }}
-      {%- else -%}
-        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
-      {%- endif -%}
-    </p>
+  <div class="page-width">
+    <hr class="ftb__divider">
 
-    {%- if section.settings.show_payment_icons and section.blocks.size > 0 -%}
-      <ul class="ftb__payment list-unstyled" role="list">
-        {%- for block in section.blocks -%}
-          {%- if block.type == 'payment_icon' -%}
-            {%- liquid
-              assign icon_image = block.settings.image
-              assign icon_url = block.settings.image_url
-              assign icon_name = block.settings.name
-            -%}
-            <li class="ftb__payment-item" {{ block.shopify_attributes }}>
-              {%- if icon_image != blank -%}
-                <img
-                  class="ftb__payment-img"
-                  src="{{ icon_image | image_url: width: 220 }}"
-                  width="{{ icon_image.width }}"
-                  height="{{ icon_image.height }}"
-                  alt="{{ icon_name | escape }}"
-                  loading="lazy"
-                  decoding="async"
-                >
-              {%- elsif icon_url != blank -%}
-                <img
-                  class="ftb__payment-img"
-                  src="{{ icon_url }}"
-                  width="210"
-                  height="144"
-                  alt="{{ icon_name | escape }}"
-                  loading="lazy"
-                  decoding="async"
-                >
-              {%- endif -%}
-            </li>
-          {%- endif -%}
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
+    <div class="ftb__row">
+      <p class="ftb__copyright">
+        {%- if section.settings.copyright_text != blank -%}
+          {{ section.settings.copyright_text }}
+        {%- else -%}
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+        {%- endif -%}
+      </p>
+
+      {%- if section.settings.show_payment_icons and section.blocks.size > 0 -%}
+        <ul class="ftb__payment list-unstyled" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'payment_icon' -%}
+              {%- liquid
+                assign icon_image = block.settings.image
+                assign icon_url = block.settings.image_url
+                assign icon_name = block.settings.name
+              -%}
+              <li class="ftb__payment-item" {{ block.shopify_attributes }}>
+                {%- if icon_image != blank -%}
+                  <img
+                    class="ftb__payment-img"
+                    src="{{ icon_image | image_url: width: 220 }}"
+                    width="{{ icon_image.width }}"
+                    height="{{ icon_image.height }}"
+                    alt="{{ icon_name | escape }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- elsif icon_url != blank -%}
+                  <img
+                    class="ftb__payment-img"
+                    src="{{ icon_url }}"
+                    width="210"
+                    height="144"
+                    alt="{{ icon_name | escape }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                {%- endif -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
   </div>
 
   {%- if section.settings.show_quote_mark -%}

@@ -22,20 +22,24 @@
 .fu__heading-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 
 .fu__heading {
   margin: 0;
   font-weight: 500;
+  /* base.css paints every h1-h5 with the scheme foreground, which is dark;
+     the section's own colour has to win for a dark background to work. */
+  color: inherit;
+  color: #FFFFFF;
 }
 
 .fu__handle {
-  font-size: 16px;
-  color: var(--fu-fg, #000);
+  font-size: 22px;
+  color: #FFFFFF;
   text-decoration: none;
-  opacity: 0.75;
   width: fit-content;
+  font-weight: 400;
 }
 
 .fu__handle:hover {
@@ -67,9 +71,11 @@
 
 .fu__tile {
   position: relative;
-  flex: 1 1 var(--fu-tile-width, 280px);
+  /* Same basis and grow on every tile — photos and the quote card alike — so
+     the run divides the content width evenly however many tiles there are. */
+  flex: 1 1 var(--fu-tile-width, 300px);
   min-width: 220px;
-  height: fit-content;
+  height: var(--fu-tile-height, 375px);
   overflow: hidden;
   border-radius: var(--fu-radius, 0px);
   scroll-snap-align: start;
@@ -89,11 +95,10 @@
 }
 
 .fu__tile--quote {
-  flex: 0 0 var(--fu-quote-width, 300px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 28px;
+  padding: 24px;
   background: var(--fu-quote-bg, #fff);
   color: var(--fu-quote-text, #121212);
 }
@@ -107,7 +112,6 @@
 
 .fu__quote-eyebrow {
   margin: 0;
-  max-width: 72%;
   font-size: 12px;
   line-height: 1.4;
   opacity: 0.6;
@@ -136,7 +140,6 @@
 .fu__quote-cta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 14px 18px;
   background: var(--fu-accent, #f5e626);
@@ -144,6 +147,11 @@
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
+}
+
+.fu__quote-cta>span:first-child {
+  flex: 1 1 auto;
+  text-align: center;
 }
 
 .fu__quote-arrow {
@@ -195,7 +203,9 @@
     font-size: 1.5rem;
   }
 
+  /* No shrink here: the row scrolls on mobile, and a shrinking card would let
+     the eyebrow and quote collapse into a narrow column instead. */
   .fu__tile--quote {
-    flex-basis: 74vw;
+    flex: 0 0 74vw;
   }
 }

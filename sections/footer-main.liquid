@@ -1,15 +1,18 @@
 {{ 'footer-main.css' | asset_url | stylesheet_tag }}
-{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign has_social_icons = true
-  if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
-    assign has_social_icons = false
+  assign facebook_url = section.settings.facebook_url | default: settings.social_facebook_link
+  assign instagram_url = section.settings.instagram_url | default: settings.social_instagram_link
+  assign linkedin_url = section.settings.linkedin_url
+
+  assign has_social = false
+  if facebook_url != blank or instagram_url != blank or linkedin_url != blank
+    assign has_social = true
   endif
 -%}
 
 <div
-  class="ftm color-{{ section.settings.color_scheme }} gradient"
+  class="ftm"
   id="ftm-{{ section.id }}"
   style="
     --ftm-pad-top: {{ section.settings.padding_top }}px;
@@ -20,15 +23,15 @@
 >
   <div class="page-width ftm__grid">
     <div class="ftm__brand">
-      {%- if section.settings.logo != blank -%}
-        <a href="{{ routes.root_url }}" class="ftm__logo-link">
+      <a href="{{ routes.root_url }}" class="ftm__logo">
+        {%- if section.settings.logo != blank -%}
           <img
             class="ftm__logo-img"
             src="{{ section.settings.logo | image_url: width: 400 }}"
             srcset="
-              {{ section.settings.logo | image_url: width: 200 }}  200w,
-              {{ section.settings.logo | image_url: width: 400 }}  400w,
-              {{ section.settings.logo | image_url: width: 600 }}  600w
+              {{ section.settings.logo | image_url: width: 200 }} 200w,
+              {{ section.settings.logo | image_url: width: 400 }} 400w,
+              {{ section.settings.logo | image_url: width: 600 }} 600w
             "
             width="{{ section.settings.logo.width }}"
             height="{{ section.settings.logo.height }}"
@@ -36,31 +39,33 @@
             loading="lazy"
             decoding="async"
           >
-        </a>
-      {%- else -%}
-        <a href="{{ routes.root_url }}" class="ftm__logo-link ftm__logo-text">{{ shop.name }}</a>
-      {%- endif -%}
+        {%- else -%}
+          {{- 'footer-logo.svg' | inline_asset_content -}}
+        {%- endif -%}
+        <span class="visually-hidden">{{ shop.name }}</span>
+      </a>
 
-      {%- if section.settings.newsletter_enable -%}
-        <div class="ftm__newsletter">
+      <div class="ftm__stack">
+        {%- if section.settings.newsletter_enable -%}
           {%- if section.settings.newsletter_heading != blank -%}
-            <h2 class="ftm__newsletter-heading">{{ section.settings.newsletter_heading }}</h2>
+            <h2 class="ftm__heading">{{ section.settings.newsletter_heading }}</h2>
           {%- endif -%}
+
           {%- assign newsletter_form_id = 'FooterMainNewsletter-' | append: section.id -%}
-          {%- form 'customer', id: newsletter_form_id, class: 'ftm__newsletter-form' -%}
+          {%- form 'customer', id: newsletter_form_id, class: 'ftm__form' -%}
             <input type="hidden" name="contact[tags]" value="newsletter">
-            <div class="ftm__newsletter-field">
+            <div class="ftm__field">
               <input
                 id="FooterMainNewsletterEmail-{{ section.id }}"
                 type="email"
                 name="contact[email]"
-                class="ftm__newsletter-input"
+                class="ftm__input"
                 value="{{ form.email }}"
                 aria-label="{{ 'newsletter.label' | t }}"
                 autocorrect="off"
                 autocapitalize="off"
                 autocomplete="email"
-                placeholder="Enter your email"
+                placeholder="{{ section.settings.newsletter_placeholder | escape }}"
                 required
                 {% if form.errors %}
                   autofocus
@@ -72,100 +77,89 @@
               >
               <button
                 type="submit"
-                class="ftm__newsletter-submit"
+                class="ftm__submit"
                 name="commit"
                 aria-label="{{ 'newsletter.button_label' | t }}"
               >
-                <span class="ftm__newsletter-arrow">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                {{- 'icon-footer-arrow-right.svg' | inline_asset_content -}}
               </button>
             </div>
             {%- if form.errors -%}
-              <small class="ftm__newsletter-message" id="FooterMainNewsletterError-{{ section.id }}">
+              <small class="ftm__form-message" id="FooterMainNewsletterError-{{ section.id }}">
                 {{- form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email -}}
               </small>
             {%- endif -%}
             {%- if form.posted_successfully? -%}
-              <p
-                class="ftm__newsletter-message"
-                id="FooterMainNewsletterSuccess-{{ section.id }}"
-                tabindex="-1"
-              >
+              <p class="ftm__form-message" id="FooterMainNewsletterSuccess-{{ section.id }}" tabindex="-1">
                 {{- 'newsletter.success' | t -}}
               </p>
             {%- endif -%}
           {%- endform -%}
-        </div>
-      {%- endif -%}
+        {%- endif -%}
 
-      {%- if section.settings.show_social and has_social_icons -%}
-        <div class="ftm__follow">
-          {%- if section.settings.social_label != blank -%}
-            <p class="ftm__follow-label">{{ section.settings.social_label }}</p>
-          {%- endif -%}
-          {%- render 'social-icons', class: 'ftm__social' -%}
-        </div>
-      {%- endif -%}
+        {%- if section.settings.show_social and has_social -%}
+          <ul class="ftm__social list-unstyled" role="list">
+            {%- if facebook_url != blank -%}
+              <li>
+                <a href="{{ facebook_url }}" class="ftm__social-link ftm__social-link--fb">
+                  {{- 'icon-footer-facebook.svg' | inline_asset_content -}}
+                  <span class="visually-hidden">{{ 'general.social.links.facebook' | t }}</span>
+                </a>
+              </li>
+            {%- endif -%}
+            {%- if instagram_url != blank -%}
+              <li>
+                <a href="{{ instagram_url }}" class="ftm__social-link ftm__social-link--ig">
+                  {{- 'icon-footer-instagram.svg' | inline_asset_content -}}
+                  <span class="visually-hidden">{{ 'general.social.links.instagram' | t }}</span>
+                </a>
+              </li>
+            {%- endif -%}
+            {%- if linkedin_url != blank -%}
+              <li>
+                <a href="{{ linkedin_url }}" class="ftm__social-link ftm__social-link--li">
+                  {{- 'icon-footer-linkedin.svg' | inline_asset_content -}}
+                  <span class="visually-hidden">LinkedIn</span>
+                </a>
+              </li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
     </div>
 
     {%- if section.blocks.size > 0 -%}
-      <div class="ftm__menus">
+      <nav class="ftm__menus">
         {%- comment -%}
-          Three independent passes over the same block list, one per column,
-          so each column's height comes only from its own headings and links
-          — a flex column here rather than a grid cell, since a shared grid
-          row would let a tall column drag a short one's second group down.
+          Each menu_heading is a column, and the links between it and the next
+          heading are its own — so the inner loop starts just past the heading
+          and stops at whichever heading comes next.
         {%- endcomment -%}
-        {%- for col in (1..3) -%}
-          {%- liquid
-            assign col_string = col | append: ''
-            assign current_heading_column = ''
-            assign menu_open = false
-            assign has_column_content = false
-          -%}
-          {%- capture column_html -%}
-            {%- for block in section.blocks -%}
-              {%- case block.type -%}
-                {%- when 'menu_heading' -%}
-                  {%- assign current_heading_column = block.settings.column -%}
-                  {%- if current_heading_column == col_string -%}
-                    {%- assign has_column_content = true -%}
-                    {%- if menu_open -%}
-                      </ul>
-                      </div>
-                    {%- endif -%}
-                    <div class="ftm__menu" {{ block.shopify_attributes }}>
-                      {%- if block.settings.heading != blank -%}
-                        <h2 class="ftm__menu-heading">{{ block.settings.heading }}</h2>
-                      {%- endif -%}
-                      <ul class="ftm__menu-list list-unstyled">
-                        {%- assign menu_open = true -%}
-                  {%- else -%}
-                    {%- if menu_open -%}
-                      </ul>
-                      </div>
-                    {%- endif -%}
-                    {%- assign menu_open = false -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'menu_heading' -%}
+            {%- assign links_from = forloop.index -%}
+            <div class="ftm__menu" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <h2 class="ftm__menu-heading">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              <ul class="ftm__menu-list list-unstyled" role="list">
+                {%- for link in section.blocks offset: links_from -%}
+                  {%- if link.type == 'menu_heading' -%}
+                    {%- break -%}
                   {%- endif -%}
-                {%- when 'menu_link' -%}
-                  {%- if menu_open and current_heading_column == col_string and block.settings.title != blank -%}
+                  {%- if link.settings.title != blank -%}
                     <li>
-                      <a href="{{ block.settings.url }}" class="ftm__menu-link" {{ block.shopify_attributes }}>
-                        {{- block.settings.title | escape -}}
+                      <a href="{{ link.settings.url }}" class="ftm__menu-link" {{ link.shopify_attributes }}>
+                        {{- link.settings.title | escape -}}
                       </a>
                     </li>
                   {%- endif -%}
-              {%- endcase -%}
-            {%- endfor -%}
-            {%- if menu_open -%}
+                {%- endfor -%}
               </ul>
-              </div>
-            {%- endif -%}
-          {%- endcapture -%}
-          {%- if has_column_content -%}
-            <div class="ftm__menu-column">{{ column_html }}</div>
+            </div>
           {%- endif -%}
         {%- endfor -%}
-      </div>
+      </nav>
     {%- endif -%}
   </div>
 </div>
@@ -183,17 +177,18 @@
     {
       "type": "image_picker",
       "id": "logo",
-      "label": "Logo"
+      "label": "Logo",
+      "info": "Leave empty to use the built-in Beyond Beyond wordmark."
     },
     {
       "type": "range",
       "id": "logo_width",
-      "min": 60,
-      "max": 300,
-      "step": 10,
+      "min": 100,
+      "max": 200,
+      "step": 1,
       "unit": "px",
       "label": "Logo width",
-      "default": 220
+      "default": 137
     },
     {
       "type": "header",
@@ -212,31 +207,37 @@
       "default": "Join our community and get 10% off on your first purchase"
     },
     {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
       "type": "header",
-      "content": "Follow us"
+      "content": "Social"
     },
     {
       "type": "checkbox",
       "id": "show_social",
       "label": "Show social icons",
-      "info": "Uses the links set in Theme settings > Social media.",
       "default": true
     },
     {
-      "type": "text",
-      "id": "social_label",
-      "label": "Label",
-      "default": "Follow us"
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook",
+      "info": "Falls back to Theme settings > Social media."
     },
     {
-      "type": "header",
-      "content": "Layout"
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram",
+      "info": "Falls back to Theme settings > Social media."
     },
     {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
+      "type": "url",
+      "id": "linkedin_url",
+      "label": "LinkedIn"
     },
     {
       "type": "header",
@@ -247,7 +248,7 @@
       "id": "padding_top",
       "min": 0,
       "max": 160,
-      "step": 4,
+      "step": 2,
       "unit": "px",
       "label": "Padding top",
       "default": 64
@@ -257,34 +258,23 @@
       "id": "padding_bottom",
       "min": 0,
       "max": 160,
-      "step": 4,
+      "step": 2,
       "unit": "px",
       "label": "Padding bottom",
-      "default": 64
+      "default": 10
     }
   ],
   "blocks": [
     {
       "type": "menu_heading",
-      "name": "Menu heading",
+      "name": "Menu column",
       "settings": [
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Menu"
-        },
-        {
-          "type": "select",
-          "id": "column",
-          "label": "Column",
-          "info": "Headings sharing a column stack in the order they're listed here. The links below a heading belong to it, until the next heading.",
-          "options": [
-            { "value": "1", "label": "1" },
-            { "value": "2", "label": "2" },
-            { "value": "3", "label": "3" }
-          ],
-          "default": "1"
+          "default": "Menu",
+          "info": "Starts a new column. Every link below it belongs to this column, until the next column heading."
         }
       ]
     },
@@ -309,36 +299,18 @@
     {
       "name": "Footer Main",
       "blocks": [
-        { "type": "menu_heading", "settings": { "heading": "Shop", "column": "1" } },
-        { "type": "menu_link", "settings": { "title": "The Ultimate Night Repair Super Cream", "url": "/products/the-ultimate-night-repair-supercream" } },
-        { "type": "menu_link", "settings": { "title": "Hydro-Active Day Cream", "url": "/products/hydro-active-day-cream" } },
-        { "type": "menu_link", "settings": { "title": "Moisture Surge Lip Butter", "url": "/products/moisture-surge-lip-butter" } },
-        { "type": "menu_link", "settings": { "title": "Oil-Free Matte Sunscreen", "url": "/products/oil-free-matte-sunscreen" } },
-        { "type": "menu_link", "settings": { "title": "Dirt & Makeup Cleanser Jelly", "url": "/products/dirt-makeup-cleanser-jelly" } },
-        { "type": "menu_link", "settings": { "title": "Deep Clean Enzyme Cleanser", "url": "/products/deep-clean-enzyme-cleanser" } },
-        { "type": "menu_link", "settings": { "title": "Broad Spectrum Active Sunspray", "url": "/products/broad-spectrum-active-sunspray" } },
-        { "type": "menu_link", "settings": { "title": "Ultra Hydrating Oligo HA Mist", "url": "/products/ultra-hydrating-oligo-ha-mist" } },
-        { "type": "menu_link", "settings": { "title": "Advanced Complexion Corrector Serum", "url": "/products/advanced-complexion-corrector-serum" } },
-        { "type": "menu_link", "settings": { "title": "Advanced Cellular Repair Serum", "url": "/products/advanced-cellular-repair-serum" } },
-        { "type": "menu_link", "settings": { "title": "Advanced Cellular Hydration Serum", "url": "/products/advanced-cellular-hydration-serum" } },
-        { "type": "menu_link", "settings": { "title": "Advanced Antioxidant Defense Serum", "url": "/products/advanced-antioxidant-defense-serum" } },
-
-        { "type": "menu_heading", "settings": { "heading": "Beyond Beyond", "column": "2" } },
-        { "type": "menu_link", "settings": { "title": "Beyond Beyond", "url": "/pages/beyond-beyond" } },
+        { "type": "menu_heading", "settings": { "heading": "Beyond Beyond" } },
+        { "type": "menu_link", "settings": { "title": "Home", "url": "/" } },
+        { "type": "menu_link", "settings": { "title": "Shop", "url": "/collections/all" } },
         { "type": "menu_link", "settings": { "title": "Bestsellers", "url": "/collections/bestsellers-1" } },
-        { "type": "menu_link", "settings": { "title": "About", "url": "/pages/clean-clinical-skincare" } },
-
-        { "type": "menu_heading", "settings": { "heading": "Customer care", "column": "2" } },
-        { "type": "menu_link", "settings": { "title": "Contact Us", "url": "/pages/contact" } },
-        { "type": "menu_link", "settings": { "title": "Track Orders", "url": "/" } },
-        { "type": "menu_link", "settings": { "title": "FAQ", "url": "/pages/faqs" } },
-
-        { "type": "menu_heading", "settings": { "heading": "Learn", "column": "3" } },
-        { "type": "menu_link", "settings": { "title": "Journal", "url": "/blogs/news" } },
         { "type": "menu_link", "settings": { "title": "NAD+", "url": "/pages/nad" } },
-        { "type": "menu_link", "settings": { "title": "FAQ", "url": "/pages/faqs" } },
+        { "type": "menu_link", "settings": { "title": "Journal", "url": "/blogs/news" } },
+        { "type": "menu_link", "settings": { "title": "As Seen In", "url": "/" } },
 
-        { "type": "menu_heading", "settings": { "heading": "Legal", "column": "3" } },
+        { "type": "menu_heading", "settings": { "heading": "Customer Care" } },
+        { "type": "menu_link", "settings": { "title": "Contact Us", "url": "/pages/contact" } },
+        { "type": "menu_link", "settings": { "title": "Profile", "url": "/account" } },
+        { "type": "menu_link", "settings": { "title": "FAQ", "url": "/pages/faqs" } },
         { "type": "menu_link", "settings": { "title": "Return & Refund", "url": "/pages/legal" } },
         { "type": "menu_link", "settings": { "title": "Terms & Conditions", "url": "/pages/legal" } },
         { "type": "menu_link", "settings": { "title": "Privacy Policy", "url": "/pages/legal" } }

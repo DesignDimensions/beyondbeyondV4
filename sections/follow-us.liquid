@@ -96,7 +96,6 @@
               <div
                 class="fu__tile fu__tile--quote"
                 style="
-                  --fu-quote-width: {{ block.settings.width }}px;
                   --fu-quote-bg: {{ block.settings.background_color }};
                   --fu-quote-text: {{ block.settings.text_color }};
                   --fu-accent: {{ block.settings.accent_color }};
@@ -138,7 +137,7 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Follow Us"
+      "default": "Discover More With Us"
     },
     {
       "type": "select",
@@ -176,7 +175,7 @@
       "type": "richtext",
       "id": "description",
       "label": "Description",
-      "default": "<p>See our latest routines, results and behind-the-scenes on Instagram.</p>"
+      "info": "Optional — sits to the right of the heading."
     },
     {
       "type": "color_scheme",
@@ -205,10 +204,10 @@
       "id": "tile_height",
       "min": 260,
       "max": 600,
-      "step": 10,
+      "step": 5,
       "unit": "px",
       "label": "Tile height",
-      "default": 420
+      "default": 375
     },
     {
       "type": "range",
@@ -217,8 +216,9 @@
       "max": 440,
       "step": 10,
       "unit": "px",
-      "label": "Image tile width",
-      "default": 280
+      "label": "Tile width",
+      "info": "Tiles share the row evenly; this is the width they aim for before the row divides up what's left.",
+      "default": 300
     },
     {
       "type": "range",
@@ -331,16 +331,6 @@
           "type": "url",
           "id": "button_link",
           "label": "Button link"
-        },
-        {
-          "type": "range",
-          "id": "width",
-          "min": 220,
-          "max": 440,
-          "step": 10,
-          "unit": "px",
-          "label": "Card width",
-          "default": 300
         },
         {
           "type": "color",

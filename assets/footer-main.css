@@ -1,275 +1,272 @@
 /* ==========================================================================
-   Footer Main — brand/newsletter/follow-us column beside a set of menu
-   columns. Each menu block picks which of the three visual columns it sits
-   in, so two short menus can stack under one heading-width the way a long
-   one fills a column on its own.
+   Footer Main — brand column (wordmark, newsletter, socials) on the left,
+   menu columns on the right, above the divider drawn by Footer Bottom.
+   Geometry matches the Figma footer frame at a 1440px viewport: 1200px of
+   content, a 408px brand column and 182px menu columns 48px apart.
    ========================================================================== */
 
 .ftm {
   padding-top: var(--ftm-pad-top, 64px);
-  padding-bottom: var(--ftm-pad-bottom, 64px);
+  padding-bottom: var(--ftm-pad-bottom, 10px);
+  background-color: #f5f5f5;
+  color: #202020;
 }
 
+/* The design fixes this row at 424px even though its content stops short of
+   that, which is what sets the distance down to the divider. */
 .ftm__grid {
-  display: grid;
-  grid-template-columns: minmax(240px, 340px) 1fr;
-  gap: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 48px;
+  min-height: 424px;
 }
+
+/* --- Brand column ------------------------------------------------------- */
 
 .ftm__brand {
   display: flex;
+  flex: 0 1 408px;
   flex-direction: column;
-  gap: 45px;
+  gap: 48px;
+  max-width: 408px;
 }
 
-.ftm__logo-link {
-  display: inline-block;
-  width: fit-content;
-  color: inherit;
+.ftm__logo {
+  display: block;
+  width: var(--ftm-logo-width, 137px);
+  color: #000;
   text-decoration: none;
 }
 
+.ftm__logo svg,
 .ftm__logo-img {
   display: block;
-  width: var(--ftm-logo-width, 140px);
+  width: 100%;
   height: auto;
 }
 
-.ftm__logo-text {
-  font-family: var(--font-heading-family);
-  font-style: italic;
-  font-size: 30px;
-  line-height: 1.1;
+.ftm__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 39px;
+  width: 100%;
 }
 
-.ftm__newsletter-heading {
-  margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.35;
+.ftm__heading {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 40px;
+  letter-spacing: 0.56px;
+  color: #000;
 }
 
-.ftm__newsletter-field {
+.ftm__form {
+  width: 100%;
+}
+
+.ftm__field {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 4px 4px 20px;
-  border: 1px solid currentColor;
-  border-radius: 10px;
-  opacity: 0.9;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #868686;
+  border-radius: 16px;
+  background-color: #f5f5f5;
 }
 
-.ftm__newsletter-input {
-  flex: 1;
+.ftm__input {
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 10px 0;
+  padding: 0;
   border: 0;
   background: none;
-  color: inherit;
-  /* 16px minimum — anything smaller makes iOS Safari zoom the page in on focus. */
-  font-size: 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  /* The theme puts 0.06rem of tracking on <body>; the design has none here. */
+  letter-spacing: normal;
+  color: #202020;
   outline: none;
 }
 
-.ftm__newsletter-input::placeholder {
-  color: currentColor;
-  opacity: 0.6;
+.ftm__input::placeholder {
+  color: #202020;
+  opacity: 1;
 }
 
-.ftm__newsletter-submit {
+.ftm__submit {
   display: flex;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 0;
-  border-radius: 50%;
-  color: var(--ftm-btn-bg, #121212);
-  background: transparent;
+  background: none;
+  color: #000;
   cursor: pointer;
 }
 
-.ftm__newsletter-arrow {
-  display: flex;
-  width: 14px;
-  height: 14px;
+.ftm__submit svg {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
-.ftm__newsletter-arrow svg {
-  width: 100%;
-  height: 100%;
-}
-
-.ftm__newsletter-message {
+.ftm__form-message {
+  display: block;
   margin: 10px 0 0;
   font-size: 12px;
 }
 
-.ftm__follow {
+.ftm__social {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 24px;
+  margin: 0;
+  padding: 0;
 }
 
-.ftm__follow-label {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.ftm__social-link {
+  display: block;
+  color: #202020;
+  text-decoration: none;
+}
+
+.ftm__social-link:hover {
+  opacity: 0.7;
+}
+
+.ftm__social-link svg {
+  display: block;
+}
+
+.ftm__social-link--fb svg,
+.ftm__social-link--ig svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Drawn 26px in the design, a touch smaller than the other two. */
+.ftm__social-link--li {
   color: #000;
 }
 
-.ftm__social {
-  display: flex;
-  gap: 35px;
-  margin: 0;
-  padding: 0;
+.ftm__social-link--li svg {
+  width: 26px;
+  height: 26px;
 }
 
-.ftm__social .list-social__link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-}
+/* --- Menu columns ------------------------------------------------------- */
 
-.ftm__social .list-social__link .icon,
-.ftm__social .list-social__link .svg-wrapper {
-  width: 100%;
-  height: 100%;
-}
-
-/* Flexbox, not grid: a grid row is one shared band across every column, so a
-   tall column (Shop) would drag every other column's second group down with
-   it. Each column here is its own box that only grows to fit its own
-   content, the way the design needs. */
 .ftm__menus {
   display: flex;
-  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 45px;
   justify-content: flex-end;
+  gap: 48px;
 }
 
-.ftm__menu-column {
+.ftm__menu {
   display: flex;
-  width: fit-content;
+  flex: 0 0 182px;
   flex-direction: column;
-  gap: 36px;
-  min-width: 23.5%;
+  gap: 47px;
+  width: 182px;
 }
 
 .ftm__menu-heading {
-  margin: 0 0 35px;
-  font-size: 22px;
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 20px;
   font-weight: 600;
+  line-height: 32px;
+  letter-spacing: 0.4px;
+  color: #202020;
 }
 
 .ftm__menu-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   margin: 0;
   padding: 0;
+  /* Matches the links' own line-height so each row's strut doesn't grow the
+     28px line the design spaces the column on. */
+  line-height: 28px;
 }
 
 .ftm__menu-link {
   font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.32px;
   color: #202020;
   text-decoration: none;
-  opacity: 0.8;
 }
 
 .ftm__menu-link:hover {
   text-decoration: underline;
-  opacity: 1;
 }
+
+/* --- Below desktop ------------------------------------------------------ */
 
 @media screen and (max-width: 989px) {
   .ftm__grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 48px;
+    min-height: 0;
   }
 
-  .ftm__menu-column {
-    flex-basis: 45%;
+  .ftm__brand {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .ftm__menus {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  /* 16px keeps iOS Safari from zooming the page in when the field is focused. */
+  .ftm__input {
+    font-size: 16px;
   }
 }
 
 @media screen and (max-width: 749px) {
   .ftm {
     padding-top: 50px;
-    padding-bottom: 50px;
   }
 
-  /* A single flex column would run all five menus (Shop's twelve links
-     included) down the page one after another. Balancing them into two
-     print-style columns instead — the same 2-column convention the theme's
-     own stock footer uses on mobile — keeps the long Shop list to one column
-     and lets the shorter menus share the other, without the empty gaps a
-     plain 2-col grid would leave beside them. */
-  .ftm__menus {
-    display: block;
-    column-count: 2;
-    column-gap: 24px;
-    margin-top: 20px;
-  }
-
-  .ftm__logo-img {
-    width: 100px;
-  }
-
-  .ftm__menu-heading {
-    margin: 0 0 5px;
-    font-size: 1.6rem;
-  }
-
-  /* Follow-us goes under the menus here. It is a child of the brand column,
-     and `order` cannot lift a child past its parent's sibling — so the brand
-     column stops being a box of its own and hands its three children straight
-     to the grid, where all four are siblings and can be ordered freely. The
-     15px it used to space them by moves onto the grid with them, which is why
-     the gap is set there rather than here. */
+  .ftm__brand,
   .ftm__grid {
-    gap: 15px;
+    gap: 32px;
   }
 
-  .ftm__brand {
-    display: contents;
+  .ftm__stack {
+    gap: 28px;
+  }
+
+  .ftm__heading {
+    font-size: 2.9rem;
+    line-height: 1.35;
   }
 
   .ftm__menus {
-    order: 1;
+    gap: 24px;
   }
 
-  .ftm__follow {
-    order: 2;
-    border-top: 1px solid #202020;
-    border-bottom: 1px solid #202020;
-    padding: 15px 0;
-  }
-
-  .ftm__social .list-social__link {
-    width: 25px;
-    height: 25px;
-  }
-
-  .ftm__newsletter-heading {
-    font-size: 2.9rem;
-    font-weight: 500;
-  }
-
-  .ftm__menu-column {
-    width: 100%;
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-  }
-
-  .ftm__menu-column:not(:last-child) {
-    margin-bottom: 36px;
+  .ftm__menu {
+    flex: 1 1 0;
+    gap: 20px;
+    width: auto;
+    min-width: 0;
   }
 }
