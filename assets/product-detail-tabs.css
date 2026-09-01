@@ -539,6 +539,100 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   Figma keeps the three tabs in one row even here — the 989px column stack
+   above is for tablet, not the phone frame — and drops the glass for a flat
+   pill, the same swap Founder's Routine's switcher makes at this width.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .pdt {
+    padding: 40px 0;
+  }
+
+  .pdt__tabs {
+    flex-direction: row;
+    /* Figma hugs the three tabs to their own text rather than stretching
+       them to fill the card's width — equal `flex: 1 1 0` columns are what
+       was squeezing "What It Does" and "How To Use" onto two lines. */
+    width: fit-content;
+    max-width: 100%;
+    gap: 0;
+    padding: 0;
+    border-radius: 8px;
+    background-color: rgba(194, 190, 190, 0.25);
+    background-image: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .pdt__tabs::before,
+  .pdt__tabs::after {
+    display: none;
+  }
+
+  .pdt__tabs-pill {
+    width: calc(var(--pdt-pill-w, 0px));
+    height: calc(var(--pdt-pill-h, 0px));
+    transform: translate3d(var(--pdt-pill-x, 0px), var(--pdt-pill-y, 0px), 0);
+  }
+
+  .pdt__tabs-pill-face {
+    border-radius: 6px;
+    background-image: none;
+    box-shadow: none;
+  }
+
+  .pdt__tab {
+    flex: 0 0 auto;
+    /* Figma's own 16px padding measures wider than the column in the real
+       Raleway Bold face — three tabs at that padding run to 382px against a
+       342px card, which is what was clipping "How To Use". Tightened just
+       enough to clear it. */
+    padding: 8px 10px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .pdt__panels {
+    margin-top: 40px;
+  }
+
+  .pdt__overline {
+    margin-bottom: 24px;
+    font-size: 12px;
+    letter-spacing: 4.8px;
+  }
+
+  .pdt__grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 24px;
+  }
+
+  .pdt__item-title {
+    margin-bottom: 12px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+    color: #444343;
+  }
+
+  .pdt__item-body,
+  .pdt__body p,
+  .pdt__meta {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+    color: #444343;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   .pdt__tab,

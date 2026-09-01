@@ -42,6 +42,12 @@
   }
 }
 
+@media screen and (max-width: 750px) {
+  .vpx__band {
+    aspect-ratio: 402/376;
+  }
+}
+
 .vpx__video {
   display: block;
   width: 100%;

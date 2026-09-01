@@ -85,20 +85,34 @@
    reversing a column would put the name under the paragraph it names. */
 @media screen and (max-width: 749px) {
   .exn {
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: 24px;
+    padding-bottom: 24px;
   }
 
   .exn__row,
   .exn--reversed .exn__row {
     flex-direction: column;
     align-items: stretch;
-    gap: 20px;
+    gap: 24px;
   }
 
   .exn__media {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
+  }
+
+  .exn__heading {
+    margin-bottom: 12px;
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+    color: #202020;
+  }
+
+  .exn__body {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 }

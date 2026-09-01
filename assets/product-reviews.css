@@ -444,28 +444,67 @@
 
 @media screen and (max-width: 749px) {
   .prv {
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
 
+  /* Figma reads title, score, summary, button — one column, in that order —
+     rather than the desktop split of a title+button side against a
+     score+summary side. `display: contents` drops the two wrapper divs out
+     of layout so their children become direct flex items of `.prv__head`
+     itself, free to take the order the design wants instead of the order
+     the markup groups them in. */
   .prv__head {
     flex-direction: column;
-    gap: 28px;
-    margin-bottom: 32px;
+    gap: 0;
+    margin-bottom: 40px;
+  }
+
+  .prv__head-left,
+  .prv__summary {
+    display: contents;
+  }
+
+  .prv__title {
+    order: 0;
+    margin: 0 0 12px;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .prv__score {
+    order: 1;
+    margin: 0 0 12px;
+  }
+
+  .prv__score-value {
+    font-size: 16px;
+    letter-spacing: 0.32px;
+  }
+
+  .prv__summary-text {
+    order: 2;
+    margin: 0 0 40px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 
   .prv__write {
+    order: 3;
     min-width: 0;
     width: 100%;
-  }
-
-  .prv__summary {
-    flex: 0 0 auto;
+    height: 44px;
+    padding: 8px 36px;
+    font-size: 16px;
+    letter-spacing: 0.32px;
   }
 
   .prv__body {
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
   }
 
   .prv__list-col {
@@ -474,15 +513,66 @@
     width: 100%;
   }
 
-  /* The name and the date go above what was written rather than beside it —
-     a 145px column beside a phone's text column leaves neither room. */
-  .prv__review {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
+  /* The picture leads the reviews rather than sitting beside them — moved
+     with `order` alone, since it's already a flex sibling of the list
+     column and needs nothing heavier to change its place. */
+  .prv__media {
+    order: -1;
   }
 
-  .prv__title {
-    font-size: 28px;
+  .prv__review {
+    grid-template-columns: minmax(0, 133px) minmax(0, 1fr);
+    column-gap: 24px;
+    padding-bottom: 24px;
+  }
+
+  .prv__review+.prv__review {
+    padding-top: 24px;
+  }
+
+  .prv__review-author {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+    color: #202020;
+  }
+
+  .prv__review-verified,
+  .prv__review-date {
+    font-size: 14px;
+    line-height: 22px;
+    color: #959595;
+  }
+
+  .prv__review-stars {
+    --prv-star-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .prv__review-body {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .prv__pages:not(:empty) {
+    gap: 24px;
+    padding-top: 24px;
+  }
+
+  .prv__page {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: #bebebe;
+  }
+
+  .prv__page[aria-current='true'] {
+    color: #000;
+  }
+
+  .prv__page-gap {
+    font-size: 14px;
+    color: #bebebe;
   }
 }
 

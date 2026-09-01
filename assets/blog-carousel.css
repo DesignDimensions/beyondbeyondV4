@@ -277,7 +277,7 @@
      it, so both get the whole width. */
   .bc__inner {
     flex-direction: column;
-    gap: var(--bc-split-gap-mobile, 28px);
+    gap: 40px;
   }
 
   .bc__intro,
@@ -288,20 +288,52 @@
   }
 
   .bc .section-title {
-    font-size: clamp(2.4rem, 7vw, 3.2rem);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.56px;
   }
 
   .bc__body {
+    margin-top: 24px;
     max-width: none;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 
   .bc__cta {
+    gap: 10px;
     max-width: none;
     height: var(--bc-cta-h-mobile, 44px);
+    margin-top: 24px;
+    font-size: 16px;
+    letter-spacing: normal;
+  }
+
+  .bc__cta-arrow {
+    width: 27px;
+    height: auto;
+  }
+
+  /* Fixed rather than a share of the column, the same peeking mechanic every
+     other phone rail in this theme uses — the design leaves the next card
+     riding half off the edge as the cue that the row scrolls. */
+  .bc__rail {
+    gap: 24px;
   }
 
   .bc__card {
-    flex-basis: var(--bc-card-w-mobile, 78cqw);
+    flex: 0 0 264px;
+  }
+
+  .bc__card-body {
+    padding: 24px 16px;
+  }
+
+  .bc__card-title {
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 }
 

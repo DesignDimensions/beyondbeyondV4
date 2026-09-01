@@ -307,14 +307,25 @@
    Mobile
    -------------------------------------------------------------------------- */
 
+/* The phone drawing fixes each card at 224px rather than dividing the column
+   evenly between however many the merchant asks for — two cards run to 460px
+   against a 354px column, so the second one rides half off the edge as a peek
+   that says the row scrolls, the same peeking mechanic the concern rail and
+   the bestsellers rail already use on a phone. */
 @media screen and (max-width: 749px) {
   .tst {
     padding-top: 40px;
     padding-bottom: 40px;
   }
 
+  .tst__heading {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 4.8px;
+  }
+
   .tst__card {
-    flex-basis: calc((70% - (var(--tst-columns-mobile, 1.2) - 1) * var(--tst-gap, 34px)) / var(--tst-columns-mobile, 1.2));
+    flex: 0 0 224px;
   }
 
   .tst__arrow {
@@ -325,8 +336,34 @@
     gap: 12px;
   }
 
+  .tst__product {
+    gap: 13px;
+    padding: 12px;
+  }
+
+  .tst__product-media {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tst__product-info {
+    gap: 4px;
+  }
+
   .tst__product-title {
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0.28px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .tst__product-price {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0.28px;
   }
 }
 

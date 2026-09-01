@@ -158,12 +158,37 @@
    Mobile
    -------------------------------------------------------------------------- */
 
+/* --------------------------------------------------------------------------
+   Mobile
+   --------------------------------------------------------------------------
+   The phone drawing is the portrait, not the chat mock the desktop row shows
+   beside it: label, heading, then the photo with the blue bar fused to its
+   foot, all at the full width of the column. 40px of padding top and bottom,
+   40px between the heading and the photo, and the bar overlapping the photo by
+   12px so the two read as one control.
+   -------------------------------------------------------------------------- */
+
 @media screen and (max-width: 749px) {
 
-  /* Overrides the shared heading's own margin (base.css), which is sized for
-     a section that doesn't have a tight video sitting right under it. */
+  .sc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .sc .section-heading {
+    margin-bottom: 4px;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 4.8px;
+  }
+
   .sc .section-title {
-    margin-bottom: 1.5rem;
+    max-width: 100%;
+    margin-bottom: 40px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.56px;
   }
 
   .sc__grid {
@@ -172,30 +197,33 @@
     padding: 0;
   }
 
-  /* The video takes the image's spot, with the CTA fused to it the same way
-     it's fused to the image on desktop -- so the swap needs both the image
-     hidden and the two grid rows reordered, not just the image hidden. */
-  .sc__image,
-  .sc__media .placeholder-svg {
+  /* The chat mock is the desktop row's second column and has no place in the
+     phone drawing. */
+  .sc__video-wrap {
     display: none;
   }
 
-  .sc__video-wrap {
-    order: -1;
+  .sc__media picture {
+    width: 100%;
+  }
+
+  .sc__image,
+  .sc__media .placeholder-svg {
+    width: 100%;
     height: auto;
-    margin-top: 30px;
   }
 
-  .sc {
-    padding-top: 40px;
-    padding-bottom: 40px;
+  .sc__cta {
+    margin-top: -12px;
+    padding: 8px 16px;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 28px;
   }
 
-  /* Auto margins on the flex item override the wrap's own end-alignment for
-     just this element, so the plain (cover-fit) video stays right-aligned. */
-  .sc__video.sc__video--fit {
-    margin-left: auto;
-    margin-right: auto;
+  .sc__cta-arrow {
+    width: 23px;
   }
 
   .sc__rule {

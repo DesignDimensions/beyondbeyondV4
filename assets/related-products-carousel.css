@@ -137,15 +137,58 @@
    Mobile
    -------------------------------------------------------------------------- */
 
+/* Figma's mobile grid is a static 2x2 under "You May Also Like" — the same
+   treatment Founder's Routine and Browse By Concern use for a phone results
+   grid, not a peeking scroll rail. */
 @media screen and (max-width: 749px) {
+  .rp__heading {
+    margin-bottom: 40px;
+    font-size: 12px;
+    letter-spacing: 4.8px;
+  }
+
+  .rp__rail {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 12px;
+  }
+
   .rp__card {
-    flex-basis: calc((100% - (var(--rp-columns-mobile, 1.2) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns-mobile, 1.2));
+    flex-basis: calc((100% - 12px) / 2);
   }
 
   /* A thumb already does what they do, and there is no room beside the cards
      to put them. */
   .rp__arrow {
     display: none;
+  }
+
+  /* Sizing is the one thing this grid doesn't share with the wide rail card
+     elsewhere on the phone — see the same override on Browse By Concern's
+     results grid and Founder's Routine's picks for why. */
+  .rp__card .card-wrapper {
+    --pcard-star-size: 11px;
+    --pcard-star-gap: 2px;
+  }
+
+  .rp__card .card-wrapper .card__heading {
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0;
+  }
+
+  .rp__card .card-wrapper .card__meta {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+
+  .rp__card .card-wrapper .quick-add__submit.button {
+    height: 28px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.24px;
   }
 }
 

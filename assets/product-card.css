@@ -473,96 +473,110 @@
 /* ==========================================================================
    Phone
    ==========================================================================
-   Two cards to a row leaves each one about 170px wide, and the design is
-   drawn at that size: the copy runs edge to edge under the picture rather
-   than inset from it, the button is a bar across the foot of the card, and
-   every size steps down to keep the same proportion to the card it did in
-   the drawing. Written against the tokens where there is one, so the card
-   steps down as a piece.
+   The phone card is drawn at the width of the content column — one card to a
+   screen, 354px in the frame — and everything under the picture runs on a
+   single 8px rhythm: picture, title, type line, stars, price, each 8px from
+   the one above it. The copy runs edge to edge rather than inset from the
+   picture. The add-to-cart bar is the one thing held off an edge: it rides
+   inside the picture with the same gap on its left, right and bottom.
    ========================================================================== */
 
 @media screen and (max-width: 749px) {
 
   .card-wrapper {
     --pcard-inset: 0px;
-    --pcard-star-size: 13px;
+    /* The bar's gap off the picture's three edges. A number of its own, not
+       `--pcard-inset`: the copy's inset is zero here, and on desktop the two
+       were the same 16px. */
+    --pcard-atc-inset: 10px;
+    /* `mask-repeat: space` fits as many star tiles as clear the box without
+       clipping, not the 5 the box was actually sized for — so the gap has to
+       stay well under a quarter of the tile width (here ~15px) or a 6th tile
+       clears it too. 16/4 is Figma's own phone numbers and keeps clear of
+       that line; a size/gap pair chosen without checking it can silently draw
+       6 stars instead of 5. */
+    --pcard-star-size: 16px;
+    --pcard-star-gap: 4px;
   }
 
+  /* The title keeps the price's size and gives up its weight — on a phone the
+     price is the bold line and the name reads plainly beneath the picture. */
   .card-wrapper .card__heading {
-    font-size: 14px;
-  }
-
-  .card-wrapper .price {
     font-size: 16px;
-  }
-
-  .card__meta {
-    font-size: 11px;
-  }
-
-  .card-wrapper .quick-add__submit.button {
-    font-size: 12px;
+    font-weight: 400;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 
   .card-wrapper .card__information {
-    padding: 16px 0 0;
+    padding: 8px 0 0;
   }
 
-  /* Type plus two sizes is one line in the design, and at 172px it only stays
-     one line if the space between the words is spent sparingly. A product
-     whose type runs long — "Sun Protection" — still takes a second line
-     rather than being shrunk until it fits. */
-  .card__meta {
-    gap: 4px;
-    margin-top: 10px;
-    letter-spacing: 0.5px;
+  /* Type plus two sizes is one line in the design. A product whose type runs
+     long — "Sun Protection" — still takes a second line rather than being
+     shrunk until it fits.
+
+     The margins below are all written as the shorthand, and all under
+     `.card-wrapper`. `component-card.css` gives every child of the
+     information block a top and a bottom margin of its own, and it loads from
+     inside the body — later than this sheet, and at the same weight as a bare
+     class. Stating only `margin-top` here would leave its 7px bottom margin
+     underneath, and the 8px rhythm would read as 15. */
+  .card-wrapper .card__meta {
+    gap: 8px;
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0.28px;
+    color: var(--pcard-text);
   }
 
-  .card-wrapper .rating,
+  .card-wrapper .rating {
+    margin: 8px 0 0;
+  }
+
   .card-wrapper .rating-count {
-    margin-top: 10px;
+    margin: 8px 0 0 4px;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.24px;
+    color: var(--pcard-text);
   }
 
   .card-wrapper .price {
-    margin-top: 10px;
+    margin: 8px 0 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 
-  /* The auto margin below is the whole mechanism, and it needs two things the
-     card does not otherwise have on a phone.
-
-     A column to spend the free space in: the content layer is a block above,
-     where the button leaves the flow and rides inside the picture instead, and
-     a block box has no free space to give an auto margin.
-
-     And a card as tall as the row it stands in: the wrapper already asks for
-     its full height, but a percentage height only reaches as far as the first
-     ancestor that has a height of its own, and the custom element each section
-     wraps a card in has none. Given one, it passes the row's height through. */
-  product-component {
-    height: 100%;
-  }
-
-  .card-wrapper .card>.card__content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* The bar under the price. `--pcard-atc-h` stays the merchant's number;
-     the design's button is a little over two thirds of it at this width.
-
-     `auto` rather than a fixed top margin: cards in a row are stretched to
-     the tallest of them, and a bar that starts where its own copy happens to
-     end leaves the row's buttons at three different heights. This puts every
-     one of them on the card's bottom edge; the padding is the gap the tallest
-     card in the row — the one setting the height — keeps under its price. */
+  /* The bar rides inside the picture the way desktop's hover state does — it
+     simply never goes back to invisible, since a phone has no hover to reveal
+     it with, and it is measured the same way: `bottom: 100% + gap` puts its
+     base that far above the copy's top edge, which is the picture's bottom
+     edge, and the left/right pair holds it off the other two. */
   .card-wrapper .quick-add {
-    margin-top: auto;
-    padding-top: 10px;
+    position: absolute;
+    left: var(--pcard-atc-inset);
+    right: var(--pcard-atc-inset);
+    bottom: calc(100% + var(--pcard-atc-inset));
+    margin: 0;
+    padding: 0;
+    z-index: 2;
   }
 
   .card-wrapper .quick-add__submit.button {
-    height: calc(var(--pcard-atc-h, 50px) * 0.72);
-    --pcard-atc-spinner: 15px;
+    height: 44px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.32px;
+  }
+
+  /* The design reads title, type line, stars, price on a phone — the type
+     line leads here, where desktop has the stars leading instead. */
+  .card-wrapper .card__meta {
+    order: 0;
   }
 }
 

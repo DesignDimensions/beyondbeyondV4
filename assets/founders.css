@@ -110,7 +110,7 @@
 
   .fnd__panel {
     flex-direction: column;
-    gap: 18px;
+    gap: 24px;
     padding: 12px;
   }
 
@@ -121,13 +121,35 @@
     aspect-ratio: var(--fnd-media-ratio-mobile, var(--fnd-media-ratio, 0.815));
   }
 
+  /* Stacked, the desktop row's own top offset — there to line the copy up
+     against the picture beside it — has nothing left to align with. */
+  .fnd__copy {
+    padding-top: 0;
+  }
+
   .fnd__heading {
-    margin-bottom: 15px;
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .fnd__body {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 
   .fnd__cta {
-    height: 40px;
-    margin-top: calc(var(--fnd-cta-gap, 40px) * 0.75);
+    gap: 10px;
+    height: 44px;
+    margin-top: 24px;
+  }
+
+  .fnd__cta-arrow {
+    width: 23px;
+    height: auto;
   }
 }
 

@@ -135,22 +135,32 @@
    Mobile
    -------------------------------------------------------------------------- */
 
+/* The phone drawing fixes the logo row at 40px regardless of the merchant's
+   Logo height setting, with the separator standing the same 40px tall as the
+   logos either side of it rather than its own shorter Separator height — so
+   both are written as literal px here instead of scaling the desktop tokens. */
 @media screen and (max-width: 749px) {
   .asi {
     padding-top: 40px;
     padding-bottom: 40px;
   }
 
+  .asi__heading {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 4.8px;
+  }
+
   .asi__logo-img {
-    height: var(--asi-logo-h-mobile, 32px);
+    height: 40px;
   }
 
   .asi__cell {
-    gap: calc(var(--asi-gap, 56px) * 0.6);
-    padding-right: calc(var(--asi-gap, 56px) * 0.6);
+    gap: 24px;
+    padding-right: 24px;
   }
 
   .asi__sep-img {
-    height: calc(var(--asi-sep-h, 30px) * 0.7);
+    height: 40px;
   }
 }

@@ -81,10 +81,13 @@ collection-component {
 
 /* base */
 
+/* 2.4rem below 750px is the phone gutter the mobile designs are drawn on: a
+   402px frame with a 354px content column. Desktop's 5rem is set further
+   down. */
 .page-width {
   max-width: var(--page-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2.4rem;
 }
 
 body:has(.section-header .drawer-menu) .announcement-bar-section .page-width {

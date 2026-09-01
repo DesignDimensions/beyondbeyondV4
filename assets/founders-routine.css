@@ -323,10 +323,15 @@
     padding-bottom: 40px;
   }
 
+  /* Figma's mobile routine grid is a static 2x2, not a scroll rail. */
+  .fr__rail {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 12px;
+  }
+
   .fr__card {
-    flex-basis: calc(
-      (100% - (var(--fr-columns-mobile, 1.2) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns-mobile, 1.2)
-    );
+    flex-basis: calc((100% - 12px) / 2);
   }
 
   .fr__arrow {
@@ -334,20 +339,95 @@
   }
 
   .fr__dots {
-    display: flex;
+    display: none;
   }
 
-  /* A phone has no room to spare either side of the control, so it takes the
-     content column whole and the names give back the padding they were
-     holding. Set on the tabs rather than the section, so it out-ranks the
-     inline `--fr-tab-pad` the section settings write further up the tree. */
+  /* Card look, fusion, ordering and colour all come from product-card.css —
+     the sitewide "one design, everywhere" sheet every card on the store
+     already draws from. Sizing is the one thing this grid doesn't share with
+     it: product-card.css's phone rules are drawn for a card the width of the
+     whole column — one to a screen, 354px in the frame — and this rail's
+     cards sit two to a row at roughly half that. Figma draws the card smaller
+     throughout at that width, the same numbers Browse By Concern's results
+     grid uses for the same reason. */
+  .fr__card .card-wrapper {
+    --pcard-star-size: 11px;
+    --pcard-star-gap: 2px;
+  }
+
+  .fr__card .card-wrapper .card__heading {
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0;
+  }
+
+  .fr__card .card-wrapper .card__meta {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+
+  .fr__card .card-wrapper .quick-add__submit.button {
+    height: 28px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+
+  /* Scoped under `.fr` rather than written into the shared `.section-heading`
+     / `.section-title` rules — those are used across sections this pass
+     hasn't reached yet, and the phone drawing's overline-to-heading and
+     heading-to-tabs gaps (24px, 40px) are this section's own, not a sitewide
+     change. */
+  .fr .section-heading {
+    margin-bottom: 24px;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 4.8px;
+  }
+
+  .fr .section-title {
+    margin-bottom: 40px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  /* The phone drawing loses the glass — flat colour, no sheen, no blur — and
+     takes the content column whole rather than fitting the two names. Set on
+     the tabs rather than the section, so it out-ranks the inline custom
+     properties the section settings write further up the tree. */
   .fr__tabs {
     width: 100%;
-    --fr-tab-pad: 12px;
+    height: 44px;
+    margin-bottom: 40px;
+    padding: 0;
+    border-radius: 8px;
+    background-color: rgba(194, 190, 190, 0.25);
+    background-image: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    --fr-pill-inset: 0px;
+    --fr-tab-pad: 24px;
+    --fr-tab-color: #000;
+  }
+
+  .fr__tabs::before {
+    display: none;
+  }
+
+  .fr__pill {
+    border-radius: 6px;
   }
 
   .fr__tab {
-    font-size: 14.4px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.32px;
   }
 }
 

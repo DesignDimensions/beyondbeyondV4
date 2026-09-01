@@ -48,21 +48,6 @@
   color: #000;
 }
 
-/* Sized off the label rather than in pixels, so the arrow keeps its
-   proportion to the words if the label size ever changes. Height is what is
-   set, not width: what makes an arrow look right beside type is standing as
-   tall as the capitals do, and its own ratio gives it the width from there. */
-.hbc__shop-all-arrow {
-  flex: none;
-  height: 1.2rem;
-  width: auto;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.hbc__shop-all:hover .hbc__shop-all-arrow {
-  transform: translateX(4px);
-}
-
 /* --------------------------------------------------------------------------
    Rail
    --------------------------------------------------------------------------
@@ -199,6 +184,18 @@
     padding-bottom: 40px;
   }
 
+  .hbc__head {
+    margin-bottom: 40px;
+  }
+
+  /* The phone's section label: 12/700 on a 20px line, tracked 4.8 — smaller
+     and tighter than the shared `.section-heading` step. */
+  .hbc__heading {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 4.8px;
+  }
+
   .hbc__card {
     flex-basis: calc((100% - (var(--hbc-columns-mobile, 1.2) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns-mobile, 1.2));
   }
@@ -210,15 +207,19 @@
   }
 
   .hbc__shop-all {
-    font-size: 11px;
-    letter-spacing: 1.5px;
+    font-size: 12px;
+    letter-spacing: normal;
+    text-decoration-line: underline;
   }
+
+  /* Card look, fusion, ordering and colour all come from product-card.css —
+     the sitewide "one design, everywhere" sheet every card on the store
+     already draws from. Nothing card-specific belongs here. */
 }
 
 @media (prefers-reduced-motion: reduce) {
 
-  .hbc__arrow,
-  .hbc__shop-all-arrow {
+  .hbc__arrow {
     transition-duration: 0.01ms;
   }
 }

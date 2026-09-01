@@ -305,30 +305,76 @@
    Mobile
    -------------------------------------------------------------------------- */
 
+/* The phone drawing sizes every thumbnail at a fixed 99 x 132 rather than a
+   share of the row, and lets the row run past the edge of the screen — the
+   fourth thumbnail sits half off-screen as a peek that says the row drags.
+   That is a different mechanic from desktop's "divide the column evenly"
+   rail, so the fixed width replaces the percentage formula outright instead
+   of feeding it a mobile number. Nothing about the drag/step JS depends on
+   which one is in effect — it reads the thumbnail's live `offsetWidth`. */
 @media screen and (max-width: 749px) {
-  .bbc__dots {
-    display: flex;
-  }
-
-  .bbc__concern-label {
-    font-size: 15px;
-    font-weight: 600;
-    color: #000;
-    line-height: 18px;
-    margin-top: 8px;
-  }
-
   .bbc {
     padding-top: 40px;
     padding-bottom: 40px;
   }
 
-  .bbc__grid {
-    grid-template-columns: repeat(var(--bbc-columns-mobile, 2), minmax(0, 1fr));
+  .bbc__rail {
+    margin-bottom: 24px;
+    /* A small rise rather than desktop's full 28px — just enough that the
+       active dot clears the row and doesn't read as touching whatever sits
+       below the rail. */
+    --bbc-thumb-lift: 6px;
   }
 
-  .bbc__rail {
-    --bbc-visible: var(--bbc-visible-mobile, 3);
+  /* The lift is only 6px now, not desktop's 28, so the headroom it needs
+     shrinks to match — enough to clear the raised thumbnail without being
+     sheared off against the viewport's clip. */
+  .bbc__viewport {
+    width: 100%;
+    margin: 0;
+    padding-top: 6px;
+  }
+
+  .bbc__track {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .bbc__concern {
+    flex: 0 0 99px;
+    width: 99px;
+  }
+
+  .bbc__concern-media {
+    aspect-ratio: 99 / 132;
+  }
+
+  /* Every label reads the same weight on a phone; the dot below it is the
+     only thing that marks which concern is active. */
+  .bbc__concern-label {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.24px;
+    color: #000;
+  }
+
+  .bbc__concern-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 8px;
+  }
+
+  .bbc__dots {
+    display: flex;
+    gap: 4px;
+    margin-top: 0;
+  }
+
+  .bbc__grid {
+    grid-template-columns: repeat(var(--bbc-columns-mobile, 2), minmax(0, 1fr));
+    gap: 12px;
   }
 
   /* The gutter here is 1.5rem, which is not room enough to hang an arrow in.
@@ -337,6 +383,51 @@
     display: none;
   }
 
+  /* --------------------------------------------------------------------------
+     Cards in the results grid
+     --------------------------------------------------------------------------
+     product-card.css's phone rules are drawn for a card the width of the
+     whole column — one to a screen, 354px in the frame. Here the same card
+     sits two to a row at roughly half that, and Figma draws it smaller
+     throughout: a 28px bar instead of 44, 14px title instead of 16, 12px type
+     line instead of 14. Scoped to this grid rather than written into
+     product-card.css itself, since the wide card elsewhere on the phone (the
+     bestsellers rail, the routine picks) is drawn at the larger size and
+     still needs it.
+     -------------------------------------------------------------------------- */
+  .bbc__grid .card-wrapper {
+    /* 11px stars keep Figma's size, but a 4px gap between them is wide enough
+       relative to an 11px star that `mask-repeat: space` fits a 6th one
+       rather than the intended 5 — the mask has no idea 5 was the count to
+       hit, only that a 6th copy still clears the box without clipping. 2px
+       keeps the same row comfortably under that threshold. */
+    --pcard-star-size: 11px;
+    --pcard-star-gap: 2px;
+  }
+
+  .bbc__grid .card-wrapper .card__heading {
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0;
+  }
+
+  .bbc__grid .card-wrapper .card__meta {
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+
+  .bbc__grid .card-wrapper .quick-add__submit.button {
+    height: 28px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.24px;
+  }
+
+  /* Card look, fusion, ordering and colour all come from product-card.css —
+     the sitewide "one design, everywhere" sheet every card on the store
+     already draws from. Nothing card-specific belongs here. */
 }
 
 @media (prefers-reduced-motion: reduce) {

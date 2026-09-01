@@ -66,13 +66,17 @@
    wants to size the ones inside it rather than be sized by nothing. */
 .ph__stage {
   display: grid;
-  /* One explicit row, floored at zero. Without it the row is auto-sized and a
-     tall photo grows the box past the ratio — which is exactly what a source
-     image taller than the ratio was doing. `minmax(0, 1fr)` makes the row
-     exactly the height the ratio asks for and gives the content no say, which
-     is also what turns the slides' `height: 100%` into a real measurement
-     rather than `auto`. */
+  /* One explicit row and one explicit column, both floored at zero. Without
+     the row, it auto-sizes to a tall photo and grows the box past the ratio;
+     without the column, the same auto-sizing runs sideways — a slide's `img`
+     is `width: 100%`, which grid's column-sizing pass treats as indefinite
+     and falls back to the image's own intrinsic width, so the box (and the
+     picture in it) render at whatever the source photo's natural size is
+     rather than the stage's. `minmax(0, 1fr)` on both axes gives the content
+     no say either way, which is also what turns the slides' `height: 100%`
+     into a real measurement rather than `auto`. */
   grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   flex: 0 0 auto;
   min-height: 0;
   aspect-ratio: var(--ph-media-ratio, 600 / 637);
@@ -633,6 +637,7 @@
 .ph__link {
   color: var(--ph-text, #0a0a0b);
   text-decoration: none;
+  text-align: center;
 }
 
 .ph__link:hover {
@@ -672,7 +677,7 @@
 
   .ph__thumbs {
     --ph-thumbs-visible: var(--ph-thumbs-visible-mobile, 5);
-    margin-bottom: var(--ph-thumbs-bottom-mobile, 16px);
+    margin-bottom: 0;
   }
 
   .ph__info {
@@ -695,6 +700,189 @@
 
   .ph__qty {
     flex: 0 0 96px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   The theme's own mobile breakpoint (749px), under the 989px tablet-down
+   collapse above. Every size below is Figma's phone frame, not a scaled-down
+   version of the desktop numbers.
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+
+  /* The marquee's track is wider than any screen by design — it loops — and
+     normally that's `.usp-carousal-container`'s own `overflow: hidden` to
+     contain. Relocated to sit directly under `.ph` rather than several
+     levels down inside its original section, something about that
+     containment stops reaching the document: the track still measures into
+     `documentElement.scrollWidth` and the page gains a horizontal scrollbar
+     over content nothing ever shows. Contained again one level up instead
+     of chased through the marquee's own sheet, which has no reason to know
+     it now sits somewhere its overflow needs a second guard. */
+  .ph {
+    overflow-x: hidden;
+  }
+
+  /* The gallery and the badge strip run to the screen's own edges; only the
+     buying copy after them keeps the page-width gutter. `product-hero.js`
+     moves both out to be direct children of `.ph` on a phone — ahead of
+     `.page-width`, whose own inset they're leaving — so getting them
+     full-bleed is nothing more than taking the width that ancestor already
+     has. No transform, no percentage measured against the wrong box: `.ph`
+     already spans the viewport, so its own children can just say so. */
+  .ph>.ph__media,
+  .ph>.section-usp-carousal {
+    width: 100%;
+  }
+
+  /* A grid item's automatic minimum width is its content's, not 0 — and on
+     the rare frame this paints before the relocation script runs, or on a
+     resize back past this breakpoint before it un-does it, the marquee's
+     track is `width: max-content` several layers down. Without this the
+     item — and the grid, and the page — would grow to fit the whole
+     unrolled strip instead of letting `overflow: hidden` clip it. */
+  .ph__grid>.section-usp-carousal {
+    min-width: 0;
+  }
+
+  .ph__thumbs {
+    padding: 0 10px 24px;
+  }
+
+  .ph__thumb-track {
+    gap: 8px;
+  }
+
+  .ph__thumb {
+    flex-basis: 50px;
+    width: 50px;
+  }
+
+  .ph__info {
+    padding: 48px 0;
+  }
+
+  .ph__rating {
+    gap: 12px;
+  }
+
+  .ph__stars {
+    --ph-star-size: 12px;
+  }
+
+  .ph__reviews {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .ph__title {
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .ph__lede {
+    margin-top: 24px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .ph__desc {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .ph__variants {
+    margin-top: 24px;
+    gap: 12px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .ph__rule {
+    margin-top: 12px;
+  }
+
+  .ph__mrp {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .ph__price-row {
+    margin-top: 12px;
+  }
+
+  .ph__price {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 0.4px;
+  }
+
+  .ph__tax {
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.24px;
+  }
+
+  .ph__badge {
+    padding: 2px 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .ph__buy {
+    margin-top: 24px;
+  }
+
+  .ph__qty {
+    flex-basis: 87px;
+    height: 44px;
+  }
+
+  .ph__atc {
+    height: 44px;
+    padding: 0 36px;
+    letter-spacing: 0.32px;
+  }
+
+  /* Two links to a row, centred, each pair with its own separator between
+     them — not the flex-wrap flow's one separator per link, which leaves a
+     pipe dangling at the start of a wrapped row rather than between the two
+     links sharing it. Three auto columns (link, pipe, link) do it without
+     touching the markup: with the between-pair separator hidden below, the
+     remaining sequence is exactly two links and a pipe per row, and grid's
+     auto-placement wraps it there on its own. */
+  .ph__links {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    align-items: center;
+    column-gap: 38px;
+    row-gap: 8px;
+    margin-top: 24px;
+  }
+
+  /* First, third, fifth… separator sits between a row's two links and
+     stays; second, fourth… sits between one row and the next and goes —
+     removed rather than hidden, so it takes no grid cell and the two links
+     either side of it close the gap into one row. */
+  .ph__link-sep:nth-of-type(even) {
+    display: none;
   }
 }
 

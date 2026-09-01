@@ -139,16 +139,21 @@
   }
 }
 
-@media(max-width:756px) {
+@media screen and (max-width: 749px) {
   .usp-carousal__track {
-    gap: 30px;
+    gap: 20px;
+  }
+
+  .usp-carousal__inner {
+    gap: 12px;
   }
 
   .usp-carousal__icon {
-    width: 38px;
+    width: 37.5px;
   }
 
   .usp-carousal__title {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
+    font-weight: 700;
   }
 }

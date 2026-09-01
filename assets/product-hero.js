@@ -230,12 +230,74 @@
     sync();
   }
 
+  /* ----------------------------------------------------------------------
+     Gallery and badge strip, full-bleed on a phone
+     ----------------------------------------------------------------------
+     The phone drawing runs the gallery and the USP marquee to the screen's
+     own edges, with only the buying copy after them kept to the page-width
+     gutter — and sits the marquee between the two, even though it's a
+     separate section the merchant places after this one.
+
+     Both of those are DOM moves, not CSS. A `width: 100vw` breakout the
+     usual way — `margin-left: 50%; transform: translateX(-50%)` — measures
+     that 50% against the element's own containing block, which for
+     `.ph__media` is `.ph__grid`'s column, not the viewport; the two agree
+     only when `.page-width` happens to have zero padding, so on a real page
+     the box lands off-centre and the doc gains the padding back as
+     horizontal overflow. There's no percentage that means "the viewport"
+     from inside a padded, centred ancestor — the box has to actually leave
+     it. So both `.ph__media` and the marquee's section move to be direct
+     children of `.ph` itself, ahead of `.page-width`, where the section's
+     own full width is theirs to have; `.ph__info` stays inside `.page-width`
+     for its inset. Reversed on a resize back past this breakpoint, since
+     the split-column desktop layout wants media inside the grid again. */
+  var MOBILE_QUERY = '(max-width: 749px)';
+
+  function setupBadgeStrip(root) {
+    var pageWidth = root.querySelector(':scope > .page-width');
+    var grid = root.querySelector('.ph__grid');
+    var media = root.querySelector('.ph__media');
+    var info = root.querySelector('.ph__info');
+    var badge = document.querySelector('.section-usp-carousal');
+    if (!pageWidth || !grid || !media || !info || !badge || badge.phRelocated) return;
+    badge.phRelocated = true;
+
+    var mediaHomeNext = media.nextSibling;
+    var badgeHomeParent = badge.parentNode;
+    var badgeHomeNext = badge.nextSibling;
+
+    function place(isMobile) {
+      if (isMobile) {
+        if (media.parentNode !== root) {
+          root.insertBefore(media, pageWidth);
+        }
+        if (badge.parentNode !== root) {
+          root.insertBefore(badge, pageWidth);
+        }
+      } else {
+        if (media.parentNode !== grid) {
+          grid.insertBefore(media, mediaHomeNext);
+        }
+        if (badge.parentNode !== badgeHomeParent) {
+          badgeHomeParent.insertBefore(badge, badgeHomeNext);
+        }
+      }
+    }
+
+    var mql = window.matchMedia(MOBILE_QUERY);
+    place(mql.matches);
+    mql.addEventListener('change', function (event) {
+      place(event.matches);
+    });
+  }
+
   function setup(root) {
     if (root.phBound) return;
     root.phBound = true;
 
     setupVariants(root, setupGallery(root));
     setupQuantity(root);
+    setupBadgeStrip(root);
   }
 
   function setupAll(scope) {
