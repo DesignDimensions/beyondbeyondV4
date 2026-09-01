@@ -78,28 +78,48 @@
 
 @media screen and (max-width: 989px) {
   .ftb__divider {
-    margin-bottom: 32px;
+    margin-bottom: 40px;
   }
 }
 
 @media screen and (max-width: 749px) {
+  .ftb__payment-item {
+    width: 28%;
+  }
+
   .ftb {
     padding-bottom: 50px;
   }
 
+  /* Badges left, copyright right, on one row — the copy leads in the markup
+     so that it is read first, and only the painted order is swapped. */
   .ftb__row {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: flex-start;
-    gap: 24px;
+    justify-content: space-between;
+    gap: 20px;
   }
 
+  .ftb__copyright {
+    order: 2;
+    font-size: 12px;
+    line-height: 28px;
+    text-align: right;
+  }
+
+  /* 176px is four badges and the three gaps between them, so the row breaks
+     after the fourth on its own rather than needing a count written into it. */
   .ftb__payment {
-    gap: 12px;
+    order: 1;
+    flex: 0 0 auto;
+    max-width: 140px;
+    gap: 12px 10px;
   }
 
   .ftb__payment-img {
-    width: 52px;
-    height: 36px;
+    width: 100%;
+    height: auto;
   }
 
   .ftb__quote svg,

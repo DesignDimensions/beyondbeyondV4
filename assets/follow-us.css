@@ -172,30 +172,42 @@
 }
 
 @media screen and (max-width: 749px) {
-  .fu .page-width:last-of-type {
-    padding: 0 !important;
-  }
-
   .fu {
-    padding-top: 20px;
-    padding-bottom: 0;
+    padding-top: 40px;
+    padding-bottom: 40px;
   }
 
-  .fu__tile {
-    min-width: 42vw;
-    height: fit-content;
-    aspect-ratio: 1 / 1;
-  }
-
-
-  .fu__handle {
-    font-size: 1.8rem;
+  /* The strip keeps the content column's left gutter and runs off the right
+     edge instead of being full-bleed at both ends — a tile and a bit of the
+     next one, which is what says there is more to scroll to. */
+  .fu .page-width:last-of-type {
+    padding-right: 0;
   }
 
   .fu__header {
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+  }
+
+  .fu__heading-group {
+    gap: 4px;
+  }
+
+  /* Two classes deep so it outranks the `h1`/`h2` size class the heading
+     carries from its section setting. */
+  .fu .fu__heading {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .fu__handle {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 0.4px;
   }
 
   .fu__description {
@@ -203,9 +215,32 @@
     font-size: 1.5rem;
   }
 
-  /* No shrink here: the row scrolls on mobile, and a shrinking card would let
-     the eyebrow and quote collapse into a narrow column instead. */
+  /* 172 x 215 as drawn — a portrait tile, not the square the row used to
+     divide itself into. Fixed rather than a share of the screen so the run
+     keeps its shape whatever the phone's width. */
+  .fu__tile {
+    flex: 0 0 172px;
+    width: 172px;
+    min-width: 0;
+    height: 215px;
+    aspect-ratio: auto;
+  }
+
+  /* The quote card is the one tile that cannot take the photo width — its
+     eyebrow, sentence and button would stack into a column too narrow to
+     read. It keeps the row's height and takes the width it needs, and its
+     sentence steps down to fit that height. */
   .fu__tile--quote {
     flex: 0 0 74vw;
+    width: auto;
+  }
+
+  .fu__quote-text {
+    margin: 12px 0;
+    font-size: 16px;
+  }
+
+  .fu__quote-cta {
+    padding: 10px 14px;
   }
 }

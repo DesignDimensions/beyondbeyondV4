@@ -99,6 +99,74 @@
   opacity: 1;
 }
 
+/* `base.css` puts a ring on everything focusable — an offset outline plus a
+   two-part box-shadow glow. Inside a field that already draws its own border
+   that reads as a second box floating in the first, so the field takes the
+   focus itself and simply darkens its edge. Clearing the outline alone is not
+   enough: the glow is a box-shadow, and this element never set one. */
+.ftm__input:focus,
+.ftm__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.ftm__field:focus-within {
+  border-color: #202020;
+}
+
+/* The arrow keeps a real focus ring — it is the one thing in here a keyboard
+   lands on that the field's own border does not already announce — but a
+   plain one, without the glow. */
+.ftm__submit:focus-visible {
+  outline: 2px solid #202020;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Chrome paints its own panel behind an autofilled value, which shows through
+   as a filled rectangle inside the rounded field. There is no property for the
+   colour of it — an inset shadow the depth of the field is the way to cover
+   it. */
+.ftm__input:-webkit-autofill,
+.ftm__input:-webkit-autofill:hover,
+.ftm__input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px #f5f5f5 inset;
+  box-shadow: 0 0 0 100px #f5f5f5 inset;
+  -webkit-text-fill-color: #202020;
+}
+
+/* --- Newsletter, once it has been sent ---------------------------------- */
+
+.ftm__success {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ftm__success:focus {
+  outline: none;
+}
+
+.ftm__success-heading {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: 0.56px;
+  color: #171717;
+}
+
+.ftm__success-text {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+  letter-spacing: 0.4px;
+  color: #202020;
+}
+
 .ftm__submit {
   display: flex;
   flex: 0 0 auto;
@@ -123,6 +191,20 @@
   display: block;
   margin: 10px 0 0;
   font-size: 12px;
+}
+
+/* Carries the social icons alone on a wide screen — the wordmark inside it is
+   hidden there, so `space-between` leaves the icons at the left exactly as
+   they sat before this row existed. */
+.ftm__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ftm__logo--foot {
+  display: none;
 }
 
 .ftm__social {
@@ -243,30 +325,98 @@
 @media screen and (max-width: 749px) {
   .ftm {
     padding-top: 50px;
+    padding-bottom: 40px;
   }
 
-  .ftm__brand,
-  .ftm__grid {
+  /* The mark moves out of the head of the column and onto the social row,
+     where Figma draws it: mark left, icons right. */
+  .ftm__logo--top {
+    display: none;
+  }
+
+  .ftm__logo--foot {
+    display: block;
+    width: 84px;
+  }
+
+  .ftm__brand {
     gap: 32px;
   }
 
+  /* Two different gaps live under one flex container: 24px from the
+     heading down to the email field (both inside the newsletter group),
+     then 40px on to the row carrying the mark and the icons. The container
+     gap covers the first; the extra 16px of margin makes up the second. */
   .ftm__stack {
-    gap: 28px;
-  }
-
-  .ftm__heading {
-    font-size: 2.9rem;
-    line-height: 1.35;
-  }
-
-  .ftm__menus {
     gap: 24px;
   }
 
+  /* The icons sit on the mark's baseline rather than its centre — Figma
+     drops them to the foot of a 45px row. */
+  .ftm__foot {
+    align-items: flex-end;
+    margin-top: 16px;
+  }
+
+  .ftm__social-link--fb svg,
+  .ftm__social-link--ig svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ftm__social-link--li svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* The base rule already carries Figma's phone size (28/40/500/0.56) —
+     this used to override it larger, which had it backwards. */
+  .ftm__heading {
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  /* The rule Figma draws between the brand column and the menu columns
+     once they stack — 40px down to it, 40px on from it. */
+  .ftm__grid {
+    gap: 0;
+  }
+
+  /* Both columns take their content's width and are pushed to the two edges,
+     which is what puts the second one's left edge where Figma has it rather
+     than at the midpoint an equal split would give. */
+  .ftm__menus {
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid #000;
+  }
+
   .ftm__menu {
-    flex: 1 1 0;
-    gap: 20px;
+    flex: 0 1 auto;
+    gap: 24px;
     width: auto;
     min-width: 0;
+  }
+
+  .ftm__menu-heading {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0.32px;
+  }
+
+  /* 14/22 with a 12px gap — a 34px pitch down the column, against the 36px
+     the desktop 16/28 pair gives. */
+  .ftm__menu-list {
+    gap: 12px;
+    line-height: 22px;
+  }
+
+  .ftm__menu-link {
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: normal;
   }
 }

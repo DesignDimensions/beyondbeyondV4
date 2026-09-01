@@ -11,6 +11,33 @@
   endif
 -%}
 
+{%- comment -%}
+  The wordmark is drawn twice and only ever shown once: desktop puts it at the
+  head of the brand column, the phone layout puts it on the row with the social
+  icons instead. Captured here so the markup for it is written the once.
+{%- endcomment -%}
+{%- capture footer_logo_inner -%}
+  {%- if section.settings.logo != blank -%}
+    <img
+      class="ftm__logo-img"
+      src="{{ section.settings.logo | image_url: width: 400 }}"
+      srcset="
+        {{ section.settings.logo | image_url: width: 200 }} 200w,
+        {{ section.settings.logo | image_url: width: 400 }} 400w,
+        {{ section.settings.logo | image_url: width: 600 }} 600w
+      "
+      width="{{ section.settings.logo.width }}"
+      height="{{ section.settings.logo.height }}"
+      alt="{{ shop.name | escape }}"
+      loading="lazy"
+      decoding="async"
+    >
+  {%- else -%}
+    {{- 'footer-logo.svg' | inline_asset_content -}}
+  {%- endif -%}
+  <span class="visually-hidden">{{ shop.name }}</span>
+{%- endcapture -%}
+
 <div
   class="ftm"
   id="ftm-{{ section.id }}"
@@ -23,27 +50,7 @@
 >
   <div class="page-width ftm__grid">
     <div class="ftm__brand">
-      <a href="{{ routes.root_url }}" class="ftm__logo">
-        {%- if section.settings.logo != blank -%}
-          <img
-            class="ftm__logo-img"
-            src="{{ section.settings.logo | image_url: width: 400 }}"
-            srcset="
-              {{ section.settings.logo | image_url: width: 200 }} 200w,
-              {{ section.settings.logo | image_url: width: 400 }} 400w,
-              {{ section.settings.logo | image_url: width: 600 }} 600w
-            "
-            width="{{ section.settings.logo.width }}"
-            height="{{ section.settings.logo.height }}"
-            alt="{{ shop.name | escape }}"
-            loading="lazy"
-            decoding="async"
-          >
-        {%- else -%}
-          {{- 'footer-logo.svg' | inline_asset_content -}}
-        {%- endif -%}
-        <span class="visually-hidden">{{ shop.name }}</span>
-      </a>
+      <a href="{{ routes.root_url }}" class="ftm__logo ftm__logo--top">{{ footer_logo_inner }}</a>
 
       <div class="ftm__stack">
         {%- if section.settings.newsletter_enable -%}
@@ -54,6 +61,23 @@
           {%- assign newsletter_form_id = 'FooterMainNewsletter-' | append: section.id -%}
           {%- form 'customer', id: newsletter_form_id, class: 'ftm__form' -%}
             <input type="hidden" name="contact[tags]" value="newsletter">
+
+            {%- comment -%}
+              Once it has gone through, the confirmation takes the field's
+              place rather than sitting under it — there is nothing left to
+              type. It holds focus so a screen reader is told what happened
+              without having to hunt for the message.
+            {%- endcomment -%}
+            {%- if form.posted_successfully? -%}
+              <div class="ftm__success" id="FooterMainNewsletterSuccess-{{ section.id }}" tabindex="-1">
+                {%- if section.settings.newsletter_success_heading != blank -%}
+                  <p class="ftm__success-heading">{{ section.settings.newsletter_success_heading }}</p>
+                {%- endif -%}
+                {%- if section.settings.newsletter_success_text != blank -%}
+                  <p class="ftm__success-text">{{ section.settings.newsletter_success_text }}</p>
+                {%- endif -%}
+              </div>
+            {%- else -%}
             <div class="ftm__field">
               <input
                 id="FooterMainNewsletterEmail-{{ section.id }}"
@@ -89,13 +113,20 @@
                 {{- form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email -}}
               </small>
             {%- endif -%}
-            {%- if form.posted_successfully? -%}
-              <p class="ftm__form-message" id="FooterMainNewsletterSuccess-{{ section.id }}" tabindex="-1">
-                {{- 'newsletter.success' | t -}}
-              </p>
             {%- endif -%}
           {%- endform -%}
         {%- endif -%}
+
+        {%- comment -%}
+          The phone layout sets the wordmark and the social icons on one row,
+          the mark to the left and the icons to the right. On a wide screen the
+          mark in here is hidden and the row carries the icons alone, exactly
+          as it did before.
+        {%- endcomment -%}
+        <div class="ftm__foot">
+          <a href="{{ routes.root_url }}" class="ftm__logo ftm__logo--foot" aria-hidden="true" tabindex="-1">
+            {{- footer_logo_inner -}}
+          </a>
 
         {%- if section.settings.show_social and has_social -%}
           <ul class="ftm__social list-unstyled" role="list">
@@ -125,6 +156,7 @@
             {%- endif -%}
           </ul>
         {%- endif -%}
+        </div>
       </div>
     </div>
 
@@ -211,6 +243,19 @@
       "id": "newsletter_placeholder",
       "label": "Email placeholder",
       "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_success_heading",
+      "label": "Success heading",
+      "info": "Replaces the email field once someone has signed up.",
+      "default": "You're in!"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_success_text",
+      "label": "Success text",
+      "default": "Please check your email for confirmation"
     },
     {
       "type": "header",

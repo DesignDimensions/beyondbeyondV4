@@ -82,7 +82,7 @@
           "type": "menu_link",
           "settings": {
             "title": "Shop",
-            "url": "/collections/all"
+            "url": "/collections/all?view=all-collections"
           }
         },
         "link-3": {
@@ -103,7 +103,7 @@
           "type": "menu_link",
           "settings": {
             "title": "Journal",
-            "url": "/blogs/news"
+            "url": "/blogs/blog"
           }
         },
         "link-6": {
@@ -183,10 +183,12 @@
         "newsletter_enable": true,
         "newsletter_heading": "Join our community and get 10% off on your first purchase",
         "newsletter_placeholder": "Enter your email",
+        "newsletter_success_heading": "You're in!",
+        "newsletter_success_text": "Please check your email for confirmation",
         "show_social": true,
         "facebook_url": "",
         "instagram_url": "",
-        "linkedin_url": "",
+        "linkedin_url": "https://www.linkedin.com/company/beyond-beyond-skincare",
         "padding_top": 64,
         "padding_bottom": 10
       }
