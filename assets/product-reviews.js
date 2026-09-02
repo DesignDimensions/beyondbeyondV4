@@ -32,6 +32,7 @@
     this.modal = root.querySelector('[data-prv-modal]');
     this.form = root.querySelector('[data-prv-form]');
     this.message = root.querySelector('[data-prv-message]');
+    this.thanks = root.querySelector('[data-prv-thanks]');
     this.submitButton = root.querySelector('[data-prv-submit]');
 
     this.config = this.readConfig();
@@ -191,6 +192,8 @@
   Reviews.prototype.open = function () {
     if (!this.modal) return;
     this.say('', false);
+    // A new review is being written; the last one's thank-you is spent.
+    this.thank('');
     if (typeof this.modal.showModal === 'function') this.modal.showModal();
     else this.modal.setAttribute('open', '');
   };
@@ -206,6 +209,18 @@
     this.message.textContent = text;
     this.message.classList.toggle('is-error', !!isError);
     this.message.toggleAttribute('hidden', !text);
+  };
+
+  /**
+   * The thank-you, said outside the dialog. Kept separate from `say()` because
+   * the two speak in different places for different reasons: `say()` is for
+   * something that went wrong while the form is still open and can be fixed,
+   * this is for a form that has closed and succeeded.
+   */
+  Reviews.prototype.thank = function (text) {
+    if (!this.thanks) return;
+    this.thanks.textContent = text;
+    this.thanks.toggleAttribute('hidden', !text);
   };
 
   Reviews.prototype.submit = function () {
@@ -244,7 +259,11 @@
       .then(function (body) {
         if (!body || body.ok !== true) throw new Error((body && body.error) || 'failed');
         self.form.reset();
-        self.say(self.config.success || 'Thank you — your review has been received.', false);
+        // Clear the in-dialog line first: it is about to be hidden, and it
+        // should not be waiting there the next time the form is opened.
+        self.say('', false);
+        self.close();
+        self.thank(self.config.success || 'Thank you — your review has been received.');
       })
       .catch(function () {
         self.say(self.config.error || 'Sorry, your review could not be sent.', true);

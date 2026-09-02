@@ -11,25 +11,34 @@ Nothing else in this folder is deployed to Shopify. The theme ignores it.
 
 1. **Put the token above the web root.** On the cPanel account, create
 
-       /home/<cpanel-user>/.shopify-review-token
+       /home1/a178436f/shopify-review-token
 
    containing the Admin API access token on one line and nothing else, then
    `chmod 600` it. Anything under `public_html` can be served as plain text if
    PHP is ever misconfigured, which is why it does not go there.
 
-2. **Point the script at it.** In `reviews-endpoint.php`, set `TOKEN_FILE` to
-   that path — the `CPANEL_USER` placeholder is the only edit the file needs.
+   Note the host puts accounts under `/home1`, not `/home` — a path with the
+   wrong one reads as "Server not configured."
 
-3. **Upload** `reviews-endpoint.php` to somewhere the domain serves, e.g.
-   `public_html/api/reviews-endpoint.php`.
+2. **Point the script at it.** `TOKEN_FILE` is already set to that path. It only
+   needs changing if the account moves.
+
+3. **Upload** `reviews-endpoint.php` to the folder the domain serves it from:
+
+       /home1/a178436f/public_html/bb_product_ratings/reviews-endpoint.php
 
 4. **Check the allowed origins.** `ALLOWED_ORIGINS` lists the domains whose
    storefront may post here. Add or remove as the store's domains change.
 
+   The storefront is on Shopify at `beyondbeyond.co.in`; this cPanel account
+   serves `designdimensions.in`. They are two different servers, which is why
+   the endpoint is on the second and `ALLOWED_ORIGINS` names the first — the
+   browser posts across origins and CORS is what permits it.
+
 5. **Tell the theme where it is.** In the theme editor, open the Product Reviews
    section and put the full URL into **Review form endpoint**:
 
-       https://your-domain.com/api/reviews-endpoint.php
+       https://designdimensions.in/bb_product_ratings/reviews-endpoint.php
 
    Until that setting is filled in, the form tells the visitor it is not
    connected rather than appearing to send.

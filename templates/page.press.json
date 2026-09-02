@@ -1,0 +1,163 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "press-hero",
+      "settings": {
+        "offset_header": true,
+        "heading_lead": "Beyond Beyond,",
+        "heading": "In the Press",
+        "show_rule": true,
+        "body": "<p>Explore the stories, reviews, & conversations featuring Beyond Beyond.</p>",
+        "panel_background": "#0107ef",
+        "panel_image": "shopify://shop_images/Frame_973_d159dd25-37a0-43c2-955d-e8044d7fe647.png",
+        "panel_image_url": "",
+        "panel_alt": "",
+        "text_width": 50,
+        "min_height": 380,
+        "padding_x": 64,
+        "padding_y": 120,
+        "rule_gap": 8,
+        "body_gap": 8,
+        "outer_background": "#f1f1f1",
+        "background": "#f5f5f5",
+        "text_color": "#000000",
+        "rule_color": "#202020",
+        "content_width": 1312
+      }
+    },
+    "grid": {
+      "type": "press-grid",
+      "blocks": {
+        "femina_postfestive": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183.png",
+            "image_mobile": "shopify://shop_images/Frame_40183_9077c9c3-7af9-42e6-b946-e0915a4171f0.png",
+            "image_url": "",
+            "date": "January, 2026",
+            "title": "9 Best Post-Festive Skincare Essentials For Healthy Skin",
+            "byline": "By Unnati Sheth",
+            "link": "",
+            "link_url": "https://www.femina.in/beauty/skin/9-best-post-festive-skincare-essentials-for-healthy-skin-289013-7.html"
+          }
+        },
+        "review_modern_alchemy": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_2_e3a3cd97-398b-4e1f-8d87-e5838a04f449.png",
+            "image_url": "",
+            "date": "January, 2026",
+            "title": "Product Review: \nModern Alchemy",
+            "byline": "By Medha Dutta Yadav",
+            "link": "",
+            "link_url": "https://www.newindianexpress.com/lifestyle/health/2026/Jan/04/product-review-modern-alchemy"
+          }
+        },
+        "cellular_regeneration": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_3_7557f7c2-31c0-455a-82b5-d4c509682d24.png",
+            "image_url": "",
+            "date": "November, 2025",
+            "title": "Is cellular regeneration the final boss of skincare?",
+            "byline": "By Shree Gomes Gupta",
+            "link": "",
+            "link_url": "https://thenodmag.com/content/cellular-regeneration-stem-cell-skincare-indian-homegrown-brands"
+          }
+        },
+        "nad_popular": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_4_ed7f6e61-9642-4fd7-b061-068dddca2462.png",
+            "image_url": "",
+            "date": "January, 2026",
+            "title": "What is NAD+ and why is it getting popular in skincare?",
+            "byline": "By Nivi Shrivastava",
+            "link": "",
+            "link_url": "https://www.instagram.com/stories/highlights/18116601106581780/"
+          }
+        },
+        "new_launches_2026": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_5_fcf08297-a2c0-4078-aa4d-2452e98b94b6.png",
+            "image_url": "",
+            "date": ".....",
+            "title": "New Beauty Launches of 2026 You’ll Want on Your Vanity",
+            "byline": "By Varnika Thukral",
+            "link": "",
+            "link_url": "https://www.thestylelist.in/post/beauty-launches-that-are-the-buzz-in-2026"
+          }
+        },
+        "spf_picks": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_6.png",
+            "image_url": "",
+            "date": "January, 2026",
+            "title": "14 Best SPF Picks for Indian Weather and Humidity",
+            "byline": "By Unnati Sheth",
+            "link": "",
+            "link_url": "https://www.femina.in/beauty/skin/14-best-spf-picks-for-indian-weather-and-humidity-289119.html"
+          }
+        },
+        "valentines_brands": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/Frame_40183_5cec7037-85ad-40fc-a09f-7ee0ddc6a89c.png",
+            "image_url": "",
+            "date": ".....",
+            "title": "Homegrown Indian Brands Worth Gifting This Valentine’s Day",
+            "byline": "By Mirza Shaina Beg",
+            "link": "",
+            "link_url": "https://manifestmagazine.in/fashion-beauty/shopping/homegrown-indian-brands-worth-gifting-this-valentines-day"
+          }
+        }
+      },
+      "block_order": [
+        "femina_postfestive",
+        "review_modern_alchemy",
+        "cellular_regeneration",
+        "nad_popular",
+        "new_launches_2026",
+        "spf_picks",
+        "valentines_brands"
+      ],
+      "settings": {
+        "heading": "As Seen In",
+        "heading_gap": 40,
+        "link_label": "Read more",
+        "open_new_tab": true,
+        "columns": 3,
+        "column_gap": 136,
+        "row_gap": 40,
+        "content_width": 1312,
+        "gutter": 64,
+        "padding_top": 64,
+        "padding_bottom": 64,
+        "media_ratio": "346 / 434",
+        "media_radius": 12,
+        "media_background": "#efefef",
+        "card_background": "rgba(0,0,0,0)",
+        "card_padding": 12,
+        "background": "#ffffff",
+        "text_color": "#000000",
+        "meta_color": "#000000",
+        "link_color": "#202020"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "grid"
+  ]
+}

@@ -1,0 +1,414 @@
+{{ 'press-grid.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Press grid — the coverage itself, laid out like the journal's post grid.
+
+  The cards read as the blog listing's do — image, then a short stack of text
+  under it — but the content is not a blog. Every item here points at somebody
+  else's publication, so each is a block a merchant fills in rather than an
+  article on this store: there is no page of ours to link to, and an article
+  written only to hold an outbound URL would be a page nobody should ever land
+  on.
+
+  That is also why the card is an `<a>` around the whole thing with the link
+  repeated as a visible "Read more". The card is the target; the text is there
+  because a coverage card is a promise about where you are going, and on a page
+  of external links it should say so.
+{%- endcomment -%}
+
+<div
+  class="prg"
+  style="
+    --prg-bg: {{ section.settings.background }};
+    --prg-ink: {{ section.settings.text_color }};
+    --prg-pad-top: {{ section.settings.padding_top }}px;
+    --prg-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --prg-gutter: {{ section.settings.gutter }}px;
+    --prg-content-w: {{ section.settings.content_width }}px;
+    --prg-heading-gap: {{ section.settings.heading_gap }}px;
+    --prg-cols: {{ section.settings.columns }};
+    --prg-col-gap: {{ section.settings.column_gap }}px;
+    --prg-row-gap: {{ section.settings.row_gap }}px;
+    --prg-media-ratio: {{ section.settings.media_ratio }};
+    --prg-media-radius: {{ section.settings.media_radius }}px;
+    --prg-media-bg: {{ section.settings.media_background }};
+    --prg-card-bg: {{ section.settings.card_background }};
+    --prg-card-pad: {{ section.settings.card_padding }}px;
+    --prg-meta-color: {{ section.settings.meta_color }};
+    --prg-link-color: {{ section.settings.link_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="prg__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="prg__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <ul class="prg__grid" role="list">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign image = block.settings.image
+            assign image_mobile = block.settings.image_mobile
+            assign image_src = block.settings.image_url
+            assign link = block.settings.link
+            if link == blank
+              assign link = block.settings.link_url
+            endif
+
+            comment
+              Held in variables so the attributes below are unconditional. A
+              remote URL has no dimensions we can read, so it is given the ones
+              the card is drawn at — the image is cropped to the card either
+              way, and what these prevent is the reflow before it loads.
+            endcomment
+            assign img_w = 346
+            assign img_h = 434
+            if image != blank
+              assign img_w = image.width
+              assign img_h = image.height
+            endif
+          -%}
+          <li class="prg__item" {{ block.shopify_attributes }}>
+            {%- comment -%}
+              The card is captured before it is wrapped, because what wraps it
+              depends on whether there is anywhere to go. Coverage that is in
+              print, or not online yet, is still worth showing — it just is not
+              a link, and a link to nowhere is worse than none.
+            {%- endcomment -%}
+            {%- capture card_inner -%}
+              <div class="prg__media">
+                {%- if image != blank or image_src != blank -%}
+                  <picture>
+                    {%- if image_mobile != blank -%}
+                      <source
+                        media="(max-width: 749px)"
+                        srcset="
+                          {{ image_mobile | image_url: width: 400 }} 400w,
+                          {{ image_mobile | image_url: width: 800 }} 800w
+                        "
+                        sizes="92vw"
+                      >
+                    {%- endif -%}
+                    <img
+                      src="{% if image != blank %}{{ image | image_url: width: 700 }}{% else %}{{ image_src }}{% endif %}"
+                      {%- if image != blank %}
+                        srcset="
+                          {{ image | image_url: width: 350 }} 350w,
+                          {{ image | image_url: width: 700 }} 700w,
+                          {{ image | image_url: width: 1050 }} 1050w
+                        "
+                      {%- endif %}
+                      width="{{ img_w }}"
+                      height="{{ img_h }}"
+                      sizes="(min-width: 990px) 29vw, (min-width: 750px) 46vw, 92vw"
+                      alt="{{ image.alt | default: block.settings.title | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  </picture>
+                {%- endif -%}
+              </div>
+
+              <div class="prg__text">
+                {%- if block.settings.date != blank -%}
+                  <p class="prg__date">{{ block.settings.date | escape }}</p>
+                {%- endif -%}
+
+                {%- if block.settings.title != blank -%}
+                  <h3 class="prg__title">{{ block.settings.title | escape | newline_to_br }}</h3>
+                {%- endif -%}
+
+                {%- if block.settings.byline != blank -%}
+                  <p class="prg__byline">{{ block.settings.byline | escape }}</p>
+                {%- endif -%}
+
+                {%- comment -%}
+                  Not a link of its own — the whole card already is one, and a
+                  second would put every card in the page's tab order twice. It
+                  reads as a link and is announced as part of the card's name.
+                {%- endcomment -%}
+                {%- if link != blank and section.settings.link_label != blank -%}
+                  <span class="prg__more">{{ section.settings.link_label | escape }}</span>
+                {%- endif -%}
+              </div>
+            {%- endcapture -%}
+
+            {%- if link != blank -%}
+              <a
+                class="prg__card"
+                href="{{ link }}"
+                {% if section.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}
+              >{{ card_inner }}</a>
+            {%- else -%}
+              <div class="prg__card">{{ card_inner }}</div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Press Grid",
+  "tag": "section",
+  "class": "section-press-grid",
+  "max_blocks": 36,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "As Seen In"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "label": "Space under the heading",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Links"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link text",
+      "info": "Shown under each item. Leave blank to hide it — the card is still a link.",
+      "default": "Read more"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_new_tab",
+      "label": "Open coverage in a new tab",
+      "info": "On by default: these link to other publications, and a visitor should not lose the page they were on.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between columns",
+      "default": 136
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between rows",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 1000,
+      "max": 1400,
+      "step": 4,
+      "unit": "px",
+      "label": "Content width",
+      "default": 1312
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Card"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "346 / 434", "label": "Tall (as drawn)" },
+        { "value": "1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape" },
+        { "value": "3 / 4", "label": "Portrait" }
+      ],
+      "default": "346 / 434"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Image corner radius",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "media_background",
+      "label": "Behind the image",
+      "info": "Shows while an image loads, and where an item has none.",
+      "default": "#EFEFEF"
+    },
+    {
+      "type": "color_background",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Card text padding",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Section background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading and title",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "Date and byline",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link text",
+      "default": "#202020"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Coverage",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "A screenshot or cover of the piece."
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image — phone",
+          "info": "Optional. Used below 750px when the wide crop does not hold up."
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Image URL",
+          "info": "Used only when neither image is chosen above."
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date",
+          "info": "Written as it should read — \"January, 2026\". Free text, because coverage dates are often a month rather than a day.",
+          "default": "January, 2026"
+        },
+        {
+          "type": "textarea",
+          "id": "title",
+          "label": "Headline",
+          "info": "Line breaks are kept, for a headline the design sets over two lines.",
+          "default": "The headline as it was published"
+        },
+        {
+          "type": "text",
+          "id": "byline",
+          "label": "Byline",
+          "info": "Including the word \"By\", so a piece with no named author can say something else.",
+          "default": "By a writer"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_url",
+          "label": "Link (full URL)",
+          "info": "Use this for a publication's own site. The picker above only reaches pages on this store."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Press Grid",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

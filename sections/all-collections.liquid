@@ -41,18 +41,33 @@
     first block leads, which is the only other answer that is stable between
     two visits.
   endcomment
+  comment
+    The page opens on the first tab — "All" — whatever collection the template
+    happens to be assigned to. A rail is a way of choosing between collections,
+    and the choice it should offer first is the widest one; landing already
+    narrowed to one of the tabs makes the other six look like they do nothing.
+
+    A visitor who asked for something narrower says so with `?c=`, and the
+    script reads that on the first frame and swaps to it. That is deliberately
+    the script's job rather than this file's: Liquid cannot read a query
+    parameter, and guessing at one out of `request.url` would be a string match
+    that any other parameter could break.
+
+    Only a block that actually names a collection counts. A section just added
+    in the editor has an empty first block, and opening the page on nothing is
+    not a default, it is a bug with a tidy explanation.
+  endcomment
   assign active_index = -1
   for block in section.blocks
-    if block.settings.collection != blank and block.settings.collection.id == collection.id
+    if block.type == 'collection' and block.settings.collection != blank
       assign active_index = forloop.index0
       break
     endif
   endfor
 
   comment
-    Failing that, the first block that actually names a collection — not
-    simply the first block, which on a section just added to a page is an
-    empty one and would open the page on nothing.
+    Nothing of that type with a collection on it — every tab is a concern, say.
+    Then the first thing that names one at all, so the grid still has products.
   endcomment
   if active_index == -1
     for block in section.blocks
@@ -67,10 +82,40 @@
   if active_index >= 0
     assign active_collection = section.blocks[active_index].settings.collection
   endif
+
+  comment
+    Which group the open concern belongs to, so that group can be drawn already
+    open. A dropdown that hides the thing the page is currently showing is worse
+    than no dropdown, so this overrides whatever the setting says.
+  endcomment
+  comment
+    What is selected right now, read off the page's own URL. The rail, the
+    drawer and the links all draw from these three, so there is one answer to
+    "what is showing" rather than three that can disagree.
+  endcomment
+  assign cur_avail = ''
+  if request.url contains 'filter.v.availability=1'
+    assign cur_avail = '1'
+  elsif request.url contains 'filter.v.availability=0'
+    assign cur_avail = '0'
+  endif
+  assign cur_sort = collection.sort_by | default: collection.default_sort_by
+
+  assign active_group = ''
+  assign seen_group = ''
+  for block in section.blocks
+    if block.type == 'group'
+      assign seen_group = block.id
+    elsif block.type == 'concern'
+      if forloop.index0 == active_index
+        assign active_group = seen_group
+      endif
+    endif
+  endfor
 -%}
 
 <div
-  class="acl{% if section.settings.list_position == 'right' %} acl--reversed{% endif %}{% if section.settings.offset_header %} acl--under-header{% endif %}"
+  class="acl{% if section.settings.list_position == 'right' %} acl--reversed{% endif %}{% if section.settings.offset_header %} acl--under-header{% endif %}{% if section.settings.mobile_drawer %} acl--has-drawer{% endif %}"
   data-acl
   data-acl-endpoint="all-collections-grid"
   style="
@@ -88,6 +133,35 @@
   "
   {{ section.shopify_attributes }}
 >
+  {%- comment -%}
+    Narrow, the rail becomes a drawer. This is what opens it — shown only where
+    the drawer exists, so the wide layout never has a button for a panel it does
+    not use. Placed before the row so it reads before the products it filters.
+  {%- endcomment -%}
+  {%- if section.settings.mobile_drawer -%}
+    {%- comment -%}
+      The whole band is the control, so the <button> is the band rather than
+      something sitting inside one — the tap target is the strip.
+
+      It is not full bleed. The design places it at x=24 in a 402px frame at
+      354px wide, which is the theme's own content column with its own gutters,
+      so it keeps to `page-width` like everything else on the page rather than
+      running to the screen edges.
+
+      The funnel is the design's own path rather than something drawn to look
+      like it — a funnel is a glyph, not a rectangle, and the outline here is
+      the one the file exports.
+    {%- endcomment -%}
+    <div class="page-width acl__filterbar-wrap">
+      <button class="acl__filterbar" type="button" data-acl-open>
+      <svg class="acl__filter-icon" viewBox="0 0 10.2 11.2" width="10" height="11" fill="none" aria-hidden="true" focusable="false">
+        <path d="M10.0014 0.0501953L10.0131 0.0853516C10.0219 0.112965 10.0305 0.126787 10.0414 0.138086L10.1039 0.189844L10.1186 0.202539L10.1215 0.221094C10.1336 0.309234 10.1503 0.522571 10.1498 0.729883C10.1496 0.833627 10.1453 0.938124 10.1332 1.0248C10.1271 1.06804 10.1187 1.10865 10.1078 1.14297C10.0972 1.17629 10.0823 1.20838 10.0609 1.23184C9.93918 1.3652 9.82159 1.50617 9.70254 1.64785C9.58365 1.78934 9.4635 1.93224 9.33828 2.0668L9.3373 2.06582C9.285 2.12305 9.232 2.1792 9.1791 2.23379L9.02285 2.39883L7.36758 4.26797L6.89199 4.8041L6.89297 4.80508C6.7619 4.95355 6.61759 5.09281 6.52676 5.25723C6.51993 5.26959 6.51614 5.28492 6.51406 5.3041C6.51304 5.31366 6.51263 5.32412 6.51211 5.33535C6.51162 5.34609 6.51106 5.35839 6.51016 5.37051C6.50619 5.8575 6.5092 6.34769 6.50918 6.83535V9.72988L6.51113 10.4281C6.51132 10.5601 6.51194 10.6859 6.5043 10.7914C6.49677 10.8951 6.48045 10.99 6.43789 11.0561C6.41576 11.0904 6.38606 11.118 6.34707 11.1342C6.30836 11.1502 6.26416 11.154 6.21621 11.1469C6.14565 11.1363 6.0606 11.1023 5.9584 11.0443L5.85098 10.9779C5.34109 10.6489 4.83824 10.3126 4.3207 10.0014C4.25251 9.96036 4.14565 9.90032 4.04531 9.83828C3.94517 9.77636 3.84375 9.70811 3.78262 9.6498C3.75906 9.62719 3.74214 9.5964 3.72988 9.56387C3.71734 9.53051 3.7078 9.49118 3.70059 9.44961C3.68619 9.36653 3.68047 9.267 3.67813 9.16738C3.67352 8.97101 3.68499 8.75614 3.68496 8.66543L3.68398 6.35391C3.68395 5.98763 3.69878 5.60629 3.66152 5.25039C3.6591 5.2286 3.64601 5.19806 3.61855 5.15957C3.5916 5.12182 3.5545 5.08135 3.51406 5.04043C3.47376 4.99966 3.43072 4.95959 3.39102 4.92227L3.28945 4.8207L1.3793 2.67031L0.50332 1.69082C0.467623 1.65089 0.432793 1.60877 0.398828 1.56777C0.364776 1.52667 0.331622 1.48589 0.297266 1.44668C0.228346 1.36803 0.157279 1.29758 0.0765625 1.24355L0.0726563 1.24063L0.0501953 1.22598V0.0501953H10.0014ZM4.4457 5.42324C4.38137 5.42548 4.30642 5.4312 4.23184 5.42129C4.22027 5.64878 4.22692 5.9569 4.22695 6.18105L4.22793 7.66543L4.22695 8.7377C4.22692 8.87356 4.22259 9.14217 4.23379 9.27676C4.45102 9.39472 4.66148 9.53123 4.86953 9.66836C5.08638 9.81129 5.30132 9.95411 5.52285 10.0775C5.54682 10.0909 5.58441 10.1164 5.62637 10.1439C5.66931 10.1722 5.71915 10.2047 5.76797 10.2348C5.81683 10.2649 5.86449 10.2918 5.90371 10.31C5.91514 10.3152 5.92586 10.3183 5.93496 10.3217C5.94066 10.2618 5.94497 10.1837 5.9457 10.102C5.94666 9.99541 5.94476 9.88909 5.94473 9.81484L5.94375 8.85391L5.94277 5.42031C5.70163 5.42553 5.45938 5.42331 5.21816 5.42031C4.95943 5.4171 4.70166 5.41434 4.4457 5.42324ZM0.595117 0.618555C0.592719 0.720895 0.591727 0.827901 0.599023 0.925195C0.635012 0.979759 0.690629 1.04414 0.75332 1.10977C0.817785 1.17724 0.890531 1.24823 0.942773 1.30605L1.73379 2.18594C1.90056 2.36981 2.05876 2.56167 2.21816 2.74941C2.29818 2.84366 2.37838 2.9374 2.46133 3.02871L2.71816 3.29531L2.72012 3.29727C2.83131 3.41741 2.93653 3.54269 3.04043 3.66641C3.14469 3.79056 3.2483 3.91361 3.35977 4.02871C3.47731 4.15012 3.59427 4.2742 3.7084 4.3998C3.72924 4.42274 3.75943 4.46131 3.79238 4.50332C3.82588 4.54603 3.8634 4.59489 3.90176 4.64102C3.94028 4.68733 3.97838 4.73018 4.01211 4.76211C4.02903 4.77811 4.04447 4.79071 4.05703 4.79922C4.06909 4.80736 4.07616 4.80938 4.07852 4.80996H4.07949C4.25538 4.83877 4.43819 4.84374 4.62441 4.84219C4.8089 4.84064 4.99938 4.83287 5.18301 4.83926C5.29366 4.84027 5.47723 4.84355 5.65664 4.84219C5.83013 4.84086 5.9955 4.83407 6.08926 4.81973C6.29084 4.65821 6.37482 4.53721 6.55313 4.33242L6.99844 3.82852V3.82754L7.52285 3.23965L7.79238 2.93887L7.79336 2.93691C7.84731 2.87475 7.90438 2.81535 7.96035 2.75723C8.01661 2.6988 8.07193 2.64155 8.12441 2.58242L9.08828 1.48477L9.08926 1.48379C9.1603 1.40417 9.25135 1.31076 9.33242 1.22207C9.41598 1.13065 9.4945 1.03856 9.54922 0.950586C9.55442 0.942012 9.56052 0.922733 9.56582 0.891016C9.57091 0.860435 9.57456 0.823376 9.57656 0.78457C9.57944 0.728477 9.57845 0.670822 9.57852 0.624414C8.782 0.614145 7.97587 0.621464 7.17813 0.621484H1.30801C1.2332 0.621633 1.07204 0.624355 0.911523 0.625391C0.832415 0.625899 0.754223 0.625812 0.688867 0.624414C0.654372 0.623674 0.622217 0.620283 0.595117 0.618555Z" fill="currentColor" stroke="currentColor" stroke-width="0.1"/>
+      </svg>
+        <span class="acl__filter-label">{{ section.settings.trigger_label | escape }}</span>
+      </button>
+    </div>
+  {%- endif -%}
+
   <div class="page-width acl__row">
     {%- if section.blocks.size > 0 -%}
       {%- comment -%}
@@ -101,6 +175,23 @@
         aria-label="{{ section.settings.list_label | escape }}"
       >
         <ul class="acl__items" role="list">
+          {%- comment -%}
+            Three kinds of row, and the type decides which. A `collection` is a
+            tab as it always was. A `group` is a heading with nothing behind it —
+            "Concerns" names the concerns rather than being one, so it is a label
+            and not a link. A `concern` is one of the things under it.
+
+            The group opens a nested list and the concerns after it fall into
+            that list until the next group closes it. That nesting is not
+            decoration: a screen reader reading the rail should hear that these
+            seven are a set belonging to a name, which `aria-labelledby` on the
+            sub-list is what says.
+
+            A concern placed before any group has nowhere to belong, so it is
+            rendered on its own rather than dropped — a merchant reordering
+            blocks should never see one silently vanish.
+          {%- endcomment -%}
+          {%- assign in_group = false -%}
           {%- for block in section.blocks -%}
             {%- liquid
               assign block_collection = block.settings.collection
@@ -113,38 +204,172 @@
                 assign is_active = true
               endif
             -%}
-            {%- if block_collection != blank -%}
-              <li class="acl__item" {{ block.shopify_attributes }}>
-                <a
-                  class="acl__link{% if is_active %} is-active{% endif %}"
-                  href="{{ block_collection.url }}"
-                  data-acl-link
-                  data-acl-handle="{{ block_collection.handle }}"
-                  {% if is_active %}
-                    aria-current="true"
-                  {% endif %}
-                >
-                  <span class="acl__label">{{ label }}</span>
-                  {%- if section.settings.show_count -%}
-                    {%- comment -%}
-                      Every tab carries its count, but only the open one shows
-                      it — the stylesheet decides that, not the script. So the
-                      number follows the selection on its own, and the list
-                      never has to be re-rendered to keep up with the grid.
 
-                      Padded to two figures below ten, which is how it is
-                      drawn: a lone digit floating beside a word reads as a
-                      typo rather than a total.
-                    {%- endcomment -%}
-                    {%- assign count = block_collection.all_products_count -%}
-                    <sup class="acl__count">
-                      {%- if count < 10 -%}0{%- endif -%}{{ count }}
-                    </sup>
-                  {%- endif -%}
-                </a>
-              </li>
-            {%- endif -%}
+            {%- case block.type -%}
+              {%- when 'group' -%}
+                {%- if in_group -%}
+                      </ul>
+                    </details>
+                  </li>
+                {%- endif -%}
+                {%- liquid
+                  assign group_open = section.settings.groups_open
+                  if block.id == active_group
+                    assign group_open = true
+                  endif
+                -%}
+                <li class="acl__item acl__item--group" {{ block.shopify_attributes }}>
+                  {%- comment -%}
+                    A `<details>`, the same as the FAQ's questions and the contact
+                    page's. The browser owns opening it, the keyboard behaviour
+                    and telling a screen reader whether it is open — none of which
+                    is worth reimplementing, and all of which keeps working with
+                    the script switched off.
+                  {%- endcomment -%}
+                  <details class="acl__disclosure"{% if group_open %} open{% endif %}>
+                    <summary class="acl__group" id="acl-group-{{ block.id }}">
+                      <span class="acl__group-text">{{ label }}</span>
+                      <span class="acl__caret" aria-hidden="true"></span>
+                    </summary>
+                    <ul class="acl__children" role="list" aria-labelledby="acl-group-{{ block.id }}">
+                {%- assign in_group = true -%}
+
+              {%- when 'concern' -%}
+                {%- if block_collection != blank -%}
+                  <li class="acl__child{% unless in_group %} acl__child--loose{% endunless %}" {{ block.shopify_attributes }}>
+                    <a
+                      class="acl__childlink{% if is_active %} is-active{% endif %}"
+                      href="{{ block_collection.url }}"
+                      data-acl-link
+                      data-acl-handle="{{ block_collection.handle }}"
+                      {% if is_active %}aria-current="true"{% endif %}
+                    >
+                      {%- comment -%}
+                        The box is drawn, not an input. Only one concern is open
+                        at a time, so a real checkbox would promise a choice the
+                        rail does not offer — and this is a link, which is what
+                        lets it work with the script switched off.
+                      {%- endcomment -%}
+                      <span class="acl__box" aria-hidden="true"></span>
+                      <span class="acl__childlabel">{{ label }}</span>
+                      {%- if section.settings.show_count -%}
+                        <span class="acl__childcount">({{ block_collection.all_products_count }})</span>
+                      {%- endif -%}
+                    </a>
+                  </li>
+                {%- endif -%}
+
+              {%- else -%}
+                {%- if in_group -%}
+                      </ul>
+                    </details>
+                  </li>
+                  {%- assign in_group = false -%}
+                {%- endif -%}
+                {%- if block_collection != blank -%}
+                  <li class="acl__item" {{ block.shopify_attributes }}>
+                    <a
+                      class="acl__link{% if is_active %} is-active{% endif %}"
+                      href="{{ block_collection.url }}"
+                      data-acl-link
+                      data-acl-handle="{{ block_collection.handle }}"
+                      {% if is_active %}aria-current="true"{% endif %}
+                    >
+                      <span class="acl__label">{{ label }}</span>
+                      {%- if section.settings.show_count -%}
+                        {%- comment -%}
+                          Every tab carries its count, but only the open one
+                          shows it — the stylesheet decides that, not the
+                          script. So the number follows the selection on its own,
+                          and the list never has to be re-rendered to keep up
+                          with the grid.
+
+                          Padded to two figures below ten, which is how it is
+                          drawn: a lone digit floating beside a word reads as a
+                          typo rather than a total.
+                        {%- endcomment -%}
+                        {%- assign count = block_collection.all_products_count -%}
+                        <sup class="acl__count">
+                          {%- if count < 10 -%}0{%- endif -%}{{ count }}
+                        </sup>
+                      {%- endif -%}
+                    </a>
+                  </li>
+                {%- endif -%}
+            {%- endcase -%}
           {%- endfor -%}
+          {%- if in_group -%}
+                </ul>
+              </details>
+            </li>
+          {%- endif -%}
+
+          {%- comment -%}
+            Availability and sort are not collections, so they are not blocks —
+            there is nothing for a merchant to choose. They are the same
+            disclosure the concerns sit in, so the rail has one way of asking a
+            question rather than three.
+
+            Every row is a real link carrying the whole state in its URL. That
+            is what makes the rail work with the script switched off, and it is
+            what the script reads when it is on.
+          {%- endcomment -%}
+          {%- if section.settings.show_availability -%}
+            {%- assign base = collection.url | default: '/collections/all' -%}
+            <li class="acl__item acl__item--group">
+              <details class="acl__disclosure"{% if cur_avail != '' %} open{% endif %}>
+                <summary class="acl__group" id="acl-avail-{{ section.id }}">
+                  <span class="acl__group-text">{{ section.settings.availability_label | escape }}</span>
+                  <span class="acl__caret" aria-hidden="true"></span>
+                </summary>
+                <ul class="acl__children" role="list" aria-labelledby="acl-avail-{{ section.id }}">
+                  <li class="acl__child">
+                    <a class="acl__childlink{% if cur_avail == '1' %} is-active{% endif %}"
+                       href="{{ base }}?filter.v.availability=1"
+                       data-acl-facet="availability" data-acl-value="1"
+                       {% if cur_avail == '1' %}aria-current="true"{% endif %}>
+                      <span class="acl__box" aria-hidden="true"></span>
+                      <span class="acl__childlabel">{{ section.settings.in_stock_label | escape }}</span>
+                    </a>
+                  </li>
+                  <li class="acl__child">
+                    <a class="acl__childlink{% if cur_avail == '0' %} is-active{% endif %}"
+                       href="{{ base }}?filter.v.availability=0"
+                       data-acl-facet="availability" data-acl-value="0"
+                       {% if cur_avail == '0' %}aria-current="true"{% endif %}>
+                      <span class="acl__box" aria-hidden="true"></span>
+                      <span class="acl__childlabel">{{ section.settings.out_of_stock_label | escape }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          {%- endif -%}
+
+          {%- if section.settings.show_sort and collection.sort_options.size > 0 -%}
+            {%- assign base = collection.url | default: '/collections/all' -%}
+            <li class="acl__item acl__item--group">
+              <details class="acl__disclosure">
+                <summary class="acl__group" id="acl-sort-{{ section.id }}">
+                  <span class="acl__group-text">{{ section.settings.sort_label | escape }}</span>
+                  <span class="acl__caret" aria-hidden="true"></span>
+                </summary>
+                <ul class="acl__children" role="list" aria-labelledby="acl-sort-{{ section.id }}">
+                  {%- for option in collection.sort_options -%}
+                    <li class="acl__child">
+                      <a class="acl__childlink{% if option.value == cur_sort %} is-active{% endif %}"
+                         href="{{ base }}?sort_by={{ option.value }}"
+                         data-acl-facet="sort" data-acl-value="{{ option.value }}"
+                         {% if option.value == cur_sort %}aria-current="true"{% endif %}>
+                        <span class="acl__box" aria-hidden="true"></span>
+                        <span class="acl__childlabel">{{ option.name | escape }}</span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </details>
+            </li>
+          {%- endif -%}
         </ul>
       </nav>
     {%- endif -%}
@@ -168,6 +393,192 @@
       </ul>
     </div>
   </div>
+  {%- if section.settings.mobile_drawer -%}
+    {%- comment -%}
+      The same collections the rail lists, presented the way a phone can carry
+      them: a list of groups, each opening onto its own options. A `<dialog>`,
+      so the focus trap, the escape key and the inertness of everything behind
+      it are the browser's job rather than ours.
+
+      Choosing here does not navigate. It stages a choice, and APPLY hands it to
+      the rail link that already knows how to fetch that collection — so the
+      drawer adds a way to choose and nothing else. Turn the setting off and the
+      page is exactly what it was.
+    {%- endcomment -%}
+    <dialog class="acl__drawer" data-acl-drawer aria-labelledby="acl-drawer-title-{{ section.id }}">
+      <div class="acl__drawer-inner">
+        <header class="acl__drawer-head">
+          <div class="acl__drawer-titles">
+            <p class="acl__drawer-title" id="acl-drawer-title-{{ section.id }}">{{ section.settings.drawer_label | escape }}</p>
+            <p class="acl__drawer-count" data-acl-drawer-count></p>
+          </div>
+          <button class="acl__drawer-close" type="button" data-acl-drawer-close aria-label="{{ 'accessibility.close' | t }}">
+            <svg viewBox="0 0 27 27" width="27" height="27" aria-hidden="true" focusable="false">
+              <circle cx="13.5" cy="13.5" r="13.5" fill="#e6e6e6"/>
+              <path d="M9.5 9.5l8 8M17.5 9.5l-8 8" stroke="#33363F" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="acl__drawer-body">
+          {%- comment -%}
+            The list of groups. "Category" is the tabs themselves, which have no
+            block of their own to name them — every other group is a `group`
+            block and names itself.
+          {%- endcomment -%}
+          <ul class="acl__sheet" role="list" data-acl-sheet="root">
+            <li class="acl__sheet-item">
+              <button class="acl__grouprow" type="button" data-acl-goto="category">
+                <span class="acl__grouprow-label">{{ section.settings.category_label | escape }}</span>
+                <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </li>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'group' -%}
+                <li class="acl__sheet-item">
+                  <button class="acl__grouprow" type="button" data-acl-goto="{{ block.id }}">
+                    <span class="acl__grouprow-label">{{ block.settings.label | escape }}</span>
+                    <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if section.settings.show_availability -%}
+              <li class="acl__sheet-item">
+                <button class="acl__grouprow" type="button" data-acl-goto="availability">
+                  <span class="acl__grouprow-label">{{ section.settings.availability_label | escape }}</span>
+                  <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </li>
+            {%- endif -%}
+            {%- if section.settings.show_sort and collection.sort_options.size > 0 -%}
+              <li class="acl__sheet-item">
+                <button class="acl__grouprow" type="button" data-acl-goto="sort">
+                  <span class="acl__grouprow-label">{{ section.settings.sort_label | escape }}</span>
+                  <span class="acl__grouprow-value" data-acl-sort-value></span>
+                  <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </li>
+            {%- endif -%}
+          </ul>
+
+          {%- comment -%}
+            One sheet per group. The first row of each is the group's own name
+            and goes back — the design draws it as a row like any other, and it
+            is the only way back on a screen with no room for a title bar.
+          {%- endcomment -%}
+          <ul class="acl__sheet" role="list" data-acl-sheet="category" hidden>
+            <li class="acl__sheet-item">
+              <button class="acl__backrow" type="button" data-acl-back>
+                <span class="acl__grouprow-label">{{ section.settings.category_back_label | escape }}</span>
+                <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M16 10H4M9 5l-5 5 5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </li>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'collection' and block.settings.collection != blank -%}
+                {%- liquid
+                  assign opt_label = block.settings.label
+                  if opt_label == blank
+                    assign opt_label = block.settings.collection.title
+                  endif
+                -%}
+                <li class="acl__sheet-item">
+                  <button class="acl__optionrow" type="button" data-acl-option data-acl-facet="collection" data-acl-value="{{ block.settings.collection.handle }}" data-acl-handle="{{ block.settings.collection.handle }}">
+                    <span class="acl__box" aria-hidden="true"></span>
+                    <span class="acl__optionlabel">{{ opt_label | escape }}</span>
+                    <span class="acl__optioncount">({{ block.settings.collection.all_products_count }})</span>
+                  </button>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+
+          {%- assign sheet_open = false -%}
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when 'group' -%}
+                {%- if sheet_open -%}</ul>{%- endif -%}
+                <ul class="acl__sheet" role="list" data-acl-sheet="{{ block.id }}" hidden>
+                  <li class="acl__sheet-item">
+                    <button class="acl__backrow" type="button" data-acl-back>
+                      <span class="acl__grouprow-label">{{ block.settings.label | escape }}</span>
+                      <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M16 10H4M9 5l-5 5 5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </li>
+                {%- assign sheet_open = true -%}
+              {%- when 'concern' -%}
+                {%- if sheet_open and block.settings.collection != blank -%}
+                  {%- liquid
+                    assign opt_label = block.settings.label
+                    if opt_label == blank
+                      assign opt_label = block.settings.collection.title
+                    endif
+                  -%}
+                  <li class="acl__sheet-item">
+                    <button class="acl__optionrow" type="button" data-acl-option data-acl-facet="collection" data-acl-value="{{ block.settings.collection.handle }}" data-acl-handle="{{ block.settings.collection.handle }}">
+                      <span class="acl__box" aria-hidden="true"></span>
+                      <span class="acl__optionlabel">{{ opt_label | escape }}</span>
+                      <span class="acl__optioncount">({{ block.settings.collection.all_products_count }})</span>
+                    </button>
+                  </li>
+                {%- endif -%}
+            {%- endcase -%}
+          {%- endfor -%}
+          {%- if sheet_open -%}</ul>{%- endif -%}
+
+          {%- if section.settings.show_availability -%}
+            <ul class="acl__sheet" role="list" data-acl-sheet="availability" hidden>
+              <li class="acl__sheet-item">
+                <button class="acl__backrow" type="button" data-acl-back>
+                  <span class="acl__grouprow-label">{{ section.settings.availability_label | escape }}</span>
+                  <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M16 10H4M9 5l-5 5 5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </li>
+              <li class="acl__sheet-item">
+                <button class="acl__optionrow" type="button" data-acl-option data-acl-facet="availability" data-acl-value="1" aria-pressed="false">
+                  <span class="acl__box" aria-hidden="true"></span>
+                  <span class="acl__optionlabel">{{ section.settings.in_stock_label | escape }}</span>
+                </button>
+              </li>
+              <li class="acl__sheet-item">
+                <button class="acl__optionrow" type="button" data-acl-option data-acl-facet="availability" data-acl-value="0" aria-pressed="false">
+                  <span class="acl__box" aria-hidden="true"></span>
+                  <span class="acl__optionlabel">{{ section.settings.out_of_stock_label | escape }}</span>
+                </button>
+              </li>
+            </ul>
+          {%- endif -%}
+
+          {%- if section.settings.show_sort and collection.sort_options.size > 0 -%}
+            <ul class="acl__sheet" role="list" data-acl-sheet="sort" hidden>
+              <li class="acl__sheet-item">
+                <button class="acl__backrow" type="button" data-acl-back>
+                  <span class="acl__grouprow-label">{{ section.settings.sort_label | escape }}</span>
+                  <svg class="acl__rowarrow" viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true"><path d="M16 10H4M9 5l-5 5 5 5" stroke="#33363F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </li>
+              {%- for option in collection.sort_options -%}
+                <li class="acl__sheet-item">
+                  <button class="acl__optionrow" type="button" data-acl-option data-acl-facet="sort" data-acl-value="{{ option.value }}" aria-pressed="false">
+                    <span class="acl__box" aria-hidden="true"></span>
+                    <span class="acl__optionlabel">{{ option.name | escape }}</span>
+                  </button>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        <footer class="acl__drawer-foot">
+          <span class="acl__drawer-rule" aria-hidden="true"></span>
+          <div class="acl__drawer-actions">
+            <button class="acl__apply" type="button" data-acl-apply>{{ section.settings.apply_label | escape }}</button>
+            <button class="acl__clear" type="button" data-acl-clear>{{ section.settings.clear_label | escape }}</button>
+          </div>
+        </footer>
+      </div>
+    </dialog>
+  {%- endif -%}
 </div>
 
 {% schema %}
@@ -265,6 +676,13 @@
       "default": true
     },
     {
+      "type": "checkbox",
+      "id": "groups_open",
+      "label": "Open groups by default",
+      "info": "A group opens on its own anyway whenever one of its concerns is the collection being shown.",
+      "default": false
+    },
+    {
       "type": "range",
       "id": "item_gap",
       "min": 4,
@@ -359,6 +777,92 @@
       "unit": "px",
       "label": "Padding bottom",
       "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Phone filter drawer",
+      "info": "Below 990px the rail becomes a drawer, opened by a button above the products."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_drawer",
+      "label": "Use a drawer on phones",
+      "info": "Off leaves the row of tabs that scrolls sideways.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trigger_label",
+      "label": "Filter bar text",
+      "info": "The strip on phones that opens the drawer.",
+      "default": "FILTERS AND SORT"
+    },
+    {
+      "type": "text",
+      "id": "drawer_label",
+      "label": "Drawer title",
+      "default": "FILTER AND SORT"
+    },
+    {
+      "type": "text",
+      "id": "category_label",
+      "label": "Name for the collection tabs",
+      "info": "The tabs have no block of their own to name them, so they are named here.",
+      "default": "Category"
+    },
+    {
+      "type": "text",
+      "id": "category_back_label",
+      "label": "Collection tabs — heading inside the drawer",
+      "default": "By Category"
+    },
+    {
+      "type": "text",
+      "id": "apply_label",
+      "label": "Apply button",
+      "default": "APPLY"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear link",
+      "default": "Clear"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_availability",
+      "label": "Show availability",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "availability_label",
+      "label": "Availability heading",
+      "default": "Availability"
+    },
+    {
+      "type": "text",
+      "id": "in_stock_label",
+      "label": "In stock label",
+      "default": "In stock"
+    },
+    {
+      "type": "text",
+      "id": "out_of_stock_label",
+      "label": "Out of stock label",
+      "default": "Out of stock"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show sort",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sort_label",
+      "label": "Sort heading",
+      "default": "Sort by"
     }
   ],
   "blocks": [
@@ -378,22 +882,48 @@
           "info": "Optional — what to call it in the list. Falls back to the collection's own title."
         }
       ]
+    },
+    {
+      "type": "group",
+      "name": "Group heading",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A name for the rows under it — \"Concerns\" — with no collection of its own. Every Concern block after this one belongs to it, until the next heading."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Heading",
+          "default": "Concerns"
+        }
+      ]
+    },
+    {
+      "type": "concern",
+      "name": "Concern",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "One concern, under the heading above it. Opens its own collection, the same as a tab does."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Leave blank to use the collection's own title."
+        }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "All Collections",
-      "blocks": [
-        {
-          "type": "collection"
-        },
-        {
-          "type": "collection"
-        },
-        {
-          "type": "collection"
-        }
-      ]
+      "name": "All Collections"
     }
   ]
 }

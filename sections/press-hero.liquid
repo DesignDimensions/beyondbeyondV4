@@ -1,0 +1,287 @@
+{{ 'press-hero.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Press hero — the page's opening statement beside a colour field.
+
+  Two halves that meet at the middle of the screen: the statement on the left
+  over the page's own tint, and a plain field of brand colour on the right. The
+  right half is drawn as flat blue, so that is what it is by default — but it
+  takes an image, because a field of colour is the kind of thing that becomes a
+  photograph later and should not need a new section when it does.
+
+  The heading is two fields rather than one because the design sets its opening
+  clause heavier than the rest ("**Beyond Beyond,** In the Press"). The blog
+  grid solves the same problem by splitting on a colon it can rely on; there is
+  no such mark here, so the split is given to the merchant instead of guessed.
+{%- endcomment -%}
+
+<div
+  class="prh{% if section.settings.offset_header %} prh--under-header{% endif %}"
+  style="
+    --prh-outer-bg: {{ section.settings.outer_background }};
+    --prh-bg: {{ section.settings.background }};
+    --prh-ink: {{ section.settings.text_color }};
+    --prh-pad-x: {{ section.settings.padding_x }}px;
+    --prh-pad-y: {{ section.settings.padding_y }}px;
+    --prh-split: {{ section.settings.text_width }}%;
+    --prh-panel-bg: {{ section.settings.panel_background }};
+    --prh-rule: {{ section.settings.rule_color }};
+    --prh-rule-gap: {{ section.settings.rule_gap }}px;
+    --prh-body-gap: {{ section.settings.body_gap }}px;
+    --prh-min-h: {{ section.settings.min_height }}px;
+    --prh-content-w: {{ section.settings.content_width }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="prh__row">
+    <div class="prh__text">
+      {%- if section.settings.heading_lead != blank or section.settings.heading != blank -%}
+        <h1 class="prh__heading">
+          {%- if section.settings.heading_lead != blank -%}
+            <b>{{ section.settings.heading_lead | escape }}</b>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            {% if section.settings.heading_lead != blank %} {% endif %}{{ section.settings.heading | escape }}
+          {%- endif -%}
+        </h1>
+      {%- endif -%}
+
+      {%- if section.settings.show_rule -%}
+        <span class="prh__rule" aria-hidden="true"></span>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="prh__body">{{ section.settings.body }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      Decorative either way — a colour field says nothing, and a picture beside
+      a heading it does not caption says little more. It is left out of the
+      accessibility tree unless the merchant gives it alt text, which is the one
+      signal that it carries meaning.
+    {%- endcomment -%}
+    <div class="prh__panel">
+      {%- liquid
+        assign panel_image = section.settings.panel_image
+        assign panel_src = section.settings.panel_image_url
+
+        comment
+          Held in variables so the attributes below are unconditional. A remote
+          URL has no dimensions we can read, so it is given the ones the panel
+          is drawn at — the picture is cropped to the panel either way, and what
+          these prevent is the reflow before it loads.
+        endcomment
+        assign panel_w = 720
+        assign panel_h = 380
+        if panel_image != blank
+          assign panel_w = panel_image.width
+          assign panel_h = panel_image.height
+        endif
+      -%}
+      {%- if panel_image != blank or panel_src != blank -%}
+        <img
+          class="prh__panel-img"
+          src="{% if panel_image != blank %}{{ panel_image | image_url: width: 1440 }}{% else %}{{ panel_src }}{% endif %}"
+          {%- if panel_image != blank %}
+            srcset="
+              {{ panel_image | image_url: width: 720 }} 720w,
+              {{ panel_image | image_url: width: 1440 }} 1440w
+            "
+          {%- endif %}
+          width="{{ panel_w }}"
+          height="{{ panel_h }}"
+          sizes="(min-width: 990px) 50vw, 100vw"
+          alt="{{ section.settings.panel_alt | escape }}"
+          {% if section.settings.panel_alt == blank %}aria-hidden="true"{% endif %}
+          loading="eager"
+          decoding="async"
+        >
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Press Hero",
+  "tag": "section",
+  "class": "section-press-hero",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Statement"
+    },
+    {
+      "type": "text",
+      "id": "heading_lead",
+      "label": "Heading — opening clause",
+      "info": "Set in the heavier weight. Leave blank to set the whole heading evenly.",
+      "default": "Beyond Beyond,"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading — the rest",
+      "default": "In the Press"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Rule under the heading",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Text",
+      "default": "<p>Explore the stories, reviews, & conversations featuring Beyond Beyond.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Colour field",
+      "info": "The right half of the hero. Flat colour as drawn; add an image and it becomes a picture instead."
+    },
+    {
+      "type": "color",
+      "id": "panel_background",
+      "label": "Colour",
+      "default": "#0107EF"
+    },
+    {
+      "type": "image_picker",
+      "id": "panel_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "panel_image_url",
+      "label": "Image URL",
+      "info": "Used only when no image is chosen above."
+    },
+    {
+      "type": "text",
+      "id": "panel_alt",
+      "label": "Image description",
+      "info": "Leave blank while the panel is decorative. Fill it in only if the image carries meaning the heading does not."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "text_width",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Width of the text half",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 1000,
+      "max": 1400,
+      "step": 4,
+      "unit": "px",
+      "label": "Content width",
+      "info": "The statement lines up with this column, so it sits on the same left edge as the sections below. Match it to the grid's own content width.",
+      "default": 1312
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 200,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "label": "Minimum height",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Text side padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 24,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Text top and bottom padding",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "rule_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space around the rule",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space above the text",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "outer_background",
+      "label": "Behind the hero",
+      "info": "Shows above the hero while the header is clear.",
+      "default": "#F1F1F1"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Text half background",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rule",
+      "default": "#202020"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Press Hero"
+    }
+  ]
+}
+{% endschema %}

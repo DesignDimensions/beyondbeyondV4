@@ -80,12 +80,13 @@
 .acl__link {
   display: inline-flex;
   align-items: flex-start;
-  gap: 4px;
+  gap: 6px;
   font-size: 16px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 28px;
+  letter-spacing: 0.32px;
   text-decoration: none;
-  color: var(--acl-list-color, #4a4a4a);
+  color: #171717;
   transition: color 0.2s ease;
 }
 
@@ -94,10 +95,14 @@
 }
 
 /* The open collection is the one thing on the page that says which grid is
-   being shown, so it is given the step up in the scale rather than a weight
-   that would barely read at this size. */
+   being shown, so it steps up in size and weight together. 20px is the design's
+   own figure and not one of the store's six — the same exception the rest of
+   this page family stands on, and rounding it to 22 puts it out of proportion
+   with the 16px tabs it sits among. */
 .acl__link.is-active {
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
   color: var(--acl-list-active, #0a0a0b);
 }
 
@@ -107,11 +112,180 @@
   display: none;
   font-size: 12px;
   line-height: 1;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.48px;
 }
 
 .acl__link.is-active .acl__count {
   display: inline;
+}
+
+/* --------------------------------------------------------------------------
+   A group of concerns
+   --------------------------------------------------------------------------
+   "Concerns" names the rows under it rather than being one of them, so it is a
+   label and not a link: same size as a tab, but nothing about it invites a
+   click it could not answer.
+
+   The rows themselves are captions rather than tabs — 14px for the name and
+   12px for the count, which are the design's own tokens and not on the store's
+   six-size scale. Same exception the press cards stand on: a caption inside a
+   component is not the page's type, and the scale bottoms out at 12 for a legal
+   note rather than for a list of fourteen things read at a glance. */
+
+.acl__item--group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The heading is the thing you click, so it is a <summary>: same size and
+   weight as a tab, with the browser's own triangle taken off and the design's
+   caret put in its place. */
+.acl__disclosure {
+  width: 100%;
+}
+
+.acl__group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+  list-style: none;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  color: #171717;
+}
+
+.acl__group::-webkit-details-marker {
+  display: none;
+}
+
+.acl__group:hover {
+  color: var(--acl-list-active, #0a0a0b);
+}
+
+/* Only for keyboard use: a click on the heading should not leave a ring behind
+   on the way to the list it opens. */
+.acl__group:focus-visible {
+  outline: 2px solid var(--acl-list-active, #0a0a0b);
+  outline-offset: 3px;
+}
+
+/* Two borders of a square turned on their corner — the same shape the tick is
+   made of, pointing down when the group is shut and up when it is open. */
+.acl__caret {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.acl__disclosure[open] .acl__caret {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.acl__children {
+  display: flex;
+  flex-direction: column;
+  gap: var(--acl-child-gap, 10px);
+  margin: var(--acl-group-gap, 10px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A concern that has been placed above every heading still has to sit
+   somewhere. It reads as its own row rather than disappearing. */
+.acl__child--loose {
+  margin-left: 0;
+}
+
+.acl__childlink {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  text-decoration: none;
+  color: #171717;
+  transition: color 0.2s ease;
+  font-weight: 400;
+}
+
+/* Drawn, not an <input>. One concern opens at a time, so a real checkbox would
+   promise a choice the rail cannot honour — and a link is what keeps this
+   working with the script off. Square and 14px, as the design has it. */
+.acl__box {
+  position: relative;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--acl-box-color, #e6e6e6);
+  background: transparent;
+  transition: border-color 0.2s ease;
+  margin-top: 3px;
+}
+
+/* The open concern is ticked, not filled. A filled square reads as a swatch;
+   a tick reads as a box that has been chosen, which is what the row is. The
+   mark is two borders of a rectangle turned 45 degrees — the shape a checkbox
+   has always been made of, and it inherits the rail's own active colour. */
+.acl__childlink.is-active .acl__box {
+  border-color: var(--acl-list-active, #0a0a0b);
+}
+
+.acl__childlink.is-active .acl__box::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--acl-list-active, #0a0a0b);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+/* The label takes the room left between the box and the count, which is what
+   puts every count in the same column instead of trailing whatever the label
+   happened to be. The design pins them at a fixed x; giving the label the space
+   is the same answer that survives the rail being widened. A long concern wraps
+   inside that column rather than pushing its own count out of line. */
+.acl__childlabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* Colour only. The box is what says which concern is open, and setting the
+   label heavier as well would shift every row's width as the selection moved. */
+.acl__childlink.is-active .acl__childlabel {
+  color: var(--acl-list-active, #0a0a0b);
+}
+
+.acl__childlink:hover .acl__box {
+  border-color: var(--acl-list-active, #0a0a0b);
+}
+
+/* A column of its own rather than whatever is left after the label, so every
+   count starts at the same x — which is how the design pins them. A fixed
+   basis, not `auto`: `auto` would let a two-figure count start further left
+   than a one-figure one and put the whole column out by a few pixels. */
+.acl__childcount {
+  flex: 0 0 var(--acl-count-w, 34px);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.24px;
+  text-align: left;
+  color: var(--acl-count-color, #999696);
 }
 
 /* --------------------------------------------------------------------------
@@ -266,4 +440,319 @@
   .acl.is-loading .acl__grid {
     transition-duration: 0.01ms;
   }
+}
+/* ==========================================================================
+   The phone filter drawer
+   ==========================================================================
+   A rail is a column beside the products. On a phone there is no beside, and a
+   row that scrolls sideways hides most of itself. So the same collections are
+   put behind a button and shown as a drawer: a list of groups, each opening
+   onto its own options, with the choice applied on the way out.
+
+   Type is the design's mobile set — 16px for the title and every row, 14px for
+   the buttons at the foot, 12px for a count. The drawer is drawn at 394px wide
+   with 24px gutters, which is where these numbers come from.
+   ========================================================================== */
+
+/* The strip that opens the drawer, exactly as drawn: a band across the page in
+   its own tint, the funnel and the words centred together in it. The whole band
+   is the button, so the tap target is the strip rather than the words in it.
+
+   12px at 2.88px of tracking is the design's own setting — a quarter of the
+   size in letter spacing, which is what makes four words read as a label rather
+   than a sentence. */
+.acl__filterbar-wrap {
+  display: none;
+  margin-bottom: var(--acl-filterbar-gap-below, 24px);
+}
+
+/* 36px tall: 20px of line with 8px above and below, which is the height the
+   design draws. Full width of the column it is in, not of the screen. */
+.acl__filterbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--acl-filterbar-gap, 10px);
+  width: 100%;
+  padding: var(--acl-filterbar-pad, 8px) 12px;
+  min-height: 36px;
+  border: 0;
+  background: var(--acl-filterbar-bg, #f2f2f2);
+  color: var(--acl-filterbar-color, #202020);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.acl__filter-icon {
+  flex: 0 0 auto;
+  display: block;
+  width: 10px;
+  height: 11px;
+}
+
+.acl__filter-label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 2.88px;
+  text-align: center;
+  /* The tracking is applied after every character including the last, which
+     pushes the pair off-centre by one space. Pulled back so the funnel and the
+     words are centred as a unit. */
+  margin-right: -2.88px;
+}
+
+/* Pinned to the right edge and to full height rather than sized as a share of
+   something. A percentage height needs an ancestor with a definite one to
+   resolve against, and a dialog's ancestors are whatever the section happens to
+   be — so the foot would stop being pinned for reasons nothing to do with the
+   drawer.
+
+   `inset: 0 0 0 auto` is what holds it against the right: top, right and bottom
+   are pinned and the left is left to the width. Short of the full screen on
+   purpose — the strip of page still showing is what says the drawer is over the
+   products rather than instead of them, and it is the obvious thing to tap to
+   get back. */
+.acl__drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: var(--acl-drawer-w, 90%);
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: #202020;
+}
+
+/* Darkened and blurred, so the page behind reads as put away rather than merely
+   dimmed. `showModal` is what makes it genuinely untouchable; this is only what
+   that fact looks like. */
+.acl__drawer::backdrop {
+  background: var(--acl-backdrop, rgba(0, 0, 0, 0.55));
+  -webkit-backdrop-filter: blur(var(--acl-backdrop-blur, 6px));
+  backdrop-filter: blur(var(--acl-backdrop-blur, 6px));
+}
+
+/* A column three parts tall: a head that stays, a body that scrolls, and a foot
+   that stays. The foot has to stay — a visitor deep in a long list of concerns
+   should never have to scroll back to apply what they just chose. */
+.acl__drawer-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--acl-drawer-pad-y, 48px) var(--acl-drawer-pad-x, 24px);
+}
+
+.acl__drawer-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--acl-drawer-rule, #e6e6e6);
+}
+
+.acl__drawer-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+}
+
+.acl__drawer-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+}
+
+.acl__drawer-count {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+}
+
+.acl__drawer-close {
+  flex: 0 0 auto;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.acl__drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 12px;
+}
+
+.acl__sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* `display: flex` above beats the browser's own rule for [hidden], which is
+   what makes a hidden sheet keep showing. Said again, louder. */
+.acl__sheet[hidden] {
+  display: none;
+}
+
+.acl__sheet-item {
+  margin: 0;
+}
+
+/* Every row in the drawer is the same row: full width, a rule under it, and
+   16px of air before that rule. What changes is what sits inside. */
+.acl__grouprow,
+.acl__backrow,
+.acl__optionrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 0 16px;
+  border: 0;
+  border-bottom: 1px solid var(--acl-drawer-rule, #e6e6e6);
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.acl__sheet-item:last-child .acl__grouprow,
+.acl__sheet-item:last-child .acl__optionrow {
+  border-bottom: 0;
+}
+
+.acl__grouprow-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Not stretched. In the rail the counts line up in a column; here the design
+   sets each one immediately after its own label, so the label takes only the
+   width of its words and the count follows. */
+.acl__optionlabel {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.acl__rowarrow {
+  flex: 0 0 auto;
+}
+
+.acl__optioncount {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.24px;
+  color: var(--acl-count-color, #999696);
+}
+
+/* The same drawn box the rail uses, ticked the same way, so choosing a concern
+   looks the same whichever of the two you are looking at. */
+.acl__optionrow[aria-pressed='true'] .acl__box {
+  border-color: var(--acl-list-active, #0a0a0b);
+}
+
+.acl__optionrow[aria-pressed='true'] .acl__box::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--acl-list-active, #0a0a0b);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.acl__drawer-foot {
+  flex: 0 0 auto;
+  padding-top: 20px;
+}
+
+.acl__drawer-rule {
+  display: block;
+  height: 1px;
+  margin-bottom: 20px;
+  background: var(--acl-drawer-rule, #e6e6e6);
+}
+
+.acl__drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.acl__apply {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  background: var(--acl-apply-bg, #d9d9d9);
+  opacity: 0.9;
+  color: #202020;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.28px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.acl__clear {
+  flex: 0 0 auto;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #202020;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+
+/* The drawer only exists where the rail cannot. Above this width the button and
+   the dialog are both absent from layout, and the rail is the rail. */
+@media screen and (max-width: 989px) {
+  .acl--has-drawer .acl__filterbar-wrap {
+    display: block;
+  }
+
+  .acl--has-drawer .acl__list {
+    display: none;
+  }
+}
+
+/* The sort row says what it is set to, the way the design shows it — the only
+   row whose value is worth reading without opening it. */
+.acl__grouprow-value {
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.24px;
+  color: var(--acl-count-color, #999696);
 }

@@ -1,0 +1,199 @@
+/* ==========================================================================
+   Press hero — the statement beside a colour field
+   ==========================================================================
+   Two halves meeting at the middle of the screen, full bleed. Unlike the blog
+   hero above the journal, nothing here scrolls: the right half is a field of
+   brand colour, and the left is the one sentence the page opens with.
+
+   The section's own background shows only in the strip the fixed header sits
+   over. Below that the two halves take the full width between them, which is
+   why the padding that clears the header is on the outer element and the halves
+   carry none of it.
+   ========================================================================== */
+
+.prh {
+  background-color: var(--prh-outer-bg, #f1f1f1);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its content clear of it. */
+.prh--under-header {
+  padding-top: var(--header-height, var(--header-height-static, 96px));
+}
+
+.prh__row {
+  display: flex;
+  align-items: stretch;
+  min-height: var(--prh-min-h, 380px);
+}
+
+/* --------------------------------------------------------------------------
+   The statement
+   -------------------------------------------------------------------------- */
+
+/* The half itself runs to the edge of the screen — the tint has to, or the
+   hero stops being two fields meeting in the middle. What sits inside it does
+   not: the statement lines up with the content column the rest of the page is
+   built on, so the page has one left edge rather than two.
+
+   The percentage is the trick. Padding resolves against the containing block,
+   and this element's containing block is the full-width row — so `(100% -
+   column) / 2` is exactly the column's own left offset, without asking for the
+   viewport width and inheriting the scrollbar with it. Below the width where
+   the column stops centring, `max()` hands it back to the plain padding. */
+.prh__text {
+  flex: 0 0 var(--prh-split, 50%);
+  max-width: var(--prh-split, 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: var(--prh-pad-y, 120px);
+  padding-bottom: var(--prh-pad-y, 120px);
+  padding-right: var(--prh-pad-x, 64px);
+  padding-left: max(var(--prh-pad-x, 64px), calc((100% - var(--prh-content-w, 1312px)) / 2));
+  background-color: var(--prh-bg, #f5f5f5);
+  color: var(--prh-ink, #000);
+}
+
+/* The opening clause is heavier than the rest — one heading in two weights
+   rather than two headings, so it still reads as a single line to anything that
+   is not looking at it. */
+.prh__heading {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: 0.8px;
+  color: inherit;
+}
+
+.prh__heading b {
+  font-weight: 700;
+}
+
+/* Full width of the column the statement sits in, not of the text above it —
+   the rule is the block's own edge, and a short heading should not shorten
+   it. */
+.prh__rule {
+  display: block;
+  align-self: stretch;
+  height: 1px;
+  margin-top: var(--prh-rule-gap, 8px);
+  background-color: var(--prh-rule, #202020);
+}
+
+.prh__body {
+  margin-top: var(--prh-body-gap, 8px);
+  font-size: 20px;
+  line-height: 32px;
+  letter-spacing: 0.4px;
+}
+
+.prh__body> :first-child {
+  margin-top: 0;
+}
+
+.prh__body> :last-child {
+  margin-bottom: 0;
+}
+
+.prh__body p {
+  margin: 0 0 16px;
+}
+
+.prh__body a {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   The colour field
+   -------------------------------------------------------------------------- */
+
+.prh__panel {
+  flex: 1 1 auto;
+  background-color: var(--prh-panel-bg, #0107ef);
+  overflow: hidden;
+}
+
+.prh__panel-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --------------------------------------------------------------------------
+   Narrow
+   --------------------------------------------------------------------------
+   Two halves side by side stop working long before a phone: the statement is
+   set at 40px and needs a column, not a sliver. So they stack — and the colour
+   field, having nothing in it to read, keeps only enough height to register as
+   a band unless it is carrying a picture. */
+
+@media screen and (max-width: 989px) {
+  .prh__row {
+    display: block;
+    min-height: 0;
+  }
+
+  .prh__text {
+    max-width: none;
+    --prh-pad-y: var(--prh-pad-y-narrow, 64px);
+    --prh-pad-x: var(--prh-pad-x-narrow, 24px);
+  }
+
+  /* The colour field becomes a band under the statement rather than beside it,
+     at the height the phone layout draws it. */
+  .prh__panel {
+    min-height: var(--prh-panel-h-narrow, 277px);
+  }
+
+  .prh__panel:has(.prh__panel-img) {
+    min-height: 0;
+  }
+}
+
+/* The phone type: the `H1 Mobile` token, which is where this heading lands on a
+   394px screen. It breaks after "Beyond Beyond," on its own at this width — the
+   design draws that break, and the column produces it without being told. */
+@media screen and (max-width: 749px) {
+  .prh__heading {
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  /* The design breaks the heading after its opening clause on a phone, and puts
+     the break there rather than wherever the column happens to run out. Making
+     the clause a block is that break — no second field, no <br> in the content
+     for a merchant to wonder about, and it folds back into one line the moment
+     there is room for one. */
+  .prh__heading b {
+    display: block;
+  }
+
+  /* White here rather than the tint the wide layout uses. Stacked, the text
+     block is the full width of the screen and sits directly above the grid, so
+     a tint would read as a band across the page instead of as one half of a
+     hero. The wide layout keeps whatever colour the setting says. */
+  .prh__text {
+    background-color: var(--prh-bg-phone, #fff);
+  }
+
+  .prh__body {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  .prh__text {
+    --prh-pad-y: var(--prh-pad-y-phone, 48px);
+    --prh-pad-x: var(--prh-pad-x-phone, 24px);
+  }
+
+  .prh__panel {
+    min-height: var(--prh-panel-h-phone, 277px);
+  }
+}

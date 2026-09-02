@@ -103,6 +103,14 @@
         <button class="prv__write" type="button" data-prv-open>
           {{- section.settings.write_label -}}
         </button>
+
+        {%- comment -%}
+          The thank-you lives out here rather than in the dialog, because the
+          dialog is gone by the time it is said. `role="status"` is what makes a
+          screen reader read it when it appears — the visitor has just lost the
+          form they were looking at, so something has to tell them why.
+        {%- endcomment -%}
+        <p class="prv__thanks" data-prv-thanks role="status" hidden></p>
       </div>
 
       {%- if has_summary -%}

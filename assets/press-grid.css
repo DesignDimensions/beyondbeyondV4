@@ -1,0 +1,244 @@
+/* ==========================================================================
+   Press grid — coverage laid out like the journal's post grid
+   ==========================================================================
+   The card is the blog listing's card with two more lines under the title: the
+   date it ran and who wrote it. Those matter here in a way they do not on the
+   journal, where every post is ours — on this page the whole point is that
+   somebody else published it.
+
+   Type is the store's six sizes for the heading and the title (40px, and the
+   20px this page family stands on — see `desktop-type-scale`), and 14px for the
+   date, the byline and the link. 14 is not one of the six either; it is the
+   Figma `B2 Mobile` token, used here because these are captions on a card, and
+   the six-value scale bottoms out at 12 for a legal note rather than a byline.
+   ========================================================================== */
+
+.prg {
+  padding: var(--prg-pad-top, 64px) var(--prg-gutter, 64px) var(--prg-pad-bottom, 64px);
+  background-color: var(--prg-bg, #fff);
+  color: var(--prg-ink, #000);
+}
+
+.prg__inner {
+  max-width: var(--prg-content-w, 1312px);
+  margin: 0 auto;
+}
+
+.prg__heading {
+  margin: 0 0 var(--prg-heading-gap, 40px);
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: 0.8px;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   The grid
+   --------------------------------------------------------------------------
+   Fixed columns rather than `auto-fill`: the design's gutter is wide enough
+   that letting the browser decide how many fit would give a different answer
+   from the one drawn. The count is a setting, so the answer stays the
+   merchant's. */
+
+.prg__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--prg-cols, 3), minmax(0, 1fr));
+  column-gap: var(--prg-col-gap, 136px);
+  row-gap: var(--prg-row-gap, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prg__item {
+  margin: 0;
+  min-width: 0;
+}
+
+.prg__card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  background: var(--prg-card-bg, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   The image
+   -------------------------------------------------------------------------- */
+
+.prg__media {
+  aspect-ratio: var(--prg-media-ratio, 346 / 434);
+  border-radius: var(--prg-media-radius, 12px);
+  background-color: var(--prg-media-bg, #efefef);
+  overflow: hidden;
+}
+
+.prg__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The same lift the journal's cards have, so a page of coverage feels like part
+   of the site rather than a list pasted into it. Only where the card goes
+   somewhere — a card with no link has nothing to promise. */
+a.prg__card:hover .prg__media img {
+  transform: scale(1.03);
+}
+
+/* --------------------------------------------------------------------------
+   The text under it
+   -------------------------------------------------------------------------- */
+
+.prg__text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--prg-card-pad, 12px) 0;
+}
+
+.prg__date {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--prg-meta-color, #000);
+}
+
+/* Clamped rather than truncated on one line: a headline is the thing a visitor
+   is choosing between, and two lines of it are worth more than an ellipsis
+   after four words. Three lines is where the drawn card stops. */
+.prg__title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 0.4px;
+  color: inherit;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.prg__byline {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--prg-meta-color, #000);
+}
+
+/* Pushed to the bottom so the links line up across a row whose headlines run to
+   different lengths. `margin-top: auto` needs the card to be the full height of
+   its cell, which is why the card stretches. */
+.prg__more {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 32px;
+  color: var(--prg-link-color, #202020);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+a.prg__card:hover .prg__more {
+  text-decoration-thickness: 2px;
+}
+
+a.prg__card:focus-visible {
+  outline: 2px solid var(--prg-ink, #000);
+  outline-offset: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Narrow
+   --------------------------------------------------------------------------
+   The drawn gutter is 136px, which is a third of a card. That is a proportion
+   the page can afford at 1440 and cannot below it, so the columns drop and the
+   gutter closes rather than the cards shrinking to fit around it. */
+
+@media screen and (max-width: 1199px) {
+  .prg__grid {
+    column-gap: var(--prg-col-gap-md, 48px);
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .prg {
+    padding-left: var(--prg-gutter-narrow, 24px);
+    padding-right: var(--prg-gutter-narrow, 24px);
+  }
+
+  .prg__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--prg-col-gap-narrow, 24px);
+    row-gap: var(--prg-row-gap-narrow, 32px);
+  }
+
+  .prg__heading {
+    font-size: 32px;
+    line-height: 52px;
+    letter-spacing: 0.64px;
+    margin-bottom: 24px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   One card at a time, and the card becomes a box. On the wide page a card is
+   image-then-text on the page's own ground; on a phone the design gives it a
+   tint and sets the text into a darker panel inside it, which is what keeps
+   seven full-width cards reading as seven things rather than one long column.
+
+   The headline stays at 20px. It is the only thing on the card a visitor is
+   choosing between, and this is the width where it has the most work to do. */
+
+@media screen and (max-width: 749px) {
+  .prg {
+    padding-top: var(--prg-pad-top-narrow, 40px);
+    padding-bottom: var(--prg-pad-bottom-narrow, 40px);
+  }
+
+  .prg__grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--prg-row-gap-phone, 40px);
+  }
+
+  .prg__heading {
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .prg__card {
+    background: var(--prg-card-bg-phone, #f1f1f1);
+    gap: 4px;
+  }
+
+  /* Square on a phone: the card is the full width of the screen less its
+     gutters, and a rounded image inside a square tint reads as a mistake. */
+  .prg__media {
+    border-radius: 0;
+  }
+
+  .prg__text {
+    background-color: var(--prg-text-bg-phone, #efefef);
+    padding: var(--prg-card-pad, 12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prg__media img {
+    transition: none;
+  }
+}

@@ -14,7 +14,7 @@
  * public_html can be served as plain text if PHP is ever misconfigured. Put it
  * on its own line in a file ABOVE the web root and point TOKEN_FILE at it:
  *
- *     /home/<cpanel-user>/.shopify-review-token      chmod 600
+ *     /home1/a178436f/shopify-review-token      chmod 600
  *
  * Requires PHP 7.4+ with curl and json.
  */
@@ -23,16 +23,27 @@ declare(strict_types=1);
 
 /* ---------------------------------------------------------------- settings */
 
-const TOKEN_FILE = '/home/CPANEL_USER/.shopify-review-token';
+const TOKEN_FILE = '/home1/a178436f/shopify-review-token';
 
 const SHOP_DOMAIN = 'beyondbeyond-shop.myshopify.com';
 const API_VERSION = '2026-07';
 
-/** Origins allowed to post here. A storefront on any other domain is refused. */
+/**
+ * Origins allowed to post here. A storefront on any other domain is refused.
+ *
+ * The loopback entries are `shopify theme dev`, which serves the theme from the
+ * developer's own machine while it is being worked on. They cost nothing to
+ * leave in: CORS is a rule browsers apply to pages, not a lock on the endpoint —
+ * anything scripted skips it entirely — so the real guards are the rate limit,
+ * the product lookup and the token living out of reach. A loopback origin can
+ * only ever be someone already sitting at their own computer.
+ */
 const ALLOWED_ORIGINS = [
     'https://beyondbeyond.co.in',
     'https://www.beyondbeyond.co.in',
     'https://beyondbeyond-shop.myshopify.com',
+    'http://127.0.0.1:9292',
+    'http://localhost:9292',
 ];
 
 const MF_NAMESPACE = 'custom';
@@ -42,7 +53,7 @@ const MF_KEY       = 'product_reviews';
  * false holds new reviews back until someone sets "approved": true on them in
  * the admin — the section only shows approved ones.
  */
-const AUTO_APPROVE = true;
+const AUTO_APPROVE = false;
 
 /** A metafield value is capped at 64KB, so the list is capped well under it. */
 const MAX_REVIEWS = 300;

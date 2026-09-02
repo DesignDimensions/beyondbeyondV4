@@ -61,6 +61,33 @@
   opacity: 0.88;
 }
 
+/* The title keeps its own row; the button and whatever is said about it share
+   the one under it. `row-gap: 0` so the title's existing margin still sets the
+   vertical rhythm and adding this row changes nothing that was already there. */
+.prv__head-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 0;
+}
+
+.prv__title {
+  flex: 0 0 100%;
+}
+
+/* Said once the dialog has closed, beside the button that opened it — the
+   visitor has just watched the form disappear, and this is the sentence that
+   explains why. Muted rather than loud: it is a receipt, not an announcement,
+   and it goes away the moment they open the form again. */
+.prv__thanks {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--prv-muted, #6b6b6b);
+}
+
 .prv__summary {
   width: 30%;
 }
@@ -490,6 +517,12 @@
     font-size: 16px;
     line-height: 28px;
     letter-spacing: 0.32px;
+  }
+
+  .prv__thanks {
+    order: 4;
+    margin-top: 12px;
+    max-width: none;
   }
 
   .prv__write {
