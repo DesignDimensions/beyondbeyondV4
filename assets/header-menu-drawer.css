@@ -1,0 +1,355 @@
+/* ==========================================================================
+   The phone menu drawer
+   ==========================================================================
+   Over the page from the right, one panel at a time, three levels deep. The
+   same shape as the collection page's filter drawer on purpose: a phone in this
+   theme now has one way of drilling into a list, and learning it once is enough.
+
+   Type is the design's mobile set — 16px for every row and title, 14px for a
+   picture tile's caption. The rows are uppercase because the menu is, and that
+   is done here rather than in the content so a merchant types a menu item once,
+   in sentence case, and it reads correctly in both places.
+   ========================================================================== */
+
+.hmd__open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--hmd-ink, #202020);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   The drawer
+   --------------------------------------------------------------------------
+   The whole screen. The menu is somewhere a visitor goes rather than something
+   that hangs over where they were, so nothing of the page is left showing and
+   the way back is the close button rather than a strip of page to tap.
+
+   It still slides in from the right, and the backdrop is still drawn: at 100%
+   it is not seen, but the drawer's width is a variable, and a narrower one set
+   through `--hmd-w` has to keep working. */
+
+.hmd {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: var(--hmd-w, 100%);
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: var(--hmd-ink, #202020);
+}
+
+.hmd::backdrop {
+  background: var(--hmd-backdrop, rgba(0, 0, 0, 0.55));
+  -webkit-backdrop-filter: blur(var(--hmd-backdrop-blur, 6px));
+  backdrop-filter: blur(var(--hmd-backdrop-blur, 6px));
+}
+
+/* Three parts tall: a head and a list that scroll together, and a foot that
+   does not. The account link and the socials are the two things a visitor may
+   want from any depth, so they never scroll away. */
+.hmd__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--hmd-pad-y, 48px) var(--hmd-pad-x, 24px);
+}
+
+.hmd__panels {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hmd__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hmd-panel-gap, 24px);
+}
+
+/* `display: flex` above beats the browser's own rule for [hidden]. Said again,
+   louder — the same trap the filter drawer's sheets fell into. */
+.hmd__panel[hidden] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Panel heads
+   -------------------------------------------------------------------------- */
+
+.hmd__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hmd__headrow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hmd__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  text-transform: uppercase;
+  color: var(--hmd-ink, #202020);
+}
+
+.hmd__close {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+/* On a sub-panel the close sits above the title on its own line, which is what
+   leaves the row below free for the back arrow and the name. */
+.hmd__close--sub {
+  align-self: flex-start;
+  margin-bottom: 16px;
+}
+
+.hmd__backrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hmd__back {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+/* The upright between the arrow and the name — a divider, not a border, so it
+   keeps its height whatever the row does. */
+.hmd__backsep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 22px;
+  background: var(--hmd-rule, #e6e6e6);
+}
+
+.hmd__rule {
+  display: block;
+  height: 1px;
+  background: var(--hmd-rule, #e6e6e6);
+}
+
+/* --------------------------------------------------------------------------
+   Rows
+   -------------------------------------------------------------------------- */
+
+.hmd__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hmd__item {
+  margin: 0;
+}
+
+/* Every row keeps its rule, the last one included — the design draws the list
+   as a stack of bounded rows rather than as items separated by lines. */
+.hmd__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 0 16px;
+  border: 0;
+  border-bottom: 1px solid var(--hmd-rule, #e6e6e6);
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.hmd__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hmd__arrow {
+  flex: 0 0 auto;
+}
+
+/* A badge rather than a row: no rule under it, and no arrow, because it goes
+   straight somewhere. */
+.hmd__item--pill .hmd__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--hmd-pill-bg, #0107ef);
+  color: var(--hmd-pill-fg, #fff);
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   The picture grid
+   -------------------------------------------------------------------------- */
+
+.hmd__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--hmd-grid-cols, 3), minmax(0, 1fr));
+  column-gap: var(--hmd-grid-gap-x, 20px);
+  row-gap: var(--hmd-grid-gap-y, 16px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hmd__tile {
+  margin: 0;
+  min-width: 0;
+}
+
+.hmd__tilelink {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Square, because the design's tiles are — a picture that sets its own height
+   would break the rows into a ragged grid. */
+.hmd__tilemedia {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--hmd-tile-bg, #efefef);
+  overflow: hidden;
+}
+
+.hmd__tilemedia img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hmd__tilelabel {
+  display: block;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0.28px;
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   The foot
+   -------------------------------------------------------------------------- */
+
+.hmd__foot {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+.hmd__footrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hmd__account {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  color: var(--hmd-ink, #202020);
+  text-decoration: none;
+}
+
+.hmd__socials {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hmd__social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hmd-ink, #202020);
+}
+
+.hmd__social svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+/* LinkedIn is drawn a little smaller than the other two, as it is in the
+   design and in the footer. */
+.hmd__social--li svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* --------------------------------------------------------------------------
+   Where it applies
+   --------------------------------------------------------------------------
+   The drawer is the phone's menu. Above this width the header has room for its
+   own navigation and the button has nothing to open. */
+
+@media screen and (min-width: 990px) {
+
+  .hmd__open,
+  .hmd {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hmd__tilemedia img {
+    transition: none;
+  }
+}

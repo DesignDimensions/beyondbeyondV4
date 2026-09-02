@@ -1,0 +1,39 @@
+{%- comment -%}
+  A level shown as pictures rather than rows.
+
+  The image is the linked thing's own — a collection's image, a product's
+  featured image — so there is no second library of menu pictures to keep in
+  step with the menu. A link with nothing to show still appears; it simply gets
+  the tint instead of a photograph, which is better than a hole in the grid.
+{%- endcomment -%}
+<ul class="hmd__grid" role="list">
+  {%- for link in links -%}
+    {%- liquid
+      assign pic = blank
+      if link.type == 'collection_link' or link.type == 'catalog_link'
+        assign pic = link.object.image
+      elsif link.type == 'product_link'
+        assign pic = link.object.featured_image
+      endif
+    -%}
+    <li class="hmd__tile">
+      <a class="hmd__tilelink" href="{{ link.url }}">
+        <span class="hmd__tilemedia">
+          {%- if pic != blank -%}
+            <img
+              src="{{ pic | image_url: width: 330 }}"
+              srcset="{{ pic | image_url: width: 220 }} 220w, {{ pic | image_url: width: 330 }} 330w"
+              sizes="110px"
+              width="{{ pic.width }}"
+              height="{{ pic.height }}"
+              alt="{{ pic.alt | default: link.title | escape }}"
+              loading="lazy"
+              decoding="async"
+            >
+          {%- endif -%}
+        </span>
+        <span class="hmd__tilelabel">{{ link.title | escape }}</span>
+      </a>
+    </li>
+  {%- endfor -%}
+</ul>

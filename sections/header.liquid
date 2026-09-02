@@ -367,8 +367,17 @@
   -%}
   <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if localization_forms %} header--has-localizations{% endif %}">
     {%- liquid
+      comment
+        The phone menu. Dawn's own drawer stays in the theme untouched — set
+        "Phone menu style" back to it and this one is gone — but the store's
+        menu is drawn by `header-menu-drawer`, which is the design's.
+      endcomment
       if section.settings.menu != blank
-        render 'header-drawer'
+        if section.settings.hmd_enabled
+          render 'header-menu-drawer'
+        else
+          render 'header-drawer'
+        endif
       endif
 
       if section.settings.logo_position == 'top-center' or section.settings.menu == blank
@@ -890,6 +899,65 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "hmd_enabled",
+      "label": "Use the new phone menu",
+      "info": "Off restores the theme's original drawer.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hmd_title",
+      "label": "Drawer title",
+      "default": "MENU"
+    },
+    {
+      "type": "text",
+      "id": "hmd_account_label",
+      "label": "Account link text",
+      "default": "Log in | Sign up"
+    },
+    {
+      "type": "text",
+      "id": "hmd_grid_items",
+      "label": "Menu items shown as pictures",
+      "info": "Comma separated, matched on the menu item's own name — e.g. Shop by Concern. Their children are drawn as a grid using each linked collection's image.",
+      "default": "Shop by Concern"
+    },
+    {
+      "type": "text",
+      "id": "hmd_pill_items",
+      "label": "Menu items shown as a pill",
+      "info": "Comma separated. A pill is a badge that links straight out rather than a row that opens.",
+      "default": "NAD+"
+    },
+    {
+      "type": "text",
+      "id": "hmd_shop_item",
+      "label": "Menu item that opens the Shop journey",
+      "info": "This row opens the built-in Shop panels (All products, By category, Shop by concern, Sets and offers) instead of following its own link. Those panels are written into snippets/header-menu-drawer-shop.liquid rather than the store's navigation, so they never appear in the desktop header. Leave empty to turn the journey off.",
+      "default": "Shop"
+    },
+    {
+      "type": "text",
+      "id": "hmd_facebook",
+      "label": "Facebook URL",
+      "info": "Falls back to the theme's own social link."
+    },
+    {
+      "type": "text",
+      "id": "hmd_instagram",
+      "label": "Instagram URL",
+      "info": "Falls back to the theme's own social link."
+    },
+    {
+      "type": "text",
+      "id": "hmd_linkedin",
+      "label": "LinkedIn URL",
+      "info": "The theme has no LinkedIn setting of its own, so it is set here. Defaults to the same address the footer uses.",
+      "default": "https://www.linkedin.com/company/beyond-beyond-skincare"
     }
   ],
   "blocks": [

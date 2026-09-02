@@ -62,6 +62,7 @@
       availability: params.get(AVAIL) || '',
       sort: params.get(SORT) || '',
     };
+    this.state.collection = this.knownHandle(this.state.collection);
 
     // The grid drawn into the page is the one combination that never needs
     // fetching — but only if the URL asked for what was drawn. Keyed on the
@@ -104,6 +105,20 @@
     return null;
   };
 
+  /**
+   * The collection a URL is asking for, but only if there is a tab for it.
+   *
+   * `c` can name something the rail has no tab for — a link shared from before
+   * a tab was renamed or removed, or one built elsewhere in the theme. Left
+   * alone, that state showed the first tab's products with no tab lit, which
+   * reads as a page that has failed rather than one showing everything. Falling
+   * back to the first tab is the honest answer: it is what is on screen.
+   */
+  AllCollections.prototype.knownHandle = function (handle) {
+    if (handle && this.linkFor(handle)) return handle;
+    return this.links[0] ? this.links[0].getAttribute('data-acl-handle') : null;
+  };
+
   AllCollections.prototype.onClick = function (event) {
     // Anything the browser would rather handle itself — a new tab, a saved
     // link, a middle click — is left to it.
@@ -140,7 +155,7 @@
   AllCollections.prototype.onPopState = function () {
     var params = new URL(window.location.href).searchParams;
     var next = {
-      collection: params.get(PARAM) || (this.links[0] ? this.links[0].getAttribute('data-acl-handle') : null),
+      collection: this.knownHandle(params.get(PARAM)),
       availability: params.get(AVAIL) || '',
       sort: params.get(SORT) || '',
     };

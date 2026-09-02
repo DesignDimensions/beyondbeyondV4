@@ -1,0 +1,166 @@
+{%- comment -%}
+  The Shop journey: three hardcoded panels.
+
+  Everything else in this drawer is drawn from the store's navigation. This part
+  is not, and deliberately so — putting these levels into `bb-v4-header` would
+  put them into the desktop header too, which is not where they belong. So they
+  live here, in the one place a phone reads.
+
+  The consequence is that this file IS the menu for these three panels. To change
+  a row, change the line for it; each is `Label|tab-handle`, and a tile carries
+  the name of its picture in `assets/` as a third field. Nothing here is written
+  down anywhere else in the theme.
+
+  A tab handle is the collection a tab on the all-collections rail stands for —
+  the rail's own blocks are where those come from, so a row added here wants a
+  tab there to match.
+
+  The pictures are addressed by hand rather than read from the collections,
+  because no collection in this store has an image set — `collection.image`
+  would give nine grey squares. They live in Shopify Files, not in the theme, so
+  they are served from the CDN and cost the theme nothing; they are cropped to
+  the framing the design draws, at three times the drawn size so they hold up on
+  a phone screen.
+
+  Those addresses carry a `?v=` stamp, so changing a picture means uploading the
+  new one to Files and putting its address on the line — replacing the file in
+  the admin will not reach back into this list.
+
+  Takes `arrow` (the row chevron) and `title` from the caller, so the head of the
+  first panel says whatever the menu item that opened it says.
+{%- endcomment -%}
+
+{%- capture category_rows -%}
+  Cleanser|cleanser;
+  Toner|toners;
+  Moisturiser|moisturiser;
+  Sun Protection|sun-protection;
+  Lip Care|lip-care;
+  Serums|serums
+{%- endcapture -%}
+
+{%- capture concern_rows -%}
+  Acne & Blemishes|acne-blemishes|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-acne-blemishes.jpg?v=1788349028;
+  Age Spots & Pigmentation|age-spots-pigmentation|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-age-spots-pigmentation.jpg?v=1788349028;
+  Clogged Pores & Blackheads|clogged-pores-blackheads|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-clogged-pores-blackheads.jpg?v=1788349028;
+  Oil Control|oil-control|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-oil-control.jpg?v=1788349028;
+  Sun Damage|sun-damage-1|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-sun-damage.jpg?v=1788349028;
+  Uneven Skin Tone|uneven-skin-tone|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-uneven-skin-tone.jpg?v=1788349027;
+  Dryness & Dullness|dryness-dullness|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-dryness-dullness.jpg?v=1788349028;
+  Oxidative Stress & Cellular Repair|oxidative-stress-cellular-repair|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-oxidative-stress.jpg?v=1788349028;
+  Redness and Irritation|redness-and-irritation|https://cdn.shopify.com/s/files/1/0715/1157/2666/files/hmd-concern-redness-irritation.jpg?v=1788349028
+{%- endcapture -%}
+
+{%- liquid
+  comment
+    Records split on ";" and fields on "|", so the lists above stay one row to a
+    line and a label is free to contain a comma.
+  endcomment
+  assign categories = category_rows | split: ';'
+  assign concerns = concern_rows | split: ';'
+
+  comment
+    Every row here goes to one page — the `all-collections` view, which is the
+    one with the category and concern rail on it — and names the tab it wants
+    with `c`. That is the parameter the rail itself reads on load, so arriving
+    from the menu and tapping the tab once there land on the same state.
+
+    Landing on a handle the rail has no tab for falls back to the first tab
+    rather than erroring, so a row can never take a visitor nowhere.
+  endcomment
+  assign acl_base = routes.all_products_collection_url | append: '?view=all-collections'
+  assign all_url = acl_base
+  assign sets_url = acl_base | append: '&c=combos'
+-%}
+
+{%- comment -%} ------------------------------------------------------- Shop {%- endcomment -%}
+<section class="hmd__panel" data-hmd-panel="shop" hidden>
+  {%- render 'header-menu-drawer-head', title: title, back: 'root' -%}
+
+  <ul class="hmd__list" role="list">
+    <li class="hmd__item">
+      <a class="hmd__row" href="{{ all_url }}">
+        <span class="hmd__label">All products</span>
+        {{ arrow }}
+      </a>
+    </li>
+    <li class="hmd__item">
+      <button class="hmd__row" type="button" data-hmd-goto="shop-category">
+        <span class="hmd__label">By category</span>
+        {{ arrow }}
+      </button>
+    </li>
+    <li class="hmd__item">
+      <button class="hmd__row" type="button" data-hmd-goto="shop-concern">
+        <span class="hmd__label">Shop by concern</span>
+        {{ arrow }}
+      </button>
+    </li>
+    <li class="hmd__item">
+      <a class="hmd__row" href="{{ sets_url }}">
+        <span class="hmd__label">Sets and offers</span>
+        {{ arrow }}
+      </a>
+    </li>
+  </ul>
+</section>
+
+{%- comment -%} -------------------------------------------- Shop / By category {%- endcomment -%}
+<section class="hmd__panel" data-hmd-panel="shop-category" hidden>
+  {%- render 'header-menu-drawer-head', title: 'By category', back: 'shop' -%}
+
+  <ul class="hmd__list" role="list">
+    {%- for row in categories -%}
+      {%- liquid
+        assign parts = row | strip | split: '|'
+        assign label = parts[0] | strip
+        assign handle = parts[1] | strip
+        assign href = acl_base | append: '&c=' | append: handle
+      -%}
+      {%- if label != blank -%}
+        <li class="hmd__item">
+          <a class="hmd__row" href="{{ href }}">
+            <span class="hmd__label">{{ label }}</span>
+            {{ arrow }}
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</section>
+
+{%- comment -%} ----------------------------------------- Shop / Shop by concern {%- endcomment -%}
+<section class="hmd__panel" data-hmd-panel="shop-concern" hidden>
+  {%- render 'header-menu-drawer-head', title: 'Shop by concern', back: 'shop' -%}
+
+  <ul class="hmd__grid" role="list">
+    {%- for row in concerns -%}
+      {%- liquid
+        assign parts = row | strip | split: '|'
+        assign label = parts[0] | strip
+        assign handle = parts[1] | strip
+        assign pic = parts[2] | strip
+        assign href = acl_base | append: '&c=' | append: handle
+      -%}
+      {%- if label != blank -%}
+        <li class="hmd__tile">
+          <a class="hmd__tilelink" href="{{ href }}">
+            <span class="hmd__tilemedia">
+              <img
+                src="{{ pic }}"
+                srcset="{{ pic }}&width=220 220w, {{ pic }} 330w"
+                sizes="110px"
+                width="330"
+                height="330"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              >
+            </span>
+            <span class="hmd__tilelabel">{{ label }}</span>
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</section>
