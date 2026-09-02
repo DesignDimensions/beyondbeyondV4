@@ -1,0 +1,468 @@
+{{ 'legal-policies.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'legal-policies.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Legal — every policy the store publishes, on one page, with a rail down the
+  side that says which one you are reading.
+
+  The page is a document, so the blocks are the document's own parts rather
+  than a fixed set of fields: a `policy` block opens a policy and names it in
+  the rail, and every `clause` block after it belongs to that policy until the
+  next `policy` block opens the following one. That is the whole grouping rule.
+  It means a merchant can add a clause to the shipping policy, reorder two
+  clauses, or add a fifth policy, without anyone touching this file — and the
+  rail follows, because it is built from the same blocks.
+
+  Nothing here is a tab. Each policy is on the page and reachable by scrolling
+  whether or not the script runs; the rail is a list of ordinary in-page links
+  over it. The script only does the two things a link cannot: move the filled
+  radio as you scroll, and ease the jump when you click. With it switched off
+  the links still land in the right place, on the offset `legal-policies.css`
+  gives each policy.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  if heading == blank
+    assign heading = page.title
+  endif
+
+  comment
+    The rail's first entry is lit before a single scroll event has fired, so
+    the page never paints with four empty radios. The script takes it from
+    here on the first frame it runs.
+  endcomment
+  assign first_policy = nil
+  for block in section.blocks
+    if block.type == 'policy'
+      assign first_policy = block.id
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="lgl{% if section.settings.offset_header %} lgl--under-header{% endif %}"
+  style="
+    --lgl-pad-top: {{ section.settings.padding_top }}px;
+    --lgl-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --lgl-gutter: {{ section.settings.gutter }}px;
+    --lgl-content-w: {{ section.settings.content_width }}px;
+    --lgl-bg: {{ section.settings.background }};
+    --lgl-ink: {{ section.settings.text_color }};
+    --lgl-title-color: {{ section.settings.title_color }};
+    --lgl-gap: {{ section.settings.column_gap }}px;
+    --lgl-rail-w: {{ section.settings.rail_width }}px;
+    --lgl-rail-bg: {{ section.settings.rail_background }};
+    --lgl-rail-color: {{ section.settings.rail_color }};
+    --lgl-rail-item-gap: {{ section.settings.rail_item_gap }}px;
+    --lgl-radio-on: {{ section.settings.radio_active }};
+    --lgl-radio-off: {{ section.settings.radio_idle }};
+    --lgl-sticky-gap: {{ section.settings.sticky_gap }}px;
+    --lgl-band-bg: {{ section.settings.band_background }};
+    --lgl-band-color: {{ section.settings.band_color }};
+    --lgl-rule: {{ section.settings.rule_color }};
+    --lgl-group-gap: {{ section.settings.group_gap }}px;
+  "
+  data-lgl
+  {{ section.shopify_attributes }}
+>
+  <div class="lgl__inner">
+    {%- if heading != blank -%}
+      <h1 class="lgl__title">{{ heading | escape }}</h1>
+    {%- endif -%}
+
+    <div class="lgl__row">
+      {%- comment -%}
+        Built from the `policy` blocks in the order they are in, so the rail
+        cannot list a policy the page does not have or miss one it does. It is
+        a nav rather than a bare list because that is what it is: the page's
+        own table of contents.
+      {%- endcomment -%}
+      <nav
+        class="lgl__rail{% if section.settings.sticky_rail %} lgl__rail--sticky{% endif %}"
+        aria-label="{{ section.settings.rail_label | escape }}"
+        data-lgl-rail
+      >
+        <ul class="lgl__nav" id="lgl-nav-{{ section.id }}" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'policy' -%}
+              {%- liquid
+                assign label = block.settings.nav_label
+                if label == blank
+                  assign label = block.settings.heading
+                endif
+              -%}
+              {%- comment -%}
+                The state is carried on the item as well as the link. Narrow, the
+                rail collapses to whichever policy you are reading, and that is a
+                question about the row — which one survives `display: none` —
+                rather than about the link inside it.
+              {%- endcomment -%}
+              <li class="lgl__navitem{% if block.id == first_policy %} is-current{% endif %}">
+                <a
+                  class="lgl__navlink{% if block.id == first_policy %} is-active{% endif %}"
+                  href="#lgl-{{ block.id }}"
+                  {% if block.id == first_policy %}aria-current="true"{% endif %}
+                  data-lgl-link
+                >
+                  <span class="lgl__radio" aria-hidden="true"></span>
+                  <span class="lgl__navlabel">{{ label | escape }}</span>
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+
+        {%- comment -%}
+          Narrow, the rail has no room to stand beside the policies, so it sits
+          across the top showing only the one you are reading, and this opens it
+          to the rest. It is a real button with real state: hidden from the wide
+          layout, where every policy is already listed and there is nothing to
+          disclose. `aria-expanded` is what a screen reader is told; the chevron
+          is the same fact for everyone else, and it is the design's own path
+          rather than a stand-in.
+        {%- endcomment -%}
+        <button
+          class="lgl__toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="lgl-nav-{{ section.id }}"
+          data-lgl-toggle
+        >
+          <span class="visually-hidden">{{ section.settings.rail_toggle_label | escape }}</span>
+          <svg class="lgl__chev" viewBox="0 0 36 36" width="36" height="36" fill="none" aria-hidden="true" focusable="false">
+            <path d="M11 14.5L18 21.5L25 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+
+      <div class="lgl__content">
+        {%- comment -%}
+          One pass over the blocks, opening a policy when a `policy` block
+          arrives and closing the one before it. `open` is what says whether
+          there is a policy to close — which is also what stops a stray clause
+          left above the first policy from rendering into nothing.
+        {%- endcomment -%}
+        {%- assign open = false -%}
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'policy' -%}
+              {%- if open -%}
+                  </div>
+                </section>
+              {%- endif -%}
+              <section
+                class="lgl__group"
+                id="lgl-{{ block.id }}"
+                data-lgl-group
+                {{ block.shopify_attributes }}
+              >
+                <div class="lgl__band">
+                  <h2 class="lgl__band-title">{{ block.settings.heading | escape }}</h2>
+                </div>
+                <div class="lgl__body">
+                  {%- if block.settings.intro != blank -%}
+                    <div class="lgl__item lgl__intro">{{ block.settings.intro }}</div>
+                  {%- endif -%}
+              {%- assign open = true -%}
+
+            {%- when 'clause' -%}
+              {%- if open -%}
+                <div class="lgl__item" {{ block.shopify_attributes }}>
+                  <div class="lgl__clause">
+                    {%- comment -%}
+                      A clause without a title is a run of copy that carries on
+                      from the policy above it — the opening paragraphs of the
+                      privacy policy and the terms are written that way. It gets
+                      no rule, because a rule under nothing is just a line.
+                    {%- endcomment -%}
+                    {%- if block.settings.title != blank -%}
+                      <h3 class="lgl__clause-title">{{ block.settings.title | escape }}</h3>
+                      <span class="lgl__rule" aria-hidden="true"></span>
+                    {%- endif -%}
+                    <div class="lgl__clause-body">{{ block.settings.body }}</div>
+                  </div>
+                </div>
+              {%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+        {%- if open -%}
+            </div>
+          </section>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Legal Policies",
+  "tag": "section",
+  "class": "section-legal-policies",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page title",
+      "info": "Leave blank to use the page's own title."
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 1000,
+      "max": 1400,
+      "step": 4,
+      "unit": "px",
+      "label": "Content width",
+      "info": "1320 leaves the policies themselves on the 923px column the page was drawn to. Set 1208 to line them up with the header and footer instead.",
+      "default": 1320
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between rail and policies",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "group_gap",
+      "min": 24,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between policies",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Navigation rail",
+      "info": "The list of policies beside the page. It follows the policies below — add or reorder a policy block and the rail follows."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_rail",
+      "label": "Keep the rail in view while scrolling",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rail_label",
+      "label": "Rail label for screen readers",
+      "default": "Policies"
+    },
+    {
+      "type": "text",
+      "id": "rail_toggle_label",
+      "label": "Rail open button, for screen readers",
+      "info": "On phones the rail collapses to the policy being read, with a button to open the rest. This names that button.",
+      "default": "Show all policies"
+    },
+    {
+      "type": "range",
+      "id": "rail_width",
+      "min": 280,
+      "max": 380,
+      "step": 1,
+      "unit": "px",
+      "label": "Rail width",
+      "info": "The page is drawn at 333, which its longest policy name fills to the pixel — too tight to survive real text rendering, so the default is wider.",
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "rail_item_gap",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rail items",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "sticky_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap below the header",
+      "info": "How far the held rail keeps from the site header, and where a rail link lands.",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "rail_background",
+      "label": "Rail background",
+      "default": "#E6E6E6"
+    },
+    {
+      "type": "color",
+      "id": "rail_color",
+      "label": "Rail text",
+      "default": "#202020"
+    },
+    {
+      "type": "color",
+      "id": "radio_active",
+      "label": "Marker — current policy",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "radio_idle",
+      "label": "Marker — the rest",
+      "default": "#808080"
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Page background",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Page title",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Body text",
+      "default": "#202020"
+    },
+    {
+      "type": "color",
+      "id": "band_background",
+      "label": "Policy heading band",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "band_color",
+      "label": "Policy heading text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rules",
+      "info": "The lines under a clause title and between clauses.",
+      "default": "#202020"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "policy",
+      "name": "Policy",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Opens a policy and adds it to the rail. Every clause below it belongs to this policy until the next Policy block."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "info": "Shown in the dark band at the top of the policy.",
+          "default": "Policy name"
+        },
+        {
+          "type": "text",
+          "id": "nav_label",
+          "label": "Rail label",
+          "info": "Leave blank to reuse the heading."
+        },
+        {
+          "type": "richtext",
+          "id": "intro",
+          "label": "Effective-date line",
+          "info": "Optional. A single small line above the first clause — used for the effective-date note."
+        }
+      ]
+    },
+    {
+      "type": "clause",
+      "name": "Clause",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "info": "Leave blank for copy that carries on from the clause above, with no title and no rule."
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Text",
+          "default": "<p>Clause text.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Legal Policies",
+      "blocks": [
+        { "type": "policy" },
+        { "type": "clause" }
+      ]
+    }
+  ]
+}
+{% endschema %}

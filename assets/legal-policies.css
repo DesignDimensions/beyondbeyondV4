@@ -1,0 +1,504 @@
+/* ==========================================================================
+   Legal — the store's policies on one page, with a rail that says where you are
+   ==========================================================================
+   Two columns that hold to the theme's grid: a tinted rail of policy names on
+   the left, the policies themselves on the right. Each policy is a dark band
+   naming it followed by its clauses, and each clause is a rule, a title and
+   its copy.
+
+   The rail is the only part of this that is not simply a document. It is a
+   set of radios because that is what it is — four names, one of which is
+   where you are — and it is written as links so it still navigates with the
+   script switched off. The filled radio is moved by `legal-policies.js`
+   as the page scrolls; nothing here assumes it ever runs.
+
+   Type: 40px for the page title and the band headings and 16px for a policy's
+   effective-date line, both on the store's six-size scale; 20px for the rail
+   and the clauses, which is not.
+
+   That 20px is a deliberate exception, not drift. The scale's nearest value is
+   22px, and at 22px this page stops being the page that was drawn: the copy
+   runs 14% larger against its column, the 1.6 line height the clauses were set
+   with closes to 1.45, and the longest policy name no longer fits the rail
+   Figma sizes for it. A document this long is mostly this one size, so getting
+   it wrong is not a detail — it is the page. Every other size here is on the
+   scale; see `desktop-type-scale` for the rule this is standing outside of.
+   ========================================================================== */
+
+.lgl {
+  padding-top: var(--lgl-pad-top, 40px);
+  padding-bottom: var(--lgl-pad-bottom, 80px);
+  padding-left: var(--lgl-gutter, 64px);
+  padding-right: var(--lgl-gutter, 64px);
+  background-color: var(--lgl-bg, #f5f5f5);
+  color: var(--lgl-ink, #202020);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its content clear of it.
+   `--header-height` is the measured value the header publishes on the root;
+   `--header-height-static` is its own server-rendered estimate for the first
+   paint. */
+.lgl--under-header {
+  padding-top: calc(var(--header-height, var(--header-height-static, 96px)) + var(--lgl-pad-top, 40px));
+}
+
+/* The gutter above is the padding; this is the column it leaves. At the width
+   the page was drawn to the two agree exactly, and past it the column stops
+   growing and centres instead. */
+.lgl__inner {
+  max-width: var(--lgl-content-w, 1312px);
+  margin: 0 auto;
+}
+
+.lgl__title {
+  margin: 0 0 var(--lgl-title-gap, 40px);
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: 0.8px;
+  color: var(--lgl-title-color, #000);
+}
+
+.lgl__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lgl-gap, 56px);
+}
+
+/* --------------------------------------------------------------------------
+   The rail
+   -------------------------------------------------------------------------- */
+
+.lgl__rail {
+  flex: 0 0 var(--lgl-rail-w, 360px);
+  max-width: var(--lgl-rail-w, 360px);
+  padding: var(--lgl-rail-pad, 24px);
+  background-color: var(--lgl-rail-bg, #e6e6e6);
+}
+
+/* Held in view while the policies scroll past it.
+
+   Not at a fixed distance from the top, though. The site header is fixed and
+   hides itself as you scroll down — it animates its own `top` up to minus its
+   height and drops back the moment you scroll up — so any single number here
+   is wrong half the time: far enough down to clear a revealed header leaves a
+   band of nothing once it has gone, and tight enough to look right once it has
+   gone puts the rail underneath it the moment it comes back.
+
+   So the number is measured rather than declared. The script publishes where
+   the header's bottom edge actually is as `--lgl-sticky-top`; this fallback is
+   what stands before it runs, and if it never runs at all. Same arrangement as
+   the collections rail — see `all-collections.css` for the long version. */
+.lgl__rail--sticky {
+  position: sticky;
+  top: var(--lgl-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--lgl-sticky-gap, 16px)));
+}
+
+.lgl__nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lgl-rail-item-gap, 24px);
+}
+
+.lgl__navitem {
+  margin: 0;
+}
+
+.lgl__navlink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--lgl-rail-color, #202020);
+  cursor: pointer;
+}
+
+/* The radio is drawn rather than imported. It is two concentric circles that
+   have to change on scroll, and a circle is the one shape CSS reproduces
+   exactly — an <img> swap would be the same picture with a network request and
+   a state to keep in sync. The box is 36px so the tap target clears the 20px
+   glyph on every side, which is how the design draws it too. */
+.lgl__radio {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.lgl__radio::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--lgl-radio-off, #808080);
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* The filled state is the same ring in the active colour with the centre inked
+   in. Drawn as inset shadows rather than a second element so there is nothing
+   to lay out and nothing to hide when the state goes away.
+
+   The two shadows are read outside-in, the first painting over the second:
+   inside the 2px border the well is 16px across, a 2px ring of the rail's own
+   tint holds the dot off the ring, and the flood fills what is left — a 12px
+   dot, which is the r=6 circle the design draws inside its r=8 well. */
+.lgl__navlink.is-active .lgl__radio::before,
+.lgl__navlink[aria-current='true'] .lgl__radio::before {
+  border-color: var(--lgl-radio-on, #000);
+  box-shadow: inset 0 0 0 2px var(--lgl-rail-bg, #e6e6e6), inset 0 0 0 20px var(--lgl-radio-on, #000);
+}
+
+.lgl__navlabel {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+}
+
+.lgl__navlink:hover .lgl__radio::before {
+  border-color: var(--lgl-radio-on, #000);
+}
+
+/* --------------------------------------------------------------------------
+   The policies
+   -------------------------------------------------------------------------- */
+
+.lgl__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--lgl-content-pad-y, 40px) var(--lgl-content-pad-x, 24px);
+  background-color: var(--lgl-content-bg, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lgl-group-gap, 64px);
+}
+
+/* `scroll-margin-top` is where a rail link lands: the fixed header plus the gap
+   the rail keeps from it, so a heading arrives level with the rail rather than
+   behind the header. The script scrolls to the same number; this is what a
+   plain `#hash` navigation gets on its own, including on first load. */
+.lgl__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lgl-band-gap, 40px);
+  scroll-margin-top: var(--lgl-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--lgl-sticky-gap, 16px)));
+}
+
+.lgl__band {
+  padding: var(--lgl-band-pad, 24px);
+  background-color: var(--lgl-band-bg, #171717);
+}
+
+.lgl__band-title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: 0.8px;
+  color: var(--lgl-band-color, #fff);
+}
+
+/* Every clause sits in a ruled row. The rule belongs to the row rather than to
+   the clause so the last one still closes the policy off, the way the design
+   draws it. */
+.lgl__item {
+  padding: var(--lgl-item-pad, 24px) 0;
+  border-bottom: 1px solid var(--lgl-rule, #202020);
+}
+
+.lgl__intro {
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+}
+
+.lgl__clause {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lgl__clause-title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: 0.4px;
+  color: var(--lgl-ink, #202020);
+}
+
+/* The clause's own rule, under its title. Thinner than the row rule below it
+   and only there when there is a title to underline. */
+.lgl__rule {
+  display: block;
+  height: 1px;
+  background-color: var(--lgl-rule, #202020);
+}
+
+.lgl__clause-body,
+.lgl__intro {
+  color: var(--lgl-ink, #202020);
+}
+
+.lgl__clause-body {
+  font-size: 20px;
+  line-height: 32px;
+  letter-spacing: 0.4px;
+}
+
+/* The paragraph gap is the empty line the copy was written with. Rich text
+   arrives as a run of <p>, so the spacing is set here once rather than left to
+   whatever the editor happened to type. */
+.lgl__clause-body> :first-child,
+.lgl__intro> :first-child {
+  margin-top: 0;
+}
+
+.lgl__clause-body> :last-child,
+.lgl__intro> :last-child {
+  margin-bottom: 0;
+}
+
+.lgl__clause-body p,
+.lgl__intro p {
+  margin: 0 0 var(--lgl-para-gap, 32px);
+}
+
+/* Bulleted clauses are set the way the policies were drawn: the mark sits on
+   the text's own left margin and a wrapped line returns to it, rather than
+   indenting into a hanging column. Still a real list underneath — this is a
+   legal document, and the items are items whatever they look like. Numbered
+   lists keep the indent, because a number needs the room to stay legible. */
+.lgl__clause-body ul {
+  margin: 0 0 var(--lgl-para-gap, 32px);
+  padding-left: 0;
+  list-style: none;
+}
+
+.lgl__clause-body ul>li::before {
+  content: '•\00a0';
+}
+
+.lgl__clause-body ol {
+  margin: 0 0 var(--lgl-para-gap, 32px);
+  padding-left: 30px;
+}
+
+.lgl__clause-body li {
+  margin: 0;
+}
+
+.lgl__clause-body a,
+.lgl__intro a {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   The rail's open button
+   --------------------------------------------------------------------------
+   Only ever shown in the stacked layout below. Wide, every policy is already
+   listed and there is nothing left to disclose, so the button is not merely
+   hidden — it has no job. */
+
+.lgl__toggle {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lgl-chev, #292929);
+  cursor: pointer;
+}
+
+.lgl__chev {
+  display: block;
+  width: 36px;
+  height: 36px;
+  transition: transform 0.2s ease;
+}
+
+.lgl__toggle[aria-expanded='true'] .lgl__chev {
+  transform: rotate(180deg);
+}
+
+/* --------------------------------------------------------------------------
+   Stacked
+   --------------------------------------------------------------------------
+   Below this width there is no room for a column of policy names beside the
+   policies, so the rail stops being a rail. It crosses the top of the page
+   showing only the policy you are reading, with a button to open the rest —
+   which is how the page is drawn for a phone.
+
+   Three things move rather than shrink. The rail comes above the page title,
+   because on a phone the first useful thing is which policy you are in, not
+   the word "Legal". The heading bands run edge to edge, so the section's side
+   padding is handed to the title and the clauses individually instead of being
+   held by the section. And the rail stays pinned under the header, because the
+   document below it is twenty thousand pixels long and a rail you have to
+   scroll back to is a rail you will not use.
+
+   `display: contents` is what lets the first of those happen: the two-column
+   row stops being a box, its rail and its policies become items of the page
+   column, and `order` can then put the rail above a title that is not its
+   sibling in the markup. */
+
+@media screen and (max-width: 989px) {
+  .lgl {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* The rail, not the title, is what now sits under the header, and it sits
+     flush against it — so the section's own top padding moves down to the
+     title, which the rail carries as its bottom margin. */
+  .lgl--under-header {
+    padding-top: var(--header-height, var(--header-height-static, 76px));
+  }
+
+  .lgl__inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lgl__row {
+    display: contents;
+  }
+
+  .lgl__rail {
+    order: -1;
+    flex: none;
+    max-width: none;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: var(--lgl-rail-gap, 40px);
+  }
+
+  .lgl__title {
+    order: 0;
+    padding-left: var(--lgl-gutter-narrow, 24px);
+    padding-right: var(--lgl-gutter-narrow, 24px);
+  }
+
+  .lgl__content {
+    order: 1;
+    padding: 0;
+  }
+
+  /* Pinned under the header rather than beside the policies. The offset is the
+     same measured number the wide layout uses. */
+  .lgl__rail--sticky {
+    top: var(--lgl-sticky-top, var(--header-height, var(--header-height-static, 76px)));
+    z-index: 2;
+  }
+
+  .lgl__nav {
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .lgl__toggle {
+    display: flex;
+  }
+
+  /* Closed, the rail is the one policy you are reading. The state lives on the
+     row, so the radio inside it keeps saying the same thing it says open. */
+  .lgl__rail:not(.is-open) .lgl__navitem:not(.is-current) {
+    display: none;
+  }
+
+  /* The section no longer holds the side padding, so the parts that still want
+     it take their own. The bands deliberately do not: they run to both edges. */
+  .lgl__item {
+    margin-left: var(--lgl-gutter-narrow, 24px);
+    margin-right: var(--lgl-gutter-narrow, 24px);
+  }
+
+  /* A policy has to clear the pinned rail as well as the header now, so it
+     lands below both instead of behind the rail. The script measures the rail
+     and publishes the sum; this is what stands if it never runs. */
+  .lgl__group {
+    scroll-margin-top: var(--lgl-land, calc(var(--header-height, var(--header-height-static, 76px)) + var(--lgl-rail-h, 84px)));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   --------------------------------------------------------------------------
+   The type the page is drawn at for a 394px screen: 32px title, 28px band,
+   16px for the clauses and the rail's own label at 20px. These are the Figma
+   mobile tokens as drawn — the store's six-size scale governs the desktop
+   sizes only, mobile having been deliberately left on its own values. */
+
+@media screen and (max-width: 749px) {
+  .lgl__title {
+    font-size: 32px;
+    line-height: 52px;
+    letter-spacing: 0.64px;
+    margin-bottom: var(--lgl-title-gap-narrow, 24px);
+  }
+
+  .lgl__band-title {
+    font-size: 28px;
+    line-height: 40px;
+    letter-spacing: 0.56px;
+  }
+
+  .lgl__navlabel {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .lgl__clause-title,
+  .lgl__clause-body,
+  .lgl__intro {
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.32px;
+  }
+
+  /* Tighter between a clause's title, its rule and its copy — 4px rather than
+     the 8px the wide layout can afford. */
+  .lgl__clause {
+    gap: 4px;
+  }
+
+  .lgl__clause-body {
+    --lgl-para-gap: 28px;
+  }
+
+  /* Policies sit closer together, the band keeping its own distance from the
+     clauses under it. */
+  .lgl__content {
+    gap: var(--lgl-group-gap-narrow, 24px);
+  }
+
+  .lgl__group {
+    gap: var(--lgl-band-gap-narrow, 40px);
+  }
+}
+
+/* The script scrolls with `behavior: smooth`; this is the seatbelt for the
+   plain `#hash` navigation it falls back to. */
+@media (prefers-reduced-motion: reduce) {
+
+  .lgl__navlink .lgl__radio::before,
+  .lgl__chev {
+    transition: none;
+  }
+}
