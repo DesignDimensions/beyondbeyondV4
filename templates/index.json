@@ -421,80 +421,70 @@
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-vogue-india.svg?v=1788354169",
-            "name": "Vogue India",
-            "link": ""
+            "name": "Vogue India"
           }
         },
         "logo_cosmopolitan": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-cosmopolitan.png?v=1788354173",
-            "name": "Cosmopolitan India",
-            "link": ""
+            "name": "Cosmopolitan India"
           }
         },
         "logo_grazia": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-grazia.png?v=1788354176",
-            "name": "Grazia",
-            "link": ""
+            "name": "Grazia"
           }
         },
         "logo_elle": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-elle.svg?v=1788354177",
-            "name": "Elle",
-            "link": ""
+            "name": "Elle"
           }
         },
         "logo_style_list": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-the-style-list.png?v=1788354184",
-            "name": "The Style List",
-            "link": ""
+            "name": "The Style List"
           }
         },
         "logo_femina": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-femina.svg?v=1788354186",
-            "name": "Femina",
-            "link": ""
+            "name": "Femina"
           }
         },
         "logo_manifest": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-manifest.png?v=1788354188",
-            "name": "Manifest",
-            "link": ""
+            "name": "Manifest"
           }
         },
         "logo_midday": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-mid-day.svg?v=1788354191",
-            "name": "Mid-day",
-            "link": ""
+            "name": "Mid-day"
           }
         },
         "logo_bazaar": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-harpers-bazaar.svg?v=1788354194",
-            "name": "Harper's Bazaar",
-            "link": ""
+            "name": "Harper's Bazaar"
           }
         },
         "logo_deccan": {
           "type": "logo",
           "settings": {
             "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-deccan-chronicle.png?v=1788354196",
-            "name": "Deccan Chronicle",
-            "link": ""
+            "name": "Deccan Chronicle"
           }
         }
       },
@@ -520,8 +510,10 @@
         "separator_height": 46,
         "speed": 45,
         "direction": "1",
-        "slow_on_hover": true,
-        "dim_opacity": 0.2,
+        "view_all_label": "View All",
+        "view_all_url": "/pages/as-seen-in",
+        "tag_background": "#000000",
+        "tag_color": "#ffffff",
         "show_glow": true,
         "glow_color": "#8b7cf0",
         "glow_opacity": 0.5,

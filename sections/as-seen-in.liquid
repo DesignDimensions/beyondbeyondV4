@@ -19,7 +19,6 @@
   id="asi-{{ section.id }}"
   data-asi
   data-speed="{{ section.settings.speed }}"
-  data-hover-slow="{{ section.settings.slow_on_hover }}"
   style="
     --asi-pad-top: {{ section.settings.padding_top }}px;
     --asi-pad-bottom: {{ section.settings.padding_bottom }}px;
@@ -28,7 +27,8 @@
     --asi-logo-h-mobile: {{ section.settings.logo_height | times: 0.7 | round }}px;
     --asi-gap: {{ section.settings.logo_gap }}px;
     --asi-sep-h: {{ section.settings.separator_height }}px;
-    --asi-dim: {{ section.settings.dim_opacity }};
+    --asi-tag-bg: {{ section.settings.tag_background }};
+    --asi-tag-fg: {{ section.settings.tag_color }};
   "
   {{ section.shopify_attributes }}
 >
@@ -42,7 +42,12 @@
     </div>
   {%- endif -%}
 
-  <div class="asi__rows">
+  <a
+    class="asi__rows"
+    href="{{ section.settings.view_all_url }}"
+    data-asi-rows
+    aria-label="{{ section.settings.heading | strip_html | default: 'As seen in' }} — {{ section.settings.view_all_label | strip_html }}"
+  >
     <div
       class="asi__row"
       data-asi-row
@@ -90,15 +95,14 @@
                   {%- endif -%}
                 {%- endcapture -%}
 
-                {%- if logo.settings.link != blank -%}
-                  <a class="asi__logo" href="{{ logo.settings.link }}" data-asi-logo {{ logo.shopify_attributes }}>
-                    {{ logo_media }}
-                  </a>
-                {%- else -%}
-                  <span class="asi__logo" data-asi-logo {{ logo.shopify_attributes }}>
-                    {{ logo_media }}
-                  </span>
-                {%- endif -%}
+                {%- comment -%}
+                  A plain span, never a link: the whole row is one link to the
+                  press page now, and an anchor nested inside it would be
+                  invalid HTML.
+                {%- endcomment -%}
+                <span class="asi__logo" data-asi-logo {{ logo.shopify_attributes }}>
+                  {{ logo_media }}
+                </span>
 
                 <span class="asi__sep" aria-hidden="true">
                   {%- if separator != blank -%}
@@ -111,7 +115,18 @@
         {%- endfor -%}
       </div>
     </div>
-  </div>
+  </a>
+
+  {%- comment -%}
+    The pointer tag — same construction as the testimonials rail's: a pill
+    that rides beside the cursor, flips in over the row, and says what a
+    click here does. Re-parented to <body> by the script.
+  {%- endcomment -%}
+  <span class="asi__cursor" data-asi-cursor aria-hidden="true">
+    <span class="asi__cursor-flip" data-asi-cursor-flip>
+      <span class="asi__cursor-text">{{ section.settings.view_all_label }}</span>
+    </span>
+  </span>
 </div>
 
 <script src="{{ 'as-seen-in.js' | asset_url }}" defer="defer"></script>
@@ -220,21 +235,33 @@
       "default": "1"
     },
     {
-      "type": "checkbox",
-      "id": "slow_on_hover",
-      "label": "Slow down while hovering",
-      "info": "Holds a logo still enough to be read and clicked.",
-      "default": true
+      "type": "header",
+      "content": "View all"
     },
     {
-      "type": "range",
-      "id": "dim_opacity",
-      "min": 0,
-      "max": 0.9,
-      "step": 0.1,
-      "label": "Dim the rest to",
-      "info": "How far the other logos fade while one is hovered.",
-      "default": 0.2
+      "type": "text",
+      "id": "view_all_label",
+      "label": "Pointer tag text",
+      "default": "View All"
+    },
+    {
+      "type": "text",
+      "id": "view_all_url",
+      "label": "Link",
+      "info": "Where the row goes when clicked.",
+      "default": "/pages/as-seen-in"
+    },
+    {
+      "type": "color",
+      "id": "tag_background",
+      "label": "Pointer tag background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tag_color",
+      "label": "Pointer tag text color",
+      "default": "#FFFFFF"
     },
     {
       "type": "header",
@@ -337,11 +364,6 @@
           "id": "name",
           "label": "Publication name",
           "info": "Read out in place of the image."
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Link"
         }
       ]
     }

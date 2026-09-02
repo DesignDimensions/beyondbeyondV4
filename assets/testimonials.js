@@ -24,7 +24,15 @@
   var TILT_MAX = 28;
   var TILT_FACTOR = 0.85;
   var TILT_VERTICAL_BOOST = 1.6;
+  var TILT_SMOOTHING = 0.35;
   var FADE = 0.5;
+  /* A video's hover box is tall but not much wider than the eye naturally
+     wanders while reading it, so an arcing path — down toward the product
+     card, say, or just a shaky hand — clips the edge for a frame or two.
+     Closing on the spot reads as the tag breaking; holding it open for a
+     beat and only closing if the pointer really has left lets it keep
+     gliding with the cursor through that instead. */
+  var CLOSE_DELAY = 180;
 
   // Shared live pointer position. Only ever used to place the tag — whether it
   // counts as hovering a video is decided from the browser's own :hover state,
@@ -303,6 +311,14 @@
     var current = null;
     var prevX = 0;
     var prevY = 0;
+    // Eased rather than the raw per-frame delta: a short, slow movement's
+    // real signal is only a pixel or two, so on its own it is mostly the
+    // noise of pointer coalescing landing unevenly across frames — some
+    // frames get no delta and the next one gets it all. Chasing that raw
+    // value tilts in jerks; easing it lets a real stop decay out instead of
+    // snapping flat.
+    var tiltDeltaX = 0;
+    var tiltDeltaY = 0;
 
     var open = function () {
       if (isOpen) return;
@@ -354,18 +370,30 @@
 
       var card = hovered();
 
-      if (card && card !== current) {
-        // Entering a different video: place the tag before showing it, or it
-        // would fly in from wherever it was last left.
-        if (!current) gsap.set(tag, { x: mouseX + CURSOR_OFFSET_X, y: mouseY });
-        current = card;
-        prevX = mouseX;
-        prevY = mouseY;
-        self.setTagLabel(card.muted ? self.unmuteLabel : self.muteLabel);
-        open();
-      } else if (!card && current) {
-        current = null;
-        close();
+      if (card) {
+        // Back on a video before the grace period ran out: the tag was
+        // never really left, so there is nothing to cancel back out of.
+        if (self.cursorCloseTimer) {
+          clearTimeout(self.cursorCloseTimer);
+          self.cursorCloseTimer = null;
+        }
+
+        if (card !== current) {
+          // Entering a different video: place the tag before showing it, or
+          // it would fly in from wherever it was last left.
+          if (!current) gsap.set(tag, { x: mouseX + CURSOR_OFFSET_X, y: mouseY });
+          current = card;
+          prevX = mouseX;
+          prevY = mouseY;
+          self.setTagLabel(card.muted ? self.unmuteLabel : self.muteLabel);
+          open();
+        }
+      } else if (current && !self.cursorCloseTimer) {
+        self.cursorCloseTimer = setTimeout(function () {
+          self.cursorCloseTimer = null;
+          current = null;
+          close();
+        }, CLOSE_DELAY);
       }
 
       if (!current) return;
@@ -376,7 +404,9 @@
       if (!isFlipping) {
         var deltaX = mouseX - prevX;
         var deltaY = mouseY - prevY;
-        var raw = -deltaX + deltaY * TILT_VERTICAL_BOOST;
+        tiltDeltaX += (deltaX - tiltDeltaX) * TILT_SMOOTHING;
+        tiltDeltaY += (deltaY - tiltDeltaY) * TILT_SMOOTHING;
+        var raw = -tiltDeltaX + tiltDeltaY * TILT_VERTICAL_BOOST;
         setTilt(gsap.utils.clamp(-TILT_MAX, TILT_MAX, raw * TILT_FACTOR));
       }
 
@@ -395,6 +425,7 @@
     window.removeEventListener('resize', this.onResize);
     if (this.observer) this.observer.disconnect();
     if (this.gsap && this.tick) this.gsap.ticker.remove(this.tick);
+    if (this.cursorCloseTimer) clearTimeout(this.cursorCloseTimer);
     // The tag lives on <body> now, so it does not leave with the section.
     if (this.cursorTag && this.cursorTag.parentNode) this.cursorTag.parentNode.removeChild(this.cursorTag);
     this.ready = false;

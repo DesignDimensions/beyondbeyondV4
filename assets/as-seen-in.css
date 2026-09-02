@@ -6,6 +6,10 @@
   position: relative;
   padding-top: var(--asi-pad-top, 60px);
   overflow: hidden;
+  /* The row underneath carries its own `grab`, but everywhere else in the
+     section — heading, padding, glow — is also "view all" now, so it reads
+     as clickable rather than incidental. */
+  cursor: pointer;
 }
 
 /* A soft bloom sitting behind the logos rather than a background on the
@@ -23,6 +27,8 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
+  color: inherit;
+  text-decoration: none;
 }
 
 /* The row is the window; the track is longer than it and slides. Nothing is
@@ -70,9 +76,6 @@
   justify-content: center;
   flex: 0 0 auto;
   text-decoration: none;
-  /* Opacity alone, so nothing about the logo's size or position changes when
-     the row dims around it and the drift stays perfectly even. */
-  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .asi__logo-img {
@@ -90,7 +93,6 @@
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .asi__sep-img {
@@ -100,34 +102,50 @@
   max-width: none;
 }
 
-/* Hovering one logo is a spotlight: everything else in the section — both
-   rows, and the separators between them — falls back. Driven by a class on
-   the section rather than `:hover` on the siblings, because the logo under the
-   pointer belongs to whichever copy of the sequence happens to be passing. */
-.asi.is-focusing .asi__logo,
-.asi.is-focusing .asi__sep {
-  opacity: var(--asi-dim, 0.2);
-}
-
-.asi.is-focusing .asi__logo.is-hovered {
-  opacity: 1;
-}
-
 /* --------------------------------------------------------------------------
-   Motion
+   Pointer tag
    --------------------------------------------------------------------------
-   The rows are moved frame by frame from the script rather than by an
-   animation here: their position has to be a value a hand on the row can take
-   back mid-flight, and a keyframe animation would never give it up. Reduced
-   motion stops the drift there — the rows stay draggable, since that movement
-   is the reader's own doing.
+   Same construction as the testimonials rail's: a pill that rides beside the
+   cursor over the row and says what a click will do. No per-target label
+   swap here — the whole row is one link, so the tag only ever says one
+   thing.
    -------------------------------------------------------------------------- */
 
-@media (prefers-reduced-motion: reduce) {
+.asi__cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: none;
+  pointer-events: none;
+  will-change: transform;
+}
 
-  .asi__logo,
-  .asi__sep {
-    transition-duration: 0.01ms;
+.asi__cursor.is-enabled {
+  display: flex;
+}
+
+.asi__cursor-flip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  background: var(--asi-tag-bg, #000);
+  color: var(--asi-tag-fg, #fff);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+@media (hover: none),
+(pointer: coarse) {
+  .asi__cursor {
+    display: none !important;
   }
 }
 

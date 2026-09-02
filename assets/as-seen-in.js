@@ -2,23 +2,36 @@
  * As Seen In
  *
  * Two rows of press logos drifting endlessly, and grabbable — you can catch a
- * row, throw it, and watch it settle back into its drift.
+ * row, throw it, and watch it settle back into its drift. The whole row is
+ * one link to the press page: a pointer tag rides the cursor over it saying
+ * so, and a plain click (not a throw) follows it.
  *
  * Position is driven per frame rather than by a tween, because a tween owns the
  * value it animates and a hand on the row has to be able to take it back
  * mid-flight. Each row keeps an offset and a velocity: the offset wraps at one
  * sequence's width, which is what makes the loop endless with no seam to hide,
  * and the velocity is only ever eased toward whatever it should be — the drift,
- * a hover's slow-down, or the speed of a throw. Nothing is ever set hard, so
- * every change of state arrives as a settle rather than a jump.
+ * or the speed of a throw. Nothing is ever set hard, so every change of state
+ * arrives as a settle rather than a jump.
  *
  * GSAP drives the clock and the writes where the theme has loaded it; without
  * it the same arithmetic runs on requestAnimationFrame.
+ *
+ * The pointer tag is the same one the testimonials rail and the bikaneri
+ * kitchen banner use: a pill that rides beside the cursor, flips in and out,
+ * and tilts with the direction the pointer is moving. Split in two — the
+ * outer element only translates, the inner only rotates — because combining a
+ * percentage translation with a 3D rotation on one element shears it into a
+ * parallelogram instead of flipping. It is re-parented to <body>: any
+ * transform on an ancestor, even an identity one left behind by a finished
+ * tween, would make that ancestor the containing block for a fixed element
+ * and strand the tag far from the pointer. Unlike the testimonials tag, the
+ * label here never changes — the whole row is one link, so there is only ever
+ * one thing for it to say.
  */
 (function () {
   'use strict';
 
-  var HOVER_SCALE = 0.12;
   /* Seconds for a row to give up a throw and be drifting again. Long enough to
      read as momentum, short enough that the row never feels lost. */
   var SETTLE = 0.62;
@@ -26,6 +39,34 @@
   var DRAG_THRESHOLD = 4;
   var CLICK_CANCEL_DISTANCE = 8;
   var MAX_FRAME = 0.05;
+
+  var CURSOR_OFFSET_X = 22;
+  var TILT_MAX = 28;
+  var TILT_FACTOR = 0.85;
+  var TILT_VERTICAL_BOOST = 1.6;
+  var TILT_SMOOTHING = 0.35;
+  /* The row is a thin strip and the section's padding around it is where the
+     eye naturally drifts while reading the heading or just arriving from
+     elsewhere on the page, so the pointer clips outside `:hover` for a frame
+     or two on nearly every pass. Closing on the spot reads as the tag
+     breaking; holding it open for a beat and only closing if the pointer
+     really has left lets it keep gliding with the cursor through that
+     instead. */
+  var CLOSE_DELAY = 180;
+
+  // Shared live pointer position. Only ever used to place the tag — whether it
+  // counts as hovering the row is decided from the browser's own :hover state,
+  // which is the only thing that knows what is painted on top of what.
+  var mouseX = -Infinity;
+  var mouseY = -Infinity;
+  var hasMouse = false;
+
+  document.addEventListener('pointermove', function (event) {
+    if (event.pointerType !== 'mouse') return;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+    hasMouse = true;
+  });
 
   function reducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,10 +94,8 @@
     if (!elements.length) return;
 
     this.gsap = window.gsap || null;
+    this.fx = !!this.gsap && !reducedMotion();
     this.speed = parseFloat(root.dataset.speed) || 45;
-    this.slowOnHover = root.dataset.hoverSlow === 'true';
-    this.scale = 1;
-    this.hovered = null;
     this.swallowClick = false;
     this.frameId = null;
     this.lastTime = 0;
@@ -85,6 +124,7 @@
     this.bind();
     this.build();
     this.start();
+    this.initCursor();
 
     // A logo that arrives late changes the width the loop turns on, and a row
     // measured before it would drift out of step with itself.
@@ -195,7 +235,7 @@
         return;
       }
 
-      var target = self.still ? 0 : row.direction * self.speed * self.scale;
+      var target = self.still ? 0 : row.direction * self.speed;
       row.velocity += (target - row.velocity) * pull;
       row.x = wrap(row.x + row.velocity * step, row.width);
       self.render(row);
@@ -224,41 +264,26 @@
       });
     });
 
-    // A throw that ends over a link must not also follow it.
+    // The row itself is a real link and navigates on its own; everywhere
+    // else in the section — the heading, the padding, the glow — is not,
+    // so a plain click there is sent to the same place by hand. Either way,
+    // a throw that ends over the link must not also follow it.
+    var rowsLink = this.root.querySelector('[data-asi-rows]');
+    this.viewAllHref = rowsLink && rowsLink.getAttribute('href');
+
     this.root.addEventListener(
       'click',
       function (event) {
-        if (!self.swallowClick) return;
-        event.preventDefault();
-        event.stopPropagation();
+        if (self.swallowClick) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        if (!self.viewAllHref || closestFrom(event.target, '[data-asi-rows]')) return;
+        window.location.assign(self.viewAllHref);
       },
       true
     );
-
-    // Delegated: the logo under the pointer belongs to whichever copy of the
-    // sequence is passing, and clones arrive after this runs.
-    this.root.addEventListener('pointerover', function (event) {
-      var logo = closestFrom(event.target, '[data-asi-logo]');
-      if (!logo || logo === self.hovered) return;
-      self.focus(logo);
-    });
-
-    this.root.addEventListener('pointerout', function (event) {
-      var logo = closestFrom(event.target, '[data-asi-logo]');
-      if (!logo) return;
-      // Moving between two children of the same logo is not leaving it.
-      if (closestFrom(event.relatedTarget, '[data-asi-logo]') === logo) return;
-      self.blur();
-    });
-
-    this.root.addEventListener('focusin', function (event) {
-      var logo = closestFrom(event.target, '[data-asi-logo]');
-      if (logo) self.focus(logo);
-    });
-
-    this.root.addEventListener('focusout', function () {
-      self.blur();
-    });
 
     window.addEventListener('resize', this.onResize);
 
@@ -311,7 +336,8 @@
       this.root.classList.add('is-grabbing');
       // Not before now: a captured pointer has its click dispatched to the
       // element holding the capture, so capturing on pointerdown would take
-      // every click away from the logo links inside the row.
+      // every plain click away from the row's own link before it could
+      // navigate.
       if (row.element.setPointerCapture) row.element.setPointerCapture(drag.id);
     }
 
@@ -347,24 +373,137 @@
   };
 
   /* ------------------------------------------------------------------
-     Hover
+     Pointer tag
      ------------------------------------------------------------------ */
 
-  AsSeenIn.prototype.focus = function (logo) {
-    if (this.hovered) this.hovered.classList.remove('is-hovered');
-    this.hovered = logo;
-    logo.classList.add('is-hovered');
-    this.root.classList.add('is-focusing');
-    // Eased by the same pull as everything else: the row leans into the slower
-    // speed rather than dropping to it.
-    this.scale = this.slowOnHover ? HOVER_SCALE : 1;
-  };
+  AsSeenIn.prototype.initCursor = function () {
+    var self = this;
+    var root = this.root;
+    var tag = root.querySelector('[data-asi-cursor]');
+    var flip = tag && tag.querySelector('[data-asi-cursor-flip]');
 
-  AsSeenIn.prototype.blur = function () {
-    if (this.hovered) this.hovered.classList.remove('is-hovered');
-    this.hovered = null;
-    this.root.classList.remove('is-focusing');
-    this.scale = 1;
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!tag || !flip || !this.fx || !fine) return;
+
+    document.body.appendChild(tag);
+    tag.classList.add('is-enabled');
+    this.cursorTag = tag;
+
+    var gsap = this.gsap;
+    gsap.set(tag, { xPercent: 0, yPercent: -50 });
+    gsap.set(flip, {
+      transformOrigin: 'center center',
+      transformPerspective: 200,
+      rotationX: -100,
+      opacity: 0,
+    });
+
+    var moveX = gsap.quickTo(tag, 'x', { duration: 0.55, ease: 'power3' });
+    var moveY = gsap.quickTo(tag, 'y', { duration: 0.55, ease: 'power3' });
+    var setTilt = gsap.quickTo(flip, 'rotation', { duration: 0.3, ease: 'power2' });
+
+    var isOpen = false;
+    var isFlipping = false;
+    var prevX = 0;
+    var prevY = 0;
+    // Eased rather than the raw per-frame delta: a short, slow movement's
+    // real signal is only a pixel or two, so on its own it is mostly the
+    // noise of pointer coalescing landing unevenly across frames — some
+    // frames get no delta and the next one gets it all. Chasing that raw
+    // value tilts in jerks; easing it lets a real stop decay out instead of
+    // snapping flat.
+    var tiltDeltaX = 0;
+    var tiltDeltaY = 0;
+
+    var open = function () {
+      if (isOpen) return;
+      isOpen = true;
+      isFlipping = true;
+      gsap.killTweensOf(flip, 'rotationX,opacity');
+      gsap.set(flip, { rotation: 0 });
+      gsap.to(flip, {
+        rotationX: 0,
+        opacity: 1,
+        duration: 0.6,
+        ease: 'back.out(1.15)',
+        onComplete: function () {
+          isFlipping = false;
+        },
+      });
+    };
+
+    var close = function () {
+      if (!isOpen) return;
+      isOpen = false;
+      isFlipping = true;
+      gsap.killTweensOf(flip, 'rotationX,opacity');
+      gsap.set(flip, { rotation: 0 });
+      gsap.to(flip, {
+        rotationX: -100,
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        onComplete: function () {
+          isFlipping = false;
+        },
+      });
+    };
+
+    // The whole section, not just the row's own link: the heading and the
+    // padding around the rows are part of "view all" too now, and hovering
+    // on and off just the logos as they drift past would flip the tag open
+    // and shut between them instead of holding it through the section.
+    var hovering = function () {
+      return root.matches(':hover');
+    };
+
+    this.cursorTick = function () {
+      if (!hasMouse) return;
+
+      var over = hovering();
+
+      if (over) {
+        // Back over the section before the grace period ran out: the tag
+        // was never really left, so there is nothing to cancel back out of.
+        if (self.cursorCloseTimer) {
+          clearTimeout(self.cursorCloseTimer);
+          self.cursorCloseTimer = null;
+        }
+
+        if (!isOpen) {
+          // Entering the row: place the tag before showing it, or it would
+          // fly in from wherever it was last left.
+          gsap.set(tag, { x: mouseX + CURSOR_OFFSET_X, y: mouseY });
+          prevX = mouseX;
+          prevY = mouseY;
+          open();
+        }
+      } else if (isOpen && !self.cursorCloseTimer) {
+        self.cursorCloseTimer = setTimeout(function () {
+          self.cursorCloseTimer = null;
+          close();
+        }, CLOSE_DELAY);
+      }
+
+      if (!isOpen) return;
+
+      moveX(mouseX + CURSOR_OFFSET_X);
+      moveY(mouseY);
+
+      if (!isFlipping) {
+        var deltaX = mouseX - prevX;
+        var deltaY = mouseY - prevY;
+        tiltDeltaX += (deltaX - tiltDeltaX) * TILT_SMOOTHING;
+        tiltDeltaY += (deltaY - tiltDeltaY) * TILT_SMOOTHING;
+        var raw = -tiltDeltaX + tiltDeltaY * TILT_VERTICAL_BOOST;
+        setTilt(gsap.utils.clamp(-TILT_MAX, TILT_MAX, raw * TILT_FACTOR));
+      }
+
+      prevX = mouseX;
+      prevY = mouseY;
+    };
+
+    gsap.ticker.add(this.cursorTick);
   };
 
   /* ------------------------------------------------------------------
@@ -376,6 +515,10 @@
     if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame);
     if (this.frameId) cancelAnimationFrame(this.frameId);
     if (this.gsap && this.tick) this.gsap.ticker.remove(this.tick);
+    if (this.gsap && this.cursorTick) this.gsap.ticker.remove(this.cursorTick);
+    if (this.cursorCloseTimer) clearTimeout(this.cursorCloseTimer);
+    // The tag lives on <body> now, so it does not leave with the section.
+    if (this.cursorTag && this.cursorTag.parentNode) this.cursorTag.parentNode.removeChild(this.cursorTag);
     if (this.observer) this.observer.disconnect();
     this.ready = false;
   };
