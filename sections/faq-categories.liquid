@@ -1,0 +1,489 @@
+{{ 'faq-categories.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'faq-categories.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  FAQ — every question the store answers, grouped into categories, with a rail
+  down the side that says which category you are in.
+
+  The page is the same shape as Legal: a `category` block opens a category and
+  names it in the rail, and every `question` block after it belongs to that
+  category until the next `category` block opens the following one. That is the
+  whole grouping rule, and it means a merchant can add a question, reorder two,
+  or add a category, without anyone touching this file.
+
+  A category's rail name and its heading are separate fields on purpose. The
+  design calls the second category "Product" in the rail and "The Ultimate
+  Night Repair cream" over its questions — a short label to navigate by, a full
+  one to read.
+
+  The questions are `<details>` because that is what they are, the same as the
+  contact page's FAQ. The browser owns opening and closing them, which is why
+  there is no script here for it: `faq-categories.js` only moves the rail.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  if heading == blank
+    assign heading = page.title
+  endif
+
+  comment
+    The rail's first entry is lit before a single scroll event has fired, so the
+    page never paints with empty radios. The script takes it from here.
+  endcomment
+  assign first_category = ''
+  for block in section.blocks
+    if block.type == 'category'
+      assign first_category = block.id
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="fqc{% if section.settings.offset_header %} fqc--under-header{% endif %}"
+  style="
+    --fqc-pad-top: {{ section.settings.padding_top }}px;
+    --fqc-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --fqc-gutter: {{ section.settings.gutter }}px;
+    --fqc-content-w: {{ section.settings.content_width }}px;
+    --fqc-bg: {{ section.settings.background }};
+    --fqc-ink: {{ section.settings.text_color }};
+    --fqc-title-color: {{ section.settings.title_color }};
+    --fqc-title-gap: {{ section.settings.title_gap }}px;
+    --fqc-gap: {{ section.settings.column_gap }}px;
+    --fqc-rail-w: {{ section.settings.rail_width }}px;
+    --fqc-rail-bg: {{ section.settings.rail_background }};
+    --fqc-rail-color: {{ section.settings.rail_color }};
+    --fqc-rail-item-gap: {{ section.settings.rail_item_gap }}px;
+    --fqc-radio-on: {{ section.settings.radio_active }};
+    --fqc-radio-off: {{ section.settings.radio_idle }};
+    --fqc-sticky-gap: {{ section.settings.sticky_gap }}px;
+    --fqc-band-bg: {{ section.settings.band_background }};
+    --fqc-band-color: {{ section.settings.band_color }};
+    --fqc-rule: {{ section.settings.rule_color }};
+    --fqc-group-gap: {{ section.settings.group_gap }}px;
+    --fqc-marker: {{ section.settings.marker_size }}px;
+  "
+  data-fqc
+  {{ section.shopify_attributes }}
+>
+  <div class="fqc__inner">
+    {%- if heading != blank -%}
+      <h1 class="fqc__title">{{ heading | escape }}</h1>
+    {%- endif -%}
+
+    <div class="fqc__row">
+      <nav
+        class="fqc__rail{% if section.settings.sticky_rail %} fqc__rail--sticky{% endif %}"
+        aria-label="{{ section.settings.rail_label | escape }}"
+        data-fqc-rail
+      >
+        <ul class="fqc__nav" id="fqc-nav-{{ section.id }}" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'category' -%}
+              {%- liquid
+                assign label = block.settings.nav_label
+                if label == blank
+                  assign label = block.settings.heading
+                endif
+              -%}
+              <li class="fqc__navitem{% if block.id == first_category %} is-current{% endif %}">
+                <a
+                  class="fqc__navlink{% if block.id == first_category %} is-active{% endif %}"
+                  href="#fqc-{{ block.id }}"
+                  {% if block.id == first_category %}aria-current="true"{% endif %}
+                  data-fqc-link
+                >
+                  <span class="fqc__radio" aria-hidden="true"></span>
+                  <span class="fqc__navlabel">{{ label | escape }}</span>
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+
+        {%- comment -%}
+          Narrow, the rail crosses the top of the page collapsed to the category
+          you are in, and this opens it to the rest. Hidden from the wide layout,
+          where every category is already listed and there is nothing to
+          disclose.
+        {%- endcomment -%}
+        <button
+          class="fqc__toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="fqc-nav-{{ section.id }}"
+          data-fqc-toggle
+        >
+          <span class="visually-hidden">{{ section.settings.rail_toggle_label | escape }}</span>
+          <svg class="fqc__chev" viewBox="0 0 36 36" width="36" height="36" fill="none" aria-hidden="true" focusable="false">
+            <path d="M11 14.5L18 21.5L25 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+
+      <div class="fqc__content">
+        {%- assign open = false -%}
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'category' -%}
+              {%- if open -%}
+                  </div>
+                </section>
+              {%- endif -%}
+              <section
+                class="fqc__group"
+                id="fqc-{{ block.id }}"
+                data-fqc-group
+                {{ block.shopify_attributes }}
+              >
+                <div class="fqc__band">
+                  <h2 class="fqc__band-title">{{ block.settings.heading | escape }}</h2>
+                </div>
+                <div class="fqc__list">
+              {%- liquid
+                assign open = true
+                assign current_category = block.id
+              -%}
+
+            {%- when 'question' -%}
+              {%- if open -%}
+                {%- comment -%}
+                  `name` is what makes a category behave as one accordion: the
+                  browser closes the open question when another is opened, with
+                  no script. It is scoped to the category the question is in —
+                  opening something under "Product" should not close something
+                  under "Orders", which are two lists that happen to share a
+                  page.
+
+                  It is also mutually exclusive with starting open: a shared
+                  `name` means one open at a time, so the two settings together
+                  would have the browser close all but the last on load. The
+                  setting that was asked for explicitly wins.
+                {%- endcomment -%}
+                <details
+                  class="fqc__item"
+                  {% if section.settings.single_open and section.settings.start_open == false %}name="fqc-{{ section.id }}-{{ current_category }}"{% endif %}
+                  {% if section.settings.start_open %}open{% endif %}
+                  {{ block.shopify_attributes }}
+                >
+                  <summary class="fqc__q">
+                    <span class="fqc__q-text">{{ block.settings.question | escape }}</span>
+                    <span class="fqc__marker" aria-hidden="true"></span>
+                  </summary>
+                  <div class="fqc__a">{{ block.settings.answer }}</div>
+                </details>
+              {%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+        {%- if open -%}
+            </div>
+          </section>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "FAQ Categories",
+  "tag": "section",
+  "class": "section-faq-categories",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page title",
+      "info": "Leave blank to use the page's own title."
+    },
+    {
+      "type": "checkbox",
+      "id": "offset_header",
+      "label": "Start below the header",
+      "info": "Turn on when this is the first section on the page. The site header floats over the page until it is scrolled, so the first section has to hold its own content clear of it.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "start_open",
+      "label": "Start with every answer open",
+      "info": "On as drawn. Turn off for a page that opens closed, which is the usual behaviour for a long list of questions.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "single_open",
+      "label": "Only one answer open at a time",
+      "info": "Opening a question closes the one before it, within its own category. Ignored while every answer starts open, since the two contradict each other.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "marker_size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Open/close marker size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 1000,
+      "max": 1400,
+      "step": 4,
+      "unit": "px",
+      "label": "Content width",
+      "info": "1320 to match the Legal page, which is drawn to the same layout.",
+      "default": 1320
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Side padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between rail and questions",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "group_gap",
+      "min": 24,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between categories",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "title_gap",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Space under the page title",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Navigation rail",
+      "info": "The list of categories beside the questions. It follows the category blocks below — add or reorder one and the rail follows."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_rail",
+      "label": "Keep the rail in view while scrolling",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rail_label",
+      "label": "Rail label for screen readers",
+      "default": "FAQ categories"
+    },
+    {
+      "type": "text",
+      "id": "rail_toggle_label",
+      "label": "Rail open button, for screen readers",
+      "info": "On phones the rail collapses to the category being read, with a button to open the rest. This names that button.",
+      "default": "Show all categories"
+    },
+    {
+      "type": "range",
+      "id": "rail_width",
+      "min": 280,
+      "max": 380,
+      "step": 1,
+      "unit": "px",
+      "label": "Rail width",
+      "info": "The design hugs its longest category name, which is about 264. This is wider to match the Legal page's rail, the two being sibling pages.",
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "rail_item_gap",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rail items",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "sticky_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap below the header",
+      "info": "How far the held rail keeps from the site header, and where a rail link lands.",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "rail_background",
+      "label": "Rail background",
+      "default": "#E6E6E6"
+    },
+    {
+      "type": "color",
+      "id": "rail_color",
+      "label": "Rail text",
+      "default": "#202020"
+    },
+    {
+      "type": "color",
+      "id": "radio_active",
+      "label": "Marker — current category",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "radio_idle",
+      "label": "Marker — the rest",
+      "default": "#808080"
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Page background",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Page title",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Question and answer text",
+      "default": "#202020"
+    },
+    {
+      "type": "color",
+      "id": "band_background",
+      "label": "Category heading band",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "band_color",
+      "label": "Category heading text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "rule_color",
+      "label": "Rules between questions",
+      "default": "#202020"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Opens a category and adds it to the rail. Every question below it belongs to this category until the next Category block."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "info": "Shown in the dark band above the questions.",
+          "default": "Category name"
+        },
+        {
+          "type": "text",
+          "id": "nav_label",
+          "label": "Rail label",
+          "info": "The short name to navigate by. Leave blank to reuse the heading."
+        }
+      ]
+    },
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Ask a question here"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>And answer it here.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Categories",
+      "blocks": [
+        { "type": "category" },
+        { "type": "question" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,473 @@
+/* ==========================================================================
+   FAQ — every question the store answers, grouped, with a rail that says where
+   you are
+   ==========================================================================
+   The same page as Legal wearing different contents: a tinted rail of category
+   names on the left, the questions on the right under a dark band naming each
+   category. What is different is the row — here it opens.
+
+   The rail is the third in this theme to hold itself level with a header that
+   moves. `all-collections.css` carries the long explanation of why the offset
+   is measured rather than declared; `legal-policies.css` is the same
+   arrangement as this one. They are kept as three because a section here owns
+   its own stylesheet, and a shared rail would couple three pages that are only
+   coincidentally alike.
+
+   Type: 40px for the page title and the band headings and 16px for the answers,
+   all on the store's six-size scale; 20px for the questions and the rail label,
+   which is not. That 20px is the same deliberate exception the Legal page
+   stands on — this page is drawn from the same Figma tokens, and rounding it to
+   22px would pull the questions out of proportion with their answers in exactly
+   the way it did there. See `desktop-type-scale` for the rule.
+   ========================================================================== */
+
+.fqc {
+  padding-top: var(--fqc-pad-top, 30px);
+  padding-bottom: var(--fqc-pad-bottom, 80px);
+  padding-left: var(--fqc-gutter, 64px);
+  padding-right: var(--fqc-gutter, 64px);
+  background-color: var(--fqc-bg, #f5f5f5);
+  color: var(--fqc-ink, #202020);
+}
+
+/* The site header is fixed and paints nothing of its own until the page has
+   scrolled, so a section leading a page holds its content clear of it. */
+.fqc--under-header {
+  padding-top: calc(var(--header-height, var(--header-height-static, 96px)) + var(--fqc-pad-top, 30px));
+}
+
+.fqc__inner {
+  max-width: var(--fqc-content-w, 1312px);
+  margin: 0 auto;
+}
+
+.fqc__title {
+  margin: 0 0 var(--fqc-title-gap, 56px);
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 64px;
+  letter-spacing: 0.8px;
+  color: var(--fqc-title-color, #000);
+}
+
+.fqc__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fqc-gap, 56px);
+}
+
+/* --------------------------------------------------------------------------
+   The rail
+   -------------------------------------------------------------------------- */
+
+.fqc__rail {
+  flex: 0 0 var(--fqc-rail-w, 360px);
+  max-width: var(--fqc-rail-w, 360px);
+  padding: var(--fqc-rail-pad, 24px);
+  background-color: var(--fqc-rail-bg, #e6e6e6);
+}
+
+/* Held in view while the questions scroll past it, at a distance measured each
+   frame rather than declared — the header hides itself on the way down the page
+   and any fixed number would be wrong half the time. `--fqc-sticky-top` is what
+   the script publishes; this is what stands before it runs. */
+.fqc__rail--sticky {
+  position: sticky;
+  top: var(--fqc-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--fqc-sticky-gap, 16px)));
+}
+
+.fqc__nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fqc-rail-item-gap, 24px);
+}
+
+.fqc__navitem {
+  margin: 0;
+}
+
+.fqc__navlink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--fqc-rail-color, #202020);
+  cursor: pointer;
+}
+
+/* Drawn rather than imported: two concentric circles that change on scroll, and
+   a circle is the one shape CSS reproduces exactly. The 36px box is the tap
+   target the design gives the 20px glyph. */
+.fqc__radio {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.fqc__radio::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--fqc-radio-off, #808080);
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Two inset shadows read outside-in, the first painting over the second: inside
+   the 2px border the well is 16px across, a 2px ring of the rail's own tint
+   holds the dot off the ring, and the flood fills what is left — a 12px dot. */
+.fqc__navlink.is-active .fqc__radio::before,
+.fqc__navlink[aria-current='true'] .fqc__radio::before {
+  border-color: var(--fqc-radio-on, #000);
+  box-shadow: inset 0 0 0 2px var(--fqc-rail-bg, #e6e6e6), inset 0 0 0 20px var(--fqc-radio-on, #000);
+}
+
+.fqc__navlabel {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+}
+
+.fqc__navlink:hover .fqc__radio::before {
+  border-color: var(--fqc-radio-on, #000);
+}
+
+/* --------------------------------------------------------------------------
+   The categories
+   -------------------------------------------------------------------------- */
+
+.fqc__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--fqc-content-pad-y, 40px) var(--fqc-content-pad-x, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fqc-group-gap, 64px);
+}
+
+/* `scroll-margin-top` is where a rail link lands: the same offset the rail is
+   holding, so a heading arrives level with it rather than behind the header. */
+.fqc__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fqc-band-gap, 40px);
+  scroll-margin-top: var(--fqc-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--fqc-sticky-gap, 16px)));
+}
+
+.fqc__band {
+  padding: var(--fqc-band-pad, 24px);
+  background-color: var(--fqc-band-bg, #171717);
+}
+
+/* Lighter than the page title above it and set at a closer line height — the
+   category names are labels on the page, not a second title competing with it,
+   and the design draws them that way. */
+.fqc__band-title {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 56px;
+  letter-spacing: 0;
+  color: var(--fqc-band-color, #fff);
+}
+
+/* --------------------------------------------------------------------------
+   A question
+   --------------------------------------------------------------------------
+   `<details>` because that is what a question is, the same as the contact
+   page's. The browser owns the open state, the keyboard behaviour and the
+   announcement; all this does is take the disclosure triangle off and put the
+   design's own marker where it belongs. */
+
+.fqc__item {
+  padding: var(--fqc-row-pad, 24px) 0;
+  border-bottom: 1px solid var(--fqc-rule, #202020);
+}
+
+.fqc__q {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  color: var(--fqc-ink, #202020);
+}
+
+.fqc__q::-webkit-details-marker {
+  display: none;
+}
+
+/* Only for keyboard use: a click on a question should not leave a ring behind
+   on the way to the answer. */
+.fqc__q:focus-visible {
+  outline: 2px solid var(--fqc-ink, #202020);
+  outline-offset: 4px;
+}
+
+.fqc__q-text {
+  min-width: 0;
+}
+
+/* Two bars, crossed. The upright one folds away as the question opens, so the
+   `+` becomes a `−` rather than being swapped for one. Sized in its own
+   variable because this is a glyph, not type. */
+.fqc__marker {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--fqc-marker, 16px);
+  height: var(--fqc-marker, 16px);
+  margin-top: 6px;
+  color: var(--fqc-ink, #202020);
+}
+
+.fqc__marker::before,
+.fqc__marker::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background-color: currentColor;
+  transform: translateY(-50%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fqc__marker::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.fqc__item[open] .fqc__marker::after {
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.fqc__a {
+  margin-top: var(--fqc-answer-gap, 12px);
+  font-size: 16px;
+  line-height: 28px;
+  letter-spacing: 0.32px;
+  color: var(--fqc-ink, #202020);
+}
+
+.fqc__a> :first-child {
+  margin-top: 0;
+}
+
+.fqc__a> :last-child {
+  margin-bottom: 0;
+}
+
+.fqc__a p {
+  margin: 0 0 var(--fqc-para-gap, 28px);
+}
+
+/* Numbered steps keep their indent — a number needs the room to stay legible.
+   Bulleted answers are set flat, the mark on the text's own left margin, the
+   way the policies are. */
+.fqc__a ol {
+  margin: 0 0 var(--fqc-para-gap, 28px);
+  padding-left: 24px;
+}
+
+.fqc__a ul {
+  margin: 0 0 var(--fqc-para-gap, 28px);
+  padding-left: 0;
+  list-style: none;
+}
+
+.fqc__a ul>li::before {
+  content: '•\00a0';
+}
+
+.fqc__a li {
+  margin: 0;
+}
+
+.fqc__a a {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   The rail's open button
+   --------------------------------------------------------------------------
+   Only ever shown in the stacked layout below. Wide, every category is already
+   listed and there is nothing left to disclose. */
+
+.fqc__toggle {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fqc-chev, #292929);
+  cursor: pointer;
+}
+
+.fqc__chev {
+  display: block;
+  width: 36px;
+  height: 36px;
+  transition: transform 0.2s ease;
+}
+
+.fqc__toggle[aria-expanded='true'] .fqc__chev {
+  transform: rotate(180deg);
+}
+
+/* --------------------------------------------------------------------------
+   Stacked
+   --------------------------------------------------------------------------
+   Below this width there is no room for a column of category names beside the
+   questions, so the rail crosses the top of the page instead, pinned under the
+   header and collapsed to whichever category you are in — the arrangement the
+   Legal page is drawn with for a phone, and the same one here.
+
+   `display: contents` is what lets the rail sit above the page title: the
+   two-column row stops being a box, its rail and its questions become items of
+   the page column, and `order` can then put the rail above a title that is not
+   its sibling in the markup. */
+
+@media screen and (max-width: 989px) {
+  .fqc {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* The rail, not the title, is what sits under the header now, and it sits
+     flush against it — so the section's top padding moves down to the title,
+     which the rail carries as its bottom margin. */
+  .fqc--under-header {
+    padding-top: var(--header-height, var(--header-height-static, 76px));
+  }
+
+  .fqc__inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fqc__row {
+    display: contents;
+  }
+
+  .fqc__rail {
+    order: -1;
+    flex: none;
+    max-width: none;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: var(--fqc-rail-gap, 40px);
+  }
+
+  .fqc__title {
+    order: 0;
+    padding-left: var(--fqc-gutter-narrow, 24px);
+    padding-right: var(--fqc-gutter-narrow, 24px);
+    margin-bottom: var(--fqc-title-gap-narrow, 24px);
+  }
+
+  .fqc__content {
+    order: 1;
+    padding: 0;
+  }
+
+  .fqc__rail--sticky {
+    top: var(--fqc-sticky-top, var(--header-height, var(--header-height-static, 76px)));
+    z-index: 2;
+  }
+
+  .fqc__nav {
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .fqc__toggle {
+    display: flex;
+  }
+
+  /* Closed, the rail is the one category you are in. The state lives on the
+     row, so the radio inside it keeps saying the same thing it says open. */
+  .fqc__rail:not(.is-open) .fqc__navitem:not(.is-current) {
+    display: none;
+  }
+
+  /* The section no longer holds the side padding, so the parts that still want
+     it take their own. The bands deliberately do not: they run to both edges. */
+  .fqc__item {
+    margin-left: var(--fqc-gutter-narrow, 24px);
+    margin-right: var(--fqc-gutter-narrow, 24px);
+  }
+
+  /* A category has to clear the pinned rail as well as the header now. The
+     script measures the rail and publishes the sum; this is the fallback. */
+  .fqc__group {
+    scroll-margin-top: var(--fqc-land, calc(var(--header-height, var(--header-height-static, 76px)) + var(--fqc-rail-h, 84px)));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phone
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 749px) {
+  .fqc__title {
+    font-size: 32px;
+    line-height: 52px;
+    letter-spacing: 0.64px;
+  }
+
+  .fqc__band-title {
+    font-size: 28px;
+    line-height: 40px;
+  }
+
+  .fqc__navlabel {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .fqc__q {
+    font-size: 16px;
+    line-height: 28px;
+    gap: 16px;
+  }
+
+  .fqc__marker {
+    margin-top: 6px;
+  }
+
+  .fqc__content {
+    gap: var(--fqc-group-gap-narrow, 24px);
+  }
+
+  .fqc__group {
+    gap: var(--fqc-band-gap-narrow, 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .fqc__navlink .fqc__radio::before,
+  .fqc__marker::before,
+  .fqc__marker::after,
+  .fqc__chev {
+    transition: none;
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "sections": {
+    "faq": {
+      "type": "faq-categories",
+      "blocks": {
+        "cat_orders": {
+          "type": "category",
+          "settings": {
+            "heading": "Orders",
+            "nav_label": "Orders"
+          }
+        },
+        "q_where": {
+          "type": "question",
+          "settings": {
+            "question": "Where can I buy Beyond Beyond products?",
+            "answer": "<p>Beyond Beyond products are available exclusively on our official website <strong>www.beyondbeyond.co.in</strong></p>"
+          }
+        },
+        "q_track": {
+          "type": "question",
+          "settings": {
+            "question": "How to track my order",
+            "answer": "<p>To track your order status, simply log into your account on our website. Navigate to the ‘My Orders’ section to view the details of your current and past purchases.</p><p>You can also check your order status directly by clicking on the link <strong>here</strong>.</p>"
+          }
+        },
+        "q_cancel": {
+          "type": "question",
+          "settings": {
+            "question": "Can I cancel or amend my order once placed?",
+            "answer": "<p>You may cancel your order within one hour of placing it on our website by accessing the \"My Account\" section on our website. Once the one-hour window has passed, cancellations will no longer be possible.</p><p>For prepaid orders canceled within the allowed timeframe, a full refund will be processed. The amount will be credited back to your original payment method within 24-48 business hours after the cancellation request has been successfully processed.</p>"
+          }
+        },
+        "q_return": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>Returns are eligible within 48 hours of delivery for all orders placed on beyondbeyond.in.</p><p>To ensure a smooth return process, please follow these steps:</p><ol><li>All items must be unused and returned with the original invoice.</li><li>Items should be in their original packaging, including price tags, labels, boxes, and any accompanying accessories.</li></ol><p>Note: All returned products will undergo a quality assessment before approval.</p>"
+          }
+        },
+        "q_refund": {
+          "type": "question",
+          "settings": {
+            "question": "What is your refund policy?",
+            "answer": "<p>Yes, refunds are processed for all returned orders after they successfully pass our quality assessment. Once the return is picked up, any applicable refunds will be credited to your account within 7 business days.</p>"
+          }
+        },
+        "q_payments": {
+          "type": "question",
+          "settings": {
+            "question": "What are the modes of payments do you accept?",
+            "answer": "<p>We offer multiple ways to pay for your order which include</p><p>- Credit and Debit Card<br>- Net Banking<br>- UPI</p>"
+          }
+        },
+        "q_intl": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>Currently, we ship within India. We are working on expanding our availability to international markets soon!</p>"
+          }
+        },
+        "cat_product": {
+          "type": "category",
+          "settings": {
+            "heading": "The Ultimate Night Repair cream",
+            "nav_label": "Product"
+          }
+        },
+        "q_what": {
+          "type": "question",
+          "settings": {
+            "question": "What is the Ultimate Night Repair Supercream?",
+            "answer": "<p>The Ultimate Night Repair Supercream is Beyond Beyond’s first flagship product, designed to work while you sleep—the time when skin naturally repairs itself. Infused with NAD+, high-grade Squalane, and a curated blend of clinical-grade actives, it revitalizes, hydrates, and fortifies skin at a cellular level.</p>"
+          }
+        },
+        "q_ingredients": {
+          "type": "question",
+          "settings": {
+            "question": "What are the key ingredients in the Ultimate Night Repair Supercream?",
+            "answer": "<p>Infused with a powerhouse blend of NAD+, Squalane, and Glycerin, The Ultimate Night Repair Supercream works at a cellular level to restore and rejuvenate while you sleep. Petrolatum and Cocoa Butter create a rich, occlusive barrier that locks in moisture, while Shea Butter deeply nourishes and softens the skin. Panthenol calms and soothes, ensuring overnight repair for a plump, resilient, and luminous complexion by morning.</p>"
+          }
+        },
+        "q_whynight": {
+          "type": "question",
+          "settings": {
+            "question": "Why is this a \"Night Repair\" cream?",
+            "answer": "<p>At night, your skin undergoes its most active regeneration phase. This cream is designed to:<br>Support overnight repair – enhances natural cell turnover.<br>Boost hydration and plumpness – so skin wakes up refreshed.<br>Deliver high-potency actives – ensuring deeper penetration without external stressors (sun, pollution).</p>"
+          }
+        },
+        "q_skintypes": {
+          "type": "question",
+          "settings": {
+            "question": "Is this suitable for all skin types?",
+            "answer": "<p>Yes! The formulation is designed to be gentle yet effective for:<br>Dry &amp; Dehydrated Skin – Boosts hydration &amp; strengthens barrier.<br>Aging &amp; Mature Skin – Restores elasticity &amp; reduces wrinkles.<br>Oily &amp; Combination Skin – Lightweight, non-greasy texture.<br>Sensitive Skin – Free from irritants, making it safe for reactive skin.</p>"
+          }
+        },
+        "q_howuse": {
+          "type": "question",
+          "settings": {
+            "question": "How do I use the Ultimate Night Repair Supercream?",
+            "answer": "<p>Take a generous amount, warm it between your hands, and apply to clean skin every night as the final step in your routine. Gently massage it into your face and neck, letting the actives absorb deeply for overnight repair.</p>"
+          }
+        },
+        "q_actives": {
+          "type": "question",
+          "settings": {
+            "question": "Can I use it with other actives like Retinol or Vitamin C?",
+            "answer": "<p>Yes! NAD+ is a versatile molecule that works well with:<br>Retinol &amp; Peptides – Enhances anti-aging effects.<br>Hyaluronic Acid – Boosts hydration synergy.<br>Vitamin C &amp; Antioxidants – Strengthens brightening effects.<br>Barrier-Building Ingredients – Supports repair alongside ceramides and fatty acids.</p>"
+          }
+        },
+        "q_cruelty": {
+          "type": "question",
+          "settings": {
+            "question": "Is the product cruelty-free?",
+            "answer": "<p>Our NAD+ is carefully extracted in European labs, and our products are formulated and crafted in India using high-quality, dermatologically-tested ingredients.</p>"
+          }
+        },
+        "q_allergy": {
+          "type": "question",
+          "settings": {
+            "question": "How can I determine if I am allergic to the product or any of its ingredients?",
+            "answer": "<p>All Beyond Beyond products are clinically tested, formulated for all skin types—including sensitive skin—and safe for regular use. However, if you have concerns about how your skin may react, we recommend conducting a patch test before full application.</p><p>How to Perform a Patch Test:</p><p>Step 1: Apply a small amount of the product to a clean area near your jawline or behind your ear.<br>Step 2: Keep the area dry and undisturbed.<br>Step 3: Leave the product on for 4-6 hours before gently wiping it off.<br>Step 4: If you notice redness, irritation, or discomfort, discontinue use. If the reaction persists, consult a dermatologist.</p>"
+          }
+        },
+        "cat_science": {
+          "type": "category",
+          "settings": {
+            "heading": "Skincare Science",
+            "nav_label": "Skincare Science"
+          }
+        },
+        "q_clean": {
+          "type": "question",
+          "settings": {
+            "question": "What does \"Clean Clinical\" mean?",
+            "answer": "<p>Clean Clinical means that our formulations are:<br>Scientifically backed – developed with proven ingredients.<br>Free from harmful additives – no parabens, sulfates, phthalates, alcohol, or synthetic fragrance.<br>Dermatologist-approved – tested for safety and efficacy.<br>Small-batch production – to maintain ingredient integrity and freshness.</p>"
+          }
+        },
+        "q_nad": {
+          "type": "question",
+          "settings": {
+            "question": "What is NAD+? Why is it important in skincare?",
+            "answer": "<p>NAD+ (Nicotinamide Adenine Dinucleotide) is a coenzyme found in every living cell. It plays a crucial role in cellular energy production, DNA repair, and overall skin longevity. As we age, NAD+ levels decline, leading to skin dullness, wrinkles, and loss of elasticity. By replenishing NAD+ topically, we restore skin’s youthful function and resilience.</p>"
+          }
+        },
+        "q_nadbenefit": {
+          "type": "question",
+          "settings": {
+            "question": "How does NAD+ benefit my skin?",
+            "answer": "<p>NAD+ is a game-changer in pro-aging skincare, offering:<br>Boosted Cellular Energy – Restores skin function for improved vitality.</p><p>DNA Repair &amp; Longevity – Slows visible aging at a genetic level.<br>Deep Hydration &amp; Barrier Strength – Locks in moisture and prevents transepidermal water loss.<br>Brighter &amp; Smoother Skin – Encourages skin renewal for a radiant glow.<br>Collagen &amp; Elasticity Support – Helps maintain firmness and reduces fine lines.</p>"
+          }
+        },
+        "q_nadproven": {
+          "type": "question",
+          "settings": {
+            "question": "Is NAD+ scientifically proven in skincare?",
+            "answer": "<p>Yes. Studies have shown that NAD+ plays a critical role in skin health and aging by supporting cellular metabolism, boosting collagen production, and aiding in DNA repair. It is considered one of the most promising advancements in dermatology for long-term skin wellness.</p>"
+          }
+        },
+        "q_nadabsorb": {
+          "type": "question",
+          "settings": {
+            "question": "Can NAD+ be absorbed through the skin?",
+            "answer": "<p>Absolutely! Our NAD+ is formulated for deep absorption, allowing it to penetrate skin cells effectively. The form used in Beyond Beyond’s products is highly bioavailable, meaning your skin can utilize it efficiently for maximum benefit.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "cat_orders",
+        "q_where",
+        "q_track",
+        "q_cancel",
+        "q_return",
+        "q_refund",
+        "q_payments",
+        "q_intl",
+        "cat_product",
+        "q_what",
+        "q_ingredients",
+        "q_whynight",
+        "q_skintypes",
+        "q_howuse",
+        "q_actives",
+        "q_cruelty",
+        "q_allergy",
+        "cat_science",
+        "q_clean",
+        "q_nad",
+        "q_nadbenefit",
+        "q_nadproven",
+        "q_nadabsorb"
+      ],
+      "settings": {
+        "heading": "FAQ",
+        "offset_header": true,
+        "start_open": true,
+        "single_open": false,
+        "marker_size": 16,
+        "content_width": 1320,
+        "gutter": 64,
+        "column_gap": 56,
+        "group_gap": 64,
+        "title_gap": 56,
+        "padding_top": 30,
+        "padding_bottom": 80,
+        "sticky_rail": true,
+        "rail_label": "FAQ categories",
+        "rail_toggle_label": "Show all categories",
+        "rail_width": 360,
+        "rail_item_gap": 24,
+        "sticky_gap": 16,
+        "rail_background": "#e6e6e6",
+        "rail_color": "#202020",
+        "radio_active": "#000000",
+        "radio_idle": "#808080",
+        "background": "#f5f5f5",
+        "title_color": "#000000",
+        "text_color": "#202020",
+        "band_background": "#171717",
+        "band_color": "#ffffff",
+        "rule_color": "#202020"
+      }
+    }
+  },
+  "order": [
+    "faq"
+  ]
+}
