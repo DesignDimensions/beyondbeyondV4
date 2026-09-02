@@ -159,7 +159,7 @@
       var discount = chip.getAttribute('data-discount') || '';
       if (badgeEl) {
         badgeEl.hidden = !discount;
-        if (discount) badgeEl.textContent = '-' + discount + '% OFF';
+        if (discount) badgeEl.textContent = discount + '% OFF';
       }
 
       if (atc) {

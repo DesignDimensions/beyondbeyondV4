@@ -123,8 +123,8 @@
         "callout_left": {
           "type": "callout",
           "settings": {
-            "title": "Lorem ipsum",
-            "text": "<p>Lorem ipsum dolor sit amet</p>",
+            "title": "RESTORES",
+            "text": "<p>Cellular energy</p>",
             "text_x": 4,
             "text_y": 40,
             "dot_x": 24,
@@ -138,8 +138,8 @@
         "callout_top_right": {
           "type": "callout",
           "settings": {
-            "title": "Lorem",
-            "text": "<p>Lorem ipsum dolor sit amet</p>",
+            "title": "BALANCES",
+            "text": "<p>Inflammation</p>",
             "text_x": 64,
             "text_y": 6,
             "dot_x": 63,
@@ -153,8 +153,8 @@
         "callout_bottom_right": {
           "type": "callout",
           "settings": {
-            "title": "Lorem ipsum doret",
-            "text": "<p>Lorem ipsum dolor sit amet</p>",
+            "title": "REDUCES",
+            "text": "<p>Visible signs of ageing</p>",
             "text_x": 64,
             "text_y": 70,
             "dot_x": 63,
@@ -173,12 +173,12 @@
       ],
       "name": "Philosophy Bubble",
       "settings": {
-        "heading": "Lorem ipsum diam id",
+        "heading": "How NAD+ Works",
         "bubble_style": "gel",
         "bubble_size": 340,
-        "label_image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/WHAT_IS_NAD.png?v=1786704571",
-        "label_image_w": 371,
-        "label_image_h": 217,
+        "label_image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/NAD.png?v=1788353138",
+        "label_image_w": 247,
+        "label_image_h": 69,
         "label_scale": 52,
         "label_alt": "What is NAD+",
         "label_small": "WHAT IS",
@@ -420,7 +420,7 @@
         "logo_vogue": {
           "type": "logo",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Frame_1321319004_1.png?v=1787043113",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-vogue-india.svg?v=1788354169",
             "name": "Vogue India",
             "link": ""
           }
@@ -428,7 +428,7 @@
         "logo_cosmopolitan": {
           "type": "logo",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_2_1_b4215a6b-8d52-496e-b612-29d92a5ba077.png?v=1787043112",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-cosmopolitan.png?v=1788354173",
             "name": "Cosmopolitan India",
             "link": ""
           }
@@ -436,7 +436,7 @@
         "logo_grazia": {
           "type": "logo",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Asset_1_4_1.png?v=1787043110",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-grazia.png?v=1788354176",
             "name": "Grazia",
             "link": ""
           }
@@ -444,8 +444,56 @@
         "logo_elle": {
           "type": "logo",
           "settings": {
-            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Page-1_48656e87-4f44-4ab1-a73b-99ecb359dac3.png?v=1787043109",
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-elle.svg?v=1788354177",
             "name": "Elle",
+            "link": ""
+          }
+        },
+        "logo_style_list": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-the-style-list.png?v=1788354184",
+            "name": "The Style List",
+            "link": ""
+          }
+        },
+        "logo_femina": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-femina.svg?v=1788354186",
+            "name": "Femina",
+            "link": ""
+          }
+        },
+        "logo_manifest": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-manifest.png?v=1788354188",
+            "name": "Manifest",
+            "link": ""
+          }
+        },
+        "logo_midday": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-mid-day.svg?v=1788354191",
+            "name": "Mid-day",
+            "link": ""
+          }
+        },
+        "logo_bazaar": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-harpers-bazaar.svg?v=1788354194",
+            "name": "Harper's Bazaar",
+            "link": ""
+          }
+        },
+        "logo_deccan": {
+          "type": "logo",
+          "settings": {
+            "image_url": "https://cdn.shopify.com/s/files/1/0715/1157/2666/files/asi-deccan-chronicle.png?v=1788354196",
+            "name": "Deccan Chronicle",
             "link": ""
           }
         }
@@ -454,7 +502,13 @@
         "logo_vogue",
         "logo_cosmopolitan",
         "logo_grazia",
-        "logo_elle"
+        "logo_elle",
+        "logo_style_list",
+        "logo_femina",
+        "logo_manifest",
+        "logo_midday",
+        "logo_bazaar",
+        "logo_deccan"
       ],
       "name": "As Seen In",
       "settings": {

@@ -211,14 +211,34 @@
       </div>
     </div>
 
+    {%- comment -%}
+      A callout whose dot sits to the right of its own text box is a
+      left-side callout: `text_x` is only the far (left) edge merchants drag
+      to control wrap width, so short copy left-aligned inside it strands
+      itself far from the dot it belongs to. Anchoring from the dot instead,
+      with the text right-aligned, keeps the near edge glued to the dot no
+      matter how short or long the copy is — the box only ever grows away
+      from the dot, never leaves a gap beside it.
+    {%- endcomment -%}
     {%- for block in section.blocks -%}
-      {%- assign b = block.settings -%}
+      {%- liquid
+        assign b = block.settings
+        assign align_right = false
+        if b.dot_x > b.text_x
+          assign align_right = true
+          assign right_x = 101 | minus: b.dot_x
+        endif
+      -%}
       <div
-        class="hp-callout"
+        class="hp-callout{% if align_right %} hp-callout--align-right{% endif %}"
         data-hp-reveal
         data-index="{{ forloop.index0 }}"
         style="
-          left: {{ b.text_x }}%;
+          {%- if align_right -%}
+            right: {{ right_x }}%;
+          {%- else -%}
+            left: {{ b.text_x }}%;
+          {%- endif -%}
           top: {{ b.text_y }}%;
           --hp-delay: {{ forloop.index0 | times: 120 }}ms;
         "

@@ -98,6 +98,51 @@
       this.initBlob();
       this.armReveal();
       this.watch();
+      this.fitStage();
+      this.watchFit();
+    }
+
+    /* The stage has no in-flow content of its own — the bubble, dots, lines
+       and callouts are all `position: absolute`, placed by percentages of
+       the stage's own box, so nothing inside it can give it an intrinsic
+       height. `--hp-stage-h` stays as the reference those percentages
+       resolve against (and the no-JS fallback), but the height actually
+       rendered is trimmed to fit the content: drop back to that reference,
+       measure how far the content reaches from it, then pin the stage
+       there. Resetting first each time matters — resolving against last
+       run's already-trimmed height, instead of the stable reference, would
+       creep the stage shorter on every resize. */
+    fitStage() {
+      if (!this.stage) return;
+
+      this.stage.style.removeProperty('height');
+
+      const nodes = this.stage.querySelectorAll('.hp-bubble-wrap, .hp-callout, .hp-dot');
+      let maxBottom = 0;
+      nodes.forEach((el) => {
+        const bottom = el.offsetTop + el.offsetHeight;
+        if (bottom > maxBottom) maxBottom = bottom;
+      });
+
+      if (maxBottom > 0) this.stage.style.height = `${Math.ceil(maxBottom)}px`;
+    }
+
+    /* Refit on resize — a narrower stage can wrap a callout onto an extra
+       line — and once webfonts land, which changes the same text metrics
+       after the initial, pre-font layout has already been measured. */
+    watchFit() {
+      this.onFitResize = () => {
+        if (this.fitRaf) return;
+        this.fitRaf = requestAnimationFrame(() => {
+          this.fitRaf = null;
+          this.fitStage();
+        });
+      };
+      window.addEventListener('resize', this.onFitResize, { passive: true });
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => this.fitStage());
+      }
     }
 
     /* The blob replaces the flat CSS bubble; if it can't start, what's already
@@ -398,6 +443,8 @@
       if (this.io) this.io.disconnect();
       if (this.ro) this.ro.disconnect();
       if (this.onResize) window.removeEventListener('resize', this.onResize);
+      if (this.onFitResize) window.removeEventListener('resize', this.onFitResize);
+      if (this.fitRaf) cancelAnimationFrame(this.fitRaf);
       if (this.blob) this.blob.destroy();
     }
   }

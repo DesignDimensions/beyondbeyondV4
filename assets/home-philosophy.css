@@ -1,10 +1,16 @@
 /* ==========================================================================
    Philosophy Bubble — a floating gel bubble with three annotated callouts
    ==========================================================================
-   The stage is a fixed-height box on desktop; everything inside it is placed
-   with percentages so the art stays composed as the viewport changes. Below
-   750px the whole thing collapses into a plain stack and the connector lines
-   drop away, since there is nothing left to connect.
+   Everything inside the stage is placed with percentages of its own box, so
+   the art stays composed as the viewport changes. `--hp-stage-h` below is
+   only the reference those percentages resolve against — home-philosophy.js
+   measures the content once it's laid out and pins the stage to exactly
+   that height, and keeps refitting it on resize. This value is also what a
+   no-JS page is left with, so it stays a sane height on its own. Below
+   750px the connector lines drop away and the callouts move to a fixed,
+   hardcoded set of positions instead of the merchant's percentages, since
+   those are tuned for a short, wide stage and don't produce a sane layout
+   on a tall, narrow one.
    ========================================================================== */
 
 .home-philosophy {
@@ -188,18 +194,18 @@
 
 .hp-dot {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
   border-radius: 50%;
   background: var(--hp-line);
   pointer-events: none;
 }
 
 .hp-dot--anchor {
-  width: 9px;
-  height: 9px;
-  margin: -2.5px 0 0 -2.5px;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
 }
 
 /* --------------------------------------------------------------------------
@@ -209,6 +215,12 @@
 .hp-callout {
   position: absolute;
   width: min(34rem, 30vw);
+}
+
+/* Anchored from the dot on its right instead of the merchant's left-edge
+   setting — see the comment above the loop that adds this class. */
+.hp-callout--align-right {
+  text-align: right;
 }
 
 .hp-callout__title {

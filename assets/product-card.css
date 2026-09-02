@@ -133,6 +133,13 @@
   justify-self: flex-start;
 }
 
+/* The %-off badge quotes the PDP's own saving badge, so it takes the same
+   small rectangle rather than the pill every other badge on the card gets
+   from the theme's corner-radius setting. */
+.card-wrapper .badge--percent-off {
+  border-radius: 5px;
+}
+
 /* --------------------------------------------------------------------------
    Copy
    -------------------------------------------------------------------------- */
