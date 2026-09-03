@@ -66,10 +66,10 @@
    second kind, so the size, tracking and 14px drop are restated here rather
    than inherited.
 
-   They have to be restated. `base.css` steps the shared label down to 14/6
-   under 750px and `.mar__overline` has no such step — it holds 15/7 at every
-   width — so these declarations are written to outrank that narrow-screen
-   rule on specificity and keep the label where the product page puts it.
+   They have to be restated because this compound selector otherwise outranks
+   `base.css`'s narrow-screen step on specificity alone. The mobile rule below
+   restates that same 14/6 step so the label still shrinks under 750px like
+   every other `.section-heading` on the site.
 
    Line height is deliberately absent. `.mar__overline` declares none either,
    so it inherits the body's `calc(1 + 0.8 / var(--font-body-scale))` — and
@@ -187,9 +187,17 @@
    -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 749px) {
+  .amt__row{
+    flex-direction: column-reverse !important;
+  }
   .amt {
     padding-top: calc(var(--amt-pad-top, 60px) * 0.3);
     padding-bottom: calc(var(--amt-pad-bottom, 60px) * 0.3);
+  }
+
+  .amt .section-heading {
+    font-size: 14px;
+    letter-spacing: 6px;
   }
 
   .amt--under-header {
@@ -226,6 +234,11 @@
   .amt__cta {
     max-width: none;
     height: 44px;
+  }
+
+  .amt__cta-arrow {
+    width: 16px;
+    height: auto;
   }
 }
 

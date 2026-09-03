@@ -165,7 +165,7 @@
 
 @media screen and (max-width: 749px) {
   .phc {
-    padding-top: calc(var(--phc-pad-top, 72px) * 0.333);
+    padding-top: 60px;
     padding-bottom: calc(var(--phc-pad-bottom, 72px) * 0.333);
   }
 

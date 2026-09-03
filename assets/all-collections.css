@@ -62,10 +62,34 @@
    This fallback is what stands before that script runs, and if it never runs
    at all: clear of a header at its full height. `--header-height` is the
    measured value the header publishes on the root; `--header-height-static`
-   is the header's own server-rendered estimate for the first paint. */
+   is the header's own server-rendered estimate for the first paint.
+
+   Capped to the screen below that same offset and scrolling its own overflow,
+   so a rail taller than the gap left under the header gets there through its
+   own scroll rather than only surfacing once the page has scrolled the grid
+   beside it all the way past — the grid keeps scrolling with the page as
+   it always has. */
 .acl__list--sticky {
+  --acl-sticky-offset: var(--acl-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--acl-sticky-gap, 16px)));
   position: sticky;
-  top: var(--acl-sticky-top, calc(var(--header-height, var(--header-height-static, 96px)) + var(--acl-sticky-gap, 16px)));
+  top: var(--acl-sticky-offset);
+  max-height: calc(100vh - var(--acl-sticky-offset) - var(--acl-sticky-gap, 16px));
+  overflow-y: auto;
+  /* A vertical `overflow-y` also makes the browser clip the horizontal axis
+     instead of letting it spill — and the group caret is a 6px square turned
+     45deg, whose diagonal bounding box (~8.5px) runs past a `space-between`
+     row flush with this edge. Invisible before, since overflow was visible
+     both ways; a few px of slack here keeps it from being cut off now. */
+  padding-right: 6px;
+  /* Scrollable, not a scrollbar: the rail still moves under the wheel, but
+     nothing is drawn to say so, the same way the phone row below hides its
+     own. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.acl__list--sticky::-webkit-scrollbar {
+  display: none;
 }
 
 .acl__items {
@@ -73,7 +97,11 @@
   flex-direction: column;
   gap: var(--acl-item-gap, 14px);
   margin: 0;
-  padding: 0;
+  /* Trailing room inside the scroller, not around it: the last filter should
+     still have somewhere to land above the bottom edge once the list is
+     scrolled all the way down, the same as a page never ending flush with its
+     last line. */
+  padding: 0 0 60px;
   list-style: none;
 }
 
@@ -419,12 +447,14 @@
     flex: 0 0 auto;
     max-width: none;
     position: static;
+    max-height: none;
     /* Full-bleed out of the content gutter, so the row of collections runs to
        both edges of the screen the way a scrolling row should — a scroller
        that starts and stops inside a margin looks like it has been cut off. */
     margin-inline: -1.5rem;
     padding-inline: 1.5rem;
     overflow-x: auto;
+    overflow-y: visible;
     scrollbar-width: none;
   }
 
@@ -437,6 +467,7 @@
     align-items: baseline;
     gap: 20px;
     width: max-content;
+    padding-bottom: 0;
   }
 
   /* One line, whatever the name. Wrapping a row of tabs is what makes a
@@ -448,6 +479,11 @@
   .acl__link.is-active {
     font-size: 16px;
     font-weight: 600;
+  }
+
+  .acl__more-arrow {
+    width: 16px;
+    height: auto;
   }
 }
 

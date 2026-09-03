@@ -323,9 +323,9 @@
   }
 
   .tst__heading {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
-    letter-spacing: 4.8px;
+    letter-spacing: 6px;
   }
 
   .tst__card {

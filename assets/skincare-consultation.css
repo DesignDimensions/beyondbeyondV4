@@ -209,9 +209,9 @@
 
   .sc .section-heading {
     margin-bottom: 4px;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
-    letter-spacing: 4.8px;
+    letter-spacing: 6px;
   }
 
   .sc .section-title {
@@ -249,14 +249,14 @@
     margin-top: -12px;
     padding: 8px 16px;
     gap: 10px;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: normal;
+    letter-spacing: 1.6px;
     line-height: 28px;
   }
 
   .sc__cta-arrow {
-    width: 23px;
+    width: 16px;
     height: auto;
   }
 

@@ -257,4 +257,9 @@
   .fu__quote-cta {
     padding: 10px 14px;
   }
+
+  .fu__quote-arrow {
+    width: 16px;
+    height: auto;
+  }
 }

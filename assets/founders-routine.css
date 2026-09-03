@@ -383,15 +383,13 @@
   }
 
   /* Scoped under `.fr` rather than written into the shared `.section-heading`
-     / `.section-title` rules — those are used across sections this pass
-     hasn't reached yet, and the phone drawing's overline-to-heading and
-     heading-to-tabs gaps (24px, 40px) are this section's own, not a sitewide
-     change. */
+     rule because the margin is this section's own phone drawing (24px), not a
+     sitewide change. Face, size and tracking match the shared step. */
   .fr .section-heading {
     margin-bottom: 24px;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
-    letter-spacing: 4.8px;
+    letter-spacing: 6px;
   }
 
   .fr .section-title {

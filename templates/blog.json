@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
@@ -6,7 +15,7 @@
         "blog": "blog",
         "heading": "Let's Talk Skincare!",
         "subheading": "Our top pick for you.",
-        "posts_limit": 6
+        "posts_limit": 12
       }
     },
     "grid": {
@@ -14,7 +23,7 @@
       "settings": {
         "blog": "blog",
         "heading": "Latest Journals",
-        "posts_limit": 9
+        "posts_limit": 24
       }
     }
   },

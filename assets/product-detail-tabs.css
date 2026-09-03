@@ -649,8 +649,8 @@
 
   .pdt__overline {
     margin-bottom: 24px;
-    font-size: 12px;
-    letter-spacing: 4.8px;
+    font-size: 14px;
+    letter-spacing: 6px;
   }
 
   .pdt__grid {
@@ -671,6 +671,11 @@
     font-size: 16px;
     line-height: 28px;
     letter-spacing: 0.32px;
+  }
+
+  .pdt__button-arrow {
+    width: 16px;
+    height: auto;
   }
 }
 

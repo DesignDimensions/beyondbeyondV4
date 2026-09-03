@@ -143,8 +143,8 @@
 @media screen and (max-width: 749px) {
   .rp__heading {
     margin-bottom: 40px;
-    font-size: 12px;
-    letter-spacing: 4.8px;
+    font-size: 14px;
+    letter-spacing: 6px;
   }
 
   .rp__rail {

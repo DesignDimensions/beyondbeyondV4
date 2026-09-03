@@ -188,12 +188,12 @@
     margin-bottom: 40px;
   }
 
-  /* The phone's section label: 12/700 on a 20px line, tracked 4.8 — smaller
-     and tighter than the shared `.section-heading` step. */
+  /* The phone's section label: the same 14/700 on a 20px line, tracked 6, that
+     the shared `.section-heading` step uses everywhere else. */
   .hbc__heading {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
-    letter-spacing: 4.8px;
+    letter-spacing: 6px;
   }
 
   .hbc__card {

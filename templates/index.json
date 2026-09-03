@@ -229,8 +229,8 @@
     "skincare_consultation": {
       "type": "skincare-consultation",
       "settings": {
-        "overline": "Personalised skincare consultation",
-        "heading": "Meet your skincare consultant",
+        "overline": "SKINCARE MADE PERSONAL",
+        "heading": "Expert Guidance for Your Skin",
         "subheading": "",
         "image": "shopify://shop_images/Beyond_558_2_1.png",
         "cta_label": "Start Consultation",
@@ -551,7 +551,7 @@
             "video": "shopify://files/videos/Hydration Serum 7rth render_compressed.mp4",
             "video_url": "",
             "product": "advanced-cellular-hydration-serum",
-            "product_title": "The Ultimate Night Repair\nSuper Cream"
+            "product_title": "Advanced Cellular\nHydration Serum"
           }
         },
         "testimonial_GH7DVr": {

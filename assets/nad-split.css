@@ -114,10 +114,11 @@
    Type
    --------------------------------------------------------------------------
    The label is the product page's overline at 15/700/7, restated here for the
-   reason it is restated on the About page: `base.css` steps the shared label
-   down to 14/6 under 750px and the overline it is matching has no such step.
-   The statement is the size the rest of the site settles on. Only the tints
-   are the section's own, because every band here is a different colour.
+   reason it is restated on the About page: this compound selector otherwise
+   outranks `base.css`'s narrow-screen step on specificity alone, so the same
+   14/6 step is restated in the mobile rule below. The statement is the size
+   the rest of the site settles on. Only the tints are the section's own,
+   because every band here is a different colour.
    -------------------------------------------------------------------------- */
 
 .nsp .section-heading {
@@ -175,6 +176,11 @@
 @media screen and (max-width: 749px) {
   .nsp--under-header {
     padding-top: var(--header-height, var(--nsp-header-fallback-mobile, 76px));
+  }
+
+  .nsp .section-heading {
+    font-size: 14px;
+    letter-spacing: 6px;
   }
 
   .nsp__row,

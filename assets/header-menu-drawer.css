@@ -118,6 +118,15 @@
   background: none;
   cursor: pointer;
   line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hmd__close:hover,
+.hmd__close:focus,
+.hmd__close:focus-visible,
+.hmd__close:active {
+  outline: none;
+  box-shadow: none;
 }
 
 /* On a sub-panel the close sits above the title on its own line, which is what

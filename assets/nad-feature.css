@@ -52,10 +52,11 @@
 /* --------------------------------------------------------------------------
    Type
    --------------------------------------------------------------------------
-   The same two the split bands use: the product page's 15/700/7 overline and
-   the statement size the rest of the site settles on. Restated here rather
-   than inherited, so `base.css`'s narrow-screen step-down on the shared label
-   cannot reach them.
+   The same two the split bands use: the product page's overline and the
+   statement size the rest of the site settles on. Restated here rather than
+   inherited, since this compound selector otherwise outranks `base.css`'s
+   narrow-screen step on specificity alone — the mobile rule below restates
+   that same 14/6 step so the label still shrinks under 750px.
    -------------------------------------------------------------------------- */
 
 .nft .section-heading {
@@ -114,6 +115,11 @@
 
   .nft--under-header {
     padding-top: calc(var(--header-height, var(--nft-header-fallback-mobile, 76px)) + var(--nft-pad-top, 80px) * 0.6);
+  }
+
+  .nft .section-heading {
+    font-size: 14px;
+    letter-spacing: 6px;
   }
 
   .nft__row,
