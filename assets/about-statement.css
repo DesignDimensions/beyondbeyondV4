@@ -125,9 +125,11 @@
   border-radius: var(--abs-cta-radius, 0px);
   background-color: #000;
   color: var(--abs-cta-fg, #fff);
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
   line-height: 1;
+  text-transform: uppercase;
   text-decoration: none;
   transition: filter 0.3s ease;
 }
@@ -136,15 +138,33 @@
   filter: brightness(1.35);
 }
 
+/* Sized off the label rather than in pixels, the same way the blog carousel's
+   CTA arrow is: what makes an arrow look right beside type is standing as
+   tall as the capitals do, and the file's own ratio gives it the width. */
 .abs__cta-arrow {
-  flex: 0 0 auto;
-  width: 34px;
-  height: 10px;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  flex: none;
+  height: var(--abs-cta-arrow-h, 1.2rem);
+  width: auto;
+  aspect-ratio: 39 / 29;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .abs__cta-arrow {
+    background-color: currentColor;
+    -webkit-mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
 }
 
 .abs__cta:hover .abs__cta-arrow {
-  transform: translateX(6px);
+  transform: translateX(4px);
 }
 
 /* --------------------------------------------------------------------------

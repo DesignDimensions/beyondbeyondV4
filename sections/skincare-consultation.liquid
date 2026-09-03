@@ -112,15 +112,11 @@
 
         <button type="button" class="sc__cta" data-sc-open-chat>
           <span>{{ s.cta_label }}</span>
-          <svg
-            class="sc__cta-arrow"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          {%- comment -%}
+            The blog carousel's arrow, so every CTA in the theme reads as the
+            same gesture. Masked rather than an inline path — see that file.
+          {%- endcomment -%}
+          <span class="sc__cta-arrow" aria-hidden="true"></span>
         </button>
       </div>
 

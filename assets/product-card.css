@@ -393,12 +393,23 @@
    so the copy never moves when it appears. Taking it out of the flow collapses
    the wrapper it sits in, which is what keeps the gap it used to occupy from
    staying behind. `bottom: 100% + inset` puts its base that far above the
-   copy's top edge — which is the tile's bottom edge.
+   copy's top edge — which is the tile's bottom edge — landing the button's
+   *revealed* position inside the picture, `inset` above that edge.
 
    That measurement is against the copy, so the wrapper must not be positioned
    itself: Dawn makes it `relative`, which turns it into the containing block
    and leaves the button measuring against a collapsed box — which is how it
-   ends up sitting over the price instead of over the picture. */
+   ends up sitting over the price instead of over the picture.
+
+   The hidden state used to add the button's own height on top of that —
+   `translate3d(0, 100% + inset, 0)` — which is a bigger drop than the
+   `inset` gap the revealed position already sits above the boundary by, so
+   at rest the button actually sat *below* the boundary, over the title and
+   rating, and the hover animation read as rising up out of the copy rather
+   than fading in from inside the picture it was already positioned in. A
+   flat offset smaller than that gap keeps the hidden state inside the
+   picture too, so revealing it is only ever a fade with a short rise, never
+   a trip through the copy underneath. */
 @media screen and (min-width: 750px) {
   .card-wrapper .quick-add__submit.button {
     position: absolute;
@@ -408,7 +419,7 @@
     z-index: 1;
     width: auto;
     opacity: 0;
-    transform: translate3d(0, calc(100% + var(--pcard-inset)), 0);
+    transform: translate3d(0, 12px, 0);
     pointer-events: none;
   }
 

@@ -72,15 +72,11 @@
     <li class="acl__span acl__more">
       <a class="acl__more-link" href="{{ grid_collection.url }}">
         {{- grid_collection.title }} &mdash; all {{ total }} products
-        <svg class="acl__more-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
-          <path
-            d="M0 5h31.5M27.5 1 32 5l-4.5 4"
-            stroke="currentColor"
-            stroke-width="1.4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        {%- comment -%}
+          The blog carousel's arrow, so every CTA in the theme reads as the
+          same gesture. Masked rather than an inline path — see that file.
+        {%- endcomment -%}
+        <span class="acl__more-arrow" aria-hidden="true"></span>
       </a>
     </li>
   {%- endif -%}

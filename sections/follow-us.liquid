@@ -116,7 +116,12 @@
                 {%- if block.settings.button_label != blank -%}
                   <a href="{{ block.settings.button_link }}" class="fu__quote-cta">
                     <span>{{ block.settings.button_label }}</span>
-                    <span class="fu__quote-arrow">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                    {%- comment -%}
+                      The blog carousel's arrow, so every CTA in the theme
+                      reads as the same gesture. Masked rather than an inline
+                      path — see that file.
+                    {%- endcomment -%}
+                    <span class="fu__quote-arrow" aria-hidden="true"></span>
                   </a>
                 {%- endif -%}
               </div>

@@ -532,7 +532,8 @@
           "settings": {
             "video": "shopify://files/videos/LEILA ERFAN X BEYOND BEYOND REEL_compressed.mp4",
             "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
           }
         },
         "testimonial_j3GFm9": {
@@ -540,39 +541,8 @@
           "settings": {
             "video": "shopify://files/videos/Nalini Sunscreen Testimonial video_compressed.mp4",
             "video_url": "",
-            "product": "oil-free-matte-sunscreen"
-          }
-        },
-        "testimonial_cTz6aL": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/Sartthak Gandhi X Beyond beyond_compressed.mp4",
-            "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
-          }
-        },
-        "testimonial_R9dmKU": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/BB REEL_compressed.mp4",
-            "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
-          }
-        },
-        "testimonial_JbTQhd": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/BB Nandani Singh 2nd Music Option_compressed.mp4",
-            "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
-          }
-        },
-        "testimonial_8": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/MALVIKA MAM REEL MUSIC OPTION 1_compressed.mp4",
-            "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
+            "product": "oil-free-matte-sunscreen",
+            "product_title": "Oil-Free Matte\nSunscreen"
           }
         },
         "testimonial_zRAV7p": {
@@ -580,15 +550,8 @@
           "settings": {
             "video": "shopify://files/videos/Hydration Serum 7rth render_compressed.mp4",
             "video_url": "",
-            "product": "advanced-cellular-hydration-serum"
-          }
-        },
-        "testimonial_tm7bGA": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/BB SUNSCREEN Testimonial Video 5th Render_compressed.mp4",
-            "video_url": "",
-            "product": "oil-free-matte-sunscreen"
+            "product": "advanced-cellular-hydration-serum",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
           }
         },
         "testimonial_GH7DVr": {
@@ -596,23 +559,8 @@
           "settings": {
             "video": "shopify://files/videos/Cleanser Jelly  Dr uktra video text_compressed.mp4",
             "video_url": "",
-            "product": "dirt-makeup-cleanser-jelly"
-          }
-        },
-        "testimonial_HgcrEw": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/Sanket Lambichhane Testimonial Video_compressed.mp4",
-            "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
-          }
-        },
-        "testimonial_EAMmb4": {
-          "type": "testimonial",
-          "settings": {
-            "video": "shopify://files/videos/Sunscreen Dr Uktra video_compressed.mp4",
-            "video_url": "",
-            "product": "oil-free-matte-sunscreen"
+            "product": "dirt-makeup-cleanser-jelly",
+            "product_title": "Dirt & Makeup\nCleanser Jelly"
           }
         },
         "testimonial_cXNbqV": {
@@ -620,7 +568,8 @@
           "settings": {
             "video": "shopify://files/videos/Complexion Corrector (Dr. Uktra)_compressed.mp4",
             "video_url": "",
-            "product": "advanced-complexion-corrector-serum"
+            "product": "advanced-complexion-corrector-serum",
+            "product_title": "Advanced Complexion\nCorrector Serum"
           }
         },
         "testimonial_iMTxXX": {
@@ -628,7 +577,71 @@
           "settings": {
             "video": "shopify://files/videos/Dr. Uktra Defence Serum (Yellow)  Product Introduction Video_compressed.mp4",
             "video_url": "",
-            "product": "advanced-antioxidant-defense-serum"
+            "product": "advanced-antioxidant-defense-serum",
+            "product_title": "Advanced Antioxidant\nDefense Serum"
+          }
+        },
+        "testimonial_cTz6aL": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Sartthak Gandhi X Beyond beyond_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
+          }
+        },
+        "testimonial_R9dmKU": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/BB REEL_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
+          }
+        },
+        "testimonial_tm7bGA": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/BB SUNSCREEN Testimonial Video 5th Render_compressed.mp4",
+            "video_url": "",
+            "product": "oil-free-matte-sunscreen",
+            "product_title": "Oil-Free Matte\nSunscreen"
+          }
+        },
+        "testimonial_JbTQhd": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/BB Nandani Singh 2nd Music Option_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
+          }
+        },
+        "testimonial_8": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/MALVIKA MAM REEL MUSIC OPTION 1_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
+          }
+        },
+        "testimonial_EAMmb4": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Sunscreen Dr Uktra video_compressed.mp4",
+            "video_url": "",
+            "product": "oil-free-matte-sunscreen",
+            "product_title": "Oil-Free Matte\nSunscreen"
+          }
+        },
+        "testimonial_HgcrEw": {
+          "type": "testimonial",
+          "settings": {
+            "video": "shopify://files/videos/Sanket Lambichhane Testimonial Video_compressed.mp4",
+            "video_url": "",
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
           }
         },
         "testimonial_mtfErX": {
@@ -636,24 +649,25 @@
           "settings": {
             "video": "shopify://files/videos/BB Chandni Singh Reel_compressed.mp4",
             "video_url": "",
-            "product": "the-ultimate-night-repair-super-cream-1"
+            "product": "the-ultimate-night-repair-super-cream-1",
+            "product_title": "The Ultimate Night Repair\nSuper Cream"
           }
         }
       },
       "block_order": [
         "testimonial_pArdrH",
         "testimonial_j3GFm9",
-        "testimonial_cTz6aL",
-        "testimonial_R9dmKU",
-        "testimonial_JbTQhd",
-        "testimonial_8",
         "testimonial_zRAV7p",
-        "testimonial_tm7bGA",
         "testimonial_GH7DVr",
-        "testimonial_HgcrEw",
-        "testimonial_EAMmb4",
         "testimonial_cXNbqV",
         "testimonial_iMTxXX",
+        "testimonial_cTz6aL",
+        "testimonial_R9dmKU",
+        "testimonial_tm7bGA",
+        "testimonial_JbTQhd",
+        "testimonial_8",
+        "testimonial_EAMmb4",
+        "testimonial_HgcrEw",
         "testimonial_mtfErX"
       ],
       "name": "Testimonials",

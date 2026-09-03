@@ -359,15 +359,33 @@
   padding-bottom: 4px;
 }
 
+/* The same arrow every CTA in the theme carries, sized off the label rather
+   than in pixels: what makes an arrow look right beside type is standing as
+   tall as the capitals do, and the file's own ratio gives it the width. */
 .acl__more-arrow {
-  flex: 0 0 auto;
-  width: 28px;
-  height: 9px;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  flex: none;
+  height: var(--acl-more-arrow-h, 1.2rem);
+  width: auto;
+  aspect-ratio: 39 / 29;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .acl__more-arrow {
+    background-color: currentColor;
+    -webkit-mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
 }
 
 .acl__more-link:hover .acl__more-arrow {
-  transform: translateX(5px);
+  transform: translateX(4px);
 }
 
 /* --------------------------------------------------------------------------

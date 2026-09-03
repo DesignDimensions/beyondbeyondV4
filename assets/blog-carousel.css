@@ -54,7 +54,7 @@
   background-color: var(--bc-cta-bg, #000);
   color: var(--bc-cta-fg, #fff);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: var(--bc-cta-spacing, 1.6px);
   line-height: 1;
   text-transform: uppercase;

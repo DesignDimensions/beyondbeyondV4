@@ -1,21 +1,25 @@
 /**
  * As Seen In
  *
- * Two rows of press logos drifting endlessly, and grabbable — you can catch a
- * row, throw it, and watch it settle back into its drift. The whole row is
- * one link to the press page: a pointer tag rides the cursor over it saying
- * so, and a plain click (not a throw) follows it.
+ * Two rows of press logos drifting endlessly. The whole row is one link to
+ * the press page: a pointer tag rides the cursor over it saying so, and a
+ * plain click follows it.
  *
- * Position is driven per frame rather than by a tween, because a tween owns the
- * value it animates and a hand on the row has to be able to take it back
- * mid-flight. Each row keeps an offset and a velocity: the offset wraps at one
- * sequence's width, which is what makes the loop endless with no seam to hide,
- * and the velocity is only ever eased toward whatever it should be — the drift,
- * or the speed of a throw. Nothing is ever set hard, so every change of state
- * arrives as a settle rather than a jump.
+ * Position is driven per frame rather than by a tween, because that's what
+ * makes an endless loop with no seam to hide: each row keeps an offset and a
+ * velocity, the offset wraps at one sequence's width, and the velocity is
+ * only ever eased toward the drift speed rather than set hard, so a change
+ * — reduced motion switching on or off — arrives as a settle rather than a
+ * jump.
  *
  * GSAP drives the clock and the writes where the theme has loaded it; without
  * it the same arithmetic runs on requestAnimationFrame.
+ *
+ * Dragging the row used to let a shopper catch and throw it, but the same
+ * pointer capture that made that work also stole vertical touch scrolls that
+ * started over the strip and could leave a click swallowed after a drag that
+ * un-swallowed at the wrong moment — so there is no grab here anymore, only
+ * the drift and the link.
  *
  * The pointer tag is the same one the testimonials rail and the bikaneri
  * kitchen banner use: a pill that rides beside the cursor, flips in and out,
@@ -32,12 +36,8 @@
 (function () {
   'use strict';
 
-  /* Seconds for a row to give up a throw and be drifting again. Long enough to
-     read as momentum, short enough that the row never feels lost. */
+  /* Seconds for the velocity to settle onto the drift speed. */
   var SETTLE = 0.62;
-  var MAX_FLING = 3200;
-  var DRAG_THRESHOLD = 4;
-  var CLICK_CANCEL_DISTANCE = 8;
   var MAX_FRAME = 0.05;
 
   var CURSOR_OFFSET_X = 22;
@@ -77,12 +77,7 @@
     return target.closest(selector);
   }
 
-  function clamp(value, limit) {
-    return Math.min(Math.max(value, -limit), limit);
-  }
-
-  // Keeps the offset inside one sequence, whichever way the row is travelling
-  // and however far a throw carried it.
+  // Keeps the offset inside one sequence, whichever way the row is travelling.
   function wrap(x, width) {
     if (!width) return x;
     return (((x % width) - width) % width);
@@ -96,7 +91,6 @@
     this.gsap = window.gsap || null;
     this.fx = !!this.gsap && !reducedMotion();
     this.speed = parseFloat(root.dataset.speed) || 45;
-    this.swallowClick = false;
     this.frameId = null;
     this.lastTime = 0;
 
@@ -110,7 +104,6 @@
         width: 0,
         x: 0,
         velocity: 0,
-        drag: null,
       };
     }).filter(function (row) {
       return row.track && row.seq;
@@ -223,17 +216,12 @@
     if (!step || !this.visible) return;
 
     // Exponential rather than linear: the further the velocity is from where
-    // it belongs, the harder it is pulled back, which is what makes a throw
-    // bleed off instead of stopping.
+    // it belongs, the harder it is pulled back, which is what makes reduced
+    // motion switching on or off bleed into place instead of snapping.
     var pull = 1 - Math.exp(-step / SETTLE);
 
     this.rows.forEach(function (row) {
       if (!row.width) return;
-
-      if (row.drag) {
-        self.render(row);
-        return;
-      }
 
       var target = self.still ? 0 : row.direction * self.speed;
       row.velocity += (target - row.velocity) * pull;
@@ -242,48 +230,33 @@
     });
   };
 
-  /* ------------------------------------------------------------------
-     Grab
-     ------------------------------------------------------------------ */
-
   AsSeenIn.prototype.bind = function () {
     var self = this;
 
-    this.rows.forEach(function (row) {
-      row.element.addEventListener('pointerdown', function (event) {
-        self.grab(row, event);
-      });
-      row.element.addEventListener('pointermove', function (event) {
-        self.move(row, event);
-      });
-      row.element.addEventListener('pointerup', function (event) {
-        self.release(row, event);
-      });
-      row.element.addEventListener('pointercancel', function (event) {
-        self.release(row, event);
-      });
-    });
-
     // The row itself is a real link and navigates on its own; everywhere
     // else in the section — the heading, the padding, the glow — is not,
-    // so a plain click there is sent to the same place by hand. Either way,
-    // a throw that ends over the link must not also follow it.
+    // so a plain click there is sent to the same place by hand.
     var rowsLink = this.root.querySelector('[data-asi-rows]');
     this.viewAllHref = rowsLink && rowsLink.getAttribute('href');
 
     this.root.addEventListener(
       'click',
       function (event) {
-        if (self.swallowClick) {
-          event.preventDefault();
-          event.stopPropagation();
-          return;
-        }
         if (!self.viewAllHref || closestFrom(event.target, '[data-asi-rows]')) return;
         window.location.assign(self.viewAllHref);
       },
       true
     );
+
+    // The row is a real link, and a mousedown-and-move over any of it is
+    // otherwise the browser's cue to start dragging that link — a native
+    // gesture that takes over the pointer for as long as it runs, which is
+    // what was freezing the cursor tag mid-hover. Cancelling dragstart
+    // keeps that from ever starting, so moving the mouse here — button
+    // down or not — never reads as anything but a hover.
+    this.root.addEventListener('dragstart', function (event) {
+      event.preventDefault();
+    });
 
     window.addEventListener('resize', this.onResize);
 
@@ -300,75 +273,6 @@
         self.visible = entries[0].isIntersecting;
       });
       this.observer.observe(this.root);
-    }
-  };
-
-  AsSeenIn.prototype.grab = function (row, event) {
-    if (event.button !== 0 && event.pointerType === 'mouse') return;
-    if (!row.width) return;
-
-    row.drag = {
-      id: event.pointerId,
-      startX: event.clientX,
-      lastX: event.clientX,
-      lastTime: event.timeStamp || performance.now(),
-      origin: row.x,
-      distance: 0,
-      velocity: 0,
-      active: false,
-    };
-
-    // Whatever the row was doing is the hand's business now; the drift picks
-    // up again from the speed of the throw.
-    row.velocity = 0;
-  };
-
-  AsSeenIn.prototype.move = function (row, event) {
-    var drag = row.drag;
-    if (!drag || event.pointerId !== drag.id) return;
-
-    var dx = event.clientX - drag.startX;
-    drag.distance = Math.abs(dx);
-
-    if (!drag.active) {
-      if (drag.distance < DRAG_THRESHOLD) return;
-      drag.active = true;
-      this.root.classList.add('is-grabbing');
-      // Not before now: a captured pointer has its click dispatched to the
-      // element holding the capture, so capturing on pointerdown would take
-      // every plain click away from the row's own link before it could
-      // navigate.
-      if (row.element.setPointerCapture) row.element.setPointerCapture(drag.id);
-    }
-
-    var now = event.timeStamp || performance.now();
-    var elapsed = now - drag.lastTime;
-    if (elapsed > 0) {
-      var instant = ((event.clientX - drag.lastX) / elapsed) * 1000;
-      // Smoothed, so one stuttering frame at the moment of release cannot
-      // decide how hard the row was thrown.
-      drag.velocity = drag.velocity * 0.7 + instant * 0.3;
-      drag.lastX = event.clientX;
-      drag.lastTime = now;
-    }
-
-    row.x = wrap(drag.origin + dx, row.width);
-  };
-
-  AsSeenIn.prototype.release = function (row, event) {
-    var drag = row.drag;
-    if (!drag || (event && event.pointerId !== drag.id)) return;
-
-    row.drag = null;
-    row.velocity = clamp(drag.velocity, MAX_FLING);
-    this.root.classList.remove('is-grabbing');
-
-    if (drag.distance > CLICK_CANCEL_DISTANCE) {
-      var self = this;
-      this.swallowClick = true;
-      setTimeout(function () {
-        self.swallowClick = false;
-      }, 0);
     }
   };
 

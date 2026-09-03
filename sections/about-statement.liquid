@@ -80,19 +80,10 @@
         <a class="abs__cta" href="{{ section.settings.cta_link | default: '#' }}">
           <span class="abs__cta-label">{{ section.settings.cta_label }}</span>
           {%- comment -%}
-            The founders panel's arrow, drawn rather than typed for the reason
-            given there: no long arrow glyph is dependable across every face a
-            theme might be set to, and a drawn one can slide on hover.
+            The blog carousel's arrow, so every CTA in the theme reads as the
+            same gesture. Masked rather than an inline path — see that file.
           {%- endcomment -%}
-          <svg class="abs__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
-            <path
-              d="M0 5h31.5M27.5 1 32 5l-4.5 4"
-              stroke="currentColor"
-              stroke-width="1.4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <span class="abs__cta-arrow" aria-hidden="true"></span>
         </a>
       {%- endif -%}
     </div>

@@ -85,6 +85,10 @@
           if block.settings.poster != blank
             assign poster = block.settings.poster | image_url: width: 720
           endif
+          assign product_title = block.settings.product_title
+          if product_title == blank
+            assign product_title = product.title
+          endif
         -%}
         <article class="tst__card" data-tst-card {{ block.shopify_attributes }}>
           <div class="tst__media" data-tst-media>
@@ -171,7 +175,7 @@
                 {%- endif -%}
               </span>
               <span class="tst__product-info">
-                <span class="tst__product-title">{{ product.title }}</span>
+                <span class="tst__product-title">{{ product_title | newline_to_br }}</span>
                 <span class="tst__product-price">{{ variant.price | default: product.price | money }}</span>
               </span>
             </a>
@@ -509,6 +513,12 @@
           "type": "product",
           "id": "product",
           "label": "Product"
+        },
+        {
+          "type": "textarea",
+          "id": "product_title",
+          "label": "Product title",
+          "info": "Overrides the product's own title. Press Enter for a line break. Leave blank to use the product's title."
         }
       ]
     }

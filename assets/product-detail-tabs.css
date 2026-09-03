@@ -482,9 +482,33 @@
   color: var(--pdt-bg, #d9d2cb);
 }
 
+/* The same arrow every CTA in the theme carries, sized off the label rather
+   than in pixels: what makes an arrow look right beside type is standing as
+   tall as the capitals do, and the file's own ratio gives it the width. */
 .pdt__button-arrow {
-  font-size: 1.3em;
-  line-height: 0;
+  flex: none;
+  height: var(--pdt-button-arrow-h, 1.2rem);
+  width: auto;
+  aspect-ratio: 39 / 29;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .pdt__button-arrow {
+    background-color: currentColor;
+    -webkit-mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+}
+
+.pdt__button--primary:hover .pdt__button-arrow {
+  transform: translateX(4px);
 }
 
 /* --------------------------------------------------------------------------
@@ -656,7 +680,8 @@
   .pdt__tabs.is-pill-ready .pdt__tab,
   .pdt__tabs-pill,
   .pdt__panel,
-  .pdt__button {
+  .pdt__button,
+  .pdt__button-arrow {
     transition: none;
   }
 

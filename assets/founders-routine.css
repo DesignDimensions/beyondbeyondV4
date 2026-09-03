@@ -180,6 +180,13 @@
   display: none;
 }
 
+/* Only while a swap is in flight — the outgoing panel is briefly absolutely
+   positioned over the incoming one so the two can crossfade, and a permanent
+   clip would cut off the cards' focus rings. */
+.fr__panels.is-swapping {
+  overflow: hidden;
+}
+
 /* The arrows hang in the page-width gutters, so the cards keep the whole
    content column to themselves. */
 .fr__frame {

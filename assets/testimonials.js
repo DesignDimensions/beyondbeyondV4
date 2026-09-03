@@ -82,14 +82,24 @@
 
     this.prevArrow = root.querySelector('[data-tst-arrow="prev"]');
     this.nextArrow = root.querySelector('[data-tst-arrow="next"]');
+    this.productTitles = Array.prototype.slice.call(root.querySelectorAll('.tst__product-title'));
 
     this.onScroll = this.updateArrows.bind(this);
-    this.onResize = this.updateArrows.bind(this);
+    this.onResize = this.handleResize.bind(this);
 
     this.bind();
     this.observe();
     this.initCursor();
     this.updateArrows();
+    this.syncProductHeights();
+
+    // Titles are measured from laid-out text, and web fonts landing late
+    // change how tall a wrapped title is.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        self.syncProductHeights();
+      });
+    }
 
     this.ready = true;
   }
@@ -216,6 +226,30 @@
     var max = this.rail.scrollWidth - this.rail.clientWidth;
     this.prevArrow.classList.toggle('is-disabled', this.rail.scrollLeft <= 1);
     this.nextArrow.classList.toggle('is-disabled', this.rail.scrollLeft >= max - 1);
+  };
+
+  Testimonials.prototype.handleResize = function () {
+    this.updateArrows();
+    this.syncProductHeights();
+  };
+
+  // Every product bar reserves as much title space as the tallest title in
+  // the section needs, so the image, title and price all start from the same
+  // line no matter how short an individual product's name is — the bar is
+  // bottom-anchored on its card, so equal title space is what keeps every
+  // one of them the same overall height. Cleared before measuring, or a
+  // taller value from a wider viewport would never shrink back down.
+  Testimonials.prototype.syncProductHeights = function () {
+    if (!this.productTitles.length) return;
+
+    this.root.style.removeProperty('--tst-title-h');
+
+    var max = 0;
+    this.productTitles.forEach(function (title) {
+      max = Math.max(max, title.getBoundingClientRect().height);
+    });
+
+    if (max > 0) this.root.style.setProperty('--tst-title-h', max + 'px');
   };
 
   /* ------------------------------------------------------------------

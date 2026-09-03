@@ -179,6 +179,10 @@
   font-size: 16px;
   font-weight: 500;
   line-height: 1.35;
+  /* Set from JS to the tallest title in the section, so every product bar
+     reserves the same space and the price beneath it lands on the same
+     line everywhere — falls back to natural height with JS off. */
+  min-height: var(--tst-title-h, auto);
 }
 
 .tst__product:hover .tst__product-title {

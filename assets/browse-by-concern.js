@@ -447,6 +447,7 @@
   BrowseByConcern.prototype.swapPanels = function (from, to) {
     var self = this;
     var incoming = this.panels[to];
+    var outgoing = this.panels[from];
     if (!incoming) return;
 
     // A swap already running owns the panels' inline state; hand it the new
@@ -456,43 +457,67 @@
       this.swapTimeline = null;
     }
 
-    var animate = this.gsap && !reducedMotion();
-
-    // Read the outgoing height before anything is hidden — a panel that is
-    // already display:none measures zero and the wrapper would jump.
-    var startHeight = animate ? this.panelsWrap.offsetHeight : 0;
-
+    // Killing a timeline only stops the tween — it leaves the DOM exactly
+    // where the tween had gotten to, which after the lift below can mean a
+    // panel still sitting absolutely positioned and marked active. Two
+    // swaps started in quick succession would otherwise stack that stale
+    // panel under this one, or leave the incoming panel still carrying the
+    // old position and nothing left in flow to give the wrapper a height.
+    // Every panel is put back to a clean baseline first — position and
+    // card styles cleared on all of them, visibility settled on everyone
+    // but the one now incoming — so this swap always starts from a known
+    // state no matter what the last one left behind.
     this.panels.forEach(function (panel) {
+      if (self.gsap) {
+        self.gsap.set(panel, { clearProps: 'position,top,left,right' });
+        self.gsap.set(panel.querySelectorAll('.card-wrapper'), { clearProps: 'all' });
+      }
       if (panel === incoming) return;
       panel.hidden = true;
       panel.classList.remove('is-active');
-      if (self.gsap) self.gsap.set(panel.querySelectorAll('.card-wrapper'), { clearProps: 'all' });
     });
 
-    incoming.hidden = false;
-    incoming.classList.add('is-active');
+    var animate = this.gsap && outgoing && outgoing !== incoming && !reducedMotion();
 
     if (!animate) {
+      incoming.hidden = false;
+      incoming.classList.add('is-active');
       this.panelsWrap.classList.remove('is-swapping');
       this.panelsWrap.style.height = '';
       return;
     }
 
-    var cards = incoming.querySelectorAll('.card-wrapper');
+    // Read the outgoing height before the layout changes — a panel that is
+    // already display:none measures zero and the wrapper would jump.
+    var startHeight = this.panelsWrap.offsetHeight;
+
+    // Lift the outgoing panel out of flow so the incoming panel can lay out
+    // underneath it at the same time. That overlap is what turns this into
+    // an actual crossfade — old fading down as new fades up — instead of the
+    // outgoing content cutting out instantly before the incoming one fades in.
+    outgoing.hidden = false;
+    outgoing.classList.add('is-active');
+    this.gsap.set(outgoing, { position: 'absolute', top: 0, left: 0, right: 0 });
+
+    incoming.hidden = false;
+    incoming.classList.add('is-active');
+
+    var outgoingCards = outgoing.querySelectorAll('.card-wrapper');
+    var incomingCards = incoming.querySelectorAll('.card-wrapper');
     var endHeight = incoming.offsetHeight;
 
     this.panelsWrap.classList.add('is-swapping');
 
-    // Direction of travel matches the rail, so the grid reads as sliding in
-    // from the side the shopper moved towards.
-    var direction = to > from ? 1 : -1;
-
     this.swapTimeline = this.gsap.timeline({
       onComplete: function () {
         self.swapTimeline = null;
+        outgoing.hidden = true;
+        outgoing.classList.remove('is-active');
+        self.gsap.set(outgoing, { clearProps: 'position,top,left,right' });
+        self.gsap.set(outgoingCards, { clearProps: 'all' });
+        self.gsap.set(incomingCards, { clearProps: 'all' });
         self.panelsWrap.classList.remove('is-swapping');
         self.panelsWrap.style.height = '';
-        self.gsap.set(cards, { clearProps: 'all' });
       },
     });
 
@@ -505,18 +530,19 @@
       );
     }
 
+    this.swapTimeline.to(outgoingCards, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0);
+
     this.swapTimeline.fromTo(
-      cards,
-      { opacity: 0, y: 26, x: direction * 22 },
+      incomingCards,
+      { opacity: 0, y: 24 },
       {
         opacity: 1,
         y: 0,
-        x: 0,
-        duration: 0.6,
+        duration: 0.65,
         ease: EASE,
         stagger: { each: 0.055, from: 'start' },
       },
-      0
+      0.1
     );
   };
 

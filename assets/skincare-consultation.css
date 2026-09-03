@@ -60,6 +60,14 @@
   width: 80%;
   height: auto;
   object-fit: cover;
+  /* A plain <img> is natively draggable, and a mousedown-and-move over one
+     starts the browser's own drag-this-image gesture — not something this
+     section does anything with, and one that can leave the page's own input
+     handling in a stuck state until the drag ends. The JS also cancels
+     dragstart sitewide for this section; this keeps WebKit from even
+     offering the ghost. */
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .sc__cta {
@@ -73,10 +81,12 @@
   background: var(--sc-accent, #0107ef);
   color: #ffffff;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 1.6px;
   line-height: 1.2;
   text-align: left;
+  text-transform: uppercase;
   cursor: pointer;
   transition: background-color 0.18s ease;
 }
@@ -85,15 +95,33 @@
   background: color-mix(in srgb, var(--sc-accent, #0107ef) 85%, #000);
 }
 
+/* Sized off the label rather than in pixels, the same way the blog carousel's
+   CTA arrow is: what makes an arrow look right beside type is standing as
+   tall as the capitals do, and the file's own ratio gives it the width. */
 .sc__cta-arrow {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  transition: transform 0.18s ease;
+  flex: none;
+  height: var(--sc-cta-arrow-h, 1.2rem);
+  width: auto;
+  aspect-ratio: 39 / 29;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .sc__cta-arrow {
+    background-color: currentColor;
+    -webkit-mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    mask-image: url('https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Icon.png?v=1787383394');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
 }
 
 .sc__cta:hover .sc__cta-arrow {
-  transform: translateX(3px);
+  transform: translateX(4px);
 }
 
 /* --------------------------------------------------------------------------
@@ -123,6 +151,10 @@
   height: auto;
   max-height: 100%;
   object-fit: cover;
+  /* Only matters when this resolves to the <img> fallback below — see the
+     comment on .sc__image for why. */
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 /* The image option is a finished graphic (a device mock, a screenshot) with
@@ -218,12 +250,14 @@
     padding: 8px 16px;
     gap: 10px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: normal;
     line-height: 28px;
   }
 
   .sc__cta-arrow {
     width: 23px;
+    height: auto;
   }
 
   .sc__rule {

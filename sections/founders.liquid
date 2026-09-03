@@ -107,19 +107,11 @@
           <a class="fnd__cta" href="{{ link }}">
             <span class="fnd__cta-label">{{ section.settings.cta_label }}</span>
             {%- comment -%}
-              Drawn rather than typed: the long arrow of the design has no
-              dependable glyph across the faces a theme might be set to, and
-              this one can be given its own length and slide on hover.
+              The blog carousel's arrow, so every CTA in the theme reads as
+              the same gesture. Masked rather than an inline path — see that
+              file.
             {%- endcomment -%}
-            <svg class="fnd__cta-arrow" viewBox="0 0 34 10" fill="none" aria-hidden="true" focusable="false">
-              <path
-                d="M0 5h31.5M27.5 1 32 5l-4.5 4"
-                stroke="currentColor"
-                stroke-width="1.4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <span class="fnd__cta-arrow" aria-hidden="true"></span>
           </a>
         {%- endif -%}
       </div>

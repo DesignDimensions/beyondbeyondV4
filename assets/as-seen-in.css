@@ -1,13 +1,12 @@
 /* ==========================================================================
-   As Seen In — two rows of press logos drifting, and draggable
+   As Seen In — two rows of press logos drifting
    ========================================================================== */
 
 .asi {
   position: relative;
   padding-top: var(--asi-pad-top, 60px);
   overflow: hidden;
-  /* The row underneath carries its own `grab`, but everywhere else in the
-     section — heading, padding, glow — is also "view all" now, so it reads
+  /* The whole section is "view all", not just the row of logos, so it reads
      as clickable rather than incidental. */
   cursor: pointer;
 }
@@ -29,6 +28,12 @@
   flex-direction: column;
   color: inherit;
   text-decoration: none;
+  /* This is a real link wrapping the whole strip, and a browser's native
+     drag-a-link gesture starts on a mousedown-and-move over it same as it
+     would over any anchor — the JS also cancels dragstart, but this keeps
+     WebKit from offering the ghost in the first place. */
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 /* The row is the window; the track is longer than it and slides. Nothing is
@@ -37,17 +42,8 @@
 .asi__row {
   position: relative;
   display: flex;
-  cursor: grab;
-  /* What makes the row grabbable on a phone without stealing the page: the
-     browser keeps vertical scrolling, and hands us anything sideways before
-     it starts scrolling on its own. */
-  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
-}
-
-.asi.is-grabbing .asi__row {
-  cursor: grabbing;
 }
 
 .asi__track {
@@ -85,7 +81,6 @@
   max-width: none;
   object-fit: contain;
   user-select: none;
-  cursor: grab;
   -webkit-user-drag: none;
 }
 
