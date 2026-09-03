@@ -521,7 +521,6 @@
      price is the bold line and the name reads plainly beneath the picture. */
   .card-wrapper .card__heading {
     font-size: 16px;
-    font-weight: 400;
     line-height: 28px;
     letter-spacing: 0.32px;
   }
@@ -666,12 +665,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Positioned against .card__inner (see card-product.liquid for why the
+   buttons themselves are a sibling of .card__media, not a child of it), so
+   .card__media's own inset from --image-padding has to be added back here to
+   land in the same spot against the picture. Vertical needs no such
+   adjustment: equal top and bottom margins keep .card__media's centre the
+   same as .card__inner's. */
 .card__gallery-arrow--prev {
-  left: 8px;
+  left: calc(8px + var(--image-padding, 0px));
 }
 
 .card__gallery-arrow--next {
-  right: 8px;
+  right: calc(8px + var(--image-padding, 0px));
 }
 
 .card__gallery-arrow img {
@@ -682,14 +687,7 @@
 
 /* Claims horizontal swipes for the gallery script up front, so the browser
    never starts its own scroll/zoom gesture before JS decides it's a photo
-   swipe — vertical touch scroll still passes through untouched.
-
-   Nothing about `position` here: Dawn already makes this box absolute inside
-   the ratio frame, which is both what stretches it across the tile and the
-   positioning context the arrows need. Setting it `relative` returns it to
-   the flow, where it becomes a flex item next to the badge layer and the two
-   of them split the tile between them — half a picture and half an empty
-   panel. */
+   swipe — vertical touch scroll still passes through untouched. */
 .card-wrapper .card__media {
   touch-action: pan-y;
 }

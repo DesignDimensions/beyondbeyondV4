@@ -86,47 +86,6 @@
                 {%- endfor -%}
               </div>
 
-              {%- comment -%}
-                Outside `.media` on purpose: base.css's `.media > *` rule
-                absolutely-positions every direct child at `top:0; left:0;
-                height:100%` for the benefit of media content (images,
-                model-viewer), which stretched these buttons to the same spot
-                and stacked them on each other. `.card__media` (this element)
-                only exists to carry the shape/gradient classes and hasn't
-                been claimed by any such rule, so the arrows position
-                correctly here instead.
-              {%- endcomment -%}
-              {%- if card_product.images.size > 1 -%}
-                <button
-                  type="button"
-                  class="card__gallery-arrow card__gallery-arrow--prev"
-                  data-card-gallery-prev
-                  aria-label="{{ 'general.slider.previous_slide' | t }}"
-                >
-                  <img
-                    src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_956.png?v=1787305146"
-                    alt=""
-                    width="24"
-                    height="24"
-                    loading="lazy"
-                  >
-                </button>
-                <button
-                  type="button"
-                  class="card__gallery-arrow card__gallery-arrow--next"
-                  data-card-gallery-next
-                  aria-label="{{ 'general.slider.next_slide' | t }}"
-                >
-                  <img
-                    src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_952.png?v=1787305147"
-                    alt=""
-                    width="24"
-                    height="24"
-                    loading="lazy"
-                  >
-                </button>
-              {%- endif -%}
-
             </div>
           {%- endif -%}
           <div class="card__content">
@@ -192,6 +151,54 @@
               {%- endif -%}
             </div>
           </div>
+
+          {%- comment -%}
+            A sibling of .card__media and .card__content, not a child of
+            .card__media: .card__media carries a z-index of its own (Dawn's
+            Safari border-radius fix), which makes it a stacking context, and
+            nothing inside a stacking context can rise above an element
+            outside it no matter its own z-index — that's what was letting
+            .card__media-link, the picture's full-tile link, swallow every
+            tap meant for these arrows. Sitting beside .card__media instead
+            puts the arrows in the same stacking context as the link, where
+            their z-index actually counts, and coming after it in the markup
+            means they win the tap even without one.
+
+            The image itself is unaffected by --image-padding here (margin
+            top and bottom are equal, so .card__media's vertical centre is
+            .card__inner's too), but left/right need the offset added back —
+            product-card.css does that.
+          {%- endcomment -%}
+          {%- if card_product.featured_media and card_product.images.size > 1 -%}
+            <button
+              type="button"
+              class="card__gallery-arrow card__gallery-arrow--prev"
+              data-card-gallery-prev
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              <img
+                src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_956.png?v=1787305146"
+                alt=""
+                width="24"
+                height="24"
+                loading="lazy"
+              >
+            </button>
+            <button
+              type="button"
+              class="card__gallery-arrow card__gallery-arrow--next"
+              data-card-gallery-next
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              <img
+                src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_952.png?v=1787305147"
+                alt=""
+                width="24"
+                height="24"
+                loading="lazy"
+              >
+            </button>
+          {%- endif -%}
         </div>
         <div class="card__content">
           <div class="card__information">

@@ -6,11 +6,15 @@
    only the reference those percentages resolve against — home-philosophy.js
    measures the content once it's laid out and pins the stage to exactly
    that height, and keeps refitting it on resize. This value is also what a
-   no-JS page is left with, so it stays a sane height on its own. Below
-   750px the connector lines drop away and the callouts move to a fixed,
-   hardcoded set of positions instead of the merchant's percentages, since
-   those are tuned for a short, wide stage and don't produce a sane layout
-   on a tall, narrow one.
+   no-JS page is left with, so it stays a sane height on its own.
+
+   Below 750px the merchant's percentages give way to a second, fixed
+   diagram taken directly from Figma's own mobile frame (node 6714:2169,
+   402x567) — every position and size in that breakpoint is one of that
+   frame's own numbers divided by 402 (left/width) or 567 (top/height).
+   `.hp-stage` is locked to the same 402:567 aspect-ratio there specifically
+   so that division stays correct at whatever width the phone actually
+   renders at, rather than only matching at 402px itself.
    ========================================================================== */
 
 .home-philosophy {
@@ -166,21 +170,13 @@
    Connector lines and dots
    -------------------------------------------------------------------------- */
 
-.hp-lines,
-.hp-lines--mobile {
+.hp-lines {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-}
-
-/* Hidden by default; only the sub-750px block below turns these on — and it
-   relies on this rule coming first, since both are single-class selectors. */
-.hp-lines--mobile,
-.hp-dot--mobile {
-  display: none;
 }
 
 .hp-line {
@@ -206,6 +202,49 @@
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile connectors — three pre-drawn assets, not a computed line
+
+   Each is a dot-diagonal-corner-run-dot shape drawn once in Figma and
+   rotated into place for its own callout, not a shape this stylesheet
+   builds. .hp-connector is sized and positioned to the design's own final,
+   post-rotation box; .hp-connector__spin is sized to the asset's
+   *pre*-rotation box (rotate() doesn't change layout size, only what's
+   painted) and carries the rotation itself, centred in the outer box by
+   flex since a rotated child's own centring can't be expressed as a
+   percentage the way translate(-50%,-50%) can; .hp-connector__bleed
+   restores the few percent the flat path bounds were inset from the
+   asset's own edges, which is otherwise clipped by nothing here but would
+   read as the dot's circle getting cut off. All hidden outside mobile —
+   see home-philosophy.js and .css for why mobile gets a different diagram
+   from the merchant's percentages entirely.
+   -------------------------------------------------------------------------- */
+
+.hp-connector {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hp-connector__spin {
+  position: relative;
+  flex: none;
+}
+
+.hp-connector__bleed {
+  position: absolute;
+}
+
+.hp-connector__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -304,58 +343,137 @@
 
 @media screen and (max-width: 749px) {
   .home-philosophy {
-    --hp-bubble-size: 190px !important;
-    padding-top: 40px;
-    padding-bottom: 40px;
+    /* JS overrides this the instant it runs (it has to be a real length —
+       see fitMobileBubble() in home-philosophy.js — a percentage doesn't
+       reach the calc()s below). This is only what a no-JS page keeps: the
+       226/402 ratio at a plausible 375px-ish phone width. */
+    --hp-bubble-size: 211px;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 
+  .home-philosophy .section-title {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Figma's own mobile frame (node 6714:2169) is 402x567 — every position
+     below is that frame's numbers divided by 402 (left/width) or 567
+     (top/height), so locking the stage to the same ratio is what makes
+     dividing by a fixed reference correct at any actual phone width: the
+     stage's real height is always exactly (rendered width) * 567/402,
+     the same relationship every number here assumes. */
   .hp-stage {
-    height: 560px;
-    padding: 0 2.4rem;
+    aspect-ratio: 402 / 567;
+    height: auto;
+    padding: 0;
+    /* The Figma frame itself has ~22% of blank height above RESTORES.
+       Percentage margins resolve against the containing block's WIDTH, not
+       height, so this scales with the same width the aspect-ratio does —
+       pulling the whole stage (blank zone included) up without touching any
+       of the content's own top/left percentages inside it. */
+    margin-top: -20%;
   }
 
   /* The desktop lines/dots are driven by each block's own x/y settings, tuned
-     for a short, wide stage — swap them for the fixed mobile set instead of
-     trying to reuse those percentages on a tall, narrow one. */
-  .hp-lines {
+     for a short, wide stage — mobile gets the three connectors below instead
+     of trying to reuse those percentages on a tall, narrow one. */
+  .hp-lines,
+  .hp-dot {
     display: none;
   }
 
-  .hp-dot:not(.hp-dot--mobile) {
-    display: none;
-  }
-
-  .hp-lines--mobile,
-  .hp-dot--mobile {
-    display: block;
+  .hp-connector {
+    display: flex;
   }
 
   .hp-bubble-wrap {
-    top: 39%;
+    left: 21.89%;
+    top: 36.15%;
+    width: 56.22%;
+    height: 31.73%;
+    margin: 0;
   }
 
   .hp-callout {
-    width: min(60vw, 230px);
     text-align: left;
   }
 
   .hp-callout[data-index='0'] {
-    left: 28% !important;
-    top: 8% !important;
+    left: 30.1% !important;
+    top: 22.05% !important;
+    width: 66.9% !important;
   }
 
   .hp-callout[data-index='1'] {
-    left: 6% !important;
-    top: 59% !important;
+    left: 14.93% !important;
+    top: 69.83% !important;
+    width: 29.85% !important;
   }
 
   .hp-callout[data-index='2'] {
-    left: 41% !important;
-    top: 78% !important;
+    left: 60.2% !important;
+    top: 76.62% !important;
+    width: 28.61% !important;
   }
 
-  /* Desktop pins these to the 30/50 type scale; on mobile the bubble shrinks to
-     190px, so keep them proportional here as they were. */
+  .hp-connector--0 {
+    left: 27.48%;
+    top: 28.49%;
+    width: 9.83%;
+    height: 18.36%;
+  }
+
+  /* .hp-connector__spin isn't absolutely positioned (it has to stay a flex
+     child for the centring below to work), so its own percentages resolve
+     against .hp-connector's box, not the stage — the pre-rotation size
+     (104.116 x 39.5, swapped from the post-rotation box above) expressed as
+     a share of *that* box: 104.116/39.5 and 39.5/104.116. */
+  .hp-connector--0 .hp-connector__spin {
+    width: 263.58%;
+    height: 37.94%;
+    transform: rotate(-90deg);
+  }
+
+  .hp-connector--0 .hp-connector__bleed {
+    inset: -5.4% -2.05%;
+  }
+
+  .hp-connector--1 {
+    left: 34.72%;
+    top: 60.72%;
+    width: 8.33%;
+    height: 7.14%;
+  }
+
+  .hp-connector--1 .hp-connector__spin {
+    width: 120.9%;
+    height: 82.72%;
+    transform: rotate(90deg) scaleY(-1);
+  }
+
+  .hp-connector--1 .hp-connector__bleed {
+    inset: -6.37% -5.27%;
+  }
+
+  .hp-connector--2 {
+    left: 61.63%;
+    top: 56.37%;
+    width: 10.7%;
+    height: 17.81%;
+  }
+
+  .hp-connector--2 .hp-connector__spin {
+    width: 234.88%;
+    height: 42.57%;
+    transform: rotate(90deg);
+  }
+
+  .hp-connector--2 .hp-connector__bleed {
+    inset: -4.96% -2.11%;
+  }
+
+  /* Desktop pins these to the 30/50 type scale; on mobile the bubble shrinks
+     with the viewport, so keep them proportional to it here too. */
   .hp-bubble__label-small {
     font-size: calc(var(--hp-bubble-size) * 0.098);
   }

@@ -65,11 +65,13 @@
     aria-controls="bb-panel"
   >
     <span class="bb-launcher__mark" aria-hidden="true">
-      {%- comment -%} The brand's comma glyph -- "beyond, beyond." {%- endcomment -%}
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 4c-2.8 0-5 2.2-5 5 0 2.5 1.8 4.5 4.1 4.9-.4 2.7-2.1 4.6-4.1 5.6l.8 1.5c3.4-1.5 6.2-4.6 6.2-9.5V9c0-2.8-2.2-5-5-5z" fill="currentColor"/>
-        <circle cx="17" cy="8" r="4" fill="currentColor"/>
-      </svg>
+      <img
+        src="https://cdn.shopify.com/s/files/1/0715/1157/2666/files/Group_1180.png?v=1788421980"
+        alt=""
+        width="61"
+        height="39"
+        loading="lazy"
+      >
     </span>
     <span class="bb-launcher__pip" data-bb-pip hidden></span>
   </button>
@@ -83,7 +85,7 @@
   >
     <header class="bb-header">
       <div class="bb-header__brand">
-        {%- if chat_logo != blank -%}
+        {% comment %} {%- if chat_logo != blank -%}
           <img
             class="bb-header__logo"
             srcset="{{ chat_logo | image_url: height: chat_logo_height }} 1x, {{ chat_logo | image_url: height: chat_logo_height_2x }} 2x"
@@ -103,7 +105,7 @@
           />
         {%- else -%}
           <span class="bb-header__wordmark">{{ shop.name }}</span>
-        {%- endif -%}
+        {%- endif -%} {% endcomment %}
         <span class="bb-header__role">Skincare assistant</span>
       </div>
 
@@ -132,10 +134,7 @@
         {%- endif -%}
 
         <button id="bb-reset" class="bb-iconbtn" type="button" aria-label="Start a new conversation">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M4 12a8 8 0 1 1 2.4 5.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M4 18.5V13h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          {{- 'icon-bb-reset.svg' | inline_asset_content -}}
         </button>
         <button id="bb-close" class="bb-iconbtn" type="button" aria-label="Close chat">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

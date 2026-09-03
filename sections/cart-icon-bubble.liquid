@@ -1,7 +1,15 @@
+{%- comment -%}
+  This is the fetched-and-swapped-in half of the header's cart icon; the
+  first render comes from header.liquid's own copy of this same markup,
+  since that copy needs to be an <a>, not the plain content this section
+  renders into it. Keep the icon file identical to header.liquid's — a
+  mismatch here is invisible until the count bubble first appears, when the
+  page-load icon visibly swaps for a different-sized one.
+{%- endcomment -%}
 {% if cart == empty %}
-  <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
+  <span class="svg-wrapper">{{ 'icon-cart-v2.svg' | inline_asset_content }}</span>
 {% else %}
-  <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+  <span class="svg-wrapper">{{ 'icon-cart-v2.svg' | inline_asset_content }}</span>
 {% endif %}
 
 <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>

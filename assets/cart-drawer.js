@@ -60,7 +60,19 @@ class MiniCart extends HTMLElement {
       if (!element || !html) return;
 
       element.innerHTML = this.getSectionInnerHTML(html, section.selector);
-      if (section.id === 'mini-cart') this.loaded = true;
+      if (section.id === 'mini-cart') {
+        this.loaded = true;
+
+        // <cart-drawer> carries its own `is-empty`, set once from whatever the cart held on
+        // the page's initial render, and every rule that shows the empty state or hides the
+        // items/footer matches it on *any* ancestor -- so a stale one here keeps the empty
+        // state on screen no matter how correctly the markup just swapped in above shows the
+        // cart's real contents. `/cart/add.js` (most of this method's callers) never returns
+        // an `item_count` to check, but the form just parsed out of the fresh section HTML
+        // carries the same class the server rendered it with, which is the real answer.
+        const isEmpty = element.querySelector('.mini-cart')?.classList.contains('is-empty') ?? false;
+        this.drawer?.classList.toggle('is-empty', isEmpty);
+      }
     });
 
     // GoKwik's side-cart owns the add-to-cart drawer once it's active; opening the native
@@ -154,6 +166,12 @@ class CartDrawer extends HTMLElement {
       if (drawerHTML !== undefined) {
         miniCart.innerHTML = drawerHTML;
         miniCart.loaded = true;
+
+        // See the same line in MiniCart.renderContents() -- <cart-drawer>'s own `is-empty`
+        // is never touched by swapping the fresh markup in above, and the CSS that shows
+        // the empty state matches it on any ancestor.
+        const isEmpty = miniCart.querySelector('.mini-cart')?.classList.contains('is-empty') ?? false;
+        this.classList.toggle('is-empty', isEmpty);
       }
 
       const bubble = document.getElementById('cart-icon-bubble');

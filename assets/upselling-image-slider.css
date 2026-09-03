@@ -499,13 +499,12 @@
   }
 
   .uis__card-title {
-    font-size: 1.3rem;
     margin-bottom: 0.5rem;
     padding-right: 1.8rem;
   }
 
   .uis__card-price {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
   }
 
   /* The docked card can cover the + button, so it dismisses itself. */

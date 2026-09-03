@@ -96,26 +96,54 @@
       this.tick = this.tick.bind(this);
 
       this.initBlob();
+      this.fitMobileBubble();
       this.armReveal();
       this.watch();
       this.fitStage();
       this.watchFit();
     }
 
-    /* The stage has no in-flow content of its own — the bubble, dots, lines
-       and callouts are all `position: absolute`, placed by percentages of
-       the stage's own box, so nothing inside it can give it an intrinsic
-       height. `--hp-stage-h` stays as the reference those percentages
-       resolve against (and the no-JS fallback), but the height actually
-       rendered is trimmed to fit the content: drop back to that reference,
-       measure how far the content reaches from it, then pin the stage
-       there. Resetting first each time matters — resolving against last
-       run's already-trimmed height, instead of the stable reference, would
-       creep the stage shorter on every resize. */
+    /* Mobile's callouts, connectors and the bubble's position are all plain
+       CSS percentages of the stage now (see home-philosophy.css), locked to
+       the same 402x567 proportions as the Figma frame they're taken from
+       via that stage's aspect-ratio — so they scale together as one piece
+       with no JS involved. The one thing percentages can't drive is the
+       bubble's *size*: --hp-bubble-size has to stay a real length, because
+       .hp-bubble__label-small/-large read it back with calc() for their own
+       font-size, and a percentage there would resolve against the parent's
+       font-size instead of the bubble's width. This is the only mobile
+       measurement left in JS because of that one dependency. */
+    fitMobileBubble() {
+      if (!this.stage) return;
+      if (!window.matchMedia('(max-width: 749px)').matches) return;
+
+      const stageRect = this.stage.getBoundingClientRect();
+      if (!stageRect.width) return;
+
+      /* 226 / 402 — the bubble's width against the Figma frame it was measured on. */
+      const size = stageRect.width * (226 / 402);
+      this.root.style.setProperty('--hp-bubble-size', `${size.toFixed(2)}px`, 'important');
+    }
+
+    /* The stage has no in-flow content of its own on desktop — the bubble,
+       dots, lines and callouts are all `position: absolute`, placed by
+       percentages of the stage's own box, so nothing inside it can give it
+       an intrinsic height. `--hp-stage-h` stays as the reference those
+       percentages resolve against (and the no-JS fallback), but the height
+       actually rendered is trimmed to fit the content: drop back to that
+       reference, measure how far the content reaches from it, then pin the
+       stage there. Resetting first each time matters — resolving against
+       last run's already-trimmed height, instead of the stable reference,
+       would creep the stage shorter on every resize.
+
+       Mobile skips all of this: its own stylesheet gives the stage a fixed
+       402x567 aspect-ratio instead, so the height is never measured, only
+       declared — an inline height here would just fight that. */
     fitStage() {
       if (!this.stage) return;
 
       this.stage.style.removeProperty('height');
+      if (window.matchMedia('(max-width: 749px)').matches) return;
 
       const nodes = this.stage.querySelectorAll('.hp-bubble-wrap, .hp-callout, .hp-dot');
       let maxBottom = 0;
@@ -128,20 +156,25 @@
     }
 
     /* Refit on resize — a narrower stage can wrap a callout onto an extra
-       line — and once webfonts land, which changes the same text metrics
-       after the initial, pre-font layout has already been measured. */
+       line, or cross the mobile breakpoint outright — and once webfonts
+       land, which changes the same text metrics after the initial,
+       pre-font layout has already been measured. */
     watchFit() {
       this.onFitResize = () => {
         if (this.fitRaf) return;
         this.fitRaf = requestAnimationFrame(() => {
           this.fitRaf = null;
+          this.fitMobileBubble();
           this.fitStage();
         });
       };
       window.addEventListener('resize', this.onFitResize, { passive: true });
 
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => this.fitStage());
+        document.fonts.ready.then(() => {
+          this.fitMobileBubble();
+          this.fitStage();
+        });
       }
     }
 

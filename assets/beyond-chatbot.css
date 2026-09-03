@@ -66,15 +66,19 @@
   box-shadow: 0 4px 10px rgba(1, 7, 239, 0.3), 0 18px 38px rgba(1, 7, 239, 0.34);
 }
 
+/* Height only: the mark is a wide glyph (61 x 39), not the square the old
+   comma icon drew at, so a fixed width would stretch it. */
 .bb-launcher__mark {
   display: flex;
-  width: 25px;
+  align-items: center;
+  justify-content: center;
   height: 25px;
 }
 
-.bb-launcher__mark svg {
-  width: 100%;
-  height: 100%;
+.bb-launcher__mark img {
+  display: block;
+  width: auto;
+  height: 70%;
 }
 
 /* Count of what is already in the bag, so the routine is legible before opening. */
@@ -86,13 +90,14 @@
   height: 21px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--bb-ink);
-  color: #ffffff;
+  background: #fff;
+  color: var(--bb-blue);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 21px;
   box-shadow: 0 0 0 2px var(--bb-paper);
+  border: solid 1px var(--bb-blue);
 }
 
 .bb-launcher[hidden],
@@ -237,24 +242,12 @@
    separates it from the mark so the two are not read as one lockup. */
 .bb-header__role {
   position: relative;
-  padding-left: 12px;
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
   line-height: 1.35;
   text-transform: uppercase;
   color: var(--bb-mute);
-}
-
-.bb-header__role::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 1px;
-  height: 22px;
-  transform: translateY(-50%);
-  background: var(--bb-line);
 }
 
 .bb-header__actions {
