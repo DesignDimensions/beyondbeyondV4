@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .tst {
-  padding-top: var(--tst-pad-top, 60px);
-  padding-bottom: var(--tst-pad-bottom, 60px);
+  padding-top: 150px;
+  padding-bottom: 150px;
 }
 
 .tst__heading {
