@@ -1,11 +1,11 @@
 /* ==========================================================================
    Topics You Might Also Like — a rail of post cards under a journal article.
 
-   The rail is deliberately inset less than the article above it (64px against
-   the article's 120) and the last card is allowed to run past the right edge,
-   so the row reads as something that continues rather than a closed grid of
-   four. The segmented bar under it is the only affordance saying so on a
-   trackpad, where no scrollbar is drawn.
+   The band's background runs the full width of the viewport, but its
+   content sits in a plain .page-width column like every other section, so
+   the row is clipped to the page width on both sides rather than bleeding
+   past it. The segmented bar under it is the only affordance saying the row
+   scrolls, on a trackpad where no scrollbar is drawn.
    ========================================================================== */
 
 /* A custom element is inline until told otherwise, and this one carries the
@@ -13,7 +13,6 @@
 .ajr {
   display: block;
 
-  --ajr-inset: 64px;
   --ajr-card: 346px;
   --ajr-gap: 24px;
 
@@ -24,7 +23,6 @@
 
 .ajr__heading {
   margin: 0 0 73px;
-  padding-inline: var(--ajr-inset);
   font-family: var(--font-body-family);
   font-size: 30px;
   font-weight: 500;
@@ -33,18 +31,11 @@
   color: #171717;
 }
 
-/* The rail scrolls the full width of the viewport but starts at the inset, so
-   the first card lines up with the heading and the overflow runs off the right
-   edge rather than inside a boxed container. */
 .ajr__rail {
   display: flex;
   gap: var(--ajr-gap);
-  padding-inline: var(--ajr-inset);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  /* Without this the snap port starts at the padding box, so mandatory snapping
-     pulls the first card flush to the edge and the inset is never seen. */
-  scroll-padding-inline-start: var(--ajr-inset);
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior-x: contain;
@@ -145,7 +136,6 @@
 
 @media screen and (max-width: 989px) {
   .ajr {
-    --ajr-inset: 24px;
     --ajr-card: 260px;
     --ajr-gap: 16px;
 

@@ -12,55 +12,57 @@
 -%}
 
 <article-related class="ajr" data-scrollable="true">
-  {%- if section.settings.heading != blank -%}
-    <h2 class="ajr__heading">{{ section.settings.heading | escape }}</h2>
-  {%- endif -%}
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="ajr__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
 
-  <div class="ajr__rail" data-ajr-rail>
-    {%- for post in blog.articles limit: fetch -%}
-      {%- if post.id == article.id -%}
-        {%- continue -%}
-      {%- endif -%}
-      {%- if shown >= want -%}
-        {%- break -%}
-      {%- endif -%}
-      {%- assign shown = shown | plus: 1 -%}
+    <div class="ajr__rail" data-ajr-rail>
+      {%- for post in blog.articles limit: fetch -%}
+        {%- if post.id == article.id -%}
+          {%- continue -%}
+        {%- endif -%}
+        {%- if shown >= want -%}
+          {%- break -%}
+        {%- endif -%}
+        {%- assign shown = shown | plus: 1 -%}
 
-      {%- liquid
-        assign card_image = post.metafields.journal.hero_image.value
-        if card_image == blank
-          assign card_image = post.image
-        endif
-      -%}
+        {%- liquid
+          assign card_image = post.metafields.journal.hero_image.value
+          if card_image == blank
+            assign card_image = post.image
+          endif
+        -%}
 
-      <a class="ajr__card" href="{{ post.url }}">
-        <div class="ajr__media">
-          {%- if card_image != blank -%}
-            <img
-              src="{{ card_image | image_url: width: 700 }}"
-              srcset="
-                {{ card_image | image_url: width: 350 }} 350w,
-                {{ card_image | image_url: width: 700 }} 700w
-              "
-              sizes="(min-width: 990px) 346px, 260px"
-              width="{{ card_image.width }}"
-              height="{{ card_image.height }}"
-              alt="{{ card_image.alt | default: post.title | escape }}"
-              loading="lazy"
-            >
-          {%- endif -%}
-        </div>
-        <div class="ajr__text">
-          <h3 class="ajr__title">{{ post.title | escape }}</h3>
-        </div>
-      </a>
-    {%- endfor -%}
-  </div>
+        <a class="ajr__card" href="{{ post.url }}">
+          <div class="ajr__media">
+            {%- if card_image != blank -%}
+              <img
+                src="{{ card_image | image_url: width: 700 }}"
+                srcset="
+                  {{ card_image | image_url: width: 350 }} 350w,
+                  {{ card_image | image_url: width: 700 }} 700w
+                "
+                sizes="(min-width: 990px) 346px, 260px"
+                width="{{ card_image.width }}"
+                height="{{ card_image.height }}"
+                alt="{{ card_image.alt | default: post.title | escape }}"
+                loading="lazy"
+              >
+            {%- endif -%}
+          </div>
+          <div class="ajr__text">
+            <h3 class="ajr__title">{{ post.title | escape }}</h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
 
-  <div class="ajr__progress" aria-hidden="true">
-    {%- for i in (1..shown) -%}
-      <span class="ajr__seg{% if forloop.first %} is-active{% endif %}"></span>
-    {%- endfor -%}
+    <div class="ajr__progress" aria-hidden="true">
+      {%- for i in (1..shown) -%}
+        <span class="ajr__seg{% if forloop.first %} is-active{% endif %}"></span>
+      {%- endfor -%}
+    </div>
   </div>
 </article-related>
 
