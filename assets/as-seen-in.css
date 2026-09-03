@@ -4,7 +4,7 @@
 
 .asi {
   position: relative;
-  padding-top: var(--asi-pad-top, 60px);
+  padding-top: 120px;
   overflow: hidden;
   /* The whole section is "view all", not just the row of logos, so it reads
      as clickable rather than incidental. */
