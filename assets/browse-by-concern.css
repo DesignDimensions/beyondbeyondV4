@@ -23,12 +23,13 @@
 .bbc__rail {
   position: relative;
   margin-bottom: var(--bbc-rail-gap, 36px);
-  /* Six thumbnails and the five gaps between them divide the row exactly:
-     both are shares of it, so 6 x width + 5 x gap is always 100% and the
-     rail ends flush with the column whatever width the theme settles on.
-     The height follows from the thumbnail ratio, and is the one figure the
-     arrows need to find the middle of the row. */
-  --bbc-thumb-w: calc((100% - (var(--bbc-visible, 6) - 1) * var(--bbc-thumb-gap, 2.5%)) / var(--bbc-visible, 6));
+  /* Six thumbnails and the five fixed-width gaps between them divide the
+     row exactly: each thumbnail takes what's left over the gaps as an equal
+     share, so 6 x width + 5 x gap is always 100% and the rail ends flush
+     with the column whatever width the theme settles on. The height follows
+     from the thumbnail ratio, and is the one figure the arrows need to find
+     the middle of the row. */
+  --bbc-thumb-w: calc((100% - (var(--bbc-visible, 6) - 1) * var(--bbc-thumb-gap, 16px)) / var(--bbc-visible, 6));
   --bbc-thumb-h: calc(var(--bbc-thumb-w) * var(--bbc-ratio-h, 229) / var(--bbc-ratio-w, 173));
 }
 
@@ -54,7 +55,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--bbc-thumb-gap, 2.5%);
+  gap: var(--bbc-thumb-gap, 16px);
   will-change: transform;
 }
 
@@ -283,7 +284,7 @@
 .bbc__grid {
   display: grid;
   grid-template-columns: repeat(var(--bbc-columns, 3), minmax(0, 1fr));
-  gap: var(--bbc-grid-gap, 30px);
+  gap: var(--bbc-grid-gap, 16px);
 }
 
 .bbc__empty {
@@ -337,7 +338,7 @@
 
   .bbc__track {
     justify-content: flex-start;
-    gap: 6px;
+    gap: 8px;
   }
 
   .bbc__concern {
@@ -374,7 +375,7 @@
 
   .bbc__grid {
     grid-template-columns: repeat(var(--bbc-columns-mobile, 2), minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
   }
 
   /* The gutter here is 1.5rem, which is not room enough to hang an arrow in.
@@ -393,18 +394,9 @@
      line instead of 14. Scoped to this grid rather than written into
      product-card.css itself, since the wide card elsewhere on the phone (the
      bestsellers rail, the routine picks) is drawn at the larger size and
-     still needs it.
+     still needs it. The rating badge stays fixed at the sale badge's own
+     size regardless.
      -------------------------------------------------------------------------- */
-  .bbc__grid .card-wrapper {
-    /* 11px stars keep Figma's size, but a 4px gap between them is wide enough
-       relative to an 11px star that `mask-repeat: space` fits a 6th one
-       rather than the intended 5 — the mask has no idea 5 was the count to
-       hit, only that a 6th copy still clears the box without clipping. 2px
-       keeps the same row comfortably under that threshold. */
-    --pcard-star-size: 11px;
-    --pcard-star-gap: 2px;
-  }
-
   .bbc__grid .card-wrapper .card__heading {
     font-size: 14px;
     line-height: 22px;

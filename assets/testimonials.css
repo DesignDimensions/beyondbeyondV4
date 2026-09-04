@@ -23,7 +23,7 @@
 
 .tst__rail {
   display: flex;
-  gap: var(--tst-gap, 34px);
+  gap: var(--tst-gap, 16px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -44,7 +44,7 @@
 
 .tst__card {
   position: relative;
-  flex: 0 0 calc((100% - (var(--tst-columns, 3) - 1) * var(--tst-gap, 34px)) / var(--tst-columns, 3));
+  flex: 0 0 calc((100% - (var(--tst-columns, 3) - 1) * var(--tst-gap, 16px)) / var(--tst-columns, 3));
   scroll-snap-align: start;
   border-radius: var(--tst-radius, 0px);
   overflow: hidden;
@@ -337,7 +337,7 @@
   }
 
   .tst__rail {
-    gap: 12px;
+    gap: 8px;
   }
 
   .tst__product {

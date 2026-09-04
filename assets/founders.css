@@ -41,7 +41,7 @@
 .fnd__heading {
   margin: 0 0 var(--fnd-heading-gap, 32px);
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0;
   color: var(--fnd-heading-color, #1a1a1a);

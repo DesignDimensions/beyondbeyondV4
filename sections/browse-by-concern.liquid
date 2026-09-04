@@ -65,7 +65,7 @@
     --bbc-visible-mobile: {{ section.settings.thumbs_visible_mobile }};
     --bbc-ratio-w: {{ ratio_w }};
     --bbc-ratio-h: {{ ratio_h }};
-    --bbc-thumb-gap: {{ section.settings.thumb_gap }}%;
+    --bbc-thumb-gap: {{ section.settings.thumb_gap }}px;
     --bbc-thumb-lift: clamp({{ thumb_lift_min }}px, {{ thumb_lift_cq }}cqw, {{ section.settings.active_lift }}px);
     --bbc-thumb-radius: {{ section.settings.thumb_radius }}px;
     --bbc-label-spacing: {{ section.settings.label_letter_spacing }}px;
@@ -349,12 +349,11 @@
       "type": "range",
       "id": "thumb_gap",
       "min": 0,
-      "max": 8,
-      "step": 0.5,
-      "unit": "%",
+      "max": 40,
+      "step": 2,
+      "unit": "px",
       "label": "Space between thumbnails",
-      "info": "A share of the rail's width, so the thumbnails keep fitting it exactly.",
-      "default": 2.5
+      "default": 16
     },
     {
       "type": "range",

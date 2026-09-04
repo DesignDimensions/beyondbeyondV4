@@ -17,7 +17,7 @@
 }
 
 .card__meta-item {
-  font-weight: 300;
+  text-transform: capitalize;
 }
 
 .card.card--horizontal {
@@ -388,10 +388,10 @@
     transform: scale(1.03);
   }
 
-  .underline-links-hover:hover a {
+  /* .underline-links-hover:hover a {
     text-decoration: underline;
     text-underline-offset: 0.3rem;
-  }
+  } */
 }
 
 .card--standard.card--media .card__inner .card__information,
@@ -480,7 +480,7 @@
 }
 
 .card-information>*:not(.visually-hidden:first-child)+*:not(.rating):not(.card__information-volume-pricing-note) {
-  margin-bottom: 0.7rem;
+  margin-bottom: 7px;
 }
 
 .card-information .caption {

@@ -2,8 +2,9 @@
    Product card — one design, everywhere
    ==========================================================================
    The numbers below are the card as drawn: a portrait tile in the brand
-   lavender, the product fitted inside it, a black add-to-cart bar held off
-   the tile's corners, then title, stars, type line and price.
+   lavender, the product fitted inside it, a rating badge in the picture's
+   top-right corner, a black add-to-cart bar held off the tile's corners, then
+   title, type line and price.
 
    They live here as tokens because one snippet — `card-product` — draws
    every card in the store: the collection grids, search, related products,
@@ -36,14 +37,9 @@
   --pcard-title-weight: 700;
   --pcard-text: #171717;
   --pcard-muted: #6b6b6b;
-  --pcard-star: #0107ef;
-  --pcard-star-empty: #d5d5d5;
-  --pcard-star-size: 15px;
-  --pcard-star-gap: 1px;
-  /* The star is one tile of a mask, so the row underneath it can be painted
-     however the rating needs and the shape simply cuts it into stars. Carried
-     as a data URI rather than a file: it is a mask either way, and this one
-     cannot 404. */
+  /* The star is one tile of a mask, so it can be painted whatever colour the
+     badge needs and the shape simply cuts it out. Carried as a data URI
+     rather than a file: it's a mask either way, and this one cannot 404. */
   --pcard-star-icon: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2015%2014%22%3E%3Cpath%20d=%22M14.4381%205.24979C14.3606%205.0106%2014.2138%204.79979%2014.0165%204.64403C13.8191%204.48828%2013.58%204.39457%2013.3293%204.37479L9.79245%204.08916L8.42745%200.788536C8.33152%200.55526%208.16843%200.355756%207.95889%200.215357C7.74934%200.0749588%207.5028%200%207.25057%200C6.99834%200%206.7518%200.0749588%206.54226%200.215357C6.33272%200.355756%206.16963%200.55526%206.0737%200.788536L4.70995%204.08979L1.17307%204.37479C0.921962%204.39549%200.682574%204.48996%200.484991%204.64632C0.287409%204.80267%200.140447%205.01394%200.0625747%205.25357C-0.0152978%205.49319%20-0.0206067%205.75049%200.047315%205.99313C0.115237%206.23577%200.253359%206.45291%200.444324%206.61729L3.14307%208.94479L2.31807%2012.426C2.2579%2012.6715%202.27214%2012.9293%202.35896%2013.1666C2.44579%2013.4039%202.60129%2013.61%202.80565%2013.7587C3.01001%2013.9074%203.25398%2013.9919%203.50652%2014.0014C3.75905%2014.0109%204.0087%2013.9451%204.2237%2013.8123L7.25057%2011.9492L10.2774%2013.8123C10.4924%2013.9442%2010.7416%2014.0094%2010.9936%2013.9996C11.2456%2013.9898%2011.4891%2013.9054%2011.6931%2013.7572C11.8971%2013.609%2012.0526%2013.4036%2012.1398%2013.1669C12.2271%2012.9303%2012.2421%2012.6731%2012.1831%2012.4279L11.3581%208.94666L14.0568%206.61916C14.2489%206.45439%2014.3877%206.23625%2014.4556%205.99243C14.5235%205.74861%2014.5174%205.49012%2014.4381%205.24979ZM10.0337%208.10604C9.92963%208.19575%209.85221%208.31233%209.80989%208.44305C9.76757%208.57377%209.76197%208.7136%209.7937%208.84729L10.5993%2012.2498L7.6437%2010.4323C7.52548%2010.3595%207.38939%2010.321%207.25057%2010.321C7.11176%2010.321%206.97567%2010.3595%206.85745%2010.4323L3.90182%2012.2498L4.70745%208.84979C4.73918%208.7161%204.73358%208.57627%204.69126%208.44555C4.64893%208.31483%204.57151%208.19825%204.46745%208.10854L1.82557%205.82729L5.28807%205.54791C5.42586%205.53684%205.55791%205.48791%205.66964%205.40651C5.78136%205.32511%205.86842%205.21442%205.9212%205.08666L7.25057%201.86791L8.57995%205.08666C8.63272%205.21442%208.71978%205.32511%208.83151%205.40651C8.94324%205.48791%209.07528%205.53684%209.21307%205.54791L12.6756%205.82729L10.0337%208.10604Z%22/%3E%3Cpath%20d=%22M10.0337%208.10604C9.92963%208.19575%209.85221%208.31233%209.80989%208.44305C9.76757%208.57377%209.76197%208.7136%209.7937%208.84729L10.5993%2012.2498L7.6437%2010.4323C7.52548%2010.3595%207.38939%2010.321%207.25057%2010.321C7.11176%2010.321%206.97567%2010.3595%206.85745%2010.4323L3.90182%2012.2498L4.70745%208.84979C4.73918%208.7161%204.73358%208.57627%204.69126%208.44555C4.64893%208.31483%204.57151%208.19825%204.46745%208.10854L1.82557%205.82729L5.28807%205.54791C5.42586%205.53684%205.55791%205.48791%205.66964%205.40651C5.78136%205.32511%205.86842%205.21442%205.9212%205.08666L7.25057%201.86791L8.57995%205.08666C8.63272%205.21442%208.71978%205.32511%208.83151%205.40651C8.94324%205.48791%209.07528%205.53684%209.21307%205.54791L12.6756%205.82729L10.0337%208.10604Z%22/%3E%3C/svg%3E");
   --pcard-atc-h: 50px;
   --pcard-atc-bg: #000;
@@ -56,15 +52,13 @@
 
 /* The theme's body and heading settings both point at Raleway today, so this
    changes nothing to look at — it is here so the card cannot pick up a second
-   face if one of them is ever changed, and so the pieces that name a family of
-   their own stop doing so: Dawn's heading scale on the title, and Times on the
-   rating, which the star mask covers but the declaration outlives. */
+   face if one of them is ever changed, and so the piece that names a family of
+   its own stops doing so: Dawn's heading scale on the title. */
 .card-wrapper,
 .card-wrapper .card__heading,
 .card-wrapper .card__heading a,
 .card-wrapper .card-information,
 .card-wrapper .price,
-.card-wrapper .rating-star,
 .card-wrapper .quick-add__submit.button,
 .card__meta {
   font-family: var(--font-body-family);
@@ -167,16 +161,16 @@
 }
 
 .card-wrapper .card__heading {
-  font-size: 16px;
-  font-weight: var(--pcard-title-weight);
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0;
+  margin-bottom: 5px;
   color: var(--pcard-text);
 }
 
-/* Dawn stacks the information block; the design puts the stars and their
-   count on one line and everything else on a line of its own, which is a
-   wrapping row with the two of them left to size themselves. */
+/* Dawn stacks the information block; the design wraps the type line and
+   whatever follows it onto their own line, sized to their own content. */
 .card-wrapper .card-information {
   display: flex;
   flex-wrap: wrap;
@@ -189,78 +183,64 @@
   margin-right: 0;
 }
 
-.card-wrapper .rating,
-.card-wrapper .rating-count {
-  flex: 0 0 auto;
-}
-
 /* --------------------------------------------------------------------------
-   Rating
+   Rating badge
    -------------------------------------------------------------------------- */
 
-/* The design reads title, stars, type line, price. The information block is a
-   flex row precisely so that order can be stated here — the markup order is
-   Dawn's and stays put. The stars and their count are the two halves of one
-   line, so they take the first two places and the type line, which claims a
-   full row, drops below them. */
-.card-wrapper .rating {
-  /* 12px, not the 10 the stars used to take under the type line: this is now
-     the first thing under the title, and 12 is the gap that line held there
-     before. The count carries the same number, so the stars and the words
-     next to them share a baseline. */
-  margin: 12px 0 0;
-  order: 1;
+/* Sits in the picture's own overlay grid — the same one `.card__badge` (sale,
+   sold out) occupies — pinned to the opposite corner: the same top row,
+   `flex-end` instead of `flex-start` so the two never collide.
+
+   Styled to match that badge exactly rather than reusing its `.badge` class:
+   the same 12px/500/1px-tracked type, 8px padding, 5px corner and (via the
+   shared `color-{{ sale_badge_color_scheme }}` class) black-on-white, with
+   `margin: 0` so it sits the same distance off the picture too — both badges
+   are direct children of the same padded `.card__content`, so no margin of
+   its own is needed to line up with it. */
+.card-wrapper .card__inner .card__rating-badge {
+  grid-row-start: 1;
+  align-self: flex-start;
+  justify-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 8px;
+  border-radius: 5px;
+  border: solid 1px #000;
+  color: #000;
+  background-color: transparent;
+  font-family: var(--font-body-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 1px;
+  transition: all 0.1s ease-in;
+  z-index: 1;
+  cursor: pointer;
 }
 
-/* A row of five stars is one box: a hard-stopped gradient painted across it —
-   filled colour up to the rating, empty colour after — with the star repeated
-   over it as a mask. `space` spreads what is left of the width evenly between
-   the five, which is where the gap between them comes from. One element, no
-   second copy to keep in step, and a half star falls out of the gradient stop
-   rather than needing its own glyph. */
-.card__stars,
-.card-wrapper .rating-star {
-  --pcard-star-w: calc(var(--pcard-star-size) * 15 / 14);
+.card-wrapper .card__inner .card__rating-badge:hover {
+  color: #fff;
+  transition: all 0.1s ease-in;
+  background-color: #000;
+}
+
+/* The same star outline the five-star row used to tile, now shown once at a
+   fixed size instead of repeated across a mask. `currentColor` keeps it the
+   same white as the number beside it. */
+.card-wrapper .card__rating-star {
+  flex: none;
   display: inline-block;
-  width: calc(var(--pcard-star-w) * 5 + var(--pcard-star-gap) * 4);
-  height: var(--pcard-star-size);
-  background-image: linear-gradient(to right,
-      #000 var(--percent, 100%),
-      var(--pcard-star-empty) var(--percent, 100%));
+  width: 10px;
+  height: 10px;
+  background-color: currentColor;
   -webkit-mask-image: var(--pcard-star-icon);
   mask-image: var(--pcard-star-icon);
-  -webkit-mask-size: auto 100%;
-  mask-size: auto 100%;
-  -webkit-mask-repeat: space no-repeat;
-  mask-repeat: space no-repeat;
-  font-size: 0;
-  letter-spacing: 0;
-}
-
-/* Dawn draws its stars as text through this pseudo-element, and works the
-   half star into `--percent` with the font metrics. The mask replaces both. */
-.card-wrapper .rating-star {
-  --percent: calc(var(--rating) / var(--rating-max) * 100%);
-}
-
-.card-wrapper .rating-star::before {
-  display: none;
-}
-
-/* The design shows the count alone — "20 Reviews" — so the score beside it is
-   redundant. It stays in the markup for the screen reader label. */
-.card-wrapper .rating-text {
-  display: none;
-}
-
-.card-wrapper .rating-count {
-  margin: 12px 0 0 8px;
-  order: 2;
-  font-size: 16px;
-  letter-spacing: 0;
-  white-space: nowrap;
-  color: var(--pcard-muted);
-  opacity: 1;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 /* --------------------------------------------------------------------------
@@ -276,9 +256,10 @@
   align-items: center;
   gap: 6px;
   margin: 12px 0 0;
-  font-size: 16px;
+  font-size: 20px;
   letter-spacing: 1px;
   text-transform: uppercase;
+  font-weight: 300;
   color: var(--pcard-muted);
 }
 
@@ -346,7 +327,7 @@
 }
 
 .card-wrapper .price--on-sale .price-item--regular {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 400;
   color: var(--pcard-muted);
 }
@@ -493,10 +474,12 @@
    ==========================================================================
    The phone card is drawn at the width of the content column — one card to a
    screen, 354px in the frame — and everything under the picture runs on a
-   single 8px rhythm: picture, title, type line, stars, price, each 8px from
-   the one above it. The copy runs edge to edge rather than inset from the
-   picture. The add-to-cart bar is the one thing held off an edge: it rides
-   inside the picture with the same gap on its left, right and bottom.
+   single 8px rhythm: picture, title, type line, price, each 8px from the one
+   above it. The copy runs edge to edge rather than inset from the picture.
+   The add-to-cart bar is the one thing held off an edge: it rides inside the
+   picture with the same gap on its left, right and bottom. The rating badge
+   in the picture's opposite corner is sized to match the sale badge, not this
+   rhythm, so it needs no override here.
    ========================================================================== */
 
 @media screen and (max-width: 749px) {
@@ -507,14 +490,6 @@
        `--pcard-inset`: the copy's inset is zero here, and on desktop the two
        were the same 16px. */
     --pcard-atc-inset: 10px;
-    /* `mask-repeat: space` fits as many star tiles as clear the box without
-       clipping, not the 5 the box was actually sized for — so the gap has to
-       stay well under a quarter of the tile width (here ~15px) or a 6th tile
-       clears it too. 16/4 is Figma's own phone numbers and keeps clear of
-       that line; a size/gap pair chosen without checking it can silently draw
-       6 stars instead of 5. */
-    --pcard-star-size: 16px;
-    --pcard-star-gap: 4px;
   }
 
   /* The title keeps the price's size and gives up its weight — on a phone the
@@ -548,18 +523,6 @@
     color: var(--pcard-text);
   }
 
-  .card-wrapper .rating {
-    margin: 8px 0 0;
-  }
-
-  .card-wrapper .rating-count {
-    margin: 8px 0 0 4px;
-    font-size: 12px;
-    line-height: 16px;
-    letter-spacing: 0.24px;
-    color: var(--pcard-text);
-  }
-
   .card-wrapper .price {
     margin: 8px 0 0;
     font-size: 16px;
@@ -590,8 +553,9 @@
     letter-spacing: 0.32px;
   }
 
-  /* The design reads title, type line, stars, price on a phone — the type
-     line leads here, where desktop has the stars leading instead. */
+  /* The design reads title, type line, price on a phone — the type line
+     leads here, where desktop's badge/meta/price order otherwise carries
+     over unchanged. */
   .card-wrapper .card__meta {
     order: 0;
   }
@@ -604,16 +568,13 @@
    to a screen. Halved into a `grid--2-col-tablet-down` (collection grids,
    search, anywhere a phone shows two up), the same numbers no longer fit:
    Figma draws this card at 171px with its own, smaller scale throughout —
-   title, type line, stars and the add-to-cart bar all step down together.
-   The 8px rhythm and the price stay exactly as drawn above; only what has to
-   shrink to survive a narrower tile is restated here.
+   title, type line and the add-to-cart bar all step down together. The 8px
+   rhythm and the price stay exactly as drawn above; only what has to shrink
+   to survive a narrower tile is restated here. The rating badge stays fixed
+   at the sale badge's own size regardless.
    ========================================================================== */
 
 @media screen and (max-width: 749px) {
-  .grid--2-col-tablet-down .card-wrapper {
-    --pcard-star-size: 11px;
-  }
-
   .grid--2-col-tablet-down .card-wrapper .card__heading {
     font-size: 14px;
     font-weight: 400;

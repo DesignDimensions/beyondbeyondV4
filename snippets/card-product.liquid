@@ -7,11 +7,9 @@
   - image_shape: {String} Image mask to apply to the product image card. Values are "arch", "blob", "chevronleft", "chevronright", "diamond", "parallelogram", and "round". (optional)
   - show_secondary_image: {Boolean} Show the secondary image on hover. Default: false (optional)
   - show_vendor: {Boolean} Show the product vendor. Default: false
-  - show_rating: {Boolean} Show the product rating. Default: false
+  - show_rating: {Boolean} Show the product rating, as a star + number badge on the image. Default: false
   - show_meta: {Boolean} Show the type and size line. Default: true
-  - reviews_label: {String} The word after the review count. Default: 'Reviews'
-  - fallback_rating: {Number} Rating to show for a product with no reviews metafield. No stars without it (optional)
-  - fallback_review_count: {Number} Review count to go with that placeholder rating (optional)
+  - fallback_rating: {Number} Rating to show for a product with no reviews metafield. No badge without it (optional)
   - extend_height: {Boolean} Card height extends to available container space. Default: true (optional)
   - lazy_load: {Boolean} Image should be lazy loaded. Default: true (optional)
   - skip_styles: {Boolean} Don't include component styles. Useful when rendering multiple product cards in a loop. Default: false (optional)
@@ -25,7 +23,6 @@
   {% render 'card-product', show_vendor: section.settings.show_vendor %}
 {% endcomment %}
 {%- unless skip_styles -%}
-  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
 
   {{ 'component-price.css' | asset_url | stylesheet_tag }}
@@ -42,6 +39,32 @@
     endif
     if ratio == 0 or ratio == null
       assign ratio = 1
+    endif
+
+    comment
+      A real reviews metafield always wins; the value passed in only stands
+      in while the review app has nothing to show yet. A section that passes
+      no fallback shows no badge at all for such a product, which is what
+      every grid did before the placeholder existed.
+    endcomment
+    assign card_rating = fallback_rating
+    assign card_rating_max = 5
+    if card_product.metafields.reviews.rating.value != blank
+      assign card_rating = card_product.metafields.reviews.rating.value.rating
+      assign card_rating_max = card_product.metafields.reviews.rating.value.scale_max
+    endif
+
+    comment
+      The badge reads "5" for a whole number and "4.5" for anything else —
+      never "5.0" — so a rating is only ever shown to the precision it needs.
+    endcomment
+    if card_rating != blank
+      assign card_rating_remainder = card_rating | modulo: 1
+      if card_rating_remainder == 0
+        assign card_rating_display = card_rating | round
+      else
+        assign card_rating_display = card_rating | round: 1
+      endif
     endif
   -%}
 
@@ -150,6 +173,16 @@
                 </span>
               {%- endif -%}
             </div>
+            {%- if show_rating and card_rating != blank and card_rating != 0 -%}
+              <div
+                class="card__rating-badge color-{{ settings.sale_badge_color_scheme }}"
+                role="img"
+                aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: card_rating, rating_max: card_rating_max }}"
+              >
+                <span class="card__rating-star" aria-hidden="true"></span>
+                <span aria-hidden="true">{{ card_rating_display }}</span>
+              </div>
+            {%- endif -%}
           </div>
 
           {%- comment -%}
@@ -224,68 +257,6 @@
               {%- endif -%}
 
               <span class="caption-large light">{{ block.settings.description | escape }}</span>
-
-              {%- liquid
-                comment
-                  A real reviews metafield always wins; the values passed in
-                  only stand in while the review app has nothing to show yet.
-                  A section that passes no fallback shows no stars at all for
-                  such a product, which is what every grid did before the
-                  placeholder existed.
-                endcomment
-                assign card_rating = fallback_rating
-                assign card_rating_count = fallback_review_count
-                assign card_rating_max = 5
-                if card_product.metafields.reviews.rating.value != blank
-                  assign card_rating = card_product.metafields.reviews.rating.value.rating
-                  assign card_rating_count = card_product.metafields.reviews.rating_count
-                  assign card_rating_max = card_product.metafields.reviews.rating.value.scale_max
-                endif
-
-                assign reviews_word = reviews_label | default: 'Reviews'
-
-                comment
-                  The stars are one masked row painted to a percentage rather
-                  than a count of filled glyphs, so a half star falls out of
-                  the number itself. Dawn's own three variables stay on the
-                  element for the sheets that read them; `--percent` is the one
-                  this theme's mask uses, and it is exact.
-                endcomment
-                assign card_rating_percent = card_rating | times: 100.0 | divided_by: card_rating_max
-                assign card_rating_decimal = 0
-                assign decimal = card_rating | modulo: 1
-                if decimal >= 0.3 and decimal <= 0.7
-                  assign card_rating_decimal = 0.5
-                elsif decimal > 0.7
-                  assign card_rating_decimal = 1
-                endif
-              -%}
-
-              {%- if show_rating and card_rating != blank and card_rating != 0 -%}
-                <div
-                  class="rating"
-                  role="img"
-                  aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: card_rating, rating_max: card_rating_max }}"
-                >
-                  <span
-                    aria-hidden="true"
-                    class="rating-star"
-                    style="--rating: {{ card_rating | floor }}; --rating-max: {{ card_rating_max }}; --rating-decimal: {{ card_rating_decimal }}; --percent: {{ card_rating_percent }}%;"
-                  ></span>
-                </div>
-                <p class="rating-text caption">
-                  <span aria-hidden="true">{{- card_rating }} / {{ card_rating_max -}}</span>
-                </p>
-                {%- if card_rating_count != blank and card_rating_count != 0 -%}
-                  <p class="rating-count caption">
-                    <span aria-hidden="true">{{- card_rating_count }} {{ reviews_word }}</span>
-                    <span class="visually-hidden">
-                      {{- card_rating_count }}
-                      {{ 'accessibility.total_reviews' | t -}}
-                    </span>
-                  </p>
-                {%- endif -%}
-              {%- endif -%}
 
               {%- unless show_meta == false -%}
                 {% render 'product-card-meta', product: card_product %}

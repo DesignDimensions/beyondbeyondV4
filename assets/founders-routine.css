@@ -37,7 +37,7 @@
   width: fit-content;
   max-width: 100%;
   height: var(--fr-tabs-h, 48px);
-  margin: 0 auto var(--fr-tabs-gap, 36px);
+  margin: 0 auto 4.5rem;
   padding: var(--fr-pill-inset, 4px);
   border-radius: var(--fr-tabs-radius, 14px);
   /* Glass: the merchant's grey carried at part strength so what the section
@@ -195,7 +195,7 @@
 
 .fr__rail {
   display: flex;
-  gap: var(--fr-card-gap, 24px);
+  gap: var(--fr-card-gap, 16px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -215,7 +215,7 @@
 }
 
 .fr__card {
-  flex: 0 0 calc((100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3));
+  flex: 0 0 calc((100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 16px)) / var(--fr-columns, 3));
   scroll-snap-align: start;
 }
 
@@ -276,7 +276,7 @@
      times its card's width tall, so half of that is where its middle sits. */
   top: 0;
   margin-top: calc(
-    (100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 24px)) / var(--fr-columns, 3)
+    (100% - (var(--fr-columns, 3) - 1) * var(--fr-card-gap, 16px)) / var(--fr-columns, 3)
       * var(--pcard-media-scale, 1) / 2
   );
   z-index: 2;
@@ -334,11 +334,11 @@
   .fr__rail {
     flex-wrap: wrap;
     overflow-x: visible;
-    gap: 12px;
+    gap: 8px;
   }
 
   .fr__card {
-    flex-basis: calc((100% - 12px) / 2);
+    flex-basis: calc((100% - 8px) / 2);
   }
 
   .fr__arrow {
@@ -356,12 +356,8 @@
      whole column — one to a screen, 354px in the frame — and this rail's
      cards sit two to a row at roughly half that. Figma draws the card smaller
      throughout at that width, the same numbers Browse By Concern's results
-     grid uses for the same reason. */
-  .fr__card .card-wrapper {
-    --pcard-star-size: 11px;
-    --pcard-star-gap: 2px;
-  }
-
+     grid uses for the same reason. The rating badge stays fixed at the sale
+     badge's own size regardless. */
   .fr__card .card-wrapper .card__heading {
     font-size: 14px;
     line-height: 22px;

@@ -107,7 +107,7 @@
 .hdm__link.is-active,
 .hdm__link:hover,
 .hdm__link:focus-visible {
-  text-decoration-color: currentColor;
+  /* text-decoration-color: currentColor; */
   font-weight: 600;
 }
 

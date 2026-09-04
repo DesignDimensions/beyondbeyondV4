@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .bc {
-  padding-top: var(--bc-pad-top, 60px);
+  padding-top: 120px;
   padding-bottom: var(--bc-pad-bottom, 60px);
 }
 
@@ -118,7 +118,7 @@
 
 .bc__rail {
   display: flex;
-  gap: var(--bc-gap, 18px);
+  gap: var(--bc-gap, 16px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -162,7 +162,7 @@
    -------------------------------------------------------------------------- */
 
 .bc__card {
-  flex: 0 0 calc((100cqw - var(--bc-gap, 18px)) / 2);
+  flex: 0 0 calc((100cqw - var(--bc-gap, 16px)) / 2);
   display: flex;
   flex-direction: column;
   scroll-snap-align: start;
@@ -319,7 +319,7 @@
      other phone rail in this theme uses — the design leaves the next card
      riding half off the edge as the cue that the row scrolls. */
   .bc__rail {
-    gap: 24px;
+    gap: 8px;
   }
 
   .bc__card {

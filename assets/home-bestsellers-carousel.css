@@ -9,7 +9,7 @@
 
 .hbc {
   padding-top: var(--hbc-pad-top, 60px);
-  padding-bottom: var(--hbc-pad-bottom, 60px);
+  padding-bottom: 120px;
 }
 
 /* --------------------------------------------------------------------------
@@ -62,7 +62,7 @@
 
 .hbc__rail {
   display: flex;
-  gap: var(--hbc-card-gap, 24px);
+  gap: var(--hbc-card-gap, 16px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -82,7 +82,7 @@
 }
 
 .hbc__card {
-  flex: 0 0 calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns, 3));
+  flex: 0 0 calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 16px)) / var(--hbc-columns, 3));
   scroll-snap-align: start;
 }
 
@@ -102,7 +102,7 @@
 .hbc__arrow {
   position: absolute;
   top: 0;
-  margin-top: calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns, 3) * var(--pcard-media-scale, 1) / 2);
+  margin-top: calc((100% - (var(--hbc-columns, 3) - 1) * var(--hbc-card-gap, 16px)) / var(--hbc-columns, 3) * var(--pcard-media-scale, 1) / 2);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -182,6 +182,7 @@
   .hbc {
     padding-top: 40px;
     padding-bottom: 40px;
+    --hbc-card-gap: 8px;
   }
 
   .hbc__head {
@@ -197,7 +198,7 @@
   }
 
   .hbc__card {
-    flex-basis: calc((100% - (var(--hbc-columns-mobile, 1.2) - 1) * var(--hbc-card-gap, 24px)) / var(--hbc-columns-mobile, 1.2));
+    flex-basis: calc((100% - (var(--hbc-columns-mobile, 1.2) - 1) * var(--hbc-card-gap, 16px)) / var(--hbc-columns-mobile, 1.2));
   }
 
   /* A thumb already does what they do, and there is no room beside the cards

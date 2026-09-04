@@ -37,7 +37,7 @@
 
 .rp__rail {
   display: flex;
-  gap: var(--rp-card-gap, 24px);
+  gap: var(--rp-card-gap, 16px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -57,7 +57,7 @@
 }
 
 .rp__card {
-  flex: 0 0 calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns, 3));
+  flex: 0 0 calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 16px)) / var(--rp-columns, 3));
   scroll-snap-align: start;
 }
 
@@ -73,7 +73,7 @@
 .rp__arrow {
   position: absolute;
   top: 0;
-  margin-top: calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 24px)) / var(--rp-columns, 3) * var(--pcard-media-scale, 1) / 2);
+  margin-top: calc((100% - (var(--rp-columns, 3) - 1) * var(--rp-card-gap, 16px)) / var(--rp-columns, 3) * var(--pcard-media-scale, 1) / 2);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -150,11 +150,11 @@
   .rp__rail {
     flex-wrap: wrap;
     overflow-x: visible;
-    gap: 12px;
+    gap: 8px;
   }
 
   .rp__card {
-    flex-basis: calc((100% - 12px) / 2);
+    flex-basis: calc((100% - 8px) / 2);
   }
 
   /* A thumb already does what they do, and there is no room beside the cards
@@ -165,12 +165,8 @@
 
   /* Sizing is the one thing this grid doesn't share with the wide rail card
      elsewhere on the phone — see the same override on Browse By Concern's
-     results grid and Founder's Routine's picks for why. */
-  .rp__card .card-wrapper {
-    --pcard-star-size: 11px;
-    --pcard-star-gap: 2px;
-  }
-
+     results grid and Founder's Routine's picks for why. The rating badge
+     stays fixed at the sale badge's own size regardless. */
   .rp__card .card-wrapper .card__heading {
     font-size: 14px;
     line-height: 22px;
